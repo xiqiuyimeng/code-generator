@@ -1,0 +1,15 @@
+public interface {{cls_name}}Mapper {
+
+    int deleteByPrimaryKey({{param}} {{key}});
+
+    int insert({{cls_name}} record);
+
+    int insertSelective({{cls_name}} record);
+
+    {{cls_name}} selectByPrimaryKey({{param}} {{key}});
+    {% if haveUpdate %}
+    int updateByPrimaryKeySelective({{cls_name}} record);
+
+    int updateByPrimaryKey({{cls_name}} record);
+    {%- endif %}
+}
