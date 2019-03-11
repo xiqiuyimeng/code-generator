@@ -1,10 +1,12 @@
 
-{%- if lombok %}
+{% if lombok %}
 @Data
 {%- endif %}
 public class {{cls_name}}{
+
     {% for data in java_list %}
     private {{data.java_type}} {{data.name}};
+
     {% endfor %}
     {%- if lombok -%}
     {% else %}
@@ -17,6 +19,7 @@ public class {{cls_name}}{
     public void set{{data.name.replace(data.name[0], data.name[0].upper())}}({{data.java_type}} {{data.name}}) {
         this.{{data.name}} = {{data.name}};
     }
+
     {% endfor %}
     {%- endif %}
 }

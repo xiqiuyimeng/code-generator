@@ -68,7 +68,7 @@ class MybatisGenerator:
         self.appointed_columns = True if self.column_name else False
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
         # 获取模板文件
-        self.env = Environment(loader=FileSystemLoader('./'))
+        self.env = Environment(loader=FileSystemLoader('./'), lstrip_blocks=True, trim_blocks=True)
         self.java_path = os.path.join(path, self.deal_class_name() + '.java')
         self.xml_path = os.path.join(path, self.deal_class_name() + 'Mapper.xml')
         # 如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
@@ -164,6 +164,10 @@ class MybatisGenerator:
         params = []
         java_type = ''
         need_update = True
+        # 用来对baseColumnList进行换行处理的依据，i表示显示行数
+        i = 1
+        # 字符数
+        col = 0
         for line in self.data:
             column_name = line[0]
             name = self.deal_column_name(line[0])
@@ -171,7 +175,15 @@ class MybatisGenerator:
             java_type = self.deal_type(line[1])[0]
             data = Data(name, column_name, jdbc_type=jdbc_type, java_type=java_type)
             result_map.append(data)
-            columns.append(line[0])
+            base_column = column_name + ', '
+            if line == self.data[-1]:
+                base_column = column_name
+            # 对baseColumnList进行换行处理，控制每行字符数
+            col += len(base_column)
+            if col > i * 80:
+                i += 1
+                base_column = column_name + ', \n\t'
+            columns.append(base_column)
         if len(self.primary) > 1:
             java_type = self.deal_class_name()
         elif len(self.primary) == 1:
@@ -181,7 +193,11 @@ class MybatisGenerator:
         for primary in self.primary:
             params.append(Data(self.deal_column_name(primary[0]), primary[0],
                                self.deal_type(primary[1])[1], self.deal_type(primary[1])[0]))
-        update_columns = set(result_map) - set(params)
+        update_columns = result_map[:]
+        for param in params:
+            for result in update_columns:
+                if param.column_name == result.column_name:
+                    update_columns.remove(result)
         content = self.env.get_template(self.xml_tp).render(
             result_map=result_map, columns=columns, table_name=self.table_name,
             params=params, java_type=java_type, need_update=need_update,
@@ -204,6 +220,9 @@ class MybatisGenerator:
 if __name__ == '__main__':
     sql = 'SELECT d.id AS desk_id, d.desk_num, l.order_id, l.name, l.lease_info_id, ' \
           'l.is_refund, l.id, d.address from lease_order_desk l,lease_desk d WHERE l.desk_id=d.id'
-    generator = MybatisGenerator('xy_db', 'lease_order_desk',
+    tb_name = 'user'
+    tb_name_od = 'lease_order_desk'
+    table_double_name = 'activity_category_ref'
+    generator = MybatisGenerator('xy_db', table_double_name,
                                  path='D:\\', lombok=False)
     generator.main()

@@ -2,19 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="待填写">
   <resultMap id="BaseResultMap" type="实体类">
-    {%- for result in result_map %}
+    {% for result in result_map %}
     <result column="{{result.column_name}}" property="{{result.name}}" jdbcType="{{result.jdbc_type}}"/>
-    {%- endfor %}
+    {% endfor %}
   </resultMap>
-  {%- if not any_column %}
+  {% if not any_column %}
   <sql id="Base_Column_List">
-    {%- for column in columns -%}
-    {% if loop.last %}
+    {% for column in columns -%}
+    {%- if loop.last -%}
+    {{column~'\n'}}
+    {%- elif loop.first %}
     {{column}}
     {%- else -%}
-    {{column~', '}}
-    {%- endif -%}
-    {%- endfor %}
+    {{column}}
+    {%- endif %}
+    {% endfor %}
   </sql>
   {% if mapper %}
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="{{java_type}}">
@@ -23,11 +25,11 @@
     from {{table_name}}
     where
     {%- for param in params -%}
-    {% if params[0] == param %}
-    {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else -%}
+    {% if params[0] == param -%}
+    {{" "~param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+    {% else %}
     and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {%- endif -%}
+    {% endif -%}
     {%- endfor %}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="{{java_type}}" >
@@ -35,30 +37,34 @@
     where {% for param in params -%}
     {%- if params[0] == param -%}
     {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else -%}
+    {% else %}
     and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {%- endif -%}
+    {% endif -%}
     {%- endfor %}
   </delete>
-  {%- endif -%}
+  {% endif %}
   <insert id="insert" parameterType="实体类" >
     insert into {{table_name}} (
     {%- for result in result_map -%}
     {%- if loop.last -%}
     {{result.column_name}}
+    {% elif loop.index % 3 == 0 -%}
+    {{result.column_name~', \n\t  '}}
     {%- else -%}
     {{result.column_name~', '}}
-    {%- endif -%}
-    {%- endfor -%}
+    {%- endif %}
+    {%- endfor %}
     )
     values (
     {%- for result in result_map -%}
     {%- if loop.last -%}
     #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}'}}
+    {% elif loop.index % 3 == 0 -%}
+    #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, \n\t  '}}
     {%- else -%}
     #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
-    {%- endif -%}
-    {%- endfor -%}
+    {%- endif %}
+    {%- endfor %}
     )
   </insert>
   <insert id="insertSelective" parameterType="实体类" >
@@ -68,7 +74,7 @@
       <if test="{{result.name}} != null" >
         {{result.column_name}},
       </if>
-    {% endfor -%}
+    {% endfor %}
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
      {% for result in result_map %}
@@ -78,25 +84,27 @@
     {% endfor %}
     </trim>
   </insert>
-  {%- if need_update %}
+  {% if need_update %}
   <update id="updateByPrimaryKey" parameterType="实体类" >
     update {{table_name}}
-    set {%- for update_column in update_columns -%}
-    {%- if loop.last -%}
+    set {% for update_column in update_columns %}
+    {% if loop.first -%}
+      {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
+    {% elif loop.last %}
       {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}}
     {% else %}
       {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
-    {%- endif %}
-    {%- endfor -%}
-    {%- if mapper -%}
+    {% endif %}
+    {% endfor %}
+    {%- if mapper %}
     where {% for param in params -%}
     {%- if params[0] == param -%}
     {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else -%}
+    {% else %}
     and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {%- endif -%}
+    {% endif %}
     {%- endfor %}
-    {%- endif -%}
+    {% endif %}
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="实体类" >
     update {{table_name}}
@@ -107,16 +115,16 @@
       </if>
     {% endfor %}
     </set>
-    {%- if mapper -%}
+    {% if mapper %}
     where {% for param in params -%}
     {%- if params[0] == param -%}
     {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else -%}
+    {% else %}
     and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {%- endif -%}
+    {% endif %}
     {%- endfor %}
-    {%- endif -%}
+    {% endif %}
   </update>
-  {%- endif %}
+  {% endif %}
   {%- endif -%}
 </mapper>

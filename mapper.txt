@@ -7,6 +7,7 @@ public interface {{cls_name}}Mapper {
     int insertSelective({{cls_name}} record);
 
     {{cls_name}} selectByPrimaryKey({{param}} {{key}});
+
     {% if haveUpdate %}
     int updateByPrimaryKeySelective({{cls_name}} record);
 
