@@ -31,6 +31,7 @@ class MybatisGenerator:
         `column_name`
             单表情况下可指定字段，默认为None，如果不为None，只会生成java和xml，
             其中xml不会生成select和delete，另外所有的where语句也会缺省
+            传参形式为字符串，多个字段名用逗号分隔
         `java_tp`
             java类文件的模板，默认为当前目录下的java.txt文件，目录可选为当前目录下的子目录
         `mapper_tp`
@@ -221,9 +222,9 @@ class MybatisGenerator:
 if __name__ == '__main__':
     sql = 'SELECT d.id AS desk_id, d.desk_num, l.order_id, l.name, l.lease_info_id, ' \
           'l.is_refund, l.id, d.address from lease_order_desk l,lease_desk d WHERE l.desk_id=d.id'
-    tb_name = 'user'
+    tb_name = 'uw_company'
     tb_name_od = 'lease_order_desk'
     table_double_name = 'activity_category_ref'
-    generator = MybatisGenerator('xy_db', tb_name,
+    generator = MybatisGenerator('xy_db', tb_name, column_name='sex, passport',
                                  path='D:\\', lombok=False)
     generator.main()
