@@ -220,11 +220,11 @@ class MybatisGenerator:
 
 
 if __name__ == '__main__':
-    sql = 'SELECT d.id AS desk_id, d.desk_num, l.order_id, l.name, l.lease_info_id, ' \
-          'l.is_refund, l.id, d.address from lease_order_desk l,lease_desk d WHERE l.desk_id=d.id'
+    sql = 'SELECT cw.company_id, cw.workstage_id, cw.enter_type, w.stage_name ' \
+          'FROM company_workstage cw inner join workstage w on cw.workstage_id = w.id'
     tb_name = 'uw_company'
     tb_name_od = 'lease_order_desk'
     table_double_name = 'activity_category_ref'
-    generator = MybatisGenerator('xy_db', tb_name, column_name='sex, passport',
+    generator = MybatisGenerator('xy_db', tb_name, exec_sql=sql,
                                  path='D:\\', lombok=False)
     generator.main()

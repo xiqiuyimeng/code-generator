@@ -12,11 +12,11 @@ public class {{cls_name}}{
     {% else %}
     {# ---getter和setter---- #}
     {%- for data in java_list %}
-    public {{data.java_type}} get{{data.name.replace(data.name[0], data.name[0].upper())}}() {
+    public {{data.java_type}} get{{data.name.replace(data.name[0], data.name[0].upper(), 1)}}() {
         return {{data.name}};
     }
 
-    public void set{{data.name.replace(data.name[0], data.name[0].upper())}}({{data.java_type}} {{data.name}}) {
+    public void set{{data.name.replace(data.name[0], data.name[0].upper(), 1)}}({{data.java_type}} {{data.name}}) {
         this.{{data.name}} = {{data.name}};
     }
 
