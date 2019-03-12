@@ -1,3 +1,4 @@
+
 public interface {{cls_name}}Mapper {
 
     int deleteByPrimaryKey({{param}} {{key}});
@@ -12,5 +13,5 @@ public interface {{cls_name}}Mapper {
     int updateByPrimaryKeySelective({{cls_name}} record);
 
     int updateByPrimaryKey({{cls_name}} record);
-    {%- endif %}
+    {% endif %}
 }
