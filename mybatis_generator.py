@@ -198,6 +198,7 @@ class MybatisGenerator:
             for result in update_columns:
                 if param.column_name == result.column_name:
                     update_columns.remove(result)
+                    continue
         content = self.env.get_template(self.xml_tp).render(
             result_map=result_map, columns=columns, table_name=self.table_name,
             params=params, java_type=java_type, need_update=need_update,
@@ -223,6 +224,6 @@ if __name__ == '__main__':
     tb_name = 'user'
     tb_name_od = 'lease_order_desk'
     table_double_name = 'activity_category_ref'
-    generator = MybatisGenerator('xy_db', table_double_name,
+    generator = MybatisGenerator('xy_db', tb_name,
                                  path='D:\\', lombok=False)
     generator.main()
