@@ -9,13 +9,14 @@ _date_ = '2019/3/5 15:17'
 
 class Data:
 
-    def __init__(self, name, column_name, java_type, jdbc_type):
+    def __init__(self, name, column_name, java_type, jdbc_type, comment=None):
         # java字段名，驼峰
         self.name = name
         # 数据库字段名，下划线
         self.column_name = column_name
         self.java_type = java_type
         self.jdbc_type = jdbc_type
+        self.comment = comment
 
 
 class MybatisGenerator:
@@ -56,9 +57,9 @@ class MybatisGenerator:
         # 可选：字段名，字符串形式，逗号分隔
         self.column_name = column_name
         # 查询结果为字段名，类型，约束（判断是否为主键PRI即可，应用在按主键查询更新删除等操作），自定义sql提供完整查询字段即可
-        self.sql = 'select column_name, data_type, column_key from information_schema.columns ' \
+        self.sql = 'select column_name, data_type, column_key, column_comment from information_schema.columns ' \
                    'where table_schema = "{}" and table_name = "{}"'.format(self.table_schema, self.table_name)\
-            if exec_sql is None else 'show fields from tmp_table'
+            if exec_sql is None else 'show full fields from tmp_table'
         self.exec_sql = exec_sql
         self.data = self.get_data()
         self.primary = list(filter(lambda k: k[2] == 'PRI', self.data))
@@ -132,7 +133,7 @@ class MybatisGenerator:
         for line in self.data:
             name = self.deal_column_name(line[0])
             types = self.deal_type(line[1])
-            data = Data(name, line[0], types[1], types[0])
+            data = Data(name, line[0], types[1], types[0], line[-1])
             java_list.append(data)
         content = self.env.get_template(self.java_tp).render(
             cls_name=self.deal_class_name(), java_list=java_list, lombok=self.lombok)
