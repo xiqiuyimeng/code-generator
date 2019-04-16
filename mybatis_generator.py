@@ -166,10 +166,8 @@ class MybatisGenerator:
         params = []
         java_type = ''
         need_update = True
-        # 用来对baseColumnList进行换行处理的依据，i表示显示行数
-        i = 1
-        # 字符数
-        col = 0
+        # 生成base_column_list
+        self.generate_base_col(columns)
         for line in self.data:
             column_name = line[0]
             name = self.deal_column_name(line[0])
@@ -177,15 +175,6 @@ class MybatisGenerator:
             java_type = self.deal_type(line[1])[0]
             data = Data(name, column_name, jdbc_type=jdbc_type, java_type=java_type)
             result_map.append(data)
-            base_column = column_name + ', '
-            if line == self.data[-1]:
-                base_column = column_name
-            # 对baseColumnList进行换行处理，控制每行字符数
-            col += len(base_column)
-            if col > i * 80:
-                i += 1
-                base_column = column_name + ', \n\t'
-            columns.append(base_column)
         if len(self.primary) > 1:
             java_type = self.deal_class_name()
         elif len(self.primary) == 1:
@@ -219,13 +208,29 @@ class MybatisGenerator:
         self.generate_mapper()
         self.generate_xml()
 
+    def generate_base_col(self, columns):
+        col = 0
+        i = 1
+        for line in self.data:
+            column_name = line[0]
+            base_column = column_name + ', '
+            if line == self.data[-1]:
+                base_column = column_name
+            else:
+                # 对baseColumnList进行换行处理，控制每行字符数
+                col += len(base_column)
+                if col > i * 80:
+                    i += 1
+                    base_column = column_name + ', \n\t'
+            columns.append(base_column)
+
 
 if __name__ == '__main__':
     sql = 'SELECT cw.company_id, cw.workstage_id, cw.enter_type, w.stage_name ' \
           'FROM company_workstage cw inner join workstage w on cw.workstage_id = w.id'
-    tb_name = 'uw_company'
+    tb_name = 'lease_order_invoice'
     tb_name_od = 'lease_order_desk'
     table_double_name = 'activity_category_ref'
-    generator = MybatisGenerator('xy_db', tb_name, exec_sql=sql,
+    generator = MybatisGenerator('xy_db', tb_name,
                                  path='D:\\', lombok=False)
     generator.main()
