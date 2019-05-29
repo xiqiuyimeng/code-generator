@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <database>
+        <!-- 连接的数据库配置，地址、端口号、账号、密码、数据库名 -->
+        <host>localhost</host>
+        <port>3306</port>
+        <user>root</user>
+        <pwd>Urwork_123!</pwd>
+        <db>xy_db</db>
+    </database>
+    <generator>
+        <!-- 生成器需要配置的信息，使用的数据库名 -->
+        <table_schema>xy_db</table_schema>
+        <!-- 需要生成的数据库表名，可不填，默认会生成三个文件，java、mapper、xml -->
+        <table_name>statistics_desk_rent</table_name>
+        <!-- 指定表指定列，可多个，需要用逗号分隔 -->
+        <column>stage_status</column>
+        <!-- 输出路径，默认为当前目录下 -->
+        <path>./</path>
+        <!-- lombok注解，不开启会生成getter和setter -->
+        <lombok>True</lombok>
+        <!-- 支持自定义的可执行sql语句，会生成java和xml，xml里只会有该查询语句对应的resultMap，查询字段需要是正常列名 -->
+        <exec_sql></exec_sql>
+    </generator>
+</config>

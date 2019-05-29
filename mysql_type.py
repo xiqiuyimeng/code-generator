@@ -18,4 +18,5 @@ class MysqlType(Enum):
     char = ('CHAR', 'String')
     varchar = ('VARCHAR', 'String')
     longtext = ('VARCHAR', 'String')
+    bigint = ('INTEGER', 'INTEGER')
 
