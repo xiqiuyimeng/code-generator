@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from mysql_generator import mysql_type as mt
 from jinja2 import Environment, FileSystemLoader
-from db_opt import getcursor
+from xml.etree import cElementTree
 import os
+import pymysql
+import time
 _author_ = 'luwt'
 _date_ = '2019/3/5 15:17'
 
@@ -17,6 +19,24 @@ class Data:
         self.java_type = java_type
         self.jdbc_type = jdbc_type
         self.comment = comment
+
+
+def get_native_define_conn(host, port, user, pwd, db):
+    """打开本地数据库连接（ip/数据库用户名/登录密码/数据库名/编码）"""
+    try:
+        conn = pymysql.connect(
+            host=host,
+            port=port,
+            user=user,
+            passwd=pwd,
+            db=db,
+            charset='utf8'
+        )
+        print("获取数据库连接成功")
+        return conn
+    except Exception as e:
+        print(e)
+        raise e
 
 
 class MybatisGenerator:
@@ -79,22 +99,26 @@ class MybatisGenerator:
 
     def get_data(self):
         """连接数据库获取数据"""
-        get_cursor = getcursor.GetCursor()
-        conn = get_cursor.get_native_conn()
+        conn = get_native_define_conn(host, int(port), user, pwd, db)
         cursor = conn.cursor()
         if self.column_name and not self.exec_sql:
             columns = self.column_name.split(',')
-            self.sql += ' and column_name in {}'.format(tuple(map(lambda x: "{}".format(x.strip()), columns)))
+            for i, c in enumerate(columns):
+                if i == 0:
+                    self.sql += ' and column_name in ("' + c + '"'
+                else:
+                    self.sql += ',"' + c + '"'
+            self.sql += ')'
         if self.exec_sql:
             cursor.execute('use {};'.format(self.table_schema))
-            cursor.execute('create temporary table tmp_table {} limit 1;'.format(self.exec_sql))
+            cursor.execute('create temporary table tmp_table {};'.format(self.exec_sql))
         cursor.execute(self.sql)
         data = list(cursor.fetchall())
         if self.exec_sql:
             for line in data:
                 ix = data.index(line)
                 line = list(line)
-                if line[1].find('('):
+                if line[1].find('(') > 0:
                     type_ = line[1][0: line[1].find('(')]
                     line[1] = type_
                 data[ix] = line
@@ -226,11 +250,25 @@ class MybatisGenerator:
 
 
 if __name__ == '__main__':
-    sql = 'SELECT cw.company_id, cw.workstage_id, cw.enter_type, w.stage_name ' \
-          'FROM company_workstage cw inner join workstage w on cw.workstage_id = w.id'
-    tb_name = 'lease_order_invoice'
-    tb_name_od = 'lease_order_desk'
-    table_double_name = 'activity_category_ref'
-    generator = MybatisGenerator('xy_db', tb_name,
-                                 path='D:\\', lombok=False)
-    generator.main()
+    try:
+        tree = cElementTree.parse(os.path.join(os.path.abspath('.'), 'config.xml'))
+        root = tree.getroot()
+        host = root.find('database').find('host').text
+        port = root.find('database').find('port').text
+        user = root.find('database').find('user').text
+        pwd = root.find('database').find('pwd').text
+        db = root.find('database').find('db').text
+        table_schema = root.find('generator').find('table_schema').text
+        table_name = root.find('generator').find('table_name').text
+        column = root.find('generator').find('column').text
+        path = root.find('generator').find('path').text
+        lombok = root.find('generator').find('lombok').text
+        exec_sql = root.find('generator').find('exec_sql').text
+
+        generator = MybatisGenerator(table_schema, table_name, column, path=path, lombok=lombok, exec_sql=exec_sql)
+        generator.main()
+        print("执行成功！五秒后退出")
+        time.sleep(5)
+    except Exception as e:
+        print("执行出错：=>\n\n{}\n\n按任意键退出".format(e))
+        input()
