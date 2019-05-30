@@ -1,7 +1,7 @@
 
 {% if lombok %}
 @Data
-{%- endif %}
+{% endif %}
 public class {{cls_name}}{
 
     {% for data in java_list %}

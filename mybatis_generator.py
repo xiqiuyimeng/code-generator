@@ -60,15 +60,16 @@ class MybatisGenerator:
         `xml_tp`
             mapper.xml配置文件的模板，默认为当前目录下的xml.txt文件，目录可选为当前目录下的子目录
         `path`
-            输出路径，默认为'./'当前目录下，可修改
+            输出路径，默认为'./输出目录'，可修改
         `lombok`
             在生成java类时是否生成lombok的@Data注释，默认true，若配置为false则生成getter和setter方法
         `exec_sql`
             可执行的sql查询语句，用于多表联合查询情况，默认None，开启后将会生成相应的java类和xml，不会生成mapper.java，
             xml中只会生成resultMap
+        优先级：exec_sql 最高，有可执行语句即按exec_sql执行，其次，必须指定表名，列名可不指定，列名指定后，按列名来执行
     """
     def __init__(self, table_schema, table_name, column_name=None, java_tp='java.txt',
-                 mapper_tp='mapper.txt', xml_tp='xml.txt', path='./', lombok=True,
+                 mapper_tp='mapper.txt', xml_tp='xml.txt', path='./输出目录', lombok=True,
                  exec_sql=None):
         # 库名
         self.table_schema = table_schema
@@ -91,6 +92,7 @@ class MybatisGenerator:
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
         # 获取模板文件
         self.env = Environment(loader=FileSystemLoader('./'), lstrip_blocks=True, trim_blocks=True)
+        self.path = path
         self.java_path = os.path.join(path, self.deal_class_name() + '.java')
         self.xml_path = os.path.join(path, self.deal_class_name() + 'Mapper.xml')
         # 如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
@@ -115,8 +117,7 @@ class MybatisGenerator:
         cursor.execute(self.sql)
         data = list(cursor.fetchall())
         if self.exec_sql:
-            for line in data:
-                ix = data.index(line)
+            for ix, line in enumerate(data):
                 line = list(line)
                 if line[1].find('(') > 0:
                     type_ = line[1][0: line[1].find('(')]
@@ -149,8 +150,13 @@ class MybatisGenerator:
 
     @staticmethod
     def deal_type(data):
-        """返回jdbcType和java_type"""
-        return eval('mt.MysqlType.{}.value[0]'.format(data)), eval('mt.MysqlType.{}.value[1]'.format(data))
+        """返回jdbcType和java_type，若在枚举类型里没有，一律视为字符串"""
+        jdbc_type, java_type = 'VARCHAR', 'String'
+        try:
+            jdbc_type, java_type = eval('mt.MysqlType.{}.value[0]'.format(data)), \
+                                   eval('mt.MysqlType.{}.value[1]'.format(data))
+        finally:
+            return jdbc_type, java_type
 
     def generate_java(self):
         java_list = []
@@ -221,8 +227,9 @@ class MybatisGenerator:
         )
         self.save(self.xml_path, content)
 
-    @staticmethod
-    def save(path, content):
+    def save(self, path, content):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         with open(path, 'w+', encoding='utf-8')as f:
             f.write(content)
             print('生成的文件为' + path)
@@ -264,11 +271,23 @@ if __name__ == '__main__':
         path = root.find('generator').find('path').text
         lombok = root.find('generator').find('lombok').text
         exec_sql = root.find('generator').find('exec_sql').text
-
-        generator = MybatisGenerator(table_schema, table_name, column, path=path, lombok=lombok, exec_sql=exec_sql)
-        generator.main()
-        print("执行成功！五秒后退出")
-        time.sleep(5)
+        table_names = table_name.split(',')
+        # 如果可执行语句存在或者指定列名存在就不应该循环执行
+        if (exec_sql or column) and len(table_names) == 1:
+            generator = MybatisGenerator(table_schema, table_name.strip(), column, path=path, lombok=lombok,
+                                         exec_sql=exec_sql)
+            generator.main()
+            print("执行成功！五秒后退出")
+            time.sleep(5)
+        elif not exec_sql and not column:
+            for t_name in table_names:
+                generator = MybatisGenerator(table_schema, t_name.strip(), column, path=path, lombok=lombok,
+                                             exec_sql=exec_sql)
+                generator.main()
+            print("执行成功！五秒后退出")
+            time.sleep(5)
+        else:
+            input("请检查config.xml中参数，按任意键退出")
     except Exception as e:
         print("执行出错：=>\n\n{}\n\n按任意键退出".format(e))
         input()
