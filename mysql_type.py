@@ -20,3 +20,8 @@ class MysqlType(Enum):
     longtext = ('VARCHAR', 'String')
     bigint = ('INTEGER', 'Integer')
 
+
+# 需要import的类型和对应语句
+import_type = {
+    'Date': 'import java.util.Date;'
+}
