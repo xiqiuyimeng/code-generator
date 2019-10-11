@@ -18,7 +18,7 @@ class Data:
         self.column_name = column_name
         self.java_type = java_type
         self.jdbc_type = jdbc_type
-        self.comment = comment
+        self.comment = comment if comment is None else comment.replace("\r\n", " ")
 
 
 def get_native_define_conn(host, port, user, pwd, db):
@@ -160,13 +160,19 @@ class MybatisGenerator:
 
     def generate_java(self):
         java_list = []
+        import_list = set()
         for line in self.data:
             name = self.deal_column_name(line[0])
+            # types -> tuple(jdbcType, javaType)
             types = self.deal_type(line[1])
+            # 处理需要import的语句
+            if types[1] in mt.import_type:
+                import_list.add(mt.import_type.get(types[1]))
             data = Data(name, line[0], types[1], types[0], line[-1])
             java_list.append(data)
         content = self.env.get_template(self.java_tp).render(
-            cls_name=self.deal_class_name(), java_list=java_list, lombok=self.lombok)
+            cls_name=self.deal_class_name(), java_list=java_list,
+            lombok=self.lombok, import_list=import_list)
         self.save(self.java_path, content)
 
     def generate_mapper(self):

@@ -1,5 +1,11 @@
-
+{% if import_list %}
+{% for import in import_list %}
+{{import}}
+{% endfor %}
+{% endif %}
 {% if lombok %}
+import lombok.Data;
+
 @Data
 {% endif %}
 public class {{cls_name}}{
