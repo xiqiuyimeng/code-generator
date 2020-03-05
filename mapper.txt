@@ -1,4 +1,6 @@
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface {{cls_name}}Mapper {
 
     int deleteByPrimaryKey({{param}} {{key}});
