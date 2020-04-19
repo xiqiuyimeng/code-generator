@@ -26,4 +26,15 @@
          当可执行语句存在，请将表名指定为一个想生成的实体类名；当指定列名存在，请指定列所属表名
          -->
     </generator>
+    <else>
+        <!-- 实体类所在包的命名空间，例如com.demo.model，
+        若无，在xml中生成器将会在需要的地方自动填入“实体类”，mapper文件也不会自动import该命名空间，
+        实体类文件头部也不会自动添加该命名空间
+        -->
+        <model_package>com.demo.model</model_package>
+        <!-- mapper的namespace，例如com.demo.dao，所对应的是xml文件中的namespace，
+        若无，xml文件中将自动填入“待填写”，mapper文件头部不会添加该命名空间
+        -->
+        <mapper_package>com.demo.dao</mapper_package>
+    </else>
 </config>
