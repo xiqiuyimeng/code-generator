@@ -1,0 +1,44 @@
+package {{controller_package}};
+
+import {{model_namespace}};
+import {{service_namespace}};
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+@RestController
+@RequestMapping(value = "{{hump_cls_name}}")
+public class {{cls_name}}Controller {
+
+    @Autowired
+    {{cls_name}}Service {{hump_cls_name}}Service;
+
+    @RequestMapping(value = "get", method = RequestMethod.GET)
+    public ResponseEntity<?> get(@RequestParam {{param}} {{key}}){
+        return ResponseEntity.ok().body({{hump_cls_name}}Service.get{{cls_name}}({{key}}));
+    }
+
+    @RequestMapping(value = "add", method = RequestMethod.POST)
+    public ResponseEntity<?> add(@RequestBody {{cls_name}} {{hump_cls_name}}){
+        {{hump_cls_name}}Service.add{{cls_name}}({{hump_cls_name}});
+        return ResponseEntity.ok().body("ok");
+    }
+
+    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    public ResponseEntity<?> delete(@RequestParam {{param}} {{key}}){
+        {{hump_cls_name}}Service.delete{{cls_name}}({{key}});
+        return ResponseEntity.ok().body("ok");
+    }
+
+    @RequestMapping(value = "edit", method = RequestMethod.POST)
+    public ResponseEntity<?> edit(@RequestBody {{cls_name}} {{hump_cls_name}}){
+        {{hump_cls_name}}Service.edit{{cls_name}}({{hump_cls_name}});
+        return ResponseEntity.ok().body("ok");
+    }
+
+    @RequestMapping(value = "list", method = RequestMethod.GET)
+    public ResponseEntity<?> getList(){
+        return ResponseEntity.ok().body({{hump_cls_name}}Service.get{{cls_name}}List());
+    }
+}

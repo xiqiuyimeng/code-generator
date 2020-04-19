@@ -3,20 +3,24 @@ package {{mapper_package}};
 import {{model_namespace}};
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface {{cls_name}}Mapper {
 
     int deleteByPrimaryKey({{param}} {{key}});
 
-    int insert({{cls_name}} record);
+    int insert({{cls_name}} {{hump_cls_name}});
 
-    int insertSelective({{cls_name}} record);
+    int insertSelective({{cls_name}} {{hump_cls_name}});
 
     {{cls_name}} selectByPrimaryKey({{param}} {{key}});
 
-    {% if haveUpdate %}
-    int updateByPrimaryKeySelective({{cls_name}} record);
+    {% if need_update %}
+    int updateByPrimaryKeySelective({{cls_name}} {{hump_cls_name}});
 
-    int updateByPrimaryKey({{cls_name}} record);
+    int updateByPrimaryKey({{cls_name}} {{hump_cls_name}});
     {% endif %}
+
+    List<{{cls_name}}> get{{cls_name}}List();
 }

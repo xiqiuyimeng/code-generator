@@ -7,6 +7,7 @@
         <user>root</user>
         <pwd>admin</pwd>
         <db>test</db>
+        <charset>utf8</charset>
     </database>
     <generator>
         <!-- 生成器需要配置的信息，使用的数据库名 -->
@@ -36,5 +37,8 @@
         若无，xml文件中将自动填入“待填写”，mapper文件头部不会添加该命名空间
         -->
         <mapper_package>com.demo.dao</mapper_package>
+        <service_package>com.demo.service</service_package>
+        <service_impl_package>com.demo.service.impl</service_impl_package>
+        <controller_package>com.demo.controller</controller_package>
     </else>
 </config>

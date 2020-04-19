@@ -1,0 +1,41 @@
+package {{service_impl_package}};
+
+import {{mapper_namespace}};
+import {{model_namespace}};
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+
+@Service
+public class {{cls_name}}ServiceImpl implements {{cls_name}}Service {
+
+    @Autowired
+    private {{cls_name}}Mapper {{hump_cls_name}}Mapper;
+
+    @Override
+    public {{cls_name}} get{{cls_name}}({{param}} {{key}}) {
+        return {{hump_cls_name}}Mapper.selectByPrimaryKey({{key}});
+    }
+
+    @Override
+    public void add{{cls_name}}({{cls_name}} {{hump_cls_name}}) {
+        {{hump_cls_name}}Mapper.insertSelective({{hump_cls_name}});
+    }
+
+    @Override
+    public void delete{{cls_name}}({{param}} {{key}}) {
+        {{hump_cls_name}}Mapper.deleteByPrimaryKey({{key}});
+    }
+
+    @Override
+    public void edit{{cls_name}}({{cls_name}} {{hump_cls_name}}) {
+        {{hump_cls_name}}Mapper.updateByPrimaryKeySelective({{hump_cls_name}});
+    }
+
+    @Override
+    public List<{{cls_name}}> get{{cls_name}}List() {
+        return {{hump_cls_name}}Mapper.get{{cls_name}}List();
+    }
+}
