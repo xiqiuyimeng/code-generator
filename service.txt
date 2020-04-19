@@ -1,0 +1,19 @@
+package {{service_package}};
+
+import {{model_namespace}};
+
+import java.util.List;
+
+
+public interface {{cls_name}}Service {
+
+    {{cls_name}} get{{cls_name}}({{param}} {{key}});
+
+    void add{{cls_name}}({{cls_name}} record);
+
+    void delete{{cls_name}}({{param}} {{key}});
+
+    void edit{{cls_name}}({{cls_name}} record);
+
+    List<{{cls_name}}> get{{cls_name}}List();
+}

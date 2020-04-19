@@ -126,5 +126,10 @@
     {% endif %}
   </update>
   {% endif %}
-  {%- endif -%}
+  <select id="get{{cls_name}}List" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from {{table_name}}
+  </select>
+  {% endif -%}
 </mapper>
