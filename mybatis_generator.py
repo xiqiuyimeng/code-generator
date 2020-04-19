@@ -49,10 +49,18 @@ class MybatisGenerator:
             可执行的sql查询语句，用于多表联合查询情况，默认None，开启后将会生成相应的java类和xml，不会生成mapper.java，
             xml中只会生成resultMap
         优先级：exec_sql 最高，有可执行语句即按exec_sql执行，其次，必须指定表名，列名可不指定，列名指定后，按列名来执行
+        `model_package`
+            实体类文件所在的包命名空间，例如 com.demo.model，它将被作为实体类文件的文件头部的引包声明，若无则不声明包命名空间。
+            由包命名空间，生成器可生成实体类文件的命名空间，它将被用于xml文件及mapper文件中。
+                xml：在resultMap、插入、更新块语句中需要声明实体类命名空间，若无，则默认填写“实体类”。
+                mapper: 在插入、更新接口中需要使用实体类，若无实体类命名空间，则默认不引入。
+        `mapper_package`
+            mapper文件所在包命名空间，例如com.demo.dao，该命名空间将被作为mapper文件头部的引包声明，若无则不声明包命名空间。
+            由包命名空间，生成器可生成mapper文件的命名空间，此命名空间将用于xml中作为namespace存在，若无，则默认填写“待填写”
     """
     def __init__(self, table_schema, table_name, column_name=None, java_tp='java.txt',
                  mapper_tp='mapper.txt', xml_tp='xml.txt', path='./输出目录', lombok=True,
-                 exec_sql=None):
+                 exec_sql=None, model_package=None, mapper_package=None):
         # 库名
         self.table_schema = table_schema
         # 表名
@@ -80,11 +88,16 @@ class MybatisGenerator:
         # 获取模板文件
         self.env = Environment(loader=FileSystemLoader('./'), lstrip_blocks=True, trim_blocks=True)
         self.path = path
-        self.java_path = os.path.join(path, self.deal_class_name() + '.java')
-        self.xml_path = os.path.join(path, self.deal_class_name() + 'Mapper.xml')
+        self.class_name = self.deal_class_name()
+        self.java_path = os.path.join(path, f'{self.class_name}.java')
+        self.xml_path = os.path.join(path, f'{self.class_name}Mapper.xml')
         # 如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
-        self.mapper_path = os.path.join(path, self.deal_class_name() + 'Mapper.java') \
+        self.mapper_path = os.path.join(path, f'{self.class_name}Mapper.java') \
             if self.mapper else None
+        self.model_package = model_package
+        self.model_namespace = f'{model_package}.{self.class_name}' if model_package else "实体类"
+        self.mapper_package = mapper_package
+        self.mapper_namespace = f'{mapper_package}.{self.class_name}Mapper' if mapper_package else "待填写"
 
     def get_sql(self):
         """
@@ -170,14 +183,14 @@ class MybatisGenerator:
             data = Data(name, line[0], types[1], types[0], line[-1])
             java_list.append(data)
         content = self.env.get_template(self.java_tp).render(
-            cls_name=self.deal_class_name(), java_list=java_list,
-            lombok=self.lombok, import_list=import_list
+            cls_name=self.class_name, java_list=java_list,
+            lombok=self.lombok, import_list=import_list,
+            model_package=self.model_package
         )
         self.save(self.java_path, content)
 
     def generate_mapper(self):
         if self.mapper:
-            cls_name = self.deal_class_name()
             # 多个主键的情况，mapper里的delete和select都应传入类，否则传主键
             param = ''
             key = ''
@@ -185,13 +198,15 @@ class MybatisGenerator:
             if len(self.primary) == len(self.data):
                 have_update = False
             if len(self.primary) > 1:
-                param = cls_name
-                key = cls_name.lower()
+                param = self.class_name
+                key = self.class_name.lower()
             elif len(self.primary) == 1:
                 param = self.deal_type(self.primary[0][1])[1]
                 key = self.deal_column_name(self.primary[0][0])
             content = self.env.get_template(self.mapper_tp).render(
-                cls_name=cls_name, param=param, key=key, haveUpdate=have_update
+                cls_name=self.class_name, param=param, key=key,
+                haveUpdate=have_update, model_namespace=self.model_namespace,
+                mapper_package=self.mapper_package
             )
             self.save(self.mapper_path, content)
 
@@ -227,7 +242,8 @@ class MybatisGenerator:
         content = self.env.get_template(self.xml_tp).render(
             result_map=result_map, columns=columns, table_name=self.table_name,
             params=params, java_type=java_type, need_update=need_update,
-            update_columns=update_columns, mapper=self.mapper, any_column=self.exec_sql
+            update_columns=update_columns, mapper=self.mapper, any_column=self.exec_sql,
+            model_namespace=self.model_namespace, mapper_namespace=self.mapper_namespace
         )
         self.save(self.xml_path, content)
 
@@ -293,17 +309,19 @@ if __name__ == '__main__':
         lombok = True if lombok.lower() == 'true' else False
         exec_sql = root.find('generator').find('exec_sql').text
         table_names = table_name.split(',')
+        model_package = root.find('else').find('model_package').text
+        mapper_package = root.find('else').find('mapper_package').text
         # 如果可执行语句存在或者指定列名存在就不应该循环执行
         if (exec_sql or column) and len(table_names) == 1:
             generator = MybatisGenerator(table_schema, table_name.strip(), column, path=path, lombok=lombok,
-                                         exec_sql=exec_sql)
+                                         exec_sql=exec_sql, model_package=model_package, mapper_package=mapper_package)
             generator.main()
             print("执行成功！五秒后退出")
             time.sleep(5)
         elif len(table_names) >= 1:
             for t_name in table_names:
                 generator = MybatisGenerator(table_schema, t_name.strip(), column, path=path, lombok=lombok,
-                                             exec_sql=exec_sql)
+                                             exec_sql=exec_sql, model_package=model_package, mapper_package=mapper_package)
                 generator.main()
             print("执行成功！五秒后退出")
             time.sleep(5)

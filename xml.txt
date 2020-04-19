@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="待填写">
-  <resultMap id="BaseResultMap" type="实体类">
+<mapper namespace="{{mapper_namespace}}">
+  <resultMap id="BaseResultMap" type="{{model_namespace}}">
     {% for result in result_map %}
     <result column="{{result.column_name}}" property="{{result.name}}" jdbcType="{{result.jdbc_type}}"/>
     {% endfor %}
@@ -43,7 +43,7 @@
     {%- endfor %}
   </delete>
   {% endif %}
-  <insert id="insert" parameterType="实体类" >
+  <insert id="insert" parameterType="{{model_namespace}}" >
     insert into {{table_name}} (
     {%- for result in result_map -%}
     {%- if loop.last -%}
@@ -67,7 +67,7 @@
     {%- endfor %}
     )
   </insert>
-  <insert id="insertSelective" parameterType="实体类" >
+  <insert id="insertSelective" parameterType="{{model_namespace}}" >
     insert into {{table_name}}
     <trim prefix="(" suffix=")" suffixOverrides="," >
     {% for result in result_map %}
@@ -85,7 +85,7 @@
     </trim>
   </insert>
   {% if need_update %}
-  <update id="updateByPrimaryKey" parameterType="实体类" >
+  <update id="updateByPrimaryKey" parameterType="{{model_namespace}}" >
     update {{table_name}}
     set {% for update_column in update_columns %}
     {% if loop.first -%}
@@ -106,7 +106,7 @@
     {%- endfor %}
     {% endif %}
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="实体类" >
+  <update id="updateByPrimaryKeySelective" parameterType="{{model_namespace}}" >
     update {{table_name}}
     <set >
     {% for update_column in update_columns %}

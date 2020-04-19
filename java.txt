@@ -1,3 +1,5 @@
+package {{model_package}};
+
 {% if import_list %}
 {% for import in import_list %}
 {{import}}

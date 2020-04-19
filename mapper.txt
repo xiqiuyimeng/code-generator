@@ -1,3 +1,6 @@
+package {{mapper_package}};
+
+import {{model_namespace}};
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
