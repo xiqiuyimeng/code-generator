@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from mysql_generator import mysql_type as mt
+from mysql_generator.get_cursor import Cursor
 from jinja2 import Environment, FileSystemLoader
 from xml.etree import cElementTree
 import os
-import pymysql
 import time
 _author_ = 'luwt'
 _date_ = '2019/3/5 15:17'
@@ -19,24 +19,6 @@ class Data:
         self.java_type = java_type
         self.jdbc_type = jdbc_type
         self.comment = comment if comment is None else comment.replace("\r\n", " ")
-
-
-def get_native_define_conn(host, port, user, pwd, db):
-    """打开本地数据库连接（ip/数据库用户名/登录密码/数据库名/编码）"""
-    try:
-        conn = pymysql.connect(
-            host=host,
-            port=port,
-            user=user,
-            passwd=pwd,
-            db=db,
-            charset='utf8'
-        )
-        print("获取数据库连接成功")
-        return conn
-    except Exception as e:
-        print(e)
-        raise e
 
 
 class MybatisGenerator:
@@ -77,16 +59,21 @@ class MybatisGenerator:
         self.table_name = table_name
         # 可选：字段名，字符串形式，逗号分隔
         self.column_name = column_name
-        # 查询结果为字段名，类型，约束（判断是否为主键PRI即可，应用在按主键查询更新删除等操作），自定义sql提供完整查询字段即可
-        self.sql = 'select column_name, data_type, column_key, column_comment from information_schema.columns ' \
-                   'where table_schema = "{}" and table_name = "{}"'.format(self.table_schema, self.table_name)\
-            if exec_sql is None else 'show full fields from tmp_table'
+        # 可执行的sql语句
         self.exec_sql = exec_sql
+        # 查询结果为字段名，类型，约束（判断是否为主键PRI即可，应用在按主键查询更新删除等操作），自定义sql提供完整查询字段即可
+        self.sql = self.get_sql()
+        # 获取查询的数据
         self.data = self.get_data()
+        # 主键信息
         self.primary = list(filter(lambda k: k[2] == 'PRI', self.data))
+        # java实体类的模板文件
         self.java_tp = java_tp
+        # mapper的模板文件
         self.mapper_tp = mapper_tp
+        # xml的模板文件
         self.xml_tp = xml_tp
+        # 是否开启lombok注解
         self.lombok = lombok
         self.appointed_columns = True if self.column_name else False
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
@@ -99,32 +86,44 @@ class MybatisGenerator:
         self.mapper_path = os.path.join(path, self.deal_class_name() + 'Mapper.java') \
             if self.mapper else None
 
+    def get_sql(self):
+        """
+        生成sql查询语句。
+        如果是可执行sql语句，只能查询临时表；
+        否则应查询系统表，如果指定了列名，那么在系统表中拼接过滤条件即可
+        """
+        sql = 'select column_name, data_type, column_key, column_comment from information_schema.columns ' \
+            f'where table_schema = "{self.table_schema}" and table_name = "{self.table_name}"'
+        if self.exec_sql:
+            sql = 'show full fields from tmp_table'
+        elif self.column_name:
+            columns = list(map(lambda x: x.strip(), self.column_name.split(',')))
+            for i, col_name in enumerate(columns):
+                if i == 0:
+                    sql += f' and column_name in ("{col_name}", '
+                elif col_name == columns[-1]:
+                    sql += f'"{col_name}")'
+                else:
+                    sql += f'"{col_name}", '
+        return sql
+
     def get_data(self):
         """连接数据库获取数据"""
-        conn = get_native_define_conn(host, int(port), user, pwd, db)
-        cursor = conn.cursor()
-        if self.column_name and not self.exec_sql:
-            columns = self.column_name.split(',')
-            for i, c in enumerate(columns):
-                if i == 0:
-                    self.sql += ' and column_name in ("' + c + '"'
-                else:
-                    self.sql += ',"' + c + '"'
-            self.sql += ')'
-        if self.exec_sql:
-            cursor.execute('use {};'.format(self.table_schema))
-            cursor.execute('create temporary table tmp_table {};'.format(self.exec_sql))
-        cursor.execute(self.sql)
-        data = list(cursor.fetchall())
-        if self.exec_sql:
-            for ix, line in enumerate(data):
-                line = list(line)
-                if line[1].find('(') > 0:
-                    type_ = line[1][0: line[1].find('(')]
-                    line[1] = type_
-                data[ix] = line
-        cursor.close()
-        conn.close()
+        with Cursor(host, user, pwd, db, int(port)) as cursor:
+            # 如果存在自定义sql，那么先生成临时表
+            if self.exec_sql:
+                cursor.execute(f'use {self.table_schema};')
+                cursor.execute(f'create temporary table tmp_table {self.exec_sql};')
+            cursor.execute(self.sql)
+            data = list(cursor.fetchall())
+            if self.exec_sql:
+                for ix, line in enumerate(data):
+                    line = list(line)
+                    # 类型标准化，临时表中查得的类型是类型加字段长度，去除长度信息
+                    if line[1].find('(') > 0:
+                        type_ = line[1][0: line[1].find('(')]
+                        line[1] = type_
+                    data[ix] = line
         return data
 
     def deal_class_name(self):
@@ -172,7 +171,8 @@ class MybatisGenerator:
             java_list.append(data)
         content = self.env.get_template(self.java_tp).render(
             cls_name=self.deal_class_name(), java_list=java_list,
-            lombok=self.lombok, import_list=import_list)
+            lombok=self.lombok, import_list=import_list
+        )
         self.save(self.java_path, content)
 
     def generate_mapper(self):
@@ -191,7 +191,8 @@ class MybatisGenerator:
                 param = self.deal_type(self.primary[0][1])[1]
                 key = self.deal_column_name(self.primary[0][0])
             content = self.env.get_template(self.mapper_tp).render(
-                cls_name=cls_name, param=param, key=key, haveUpdate=have_update)
+                cls_name=cls_name, param=param, key=key, haveUpdate=have_update
+            )
             self.save(self.mapper_path, content)
 
     def generate_xml(self):
@@ -204,28 +205,25 @@ class MybatisGenerator:
         need_update = True
         # 生成base_column_list
         self.generate_base_col(columns)
-        for line in self.data:
-            column_name = line[0]
-            name = self.deal_column_name(line[0])
-            jdbc_type = self.deal_type(line[1])[0]
-            java_type = self.deal_type(line[1])[0]
-            data = Data(name, column_name, jdbc_type=jdbc_type, java_type=java_type)
-            result_map.append(data)
+        # 生成resultMap
+        self.generate_result_map(result_map)
+        # 处理主键对于java_type的影响
         if len(self.primary) > 1:
             java_type = self.deal_class_name()
         elif len(self.primary) == 1:
             java_type = self.deal_type(self.primary[0][1])[1]
+        # 如果表中都是主键，就不需要更新语句了
         if len(self.data) == len(self.primary):
             need_update = False
+        # 主键信息放入params中
         for primary in self.primary:
-            params.append(Data(self.deal_column_name(primary[0]), primary[0],
-                               self.deal_type(primary[1])[1], self.deal_type(primary[1])[0]))
+            params.append(Data(
+                self.deal_column_name(primary[0]), primary[0],
+                None, self.deal_type(primary[1])[0]
+            ))
         update_columns = result_map[:]
-        for param in params:
-            for result in update_columns:
-                if param.column_name == result.column_name:
-                    update_columns.remove(result)
-                    continue
+        # 拷贝一份result_map，用以存放xml中的更新块字段数据，将其中的主键信息剔除
+        self.rm_pri(update_columns, params)
         content = self.env.get_template(self.xml_tp).render(
             result_map=result_map, columns=columns, table_name=self.table_name,
             params=params, java_type=java_type, need_update=need_update,
@@ -233,17 +231,13 @@ class MybatisGenerator:
         )
         self.save(self.xml_path, content)
 
-    def save(self, path, content):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        with open(path, 'w+', encoding='utf-8')as f:
-            f.write(content)
-            print('生成的文件为' + path)
-
-    def main(self):
-        self.generate_java()
-        self.generate_mapper()
-        self.generate_xml()
+    @staticmethod
+    def rm_pri(update_columns, params):
+        for param in params:
+            for result in update_columns:
+                if param.column_name == result.column_name:
+                    update_columns.remove(result)
+                    continue
 
     def generate_base_col(self, columns):
         col = 0
@@ -261,6 +255,26 @@ class MybatisGenerator:
                     base_column = column_name + ', \n\t'
             columns.append(base_column)
 
+    def generate_result_map(self, result_map):
+        for line in self.data:
+            column_name = line[0]
+            name = self.deal_column_name(line[0])
+            jdbc_type = self.deal_type(line[1])[0]
+            data = Data(name, column_name, java_type=None, jdbc_type=jdbc_type)
+            result_map.append(data)
+
+    def save(self, path, content):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        with open(path, 'w+', encoding='utf-8')as f:
+            f.write(content)
+            print('生成的文件为' + path)
+
+    def main(self):
+        self.generate_java()
+        self.generate_mapper()
+        self.generate_xml()
+
 
 if __name__ == '__main__':
     try:
@@ -276,6 +290,7 @@ if __name__ == '__main__':
         column = root.find('generator').find('column').text
         path = root.find('generator').find('path').text
         lombok = root.find('generator').find('lombok').text
+        lombok = True if lombok.lower() == 'true' else False
         exec_sql = root.find('generator').find('exec_sql').text
         table_names = table_name.split(',')
         # 如果可执行语句存在或者指定列名存在就不应该循环执行
@@ -285,7 +300,7 @@ if __name__ == '__main__':
             generator.main()
             print("执行成功！五秒后退出")
             time.sleep(5)
-        elif not exec_sql and not column:
+        elif len(table_names) >= 1:
             for t_name in table_names:
                 generator = MybatisGenerator(table_schema, t_name.strip(), column, path=path, lombok=lombok,
                                              exec_sql=exec_sql)

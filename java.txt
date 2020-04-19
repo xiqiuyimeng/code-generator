@@ -7,6 +7,8 @@
 import lombok.Data;
 
 @Data
+{% else %}
+
 {% endif %}
 public class {{cls_name}}{
 
