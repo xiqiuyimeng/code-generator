@@ -2,26 +2,28 @@
 <config>
     <database>
         <!-- 连接的数据库配置，地址、端口号、账号、密码、数据库名 -->
-        <host>localhost</host>
+        <host>centos121</host>
         <port>3306</port>
         <user>root</user>
-        <pwd>Urwork_123!</pwd>
-        <db>xy_db</db>
+        <pwd>admin</pwd>
+        <db>test</db>
     </database>
     <generator>
         <!-- 生成器需要配置的信息，使用的数据库名 -->
-        <table_schema>xy_db</table_schema>
+        <table_schema>test</table_schema>
         <!-- 需要生成的数据库表名，可多个，用英文逗号分隔，默认会生成三个文件，java、mapper、xml -->
-        <table_name>lease_order,user</table_name>
+        <table_name>tax</table_name>
         <!-- 指定表指定列，可多个，需要用英文逗号分隔，需要注意的是，如果多表的时候，不支持指定多表中的任意字段 -->
         <column></column>
         <!-- 输出路径，默认为当前目录下 -->
         <path>./输出目录</path>
-        <!-- lombok注解，不开启会生成getter和setter -->
-        <lombok>True</lombok>
+        <!-- lombok注解，开启填true，关闭清空值即可，不开启会生成getter和setter -->
+        <lombok>true</lombok>
         <!-- 支持自定义的可执行sql语句，会生成java和xml，xml里只会有该查询语句对应的resultMap，查询字段需要是正常列名 -->
         <exec_sql></exec_sql>
         <!-- 优先级：exec_sql 最高，有可执行语句即按exec_sql执行，其次，必须指定表名，列名可不指定，列名指定后，按列名来执行
-         参数填写规则为：表名、列名、可执行语句可同时存在，以优先级顺序决定执行策略。如表名同时多个，请清空列名和可执行语句-->
+         参数填写规则为：表名、列名、可执行语句可同时存在，以优先级顺序决定执行策略。如表名同时多个，请清空列名和可执行语句，
+         当可执行语句存在，请将表名指定为一个想生成的实体类名；当指定列名存在，请指定列所属表名
+         -->
     </generator>
 </config>
