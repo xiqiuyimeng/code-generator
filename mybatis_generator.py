@@ -70,8 +70,8 @@ class MybatisGenerator:
             mapper文件所在包命名空间，例如com.demo.dao，该命名空间将被作为mapper文件头部的引包声明，若无则不声明包命名空间。
             由包命名空间，生成器可生成mapper文件的命名空间，此命名空间将用于xml中作为namespace存在，若无，则默认填写“待填写”
         `java_path`
-            java文件输出路径，如果此参数有效，将忽视path参数。
-                需要判断
+            java项目路径，如果此参数有效，将忽视path参数。
+                绝对路径 D:\java_workspaces\demo
         `xml_path`
             xml文件输出路径，如果此参数有效，将忽视path参数
         `java_src_relative`
@@ -147,19 +147,24 @@ class MybatisGenerator:
         self.separator = '\\' if sys.platform.startswith("win") else '/'
         # 默认输出目录"./输出目录"
         self.path = path
-        # java项目地址，绝对路径 D:\\java_workspaces\\demo
+        # java项目地址，绝对路径 D:\java_workspaces\demo
         self.java_path = java_path
         # xml 路径
         self.xml_path = xml_path
         # java项目源码包相对路径 src/main/java
-        self.java_src_relative = java_src_relative.replace('/', '\\')
+        self.java_src_relative = java_src_relative.replace('/', '\\') \
+            if sys.platform.startswith("win") else java_src_relative.replace("\\", '/')
         self.model_package = model_package
         self.mapper_package = mapper_package
+        # model实体类文件的存放目录
+        model_absolute_path = self.get_path(self.model_package)
         # model文件输出路径
-        self.java_output_path = os.path.join(self.get_path(self.model_package),
+        self.java_output_path = os.path.join(model_absolute_path,
                                              f'{self.class_name}.java')
-        # xml文件输出路径
-        self.xml_output_path = os.path.join(self.get_path(), f'{self.class_name}Mapper.xml')
+        # xml文件输出路径，根据实体类文件的存放目录是否是默认的目录来判断xml目录地址，
+        # 如果是默认目录，那么说明xml也应该输出到默认目录，否则应该输出到xml_path
+        xml_absolute_path = self.path if self.path == model_absolute_path else self.xml_path
+        self.xml_output_path = os.path.join(xml_absolute_path, f'{self.class_name}Mapper.xml')
         # mapper文件输出路径，如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
         self.mapper_output_path = os.path.join(self.get_path(self.mapper_package),
                                                f'{self.class_name}Mapper.java') \
@@ -174,18 +179,14 @@ class MybatisGenerator:
         获取生成文件的父级目录，注意，如果是开启了java_path，xml_path和java_src_relative，
         那么xml路径即为xml路径 + xml文件名，
         java类路径需要拼接：java_path + java_src_relative + package.replace(".", separator)
-        :param package 文件的包路径，如果为空，则是xml文件，return xml_path
+        :param package 文件的包路径，如果为空，参数不全，所以返回默认输出目录
         """
-        if self.java_path and self.xml_path and self.java_src_relative:
-            if package:
-                # java类
-                return os.path.join(
-                    self.java_path,
-                    self.java_src_relative,
-                    package.replace(".", self.separator)
-                )
-            else:
-                return self.xml_path
+        if self.java_path and self.xml_path and self.java_src_relative and package:
+            return os.path.join(
+                self.java_path,
+                self.java_src_relative,
+                package.replace(".", self.separator)
+            )
         elif self.path:
             return self.path
         else:

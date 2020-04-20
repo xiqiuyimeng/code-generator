@@ -193,6 +193,7 @@ if __name__ == '__main__':
             else:
                 input(PARAM_ERROR)
         elif choose == 2:
+            # 如果是选择spring生成器，那么不支持自定义sql或者指定列名
             if len(table_names) >= 1 and not exec_sql and not column:
                 for t_name in table_names:
                     generator = SpringGenerator(host, user, pwd, db, table_schema, table_name,
