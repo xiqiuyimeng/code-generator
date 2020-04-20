@@ -24,11 +24,11 @@
             形成java类文件项目前置路径，生成器会将else标签中的命名空间都转化为相应路径，并与前置路径拼接生成完整路径，
             需要注意的是，如果填入了此路径，else标签中的选项必须写入，否则依然只能写入到path目录
             所以如果写入了该参数，那么就意味着指定位置的文件将被替换，请谨慎！ -->
-            <java_output>D:\java_workspaces\demo</java_output>
+            <java_output>D:\\java_workspaces\\demo</java_output>
             <!-- java项目的源码包相对路径目录结构，可不填默认为src/main/java -->
             <src_relative>src/main/java</src_relative>
             <!-- 该参数将决定xml文件的存放位置。需要绝对路径。 -->
-            <xml_output>D:\java_workspaces\demo\src\main\resources\mybatis</xml_output>
+            <xml_output>D:\\java_workspaces\\demo\\src\\main\\resources\\mybatis</xml_output>
         </path>
         <!-- lombok注解，开启填true，关闭清空值即可，不开启会生成getter和setter -->
         <lombok>true</lombok>
