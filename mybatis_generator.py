@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from mysql_generator import mysql_type as mt
 from mysql_generator.get_cursor import Cursor
+from mysql_generator.constant import *
 from jinja2 import Environment, FileSystemLoader
 import os
+import sys
 _author_ = 'luwt'
 _date_ = '2019/3/5 15:17'
 
@@ -67,33 +69,45 @@ class MybatisGenerator:
         `mapper_package`
             mapper文件所在包命名空间，例如com.demo.dao，该命名空间将被作为mapper文件头部的引包声明，若无则不声明包命名空间。
             由包命名空间，生成器可生成mapper文件的命名空间，此命名空间将用于xml中作为namespace存在，若无，则默认填写“待填写”
+        `java_path`
+            java文件输出路径，如果此参数有效，将忽视path参数。
+                需要判断
+        `xml_path`
+            xml文件输出路径，如果此参数有效，将忽视path参数
+        `java_src_relative`
+            java项目默认的源码包相对路径结构，默认为 src/main/java，由此参数，可结合java_path生成项目源码包绝对路径，
+            再与命名空间拼接，可推出文件的绝对路径
     """
-    def __init__(self,
-                 host,
-                 user,
-                 pwd,
-                 db,
-                 table_schema,
-                 table_name,
-                 port=3306,
-                 charset='utf-8',
-                 column_name=None,
-                 java_tp='java.txt',
-                 mapper_tp='mapper.txt',
-                 xml_tp='xml.txt',
-                 path='./输出目录',
-                 lombok=True,
-                 exec_sql=None,
-                 model_package=None,
-                 mapper_package=None
-                 ):
+    def __init__(
+            self,
+            host,
+            user,
+            pwd,
+            db,
+            table_schema,
+            table_name,
+            port=DEFAULT_DB_PORT,
+            charset=DEFAULT_DB_CHARSET,
+            column_name=None,
+            java_tp=DEFAULT_JAVA_TP,
+            mapper_tp=DEFAULT_MAPPER_TP,
+            xml_tp=DEFAULT_XML_TP,
+            path=DEFAULT_PATH,
+            lombok=True,
+            exec_sql=None,
+            model_package=None,
+            mapper_package=None,
+            java_path=None,
+            xml_path=None,
+            java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH
+    ):
         # 数据库信息
         self.host = host
         self.user = user
         self.pwd = pwd
         self.db = db
-        self.port = int(port) if port else 3306
-        self.charset = charset if charset else 'utf8'
+        self.port = int(port) if port else DEFAULT_DB_PORT
+        self.charset = charset if charset else DEFAULT_DB_CHARSET
         # 库名
         self.table_schema = table_schema
         # 表名
@@ -130,16 +144,52 @@ class MybatisGenerator:
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
         # 获取模板文件
         self.env = Environment(loader=FileSystemLoader('./'), lstrip_blocks=True, trim_blocks=True)
+        self.separator = '\\' if sys.platform.startswith("win") else '/'
+        # 默认输出目录"./输出目录"
         self.path = path
-        self.java_path = os.path.join(path, f'{self.class_name}.java')
-        self.xml_path = os.path.join(path, f'{self.class_name}Mapper.xml')
-        # 如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
-        self.mapper_path = os.path.join(path, f'{self.class_name}Mapper.java') \
-            if self.mapper else None
+        # java项目地址，绝对路径 D:\\java_workspaces\\demo
+        self.java_path = java_path
+        # xml 路径
+        self.xml_path = xml_path
+        # java项目源码包相对路径 src/main/java
+        self.java_src_relative = java_src_relative.replace('/', '\\')
         self.model_package = model_package
-        self.model_namespace = f'{model_package}.{self.class_name}' if model_package else "实体类"
         self.mapper_package = mapper_package
-        self.mapper_namespace = f'{mapper_package}.{self.class_name}Mapper' if mapper_package else "待填写"
+        # model文件输出路径
+        self.java_output_path = os.path.join(self.get_path(self.model_package),
+                                             f'{self.class_name}.java')
+        # xml文件输出路径
+        self.xml_output_path = os.path.join(self.get_path(), f'{self.class_name}Mapper.xml')
+        # mapper文件输出路径，如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
+        self.mapper_output_path = os.path.join(self.get_path(self.mapper_package),
+                                               f'{self.class_name}Mapper.java') \
+            if self.mapper else None
+        self.model_namespace = f'{self.model_package}.{self.class_name}' \
+            if self.model_package else DEFAULT_MODEL_NS
+        self.mapper_namespace = f'{self.mapper_package}.{self.class_name}Mapper' \
+            if self.mapper_package else DEFAULT_MAPPER_NS
+
+    def get_path(self, package=None):
+        """
+        获取生成文件的父级目录，注意，如果是开启了java_path，xml_path和java_src_relative，
+        那么xml路径即为xml路径 + xml文件名，
+        java类路径需要拼接：java_path + java_src_relative + package.replace(".", separator)
+        :param package 文件的包路径，如果为空，则是xml文件，return xml_path
+        """
+        if self.java_path and self.xml_path and self.java_src_relative:
+            if package:
+                # java类
+                return os.path.join(
+                    self.java_path,
+                    self.java_src_relative,
+                    package.replace(".", self.separator)
+                )
+            else:
+                return self.xml_path
+        elif self.path:
+            return self.path
+        else:
+            raise EnvironmentError(PARAM_PATH_ERROR)
 
     def get_sql(self):
         """
@@ -147,10 +197,9 @@ class MybatisGenerator:
         如果是可执行sql语句，只能查询临时表；
         否则应查询系统表，如果指定了列名，那么在系统表中拼接过滤条件即可
         """
-        sql = 'select column_name, data_type, column_key, column_comment from information_schema.columns ' \
-            f'where table_schema = "{self.table_schema}" and table_name = "{self.table_name}"'
+        sql = f'{QUERY_SYS_TB} where table_schema = "{self.table_schema}" and table_name = "{self.table_name}"'
         if self.exec_sql:
-            sql = 'show full fields from tmp_table'
+            sql = QUERY_TEMP_TB
         elif self.column_name:
             columns = list(map(lambda x: x.strip(), self.column_name.split(',')))
             for i, col_name in enumerate(columns):
@@ -168,7 +217,7 @@ class MybatisGenerator:
             # 如果存在自定义sql，那么先生成临时表
             if self.exec_sql:
                 cursor.execute(f'use {self.table_schema};')
-                cursor.execute(f'create temporary table tmp_table {self.exec_sql};')
+                cursor.execute(f'{CREATE_TEMP_TB} {self.exec_sql};')
             cursor.execute(self.sql)
             data = list(cursor.fetchall())
             if self.exec_sql:
@@ -205,7 +254,8 @@ class MybatisGenerator:
     @staticmethod
     def deal_type(data):
         """返回jdbcType和java_type，若在枚举类型里没有，一律视为字符串"""
-        jdbc_type, java_type = 'VARCHAR', 'String'
+        jdbc_type, java_type = mt.MysqlType.text.value[0],\
+                               mt.MysqlType.text.value[1]
         try:
             jdbc_type, java_type = eval('mt.MysqlType.{}.value[0]'.format(data)), \
                                    eval('mt.MysqlType.{}.value[1]'.format(data))
@@ -238,7 +288,7 @@ class MybatisGenerator:
             lombok=self.lombok, import_list=import_list,
             model_package=self.model_package
         )
-        self.save(self.java_path, content)
+        self.save(self.java_output_path, content)
 
     def generate_mapper(self):
         if self.mapper:
@@ -247,7 +297,7 @@ class MybatisGenerator:
                 need_update=self.need_update, model_namespace=self.model_namespace,
                 mapper_package=self.mapper_package, hump_cls_name=self.hump_cls_name
             )
-            self.save(self.mapper_path, content)
+            self.save(self.mapper_output_path, content)
 
     def generate_xml(self):
         # resultMap
@@ -281,7 +331,7 @@ class MybatisGenerator:
             mapper=self.mapper, any_column=self.exec_sql,
             model_namespace=self.model_namespace, mapper_namespace=self.mapper_namespace
         )
-        self.save(self.xml_path, content)
+        self.save(self.xml_output_path, content)
 
     @staticmethod
     def rm_pri(update_columns, params):
@@ -315,12 +365,14 @@ class MybatisGenerator:
             data = Data(name, column_name, java_type=None, jdbc_type=jdbc_type)
             result_map.append(data)
 
-    def save(self, path, content):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+    @staticmethod
+    def save(path, content):
+        parent_dir = os.path.split(path)[0]
+        if not os.path.exists(parent_dir):
+            os.makedirs(parent_dir)
         with open(path, 'w+', encoding='utf-8')as f:
             f.write(content)
-            print('生成的文件为' + path)
+            print(f'{OUTPUT_PREFIX}{path}')
 
     def main(self):
         self.generate_java()

@@ -3,6 +3,7 @@ import time
 import os
 from xml.etree import cElementTree
 
+from mysql_generator.constant import *
 from mysql_generator.mybatis_generator import MybatisGenerator
 _author_ = 'luwt'
 _date_ = '2020/4/19 23:37'
@@ -28,47 +29,57 @@ class SpringGenerator(MybatisGenerator):
             service文件所在包命名空间，例如com.demo.controller，该命名空间将被作为controller文件头部的引包声明，若无则不声明。
     """
 
-    def __init__(self,
-                 host,
-                 user,
-                 pwd,
-                 db,
-                 table_schema,
-                 table_name,
-                 port=3306,
-                 charset='utf8',
-                 column_name=None,
-                 java_tp='java.txt',
-                 mapper_tp='mapper.txt',
-                 xml_tp='xml.txt',
-                 service_tp='service.txt',
-                 service_impl_tp='service_impl.txt',
-                 controller_tp='controller.txt',
-                 path='./输出目录',
-                 lombok=True,
-                 exec_sql=None,
-                 model_package=None,
-                 mapper_package=None,
-                 service_package=None,
-                 service_impl_package=None,
-                 controller_package=None):
-        super().__init__(host,
-                         user,
-                         pwd,
-                         db,
-                         table_schema,
-                         table_name,
-                         port,
-                         charset,
-                         column_name,
-                         java_tp,
-                         mapper_tp,
-                         xml_tp,
-                         path,
-                         lombok,
-                         exec_sql,
-                         model_package,
-                         mapper_package)
+    def __init__(
+            self,
+            host,
+            user,
+            pwd,
+            db,
+            table_schema,
+            table_name,
+            port=DEFAULT_DB_PORT,
+            charset=DEFAULT_DB_CHARSET,
+            column_name=None,
+            java_tp=DEFAULT_JAVA_TP,
+            mapper_tp=DEFAULT_MAPPER_TP,
+            xml_tp=DEFAULT_XML_TP,
+            service_tp=DEFAULT_SERVICE_TP,
+            service_impl_tp=DEFAULT_SERVICE_IMPL_TP,
+            controller_tp=DEFAULT_CONTROLLER_TP,
+            path=DEFAULT_PATH,
+            lombok=True,
+            exec_sql=None,
+            model_package=None,
+            mapper_package=None,
+            service_package=None,
+            service_impl_package=None,
+            controller_package=None,
+            java_path=None,
+            xml_path=None,
+            java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH
+    ):
+        super().__init__(
+            host,
+            user,
+            pwd,
+            db,
+            table_schema,
+            table_name,
+            port,
+            charset,
+            column_name,
+            java_tp,
+            mapper_tp,
+            xml_tp,
+            path,
+            lombok,
+            exec_sql,
+            model_package,
+            mapper_package,
+            java_path,
+            xml_path,
+            java_src_relative
+        )
         self.service_tp = service_tp
         self.service_impl_tp = service_impl_tp
         self.controller_tp = controller_tp
@@ -81,15 +92,18 @@ class SpringGenerator(MybatisGenerator):
         # service文件命名空间
         self.service_namespace = f'{self.service_package}.{self.class_name}Service'
         # service文件保存路径
-        self.service_path = os.path.join(self.path, f'{self.class_name}Service.java')
+        self.service_path = os.path.join(self.get_path(self.service_package),
+                                         f'{self.class_name}Service.java')
         # serviceImpl文件命名空间
         self.service_impl_namespace = f'{self.service_impl_package}.{self.class_name}ServiceImpl'
         # serviceImpl文件保存路径
-        self.service_impl_path = os.path.join(self.path, f'{self.class_name}ServiceImpl.java')
+        self.service_impl_path = os.path.join(self.get_path(self.service_impl_package),
+                                              f'{self.class_name}ServiceImpl.java')
         # controller文件命名空间
         self.controller_namespace = f'{self.controller_package}.{self.class_name}Controller'
         # controller文件保存路径
-        self.controller_path = os.path.join(self.path, f'{self.class_name}Controller.java')
+        self.controller_path = os.path.join(self.get_path(self.controller_package),
+                                            f'{self.class_name}Controller.java')
 
     def generate_service(self):
         content = self.env.get_template(self.service_tp).render(
@@ -102,7 +116,8 @@ class SpringGenerator(MybatisGenerator):
         content = self.env.get_template(self.service_impl_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             mapper_namespace=self.mapper_namespace, param=self.param, key=self.key,
-            service_impl_package=self.service_impl_package, hump_cls_name=self.hump_cls_name
+            service_impl_package=self.service_impl_package, hump_cls_name=self.hump_cls_name,
+            service_namespace=self.service_namespace
         )
         self.save(self.service_impl_path, content)
 
@@ -123,50 +138,60 @@ class SpringGenerator(MybatisGenerator):
 
 if __name__ == '__main__':
     try:
-        tree = cElementTree.parse(os.path.join(os.path.abspath('.'), 'config.xml'))
+        tree = cElementTree.parse(os.path.join(os.path.abspath('.'), DEFAULT_CONFIG_PATH))
         root = tree.getroot()
-        host = root.find('database').find('host').text
-        port = root.find('database').find('port').text
-        user = root.find('database').find('user').text
-        pwd = root.find('database').find('pwd').text
-        db = root.find('database').find('db').text
-        charset = root.find('database').find('charset').text
-        table_schema = root.find('generator').find('table_schema').text
-        table_name = root.find('generator').find('table_name').text
-        column = root.find('generator').find('column').text
-        path = root.find('generator').find('path').text
-        lombok = root.find('generator').find('lombok').text
-        lombok = True if lombok.lower() == 'true' else False
-        exec_sql = root.find('generator').find('exec_sql').text
+        host = root.findtext('database/host')
+        port = root.findtext('database/port')
+        user = root.findtext('database/user')
+        pwd = root.findtext('database/pwd')
+        db = root.findtext('database/db')
+        charset = root.findtext('database/charset')
+        table_schema = root.findtext('generator/table_schema')
+        table_name = root.findtext('generator/table_name')
         table_names = table_name.split(',')
-        model_package = root.find('else').find('model_package').text
-        mapper_package = root.find('else').find('mapper_package').text
-        service_package = root.find('else').find('service_package').text
-        service_impl_package = root.find('else').find('service_impl_package').text
-        controller_package = root.find('else').find('controller_package').text
-        choose = int(input("请选择生成下面哪一种代码：\r\n1.mybatis(mapper, xml, model)\r\n"
-                           "2.spring(controller, service, serviceImpl, mapper, xml, model)"))
+        column = root.findtext('generator/column')
+        # 输出路径，若java_output和xml_output存在，则path无效
+        path = root.findtext('generator/path/default')
+        java_output = root.findtext('generator/path/java_output')
+        src_relative = root.findtext('generator/path/src_relative')
+        xml_output = root.findtext('generator/path/xml_output')
+        lombok = root.findtext('generator/lombok')
+        lombok = True if lombok.lower() == 'true' else False
+        exec_sql = root.findtext('generator/exec_sql')
+        model_package = root.findtext('else/model_package')
+        mapper_package = root.findtext('else/mapper_package')
+        service_package = root.findtext('else/service_package')
+        service_impl_package = root.findtext('else/service_impl_package')
+        controller_package = root.findtext('else/controller_package')
+        choose = int(input(CHOOSE_GENERATOR_TYPE))
+        # 对参数进行校验
+        if java_output and xml_output and not (model_package and mapper_package and
+                                               service_package and service_impl_package
+                                               and controller_package):
+            raise KeyboardInterrupt(PATH_ERROR)
         if choose == 1:
             # 如果可执行语句存在或者指定列名存在就不应该循环执行
             if (exec_sql or column) and len(table_names) == 1:
                 generator = MybatisGenerator(host, user, pwd, db, table_schema, table_name.strip(),
                                              port, charset, column, path=path, lombok=lombok,
                                              exec_sql=exec_sql, model_package=model_package,
-                                             mapper_package=mapper_package)
+                                             mapper_package=mapper_package, java_path=java_output,
+                                             xml_path=xml_output, java_src_relative=src_relative)
                 generator.main()
-                print("执行成功！五秒后退出")
+                print(SUCCESS)
                 time.sleep(5)
             elif len(table_names) >= 1:
                 for t_name in table_names:
                     generator = MybatisGenerator(host, user, pwd, db, table_schema, t_name.strip(),
                                                  port, charset, column, path=path, lombok=lombok,
                                                  exec_sql=exec_sql, model_package=model_package,
-                                                 mapper_package=mapper_package)
+                                                 mapper_package=mapper_package, java_path=java_output,
+                                                 xml_path=xml_output, java_src_relative=src_relative)
                     generator.main()
-                print("执行成功！五秒后退出")
+                print(SUCCESS)
                 time.sleep(5)
             else:
-                input("请检查config.xml中参数，按任意键退出")
+                input(PARAM_ERROR)
         elif choose == 2:
             if len(table_names) >= 1 and not exec_sql and not column:
                 for t_name in table_names:
@@ -175,14 +200,16 @@ if __name__ == '__main__':
                                                 model_package=model_package, mapper_package=mapper_package,
                                                 service_package=service_package,
                                                 service_impl_package=service_impl_package,
-                                                controller_package=controller_package)
+                                                controller_package=controller_package,
+                                                java_path=java_output,
+                                                xml_path=xml_output,
+                                                java_src_relative=src_relative)
                     generator.main()
-                print("执行成功！五秒后退出")
+                print(SUCCESS)
                 time.sleep(5)
             else:
-                input("spring代码不支持指定列和自定义sql，请检查config.xml中参数，按任意键退出")
+                input(SPRING_ERROR)
         else:
-            input("输入不合法，按任意键退出")
+            input(INPUT_ILLEGAL)
     except Exception as e:
-        print("执行出错：=>\n\n{}\n\n按任意键退出".format(e))
-        input()
+        input(f"执行出错：=>\n\n{e}\n\n按任意键退出")

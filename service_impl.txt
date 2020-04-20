@@ -2,6 +2,7 @@ package {{service_impl_package}};
 
 import {{mapper_namespace}};
 import {{model_namespace}};
+import {{service_namespace}};
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
