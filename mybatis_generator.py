@@ -139,7 +139,7 @@ class MybatisGenerator:
         self.get_param_key()
         self.class_name = self.deal_class_name()
         # 驼峰形式的类名
-        self.hump_cls_name = self.class_name.replace(self.class_name[:1], self.class_name[:1].lower())
+        self.hump_cls_name = self.class_name.replace(self.class_name[:1], self.class_name[:1].lower(), 1)
         self.appointed_columns = True if self.column_name else False
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
         # 获取模板文件

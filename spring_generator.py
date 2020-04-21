@@ -196,7 +196,7 @@ if __name__ == '__main__':
             # 如果是选择spring生成器，那么不支持自定义sql或者指定列名
             if len(table_names) >= 1 and not exec_sql and not column:
                 for t_name in table_names:
-                    generator = SpringGenerator(host, user, pwd, db, table_schema, table_name,
+                    generator = SpringGenerator(host, user, pwd, db, table_schema, t_name.strip(),
                                                 port, charset, path=path, lombok=lombok,
                                                 model_package=model_package, mapper_package=mapper_package,
                                                 service_package=service_package,
