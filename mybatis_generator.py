@@ -18,7 +18,8 @@ class Data:
         self.column_name = column_name
         self.java_type = java_type
         self.jdbc_type = jdbc_type
-        self.comment = comment if comment is None else comment.replace("\r\n", " ")
+        self.comment = comment if comment is None \
+            else comment.replace("\r\n", " ")
 
 
 class MybatisGenerator:
@@ -181,7 +182,7 @@ class MybatisGenerator:
         java类路径需要拼接：java_path + java_src_relative + package.replace(".", separator)
         :param package 文件的包路径，如果为空，参数不全，所以返回默认输出目录
         """
-        if self.java_path and self.xml_path and self.java_src_relative and package:
+        if all((self.java_path, self.xml_path, self.java_src_relative, package)):
             return os.path.join(
                 self.java_path,
                 self.java_src_relative,
@@ -198,7 +199,8 @@ class MybatisGenerator:
         如果是可执行sql语句，只能查询临时表；
         否则应查询系统表，如果指定了列名，那么在系统表中拼接过滤条件即可
         """
-        sql = f'{QUERY_SYS_TB} where table_schema = "{self.table_schema}" and table_name = "{self.table_name}"'
+        sql = f'{QUERY_SYS_TB} where table_schema = "{self.table_schema}" ' \
+              f'and table_name = "{self.table_name}"'
         if self.exec_sql:
             sql = QUERY_TEMP_TB
         elif self.column_name:
@@ -214,7 +216,14 @@ class MybatisGenerator:
 
     def get_data(self):
         """连接数据库获取数据"""
-        with Cursor(self.host, self.user, self.pwd, self.db, self.port, self.charset) as cursor:
+        with Cursor(
+                self.host,
+                self.user,
+                self.pwd,
+                self.db,
+                self.port,
+                self.charset
+        ) as cursor:
             # 如果存在自定义sql，那么先生成临时表
             if self.exec_sql:
                 cursor.execute(f'use {self.table_schema};')
@@ -243,8 +252,7 @@ class MybatisGenerator:
         eg:
         user_name -> userName
         """
-        column_list = db_column_name.split('_')
-        column_name_str = ''
+        column_list, column_name_str = db_column_name.split('_'), ''
         # 处理字段名称，采用驼峰式
         for column_name in column_list:
             if column_name != column_list[0]:
@@ -266,19 +274,18 @@ class MybatisGenerator:
     def get_param_key(self):
         # 多个主键的情况，mapper里的delete和select都应传入类，否则传主键
         if len(self.primary) > 1:
-            self.param = self.class_name
-            self.key = self.class_name.lower()
+            self.param, self.key = self.class_name, self.class_name.lower()
         elif len(self.primary) == 1:
-            self.param = self.deal_type(self.primary[0][1])[1]
-            self.key = self.deal_column_name(self.primary[0][0])
+            self.param, self.key = self.deal_type(self.primary[0][1])[1], \
+                                   self.deal_column_name(self.primary[0][0])
 
     def generate_java(self):
         java_list = []
         import_list = set()
         for line in self.data:
-            name = self.deal_column_name(line[0])
             # types -> tuple(jdbcType, javaType)
-            types = self.deal_type(line[1])
+            name, types = self.deal_column_name(line[0]), \
+                          self.deal_type(line[1])
             # 处理需要import的语句
             if types[1] in mt.import_type:
                 import_list.add(mt.import_type.get(types[1]))
@@ -301,12 +308,8 @@ class MybatisGenerator:
             self.save(self.mapper_output_path, content)
 
     def generate_xml(self):
-        # resultMap
-        result_map = []
-        # base_column_list
-        columns = []
-        params = []
-        java_type = ''
+        # resultMap, base_column_list, 主键params, java类型（用于在）
+        result_map, columns, params, java_type = [], [], [], ''
         # 生成base_column_list
         self.generate_base_col(columns)
         # 生成resultMap
@@ -336,18 +339,17 @@ class MybatisGenerator:
 
     @staticmethod
     def rm_pri(update_columns, params):
-        for param in params:
-            for result in update_columns:
-                if param.column_name == result.column_name:
-                    update_columns.remove(result)
-                    continue
+        """
+        在update的时候，set语句中不需要主键的信息，
+        主键是作为唯一标识，所以需要从update的语句中删除主键的信息
+        """
+        [update_columns.remove(result) for result in update_columns
+         for param in params if param.column_name == result.column_name]
 
     def generate_base_col(self, columns):
-        col = 0
-        i = 1
+        col, i = 0, 1
         for line in self.data:
-            column_name = line[0]
-            base_column = column_name + ', '
+            column_name, base_column = line[0], line[0] + ', '
             if line == self.data[-1]:
                 base_column = column_name
             else:

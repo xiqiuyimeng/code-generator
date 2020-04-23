@@ -164,10 +164,13 @@ if __name__ == '__main__':
         service_impl_package = root.findtext('else/service_impl_package')
         controller_package = root.findtext('else/controller_package')
         choose = int(input(CHOOSE_GENERATOR_TYPE))
-        # 对参数进行校验
-        if java_output and xml_output and not (model_package and mapper_package and
-                                               service_package and service_impl_package
-                                               and controller_package):
+        # 对参数进行校验，如果填入java_output和xml_output，
+        # 则model_package,mapper_package,service_package,
+        # service_impl_package,controller_package必须都存在
+        if all((java_output, xml_output, not all(
+                (model_package, mapper_package, service_package,
+                 service_impl_package, controller_package)
+        ))):
             raise KeyboardInterrupt(PATH_ERROR)
         if choose == 1:
             # 如果可执行语句存在或者指定列名存在就不应该循环执行
@@ -194,7 +197,7 @@ if __name__ == '__main__':
                 input(PARAM_ERROR)
         elif choose == 2:
             # 如果是选择spring生成器，那么不支持自定义sql或者指定列名
-            if len(table_names) >= 1 and not exec_sql and not column:
+            if all((len(table_names) >= 1, not exec_sql, not column)):
                 for t_name in table_names:
                     generator = SpringGenerator(host, user, pwd, db, table_schema, t_name.strip(),
                                                 port, charset, path=path, lombok=lombok,
