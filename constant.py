@@ -10,6 +10,9 @@ DEFAULT_DB_PORT = 3306
 # 数据库默认字符集
 DEFAULT_DB_CHARSET = 'utf8'
 
+# 查询数据库中的表名sql
+QUERY_TABLES_SQL = 'show tables;'
+
 # 创建临时表sql
 CREATE_TEMP_TB = 'create temporary table tmp_table'
 # 查询临时表sql

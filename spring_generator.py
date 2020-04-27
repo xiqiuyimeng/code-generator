@@ -5,6 +5,7 @@ from xml.etree import cElementTree
 
 from constant import *
 from mybatis_generator import MybatisGenerator
+from get_cursor import Cursor
 _author_ = 'luwt'
 _date_ = '2020/4/19 23:37'
 
@@ -136,6 +137,21 @@ class SpringGenerator(MybatisGenerator):
         self.generate_controller()
 
 
+def check_illegal_table(tables):
+    """检查表名是否正确，返回错误的表名"""
+    with Cursor(host, user, pwd, db) as cursor:
+        cursor.execute(QUERY_TABLES_SQL)
+        data = cursor.fetchall()
+        data = set(map(lambda x: x[0], data))
+        # data为数据库中真实表名集合，tables为配置文件中取到的表名，
+        # 通过集合运算，取出tables中不在data中的表名，先求并集在求差集
+        wrong_tables = (data | tables) - data
+        if wrong_tables:
+            print(f'发现了非法的表名：{wrong_tables}，系统将不会生成这些表的文件！')
+            return tables - wrong_tables
+        return tables
+
+
 if __name__ == '__main__':
     try:
         tree = cElementTree.parse(os.path.join(os.path.abspath('.'), DEFAULT_CONFIG_PATH))
@@ -148,7 +164,7 @@ if __name__ == '__main__':
         charset = root.findtext('database/charset')
         table_schema = root.findtext('generator/table_schema')
         table_name = root.findtext('generator/table_name')
-        table_names = table_name.split(',')
+        table_names = set(table_name.split(','))
         column = root.findtext('generator/column')
         # 输出路径，若java_output和xml_output存在，则path无效
         path = root.findtext('generator/path/default')
@@ -184,7 +200,7 @@ if __name__ == '__main__':
                 print(SUCCESS)
                 time.sleep(5)
             elif len(table_names) >= 1:
-                for t_name in table_names:
+                for t_name in check_illegal_table(table_names):
                     generator = MybatisGenerator(host, user, pwd, db, table_schema, t_name.strip(),
                                                  port, charset, column, path=path, lombok=lombok,
                                                  exec_sql=exec_sql, model_package=model_package,
@@ -198,7 +214,7 @@ if __name__ == '__main__':
         elif choose == 2:
             # 如果是选择spring生成器，那么不支持自定义sql或者指定列名
             if all((len(table_names) >= 1, not exec_sql, not column)):
-                for t_name in table_names:
+                for t_name in check_illegal_table(table_names):
                     generator = SpringGenerator(host, user, pwd, db, table_schema, t_name.strip(),
                                                 port, charset, path=path, lombok=lombok,
                                                 model_package=model_package, mapper_package=mapper_package,
