@@ -3,8 +3,8 @@ import time
 import os
 from xml.etree import cElementTree
 
-from mysql_generator.constant import *
-from mysql_generator.mybatis_generator import MybatisGenerator
+from constant import *
+from mybatis_generator import MybatisGenerator
 _author_ = 'luwt'
 _date_ = '2020/4/19 23:37'
 

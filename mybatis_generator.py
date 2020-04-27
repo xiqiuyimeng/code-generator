@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from mysql_generator import mysql_type as mt
-from mysql_generator.get_cursor import Cursor
-from mysql_generator.constant import *
+from get_cursor import Cursor
+from constant import *
+import mysql_type as mt
 from jinja2 import Environment, FileSystemLoader
 import os
 import sys
