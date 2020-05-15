@@ -54,7 +54,7 @@ class MybatisGenerator:
             mapper.java接口文件的模板，默认为当前目录下的mapper.txt文件，目录可选为当前目录下的子目录
         `xml_tp`
             mapper.xml配置文件的模板，默认为当前目录下的xml.txt文件，目录可选为当前目录下的子目录
-        `path`
+        `default_path`
             输出路径，默认为'./输出目录'，可修改
         `lombok`
             在生成java类时是否生成lombok的@Data注释，默认true，若配置为false则生成getter和setter方法
@@ -93,14 +93,15 @@ class MybatisGenerator:
             java_tp=DEFAULT_JAVA_TP,
             mapper_tp=DEFAULT_MAPPER_TP,
             xml_tp=DEFAULT_XML_TP,
-            path=DEFAULT_PATH,
+            default_path=DEFAULT_PATH,
             lombok=True,
             exec_sql=None,
             model_package=None,
             mapper_package=None,
             java_path=None,
             xml_path=None,
-            java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH
+            java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
+            **kwargs
     ):
         # 数据库信息
         self.host = host
@@ -140,14 +141,22 @@ class MybatisGenerator:
         self.get_param_key()
         self.class_name = self.deal_class_name()
         # 驼峰形式的类名
-        self.hump_cls_name = self.class_name.replace(self.class_name[:1], self.class_name[:1].lower(), 1)
+        self.hump_cls_name = self.class_name.replace(
+            self.class_name[:1],
+            self.class_name[:1].lower(),
+            1
+        )
         self.appointed_columns = True if self.column_name else False
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
         # 获取模板文件
-        self.env = Environment(loader=FileSystemLoader('./'), lstrip_blocks=True, trim_blocks=True)
+        self.env = Environment(
+            loader=FileSystemLoader('./'),
+            lstrip_blocks=True,
+            trim_blocks=True
+        )
         self.separator = '\\' if sys.platform.startswith("win") else '/'
         # 默认输出目录"./输出目录"
-        self.path = path
+        self.path = default_path
         # java项目地址，绝对路径 D:\java_workspaces\demo
         self.java_path = java_path
         # xml 路径
@@ -167,9 +176,10 @@ class MybatisGenerator:
         xml_absolute_path = self.path if self.path == model_absolute_path else self.xml_path
         self.xml_output_path = os.path.join(xml_absolute_path, f'{self.class_name}Mapper.xml')
         # mapper文件输出路径，如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
-        self.mapper_output_path = os.path.join(self.get_path(self.mapper_package),
-                                               f'{self.class_name}Mapper.java') \
-            if self.mapper else None
+        self.mapper_output_path = os.path.join(
+            self.get_path(self.mapper_package),
+            f'{self.class_name}Mapper.java'
+        ) if self.mapper else None
         self.model_namespace = f'{self.model_package}.{self.class_name}' \
             if self.model_package else DEFAULT_MODEL_NS
         self.mapper_namespace = f'{self.mapper_package}.{self.class_name}Mapper' \
@@ -182,7 +192,14 @@ class MybatisGenerator:
         java类路径需要拼接：java_path + java_src_relative + package.replace(".", separator)
         :param package 文件的包路径，如果为空，参数不全，所以返回默认输出目录
         """
-        if all((self.java_path, self.xml_path, self.java_src_relative, package)):
+        if all(
+                (
+                        self.java_path,
+                        self.xml_path,
+                        self.java_src_relative,
+                        package
+                )
+        ):
             return os.path.join(
                 self.java_path,
                 self.java_src_relative,
