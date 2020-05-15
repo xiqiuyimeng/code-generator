@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import time
 import os
-from xml.etree import cElementTree
 
+from xml_parser import params
 from constant import *
 from mybatis_generator import MybatisGenerator
 from get_cursor import Cursor
@@ -47,7 +47,7 @@ class SpringGenerator(MybatisGenerator):
             service_tp=DEFAULT_SERVICE_TP,
             service_impl_tp=DEFAULT_SERVICE_IMPL_TP,
             controller_tp=DEFAULT_CONTROLLER_TP,
-            path=DEFAULT_PATH,
+            default_path=DEFAULT_PATH,
             lombok=True,
             exec_sql=None,
             model_package=None,
@@ -57,7 +57,8 @@ class SpringGenerator(MybatisGenerator):
             controller_package=None,
             java_path=None,
             xml_path=None,
-            java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH
+            java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
+            **kwargs
     ):
         super().__init__(
             host,
@@ -72,14 +73,15 @@ class SpringGenerator(MybatisGenerator):
             java_tp,
             mapper_tp,
             xml_tp,
-            path,
+            default_path,
             lombok,
             exec_sql,
             model_package,
             mapper_package,
             java_path,
             xml_path,
-            java_src_relative
+            java_src_relative,
+            **kwargs
         )
         self.service_tp = service_tp
         self.service_impl_tp = service_impl_tp
@@ -139,7 +141,12 @@ class SpringGenerator(MybatisGenerator):
 
 def check_illegal_table(tables):
     """检查表名是否正确，返回错误的表名"""
-    with Cursor(host, user, pwd, db) as cursor:
+    with Cursor(
+            params.get('host'),
+            params.get('user'),
+            params.get('pwd'),
+            params.get('db')
+    ) as cursor:
         cursor.execute(QUERY_TABLES_SQL)
         data = cursor.fetchall()
         data = set(map(lambda x: x[0], data))
@@ -154,58 +161,30 @@ def check_illegal_table(tables):
 
 if __name__ == '__main__':
     try:
-        tree = cElementTree.parse(os.path.join(os.path.abspath('.'), DEFAULT_CONFIG_PATH))
-        root = tree.getroot()
-        host = root.findtext('database/host')
-        port = root.findtext('database/port')
-        user = root.findtext('database/user')
-        pwd = root.findtext('database/pwd')
-        db = root.findtext('database/db')
-        charset = root.findtext('database/charset')
-        table_schema = root.findtext('generator/table_schema')
-        table_name = root.findtext('generator/table_name')
-        table_names = set(table_name.split(','))
-        column = root.findtext('generator/column')
-        # 输出路径，若java_output和xml_output存在，则path无效
-        path = root.findtext('generator/path/default')
-        java_output = root.findtext('generator/path/java_output')
-        src_relative = root.findtext('generator/path/src_relative')
-        xml_output = root.findtext('generator/path/xml_output')
-        lombok = root.findtext('generator/lombok')
-        lombok = True if lombok.lower() == 'true' else False
-        exec_sql = root.findtext('generator/exec_sql')
-        model_package = root.findtext('else/model_package')
-        mapper_package = root.findtext('else/mapper_package')
-        service_package = root.findtext('else/service_package')
-        service_impl_package = root.findtext('else/service_impl_package')
-        controller_package = root.findtext('else/controller_package')
         choose = int(input(CHOOSE_GENERATOR_TYPE))
         # 对参数进行校验，如果填入java_output和xml_output，
         # 则model_package,mapper_package,service_package,
         # service_impl_package,controller_package必须都存在
-        if all((java_output, xml_output, not all(
-                (model_package, mapper_package, service_package,
-                 service_impl_package, controller_package)
-        ))):
+        packages = params.get('model_package'), \
+            params.get('mapper_package'), \
+            params.get('service_package'), \
+            params.get('service_impl_package'), \
+            params.get('controller_package')
+        if all((params.get('java_path'), params.get('xml_path'), not all(packages))):
             raise KeyboardInterrupt(PATH_ERROR)
         if choose == 1:
             # 如果可执行语句存在或者指定列名存在就不应该循环执行
-            if (exec_sql or column) and len(table_names) == 1:
-                generator = MybatisGenerator(host, user, pwd, db, table_schema, table_name.strip(),
-                                             port, charset, column, path=path, lombok=lombok,
-                                             exec_sql=exec_sql, model_package=model_package,
-                                             mapper_package=mapper_package, java_path=java_output,
-                                             xml_path=xml_output, java_src_relative=src_relative)
+            if (params.get('exec_sql') or params.get('column_name')) \
+                    and len(params.get('table_names')) == 1:
+                params['table_name'] = params.get('table_names')[0].strip()
+                generator = MybatisGenerator(**params)
                 generator.main()
                 print(SUCCESS)
                 time.sleep(5)
-            elif len(table_names) >= 1:
-                for t_name in check_illegal_table(table_names):
-                    generator = MybatisGenerator(host, user, pwd, db, table_schema, t_name.strip(),
-                                                 port, charset, column, path=path, lombok=lombok,
-                                                 exec_sql=exec_sql, model_package=model_package,
-                                                 mapper_package=mapper_package, java_path=java_output,
-                                                 xml_path=xml_output, java_src_relative=src_relative)
+            elif len(params.get('table_names')) >= 1:
+                for t_name in check_illegal_table(params.get('table_names')):
+                    params['table_name'] = t_name.strip()
+                    generator = MybatisGenerator(**params)
                     generator.main()
                 print(SUCCESS)
                 time.sleep(5)
@@ -213,17 +192,16 @@ if __name__ == '__main__':
                 input(PARAM_ERROR)
         elif choose == 2:
             # 如果是选择spring生成器，那么不支持自定义sql或者指定列名
-            if all((len(table_names) >= 1, not exec_sql, not column)):
-                for t_name in check_illegal_table(table_names):
-                    generator = SpringGenerator(host, user, pwd, db, table_schema, t_name.strip(),
-                                                port, charset, path=path, lombok=lombok,
-                                                model_package=model_package, mapper_package=mapper_package,
-                                                service_package=service_package,
-                                                service_impl_package=service_impl_package,
-                                                controller_package=controller_package,
-                                                java_path=java_output,
-                                                xml_path=xml_output,
-                                                java_src_relative=src_relative)
+            if all(
+                    (
+                            len(params.get('table_names')) >= 1,
+                            not params.get('exec_sql'),
+                            not params.get('column_name')
+                    )
+            ):
+                for t_name in check_illegal_table(params.get('table_names')):
+                    params['table_name'] = t_name.strip()
+                    generator = SpringGenerator(**params)
                     generator.main()
                 print(SUCCESS)
                 time.sleep(5)
