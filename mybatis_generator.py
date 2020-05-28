@@ -222,13 +222,17 @@ class MybatisGenerator:
             sql = QUERY_TEMP_TB
         elif self.column_name:
             columns = list(map(lambda x: x.strip(), self.column_name.split(',')))
-            for i, col_name in enumerate(columns):
-                if i == 0:
-                    sql += f' and column_name in ("{col_name}", '
-                elif col_name == columns[-1]:
-                    sql += f'"{col_name}")'
-                else:
-                    sql += f'"{col_name}", '
+            # 如果只有一个值，就不需要循环了
+            if len(columns) == 1:
+                sql += f' and column_name in ("{columns[0]}")'
+            else:
+                for i, col_name in enumerate(columns):
+                    if i == 0:
+                        sql += f' and column_name in ("{col_name}", '
+                    elif col_name == columns[-1]:
+                        sql += f'"{col_name}")'
+                    else:
+                        sql += f'"{col_name}", '
         return sql
 
     def get_data(self):
