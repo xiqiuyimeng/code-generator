@@ -176,7 +176,7 @@ if __name__ == '__main__':
             # 如果可执行语句存在或者指定列名存在就不应该循环执行
             if (params.get('exec_sql') or params.get('column_name')) \
                     and len(params.get('table_names')) == 1:
-                params['table_name'] = params.get('table_names')[0].strip()
+                params['table_name'] = list(params.get('table_names'))[0].strip()
                 generator = MybatisGenerator(**params)
                 generator.main()
                 print(SUCCESS)
