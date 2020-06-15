@@ -14,8 +14,6 @@ class ExceptionEnum(Enum):
     param_path_error = "路径参数有误"
 
     def assert_true(self):
-        print(self.value)
         raise MysqlException(self.value)
 
 
-ExceptionEnum.param_path_error.assert_true()
