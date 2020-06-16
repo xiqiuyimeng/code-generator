@@ -32,14 +32,9 @@ class SpringGenerator(MybatisGenerator):
 
     def __init__(
             self,
-            host,
-            user,
-            pwd,
-            db,
+            cursor,
             table_schema,
             table_name,
-            port=DEFAULT_DB_PORT,
-            charset=DEFAULT_DB_CHARSET,
             column_name=None,
             java_tp=DEFAULT_JAVA_TP,
             mapper_tp=DEFAULT_MAPPER_TP,
@@ -61,14 +56,9 @@ class SpringGenerator(MybatisGenerator):
             **kwargs
     ):
         super().__init__(
-            host,
-            user,
-            pwd,
-            db,
+            cursor,
             table_schema,
             table_name,
-            port,
-            charset,
             column_name,
             java_tp,
             mapper_tp,

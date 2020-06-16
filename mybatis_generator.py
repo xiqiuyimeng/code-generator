@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from get_cursor import Cursor
 from constant import *
 import mysql_type as mt
 from jinja2 import Environment, FileSystemLoader
@@ -28,18 +27,8 @@ class MybatisGenerator:
     可以配置生成多表字段联合的java类和resultMap，也可以指定某表的某些字段
         参数：
 
-        `host`
-            数据库地址
-        `user`
-            数据库用户名
-        `pwd`
-            数据库密码
-        `db`
-            数据库名
-        `port`
-            数据库端口
-        `charset`
-            数据库字符集信息
+        `cursor`
+            数据库连接游标，可操作数据库
         `table_schema`
             数据库名称，需要传
         `table_name`
@@ -81,14 +70,9 @@ class MybatisGenerator:
     """
     def __init__(
             self,
-            host,
-            user,
-            pwd,
-            db,
+            cursor,
             table_schema,
             table_name,
-            port=DEFAULT_DB_PORT,
-            charset=DEFAULT_DB_CHARSET,
             column_name=None,
             java_tp=DEFAULT_JAVA_TP,
             mapper_tp=DEFAULT_MAPPER_TP,
@@ -103,13 +87,7 @@ class MybatisGenerator:
             java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
             **kwargs
     ):
-        # 数据库信息
-        self.host = host
-        self.user = user
-        self.pwd = pwd
-        self.db = db
-        self.port = int(port) if port else DEFAULT_DB_PORT
-        self.charset = charset if charset else DEFAULT_DB_CHARSET
+        self.cursor = cursor
         # 库名
         self.table_schema = table_schema
         # 表名
@@ -237,28 +215,20 @@ class MybatisGenerator:
 
     def get_data(self):
         """连接数据库获取数据"""
-        with Cursor(
-                self.host,
-                self.user,
-                self.pwd,
-                self.db,
-                self.port,
-                self.charset
-        ) as cursor:
-            # 如果存在自定义sql，那么先生成临时表
-            if self.exec_sql:
-                cursor.execute(f'use {self.table_schema};')
-                cursor.execute(f'{CREATE_TEMP_TB} {self.exec_sql};')
-            cursor.execute(self.sql)
-            data = list(cursor.fetchall())
-            if self.exec_sql:
-                for ix, line in enumerate(data):
-                    line = list(line)
-                    # 类型标准化，临时表中查得的类型是类型加字段长度，去除长度信息
-                    if line[1].find('(') > 0:
-                        type_ = line[1][0: line[1].find('(')]
-                        line[1] = type_
-                    data[ix] = line
+        # 如果存在自定义sql，那么先生成临时表
+        if self.exec_sql:
+            self.cursor.execute(f'use {self.table_schema};')
+            self.cursor.execute(f'{CREATE_TEMP_TB} {self.exec_sql};')
+        self.cursor.execute(self.sql)
+        data = list(self.cursor.fetchall())
+        if self.exec_sql:
+            for ix, line in enumerate(data):
+                line = list(line)
+                # 类型标准化，临时表中查得的类型是类型加字段长度，去除长度信息
+                if line[1].find('(') > 0:
+                    type_ = line[1][0: line[1].find('(')]
+                    line[1] = type_
+                data[ix] = line
         return data
 
     def deal_class_name(self):

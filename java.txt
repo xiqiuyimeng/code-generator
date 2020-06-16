@@ -1,4 +1,6 @@
+{% if model_package %}
 package {{model_package}};
+{% endif %}
 
 {% if import_list %}
 {% for import in import_list %}
