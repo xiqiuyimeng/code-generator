@@ -1,4 +1,6 @@
+{% if service_impl_package %}
 package {{service_impl_package}};
+{% endif %}
 
 import {{mapper_namespace}};
 import {{model_namespace}};

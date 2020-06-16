@@ -1,4 +1,6 @@
+{% if mapper_package %}
 package {{mapper_package}};
+{% endif %}
 
 import {{model_namespace}};
 import org.apache.ibatis.annotations.Mapper;

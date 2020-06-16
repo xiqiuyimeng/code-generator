@@ -1,4 +1,6 @@
+{% if service_package %}
 package {{service_package}};
+{% endif %}
 
 import {{model_namespace}};
 
