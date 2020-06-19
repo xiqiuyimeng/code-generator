@@ -9,16 +9,17 @@ _date_ = '2020/6/11 10:20'
 class DBExecutor:
     """数据库操作类"""
 
-    def __init__(self, host, user, pwd):
+    def __init__(self, host, user, pwd, port):
         self.host = host
         self.user = user
         self.pwd = pwd
+        self.port = port
         self._cursor = None
         self.cursor = self.get_cursor()
 
     def get_cursor(self):
         """获取游标"""
-        self._cursor = Cursor(self.host, self.user, self.pwd, None)
+        self._cursor = Cursor(self.host, self.user, self.pwd, None, self.port)
         gv.cursor = self._cursor.cursor
         return gv.cursor
 

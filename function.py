@@ -4,7 +4,7 @@ _author_ = 'luwt'
 _date_ = '2020/6/15 15:21'
 
 
-conn_info = 'centos121', 'root', 'admin'
+conn_info = 'centos121', 'root', 'admin', 3306
 executor = DBExecutor(*conn_info)
 
 

@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from function import *
+# from function import *
 
 
 # 表格头的标题文字
@@ -89,9 +89,24 @@ class CheckBoxHeader(QtWidgets.QHeaderView):
             self.updateSection(0)
 
 
+from collections import namedtuple
+from db_info import DBExecutor
+# todo 模拟数据
+conn = namedtuple('conn', 'host user pwd port')
+centos121 = conn('centos121', 'root', 'admin', 3306)
+cvhub_107 = conn('172.16.17.107', 'root', 'admin', 3306)
+cvhub_89 = conn('172.16.26.89', 'root', 'admin', 3306)
+conn_dict = {
+    'centos121': centos121,
+    'cvhub_107': cvhub_107,
+    'cvhub_89': cvhub_89
+}
+
+
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setupUi(self, MainWindow):
+        self.conn_dict = dict()
         self._translate = QtCore.QCoreApplication.translate
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1123, 896)
@@ -162,30 +177,54 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def get_conns(self):
         """获取所有链接，生成页面列表"""
-        # 根节点，展示连接的列表
-        self.conn = self.treeWidget.currentItem()
-        conn_item = QtWidgets.QTreeWidgetItem(self.treeWidget)
-        conn_item.setText(0, self._translate("MainWindow", "centos121"))
+        for alias, conn in conn_dict.items():
+            # 根节点，展示连接的列表
+            self.conn = self.treeWidget.currentItem()
+            conn_item = QtWidgets.QTreeWidgetItem(self.treeWidget)
+            conn_item.setText(0, self._translate("MainWindow", alias))
 
-    def get_tree_list(self, index):
+    def get_conn(self, conn_name):
+        """根据连接名称，从当前维护的连接字典中获取一个数据库连接操作对象"""
+        if not self.conn_dict.get(conn_name):
+            executor = DBExecutor(*conn_dict.get(conn_name))
+            self.conn_dict[conn_name] = executor
+        else:
+            executor = self.conn_dict.get(conn_name)
+        return executor
+
+    def get_tree_list(self):
         """获取树的子节点，双击触发，将连接 -> 数据库 -> 数据表，按顺序读取出来"""
         item = self.treeWidget.currentItem()
-        # 数据库列表，父节点是连接
-        if item.parent() is self.conn:
-            dbs = get_dbs()
-            for db in dbs:
-                self.make_tree_item(item, db)
-                self.dbs.append(db)
-        # 如果是具体的数据库，那么查询库中所有的表，并展示为树形结构，父节点为当前库
-        elif item.text(0) in self.dbs:
-            switch_db(item.text(0))
-            tables = get_tables()
-            for table in tables:
-                self.make_tree_item(item, table)
-                self.tables.append(table)
-        # 如果是具体的表，那么查询所有的字段名称，显示在右侧表格中
-        elif item.text(0) in self.tables:
-            cols = get_cols(item.text(0))
+        # 当前点击项为连接时，父节点为空，查询连接下所有的库
+        if item.parent() is None:
+            # 仅当子元素不存在时，获取子元素并填充
+            if item.childCount() == 0:
+                # 连接名称
+                conn_name = item.text(0)
+                dbs = self.get_conn(conn_name).get_dbs()
+                for db in dbs:
+                    self.make_tree_item(item, db)
+        # 如果是具体的数据库，那么查询库中所有的表，并展示为树形结构，
+        # 父节点为连接，连接的父节点为空
+        elif item.parent().parent() is None:
+            # 仅当子元素不存在时，获取子元素并填充
+            if item.childCount() == 0:
+                # 获取连接名称，从而获取该连接的数据库操作对象
+                conn_name = item.parent().text(0)
+                executor = self.get_conn(conn_name)
+                # 首先需要切换库
+                executor.switch_db(item.text(0))
+                tables = executor.get_tables()
+                for table in tables:
+                    self.make_tree_item(item, table)
+        # # 如果是具体的表，那么查询所有的字段名称，显示在右侧表格中，
+        # 父节点为库，库父节点为连接，连接父节点为空
+        elif item.parent().parent().parent() is None:
+            # 获取连接名称，从而获取该连接的数据库操作对象
+            conn_name = item.parent().parent().text(0)
+            executor = self.get_conn(conn_name)
+            # 获取当前表下所有的列名
+            cols = executor.get_cols(item.text(0))
             self.fill_table(cols)
             self.tableWidget.cellChanged.connect(self.on_cell_changed)
 
@@ -264,8 +303,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     data = self.tableWidget.item(row, 1).text()
                     print(f'{row}行 撤销选中 -> {data} : {checked_set}')
 
-    def close_conn(self):
-        executor.exit()
+    def close_conn(self, conn_name=None):
+        if conn_name:
+            self.conn_dict.get(conn_name).exit()
+        else:
+            [executor.exit() for executor in self.conn_dict.values()]
 
     # def rightClickMenu(self, pos):
     #     menu = QtWidgets.QMenu()
