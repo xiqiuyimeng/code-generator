@@ -131,8 +131,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 双击树节点事件
         self.treeWidget.doubleClicked.connect(self.get_tree_list)
         # 右击事件
-        # self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        # self.customContextMenuRequested.connect(self.rightClickMenu)
+        self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
+
         self.horizontalLayout.addWidget(self.treeWidget)
 
         # 隐式添加表格
@@ -236,11 +237,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """将列名字段全数填充在表中，三列多行表"""
         # 显示列标题
         self.tableWidget.horizontalHeader().setVisible(True)
-        [self.tableWidget.removeRow(0) for r in range(self.tableWidget.rowCount())]
-        # 清空选中集合
-        checked_set.clear()
-        all_header_combobox.clear()
-        self.header.set_header_checked(False)
+        self.clear_table()
         # 填充数据
         for i, col in enumerate(cols):
             # 插入新的一行
@@ -306,15 +303,102 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def close_conn(self, conn_name=None):
         if conn_name:
             self.conn_dict.get(conn_name).exit()
+            del self.conn_dict[conn_name]
         else:
             [executor.exit() for executor in self.conn_dict.values()]
+            self.conn_dict.clear()
 
-    # def rightClickMenu(self, pos):
-    #     menu = QtWidgets.QMenu()
-    #     menu.addAction(QtWidgets.QAction('编辑连接', menu))
-    #     menu.addAction(QtWidgets.QAction('删除连接', menu))
-    #     menu.triggered.connect(self.menuSlot)
-    #     menu.exec_(QtGui.QCursor.pos())
-    #
-    # def menuSlot(self, act):
-    #     print(act.text())
+    def right_click_menu(self, pos):
+        # 获取当前元素，只有在元素上才显示菜单
+        item = self.treeWidget.itemAt(pos)
+        if item:
+            menu = QtWidgets.QMenu()
+            menu_names = list()
+            # 连接列表的右键菜单
+            if item.parent() is None:
+                menu_names = self.get_conn_menu_names(item)
+            # 数据库列表的右键菜单
+            elif item.parent().parent() is None:
+                menu_names = self.get_db_menu_names(item)
+            # 其他作为数据表列表的右键菜单
+            else:
+                menu_names = self.get_table_menu_names()
+            [menu.addAction(QtWidgets.QAction(option, menu)) for option in menu_names]
+            menu.triggered.connect(self.menu_slot)
+            menu.exec_(QtGui.QCursor.pos())
+
+    def get_conn_menu_names(self, item):
+        """生成第一层，连接列表的右键菜单名称"""
+        menu_names = list()
+        if item.childCount():
+            menu_names.append('关闭连接')
+        else:
+            menu_names.append('打开连接')
+        menu_names.append('编辑连接')
+        menu_names.append('删除连接')
+        return menu_names
+
+    def get_db_menu_names(self, item):
+        """生成第二层，数据库列表的右键菜单名称"""
+        menu_names = list()
+        if item.childCount():
+            menu_names.append('关闭数据库')
+            menu_names.append('全选所有表')
+        else:
+            menu_names.append('打开数据库')
+        return menu_names
+
+    def get_table_menu_names(self):
+        """生成第三层，数据表列表的右键菜单"""
+        menu_names = ['生成']
+        return menu_names
+
+    def menu_slot(self, act):
+        """点击右键菜单选项后触发事件"""
+        # 获取右键点击的项
+        item = self.treeWidget.currentItem()
+        # 如果是连接
+        if item.parent() is None:
+            func = act.text()
+            if func == '打开连接':
+                self.open_tree_item(item)
+            elif func == '关闭连接':
+                self.close_tree_item(item)
+                # 关闭数据连接
+                self.close_conn(item.text(0))
+        # 如果是数据库
+        elif item.parent().parent() is None:
+            func = act.text()
+            if func == '打开数据库':
+                self.open_tree_item(item)
+            elif func == '关闭数据库':
+                self.close_tree_item(item)
+
+    def open_tree_item(self, item):
+        """打开树的某项，展开状态置为 true，刷新下页面"""
+        self.get_tree_list()
+        item.setExpanded(True)
+        self.treeWidget.repaint()
+
+    def close_tree_item(self, item):
+        """关闭树的某项，将其下所有子项移除，并将扩展状态置为false"""
+        # 移除所有子项目
+        for child in item.takeChildren():
+            item.removeChild(child)
+        self.close_table()
+        item.setExpanded(False)
+
+    def close_table(self):
+        """关闭右侧表格"""
+        # 删除表格内容
+        self.clear_table()
+        # 隐藏表头
+        self.tableWidget.horizontalHeader().setVisible(False)
+
+    def clear_table(self):
+        """清空右侧表格"""
+        [self.tableWidget.removeRow(0) for r in range(self.tableWidget.rowCount())]
+        # 清空选中集合
+        checked_set.clear()
+        all_header_combobox.clear()
+        self.header.set_header_checked(False)
