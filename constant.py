@@ -10,6 +10,9 @@ DEFAULT_DB_PORT = 3306
 # 数据库默认字符集
 DEFAULT_DB_CHARSET = 'utf8'
 
+# 测试数据库连接，查询数据库版本信息
+TEST_CONN_SQL = 'select version();'
+
 # 查询数据库列表
 QUERY_DB_SQL = 'show databases;'
 

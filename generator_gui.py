@@ -8,115 +8,40 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-# from function import *
+from table_header import all_header_combobox, CheckBoxHeader
+from conn_dialog import Ui_Dialog
+from sys_info_storage.sqlite import *
+from db_info import DBExecutor
 
 
 # 表格头的标题文字
 header_labels = ["全选", "字段名", "数据类型", "备注"]
-# 用来装行表头所有复选框 全局变量
-all_header_combobox = list()
 # 已选中集合
 checked_set = set()
 
 
-class CheckBoxHeader(QtWidgets.QHeaderView):
-    """自定义表头类，参考自 https://www.pythonf.cn/read/108150"""
-
-    # 自定义 复选框全选信号
-    select_all_clicked = QtCore.pyqtSignal(bool)
-    # 这4个变量控制列头复选框的样式，位置以及大小
-    _x_offset = 3
-    _y_offset = 0
-    _width = 20
-    _height = 20
-
-    def __init__(self, orientation=QtCore.Qt.Horizontal, parent=None):
-        super(CheckBoxHeader, self).__init__(orientation, parent)
-        self.isOn = False
-
-    def paintSection(self, painter, rect, logicalIndex):
-        painter.save()
-        super(CheckBoxHeader, self).paintSection(painter, rect, logicalIndex)
-        painter.restore()
-
-        self._y_offset = int((rect.height() - self._width) / 2)
-
-        if logicalIndex == 0:
-            option = QtWidgets.QStyleOptionButton()
-            option.rect = QtCore.QRect(rect.x() + self._x_offset, rect.y() + self._y_offset, self._width, self._height)
-            option.state = QtWidgets.QStyle.State_Enabled | QtWidgets.QStyle.State_Active
-            if self.isOn:
-                option.state |= QtWidgets.QStyle.State_On
-            else:
-                option.state |= QtWidgets.QStyle.State_Off
-            self.style().drawControl(QtWidgets.QStyle.CE_CheckBox, option, painter)
-
-    def mousePressEvent(self, event):
-        index = self.logicalIndexAt(event.pos())
-        if 0 == index:
-            x = self.sectionPosition(index)
-            if x + self._x_offset < event.pos().x() < x + self._x_offset + self._width \
-                    and self._y_offset < event.pos().y() < self._y_offset + self._height:
-                if self.isOn:
-                    self.isOn = False
-                else:
-                    self.isOn = True
-                    # 当用户点击了行表头复选框，发射 自定义信号 select_all_clicked()
-                self.select_all_clicked.emit(self.isOn)
-
-                self.updateSection(0)
-        super(CheckBoxHeader, self).mousePressEvent(event)
-
-    # 自定义信号 select_all_clicked 的槽方法
-    def change_state(self, isOn):
-        # 如果行表头复选框为勾选状态
-        if isOn:
-            # 将所有的复选框都设为勾选状态
-            for i in all_header_combobox:
-                i.setCheckState(QtCore.Qt.Checked)
-        else:
-            for i in all_header_combobox:
-                i.setCheckState(QtCore.Qt.Unchecked)
-
-    def set_header_checked(self, checked):
-        if checked:
-            self.isOn = True
-            # 更新表头控件
-            self.updateSection(0)
-        else:
-            self.isOn = False
-            # 更新表头控件
-            self.updateSection(0)
-
-
-from collections import namedtuple
-from db_info import DBExecutor
-# todo 模拟数据
-conn = namedtuple('conn', 'host user pwd port')
-centos121 = conn('centos121', 'root', 'admin', 3306)
-cvhub_107 = conn('172.16.17.107', 'root', 'admin', 3306)
-cvhub_89 = conn('172.16.26.89', 'root', 'admin', 3306)
-conn_dict = {
-    'centos121': centos121,
-    'cvhub_107': cvhub_107,
-    'cvhub_89': cvhub_89
-}
-
-
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
-    def setupUi(self, MainWindow):
-        self.conn_dict = dict()
+    def setupUi(self, main_window):
+        self.main_window = main_window
+        # 已经连接数据库的连接，key为id，value为connection对象
+        self.connected_dict = dict()
         self._translate = QtCore.QCoreApplication.translate
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1123, 896)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象
+        self.conns_dict = dict()
+        self.dbs = list()
+        self.tables = list()
+
+        self.main_window.setObjectName("MainWindow")
+        self.main_window.resize(1123, 896)
+        self.centralwidget = QtWidgets.QWidget(self.main_window)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.treeWidget = QtWidgets.QTreeWidget(self.centralwidget)
+
         # 树结构的字体设置
         font = QtGui.QFont()
         font.setFamily("楷体")
@@ -125,8 +50,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.treeWidget.setObjectName("treeWidget")
         # 初始化获取树结构的第一层元素，为数据库连接列表
         self.get_conns()
-        self.dbs = list()
-        self.tables = list()
 
         # 双击树节点事件
         self.treeWidget.doubleClicked.connect(self.get_tree_list)
@@ -138,18 +61,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # 隐式添加表格
         self.add_table()
+
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.main_window.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(self.main_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.main_window.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self.main_window)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        self.main_window.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi()
+        QtCore.QMetaObject.connectSlotsByName(self.main_window)
 
     def add_table(self):
         self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
@@ -168,29 +92,33 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 交替行颜色
         self.tableWidget.setAlternatingRowColors(True)
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.treeWidget.headerItem().setText(0, _translate("MainWindow", "mysql连接列表"))
+    def retranslateUi(self):
+        self.main_window.setWindowTitle(self._translate("MainWindow", "MainWindow"))
+        self.treeWidget.headerItem().setText(0, self._translate("MainWindow", "mysql连接列表"))
         __sortingEnabled = self.treeWidget.isSortingEnabled()
         self.treeWidget.setSortingEnabled(False)
         self.treeWidget.setSortingEnabled(__sortingEnabled)
 
     def get_conns(self):
-        """获取所有链接，生成页面列表"""
-        for alias, conn in conn_dict.items():
+        """获取所有连接，生成页面树结构第一层"""
+        conns = get_conns()
+        for item in conns:
+            # item属性：id name host port user pwd
             # 根节点，展示连接的列表
             self.conn = self.treeWidget.currentItem()
-            conn_item = QtWidgets.QTreeWidgetItem(self.treeWidget)
-            conn_item.setText(0, self._translate("MainWindow", alias))
+            self.make_tree_item(self.treeWidget, item.name, item.id)
+            self.conns_dict[item.id] = item
 
-    def get_conn(self, conn_name):
+    def get_conn(self, conn_id):
         """根据连接名称，从当前维护的连接字典中获取一个数据库连接操作对象"""
-        if not self.conn_dict.get(conn_name):
-            executor = DBExecutor(*conn_dict.get(conn_name))
-            self.conn_dict[conn_name] = executor
+        # 如果该连接已经打开，直接取，否则获取新的连接
+        if not self.connected_dict.get(conn_id):
+            # id name host port user pwd
+            conn_info = self.conns_dict.get(conn_id)
+            executor = DBExecutor(*conn_info[2:])
+            self.connected_dict[conn_id] = executor
         else:
-            executor = self.conn_dict.get(conn_name)
+            executor = self.connected_dict.get(conn_id)
         return executor
 
     def get_tree_list(self):
@@ -200,9 +128,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if item.parent() is None:
             # 仅当子元素不存在时，获取子元素并填充
             if item.childCount() == 0:
-                # 连接名称
-                conn_name = item.text(0)
-                dbs = self.get_conn(conn_name).get_dbs()
+                # 连接的id，存在于元素的第一列
+                conn_id = int(item.text(1))
+                dbs = self.get_conn(conn_id).get_dbs()
                 for db in dbs:
                     self.make_tree_item(item, db)
         # 如果是具体的数据库，那么查询库中所有的表，并展示为树形结构，
@@ -210,9 +138,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         elif item.parent().parent() is None:
             # 仅当子元素不存在时，获取子元素并填充
             if item.childCount() == 0:
-                # 获取连接名称，从而获取该连接的数据库操作对象
-                conn_name = item.parent().text(0)
-                executor = self.get_conn(conn_name)
+                # 获取连接id，从而获取该连接的数据库操作对象
+                conn_id = int(item.parent().text(1))
+                executor = self.get_conn(conn_id)
                 # 首先需要切换库
                 executor.switch_db(item.text(0))
                 tables = executor.get_tables()
@@ -221,16 +149,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # # 如果是具体的表，那么查询所有的字段名称，显示在右侧表格中，
         # 父节点为库，库父节点为连接，连接父节点为空
         elif item.parent().parent().parent() is None:
-            # 获取连接名称，从而获取该连接的数据库操作对象
-            conn_name = item.parent().parent().text(0)
-            executor = self.get_conn(conn_name)
+            # 获取连接id，从而获取该连接的数据库操作对象
+            conn_id = int(item.parent().parent().text(1))
+            executor = self.get_conn(conn_id)
             # 获取当前表下所有的列名
             cols = executor.get_cols(item.text(0))
             self.fill_table(cols)
             self.tableWidget.cellChanged.connect(self.on_cell_changed)
 
-    def make_tree_item(self, parent, name):
+    def make_tree_item(self, parent, name, item_id=None):
+        """构造树的子项"""
         item = QtWidgets.QTreeWidgetItem(parent)
+        item.setText(0, self._translate("MainWindow", name))
+        if item_id:
+            # id 作为隐藏属性，写于第二列
+            item.setText(1, self._translate("MainWindow", str(item_id)))
+
+    def update_tree_item_name(self, item, name):
         item.setText(0, self._translate("MainWindow", name))
 
     def fill_table(self, cols):
@@ -268,6 +203,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.header.select_all_clicked.connect(self.header.change_state)
 
     def on_cell_changed(self, row, col):
+        """第一列checkbox状态改变时触发"""
         if col == 0:
             # 检查第一列，checkbox选中状态
             check = self.tableWidget.item(row, col)
@@ -300,20 +236,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     data = self.tableWidget.item(row, 1).text()
                     print(f'{row}行 撤销选中 -> {data} : {checked_set}')
 
-    def close_conn(self, conn_name=None):
-        if conn_name:
-            self.conn_dict.get(conn_name).exit()
-            del self.conn_dict[conn_name]
+    def close_conn(self, conn_id=None):
+        """关闭连接"""
+        if conn_id:
+            self.connected_dict.get(conn_id).exit()
+            del self.connected_dict[conn_id]
         else:
-            [executor.exit() for executor in self.conn_dict.values()]
-            self.conn_dict.clear()
+            [executor.exit() for executor in self.connected_dict.values()]
+            self.connected_dict.clear()
 
     def right_click_menu(self, pos):
         # 获取当前元素，只有在元素上才显示菜单
         item = self.treeWidget.itemAt(pos)
         if item:
             menu = QtWidgets.QMenu()
-            menu_names = list()
             # 连接列表的右键菜单
             if item.parent() is None:
                 menu_names = self.get_conn_menu_names(item)
@@ -334,6 +270,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             menu_names.append('关闭连接')
         else:
             menu_names.append('打开连接')
+        menu_names.append('添加连接')
         menu_names.append('编辑连接')
         menu_names.append('删除连接')
         return menu_names
@@ -360,12 +297,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 如果是连接
         if item.parent() is None:
             func = act.text()
-            if func == '打开连接':
-                self.open_tree_item(item)
-            elif func == '关闭连接':
-                self.close_tree_item(item)
-                # 关闭数据连接
-                self.close_conn(item.text(0))
+            self.handle_conn(item, func)
         # 如果是数据库
         elif item.parent().parent() is None:
             func = act.text()
@@ -402,3 +334,48 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         checked_set.clear()
         all_header_combobox.clear()
         self.header.set_header_checked(False)
+
+    def show_conn_dialog(self, conn_info, title):
+        """打开添加、编辑连接子窗口"""
+        dialog = Ui_Dialog(conn_info, title)
+        dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        dialog.show()
+        if title == '添加连接':
+            dialog._signal.connect(self.add_conn_tree_item)
+        elif title == '编辑连接':
+            dialog._signal.connect(self.update_conn_tree_item)
+
+    def add_conn_tree_item(self, connection):
+        """添加树节点（连接）"""
+        self.conns_dict[connection.id] = connection
+        self.make_tree_item(self.treeWidget, connection.name, connection.id)
+
+    def update_conn_tree_item(self, connection):
+        """更新树节点"""
+        self.conns_dict[connection.id] = connection
+        item = self.treeWidget.currentItem()
+        self.update_tree_item_name(item, connection.name)
+
+    def handle_conn(self, item, func):
+        """右键菜单中关于连接的处理"""
+        if func == '打开连接':
+            self.open_tree_item(item)
+        elif func == '关闭连接':
+            self.close_tree_item(item)
+            # 关闭数据连接，关闭特定连接，id为标识
+            self.close_conn(int(item.text(1)))
+        elif func == '添加连接':
+            conn_info = Connection(None, None, None, None, None, None)
+            self.show_conn_dialog(conn_info, func)
+        elif func == '编辑连接':
+            conn_id = int(item.text(1))
+            conn_info = self.conns_dict.get(conn_id)
+            self.show_conn_dialog(conn_info, func)
+            # 在子窗口更新完数据库后，将页面数据也更新
+            self.conns_dict[int(item.text(1))] = get_conn(conn_id)
+        elif func == '删除连接':
+            conn_info = self.conns_dict[int(item.text(1))]
+            delete_conn(conn_info.id)
+            del self.conns_dict[int(item.text(1))]
+            # todo ui不刷新
+            self.treeWidget.removeItemWidget(item, 1)
