@@ -377,5 +377,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             conn_info = self.conns_dict[int(item.text(1))]
             delete_conn(conn_info.id)
             del self.conns_dict[int(item.text(1))]
-            # todo ui不刷新
-            self.treeWidget.removeItemWidget(item, 1)
+            # 删除树元素
+            # 树型部件的takeTopLevelItem方法可以从树型部件中删除对应项的节点并返回该项，语法：takeTopLevelItem(index)
+            # 通过调用树型部件的indexOfTopLevelItem方法可以获得对应项在顶层项的位置，语法：indexOfTopLevelItem
+            #
+            # self.treeWidget.removeItemWidget，它从一个项中移除一个小部件，而不是QTreeWidgetItem。它对应于setItemWidget方法
+            self.treeWidget.takeTopLevelItem(self.treeWidget.indexOfTopLevelItem(item))
