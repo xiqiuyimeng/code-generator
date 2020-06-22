@@ -8,14 +8,16 @@
 
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QDialog
+from PyQt5.QtWidgets import QDialog
 from sys_info_storage.sqlite import *
 from db_info import DBExecutor
+from message_box import *
+from constant import *
 
 
 class Ui_Dialog(QDialog):
 
-    _signal = QtCore.pyqtSignal(Connection)
+    conn_signal = QtCore.pyqtSignal(Connection)
 
     def __init__(self, connection, dialog_title):
         super().__init__()
@@ -145,37 +147,37 @@ class Ui_Dialog(QDialog):
 
     def test_connection(self):
         """测试连接"""
-        self.dialog.setDisabled(True)
         new_conn = self.get_input()
-        try:
-            with DBExecutor(
-                    new_conn.host,
-                    new_conn.port,
-                    new_conn.user,
-                    new_conn.pwd
-            ) as cur:
-                cur.test_conn()
-            self.pop_msg('连接成功\t')
-        except Exception as e:
-            self.pop_msg(f'连接失败\t\n{e.args[0]} - {e.args[1]}')
-            print(e)
-        finally:
-            self.dialog.setDisabled(False)
+        test_connection(new_conn)
 
     def add_conn(self):
         """添加新的连接记录到系统库中"""
         new_conn = self.get_input()
-        if self.dialog_title == '编辑连接':
+        if self.dialog_title == EDIT_CONN_MENU:
             update_conn(new_conn)
-        elif self.dialog_title == '添加连接':
+        elif self.dialog_title == ADD_CONN_MENU:
             add_conn(new_conn)
             new_conn = get_new_conn()
-        self.pop_msg('保存成功\t')
+        pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
         self.dialog.close()
-        self._signal.emit(new_conn)
+        self.conn_signal.emit(new_conn)
 
-    def pop_msg(self, msg):
-        QMessageBox.information(QMessageBox(), 'mysql', msg, QMessageBox.Ok)
+
+def test_connection(connection):
+    """测试连接"""
+    try:
+        with DBExecutor(
+                connection.host,
+                connection.port,
+                connection.user,
+                connection.pwd
+        ) as cur:
+            cur.test_conn()
+        pop_ok(TEST_CONN_MENU, TEST_CONN_SUCCESS_PROMPT)
+    except Exception as e:
+        pop_fail(TEST_CONN_MENU, f'{TEST_CONN_FAIL_PROMPT}\t\n'
+                                 f'{e.args[0]} - {e.args[1]}')
+        print(e)
 
 
 # if __name__ == '__main__':
@@ -183,6 +185,6 @@ class Ui_Dialog(QDialog):
 #
 #     app = QtWidgets.QApplication(sys.argv)
 #     conn = Connection(None, 'centos121', 'centos121', 3306, 'root', 'admin')
-#     ui = Ui_Dialog(conn)
+#     ui = Ui_Dialog(conn, '添加连接')
 #     ui.show()
 #     sys.exit(app.exec_())
