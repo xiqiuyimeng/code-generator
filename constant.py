@@ -68,3 +68,62 @@ PARAM_PATH_ERROR = "路径参数有误"
 
 # 执行成功提示语
 SUCCESS = "执行成功！五秒后退出"
+
+"""关于连接的右键菜单"""
+# 打开连接
+OPEN_CONN_MENU = '打开连接'
+# 关闭连接
+CLOSE_CONN_MENU = '关闭连接'
+# 测试连接
+TEST_CONN_MENU = '测试连接'
+# 添加连接
+ADD_CONN_MENU = '添加连接'
+# 编辑连接
+EDIT_CONN_MENU = '编辑连接'
+# 删除连接
+DEL_CONN_MENU = '删除连接'
+
+"""关于数据库的右键菜单"""
+# 打开数据库
+OPEN_DB_MENU = '打开数据库'
+# 关闭数据库
+CLOSE_DB_MENU = '关闭数据库'
+# 全选所有表
+SELECT_ALL_TB_MENU = '全选所有表'
+# 取消选择表
+UNSELECT_TB_MENU = '取消选择表'
+
+"""关于表的右键菜单"""
+# 打开表
+OPEN_TABLE_MENU = '打开表'
+# 关闭表
+CLOSE_TABLE_MENU = '关闭表'
+# 全选表中所有字段
+SELECT_ALL_FIELD_MENU = '全选表中所有字段'
+# 取消选择字段
+UNSELECT_FIELD_MENU = '取消选择字段'
+# 生成
+GENERATE_MENU = '生成'
+
+"""消息框按钮文字"""
+OK_BUTTON = '确定'
+ACCEPT_BUTTON = '是'
+REJECT_BUTTON = '否'
+
+"""操作连接时提示语"""
+# 编辑连接时的提示语
+EDIT_CONN_PROMPT = '编辑连接需要先关闭连接，是否继续？'
+# 删除连接时的提示语
+DEL_CONN_PROMPT = '是否要删除连接？'
+# 保存连接成功提示语
+SAVE_CONN_SUCCESS_PROMPT = '保存成功！'
+# 测试连接成功提示语
+TEST_CONN_SUCCESS_PROMPT = '连接成功！'
+# 测试连接失败提示语
+TEST_CONN_FAIL_PROMPT = '连接失败！'
+
+"""表格列头"""
+TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "备注"]
+
+"""树部件头标题"""
+TREE_HEADER_LABELS = 'mysql连接列表'

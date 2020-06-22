@@ -21,9 +21,24 @@
        <widget class="QTreeWidget" name="treeWidget">
         <column>
          <property name="text">
-          <string notr="true">1</string>
+          <string notr="true"/>
          </property>
         </column>
+        <item>
+         <property name="text">
+          <string>root</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>child</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>child_child</string>
+           </property>
+          </item>
+         </item>
+        </item>
        </widget>
       </item>
       <item>
