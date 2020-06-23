@@ -10,8 +10,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(window)
+    ui = Ui_MainWindow(window)
     window.show()
     app.exec_()
     ui.close_conn()

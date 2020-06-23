@@ -8,7 +8,6 @@
 
 
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QCheckBox
 from table_header import all_header_combobox, CheckBoxHeader
 from conn_dialog import *
 from sys_info_storage.sqlite import *
@@ -23,8 +22,10 @@ checked_set = set()
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
-    def setupUi(self, main_window):
+    def __init__(self, main_window):
+        super().__init__()
         self.main_window = main_window
+
         # 已经连接数据库的连接，key为id，value为DBExecutor对象
         self.connected_dict = dict()
         self._translate = QtCore.QCoreApplication.translate
@@ -33,6 +34,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.dbs = list()
         self.tables = list()
 
+        self.setupUi()
+
+    def setupUi(self):
         self.main_window.setObjectName("MainWindow")
         self.main_window.resize(1123, 896)
         self.centralwidget = QtWidgets.QWidget(self.main_window)
@@ -49,22 +53,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(13)
         self.treeWidget.setFont(font)
         self.treeWidget.setObjectName("treeWidget")
-        # 初始化获取树结构的第一层元素，为数据库连接列表
-        self.get_conns()
-
-        # 双击树节点事件
-        self.treeWidget.doubleClicked.connect(self.get_tree_list)
-        self.treeWidget.itemClicked.connect(self.table_check_box)
-        # 右击事件
-        self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
-
         self.horizontalLayout.addWidget(self.treeWidget)
-
-        # 隐式添加表格
-        self.add_table()
-
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
+
         self.main_window.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(self.main_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
@@ -74,10 +65,40 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.statusbar.setObjectName("statusbar")
         self.main_window.setStatusBar(self.statusbar)
 
+        # 初始化树：初始化获取树结构的第一层元素，为数据库连接列表
+        self.get_saved_conns()
+
+        # 初始化表格：隐式添加表格
+        self.add_table()
+
+        # 双击树节点事件
+        self.treeWidget.doubleClicked.connect(self.get_tree_list)
+        self.treeWidget.itemClicked.connect(self.table_check_box)
+        # 右击事件
+        self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
+
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self.main_window)
 
+    def retranslateUi(self):
+        self.main_window.setWindowTitle(self._translate("MainWindow", "MainWindow"))
+        self.treeWidget.headerItem().setText(0, self._translate("MainWindow", TREE_HEADER_LABELS))
+        __sortingEnabled = self.treeWidget.isSortingEnabled()
+        self.treeWidget.setSortingEnabled(False)
+        self.treeWidget.setSortingEnabled(__sortingEnabled)
+
+    def get_saved_conns(self):
+        """获取所有已存储的连接，生成页面树结构第一层"""
+        conns = get_conns()
+        for item in conns:
+            # item属性：id name host port user pwd
+            # 根节点，展示连接的列表
+            self.make_tree_item(self.treeWidget, item.name, item.id)
+            self.conns_dict[item.id] = item
+
     def add_table(self):
+        """添加表格"""
         self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
         self.tableWidget.setObjectName("tableWidget")
         # 创建表格列标题，共四列
@@ -89,27 +110,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
         self.horizontalLayout.addWidget(self.tableWidget)
-        # 隐藏表格头部列标题
-        self.tableWidget.horizontalHeader().setVisible(False)
         # 交替行颜色
         self.tableWidget.setAlternatingRowColors(True)
-
-    def retranslateUi(self):
-        self.main_window.setWindowTitle(self._translate("MainWindow", "MainWindow"))
-        self.treeWidget.headerItem().setText(0, self._translate("MainWindow", TREE_HEADER_LABELS))
-        __sortingEnabled = self.treeWidget.isSortingEnabled()
-        self.treeWidget.setSortingEnabled(False)
-        self.treeWidget.setSortingEnabled(__sortingEnabled)
-
-    def get_conns(self):
-        """获取所有连接，生成页面树结构第一层"""
-        conns = get_conns()
-        for item in conns:
-            # item属性：id name host port user pwd
-            # 根节点，展示连接的列表
-            self.conn = self.treeWidget.currentItem()
-            self.make_tree_item(self.treeWidget, item.name, item.id)
-            self.conns_dict[item.id] = item
 
     def get_conn(self, conn_id):
         """根据连接名称，从当前维护的连接字典中获取一个数据库连接操作对象"""
@@ -171,7 +173,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             pass
         # 只处理表
         elif item.parent().parent().parent() is None:
-            table_name = item.text(0)
             check_state = item.checkState(0)
             # 如果表已经选中，那么右侧表格需全选字段
             if check_state == Qt.Checked:
@@ -234,6 +235,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.tableWidget.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
         # 表头复选框单击信号与槽
         self.header.select_all_clicked.connect(self.header.change_state)
+        # 隐藏表格头部列标题
+        self.header.setVisible(False)
 
     def on_cell_changed(self, row, col):
         """第一列checkbox状态改变时触发"""
@@ -294,7 +297,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 menu_names = get_db_menu_names(item, checked)
             # 其他作为数据库中表列表的右键菜单
             else:
-                menu_names = get_table_menu_names()
+                # 检查字段选中状态
+                checked = self.check_field_status(item)
+                # 检查表是否展示
+                table_opened = self.tableWidget.horizontalHeader().isVisible() and self.current_table is item
+                menu_names = get_table_menu_names(table_opened, checked)
             [menu.addAction(QtWidgets.QAction(option, menu)) for option in menu_names]
             menu.triggered.connect(self.menu_slot)
             menu.exec_(QtGui.QCursor.pos())
@@ -312,7 +319,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.handle_db_menu(item, func)
         # 如果是表
         elif item.parent().parent().parent() is None:
-            pass
+            self.handle_table_menu(item, func)
 
     def open_tree_item(self, item):
         """打开树的某项，展开状态置为 true，刷新下页面"""
@@ -425,6 +432,24 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         elif func == UNSELECT_TB_MENU:
             self.set_check_state(item, QtCore.Qt.Unchecked)
 
+    def handle_table_menu(self, item, func):
+        """右键菜单关于表的处理"""
+        # 打开表
+        if func == OPEN_TABLE_MENU:
+            self.get_tree_list()
+        # 关闭表
+        elif func == CLOSE_TABLE_MENU:
+            self.close_table()
+        # 全选字段
+        elif func == SELECT_ALL_FIELD_MENU:
+            self.change_table_checkbox(True)
+        # 取消选择字段
+        elif func == UNSELECT_FIELD_MENU:
+            self.change_table_checkbox(False)
+        # 生成
+        elif func == GENERATE_MENU:
+            pass
+
     def check_table_status(self, parent):
         """
         检查表是否被全选，被部分选中，第三种情况为都没有选中
@@ -433,7 +458,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         parted_checked: 是否部分选中
         """
         all_checked, parted_checked = False, False
-        # 如果连接已经打开，再检测子项
+        # 如果数据库已经打开，再检测子项
         if parent.childCount():
             check_set = set()
             for index in range(parent.childCount()):
@@ -445,6 +470,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             elif check_set.pop() == QtCore.Qt.Checked:
                 all_checked = True
         return all_checked, parted_checked
+
+    def check_field_status(self, item):
+        """
+        检查字段是否全选
+        all_checked: 是否被全选
+        parted_checked: 是否部分选中
+        """
+        parted_check = False
+        # 根据表头复选框状态判断是否全选
+        all_checked = self.header.isOn
+        # 如果表头没有全选，左侧表选中，证明是部分选中
+        if not all_checked and item.checkState(0) == Qt.Checked:
+            parted_check = True
+        return all_checked, parted_check
 
     def set_check_state(self, parent, check_state):
         """设置树结构下父项下所有子项的选中状态"""
