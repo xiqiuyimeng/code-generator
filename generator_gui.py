@@ -57,10 +57,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
 
         self.main_window.setCentralWidget(self.centralwidget)
+        # 菜单栏
         self.menubar = QtWidgets.QMenuBar(self.main_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
         self.menubar.setObjectName("menubar")
+        self.exit_app()
+        self.fill_menubar()
         self.main_window.setMenuBar(self.menubar)
+
+        # 状态栏
         self.statusbar = QtWidgets.QStatusBar(self.main_window)
         self.statusbar.setObjectName("statusbar")
         self.main_window.setStatusBar(self.statusbar)
@@ -255,6 +260,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 # 取出选中行的字段名称
                 data = self.tableWidget.item(row, 1).text()
                 print(f'{row}行 选中了 -> {data}：{checked_set}')
+                # 状态栏
+                self.statusbar.showMessage(f'{row}行 选中了 -> {data}：{checked_set}')
                 # 如果选中行列表元素个数等于表格总行数
                 if count == len(checked_set):
                     # 全选按钮应该选中，设置表头复选框按钮状态为选中
@@ -273,6 +280,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         self.current_table.setCheckState(0, Qt.Unchecked)
                     data = self.tableWidget.item(row, 1).text()
                     print(f'{row}行 撤销选中 -> {data} : {checked_set}')
+                    # 状态栏
+                    self.statusbar.showMessage(f'{row}行 撤销选中 -> {data} : {checked_set}')
 
     def close_conn(self, conn_id=None):
         """关闭连接"""
@@ -489,3 +498,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """设置树结构下父项下所有子项的选中状态"""
         for index in range(parent.childCount()):
             parent.child(index).setCheckState(0, check_state)
+
+    def fill_menubar(self):
+        self.menubar.addMenu('添加连接')
+
+    def exit_app(self):
+        exitAction = QtWidgets.QAction(QtGui.QIcon('right.jpg'), '退出', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('退出应用程序')
+        exitAction.triggered.connect(self.quit)
+
+        fileMenu = self.menubar.addMenu('文件')
+        fileMenu.addAction(exitAction)
+
+    def quit(self):
+        print("退出")
+        self.main_window.close()
+

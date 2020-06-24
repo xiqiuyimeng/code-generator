@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QDialog
+from PyQt5.QtGui import QBrush, QPalette
 from sys_info_storage.sqlite import *
 from db_info import DBExecutor
 from message_box import *
@@ -30,6 +31,12 @@ class Ui_Dialog(QDialog):
     def setupUi(self):
         self.dialog.setObjectName("Dialog")
         self.dialog.resize(387, 332)
+
+        # 设置背景图
+        palette = QPalette()
+        palette.setBrush(self.backgroundRole(), QBrush(QPixmap('2.jpg')))
+        self.setPalette(palette)
+
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.dialog)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
