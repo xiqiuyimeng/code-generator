@@ -7,14 +7,14 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtGui
 from table_header import all_header_combobox, CheckBoxHeader
 from conn_dialog import *
 from sys_info_storage.sqlite import *
 from db_info import DBExecutor
 from message_box import *
 from menu import *
-
+from menu_bar import *
+from PyQt5 import QtWidgets, QtGui
 
 # 已选中集合
 checked_set = set()
@@ -61,7 +61,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.menubar = QtWidgets.QMenuBar(self.main_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
         self.menubar.setObjectName("menubar")
-        self.exit_app()
         self.fill_menubar()
         self.main_window.setMenuBar(self.menubar)
 
@@ -500,16 +499,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             parent.child(index).setCheckState(0, check_state)
 
     def fill_menubar(self):
-        self.menubar.addMenu('添加连接')
+        self.file_menu = self.menubar.addMenu('文件')
+        add_conn_menu(self)
+        generate_menu(self)
+        exit_app_menu(self)
 
-    def exit_app(self):
-        exitAction = QtWidgets.QAction(QtGui.QIcon('right.jpg'), '退出', self)
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('退出应用程序')
-        exitAction.triggered.connect(self.quit)
+        self.help_menu = self.menubar.addMenu('帮助')
 
-        fileMenu = self.menubar.addMenu('文件')
-        fileMenu.addAction(exitAction)
+    def add_conn(self):
+        conn_info = Connection(None, None, None, None, None, None)
+        self.show_conn_dialog(conn_info, ADD_CONN_MENU)
+
+    def generate(self):...
 
     def quit(self):
         print("退出")
