@@ -5,6 +5,9 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
+"""
+添加、编辑连接对话框界面
+"""
 
 
 from PyQt5 import QtCore, QtWidgets
@@ -18,10 +21,12 @@ from constant import *
 
 class Ui_Dialog(QDialog):
 
-    conn_signal = QtCore.pyqtSignal(Connection)
+    conn_signal = QtCore.pyqtSignal(object, Connection)
 
-    def __init__(self, connection, dialog_title):
+    def __init__(self, connection, dialog_title, gui):
         super().__init__()
+        # 只是为了维护一个主窗口对象，方便其他操作
+        self.gui_parent = gui
         self.dialog = self
         self.dialog_title = dialog_title
         self.connection = connection
@@ -110,7 +115,7 @@ class Ui_Dialog(QDialog):
         # 测试连接按钮：点击触发测试mysql连接功能
         self.test_conn.clicked.connect(self.test_connection)
         # 确定按钮：点击触发添加连接记录到系统库中，并增加到展示界面
-        self.ok.clicked.connect(self.add_conn)
+        self.ok.clicked.connect(self.handle_func)
         # 取消按钮：点击则关闭对话框
         self.cancel.clicked.connect(self.dialog.close)
 
@@ -142,6 +147,7 @@ class Ui_Dialog(QDialog):
             self.user_text.setText(self._translate("Dialog", "root"))
 
     def check_text(self, foc):
+        # todo 释焦事件，检查是否都有值
         print(foc)
 
     def get_input(self):
@@ -157,8 +163,8 @@ class Ui_Dialog(QDialog):
         new_conn = self.get_input()
         test_connection(new_conn)
 
-    def add_conn(self):
-        """添加新的连接记录到系统库中"""
+    def handle_func(self):
+        """添加新的连接记录到系统库中，或编辑连接信息"""
         new_conn = self.get_input()
         if self.dialog_title == EDIT_CONN_MENU:
             update_conn(new_conn)
@@ -167,7 +173,7 @@ class Ui_Dialog(QDialog):
             new_conn = get_new_conn()
         pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
         self.dialog.close()
-        self.conn_signal.emit(new_conn)
+        self.conn_signal.emit(self.gui_parent, new_conn)
 
 
 def test_connection(connection):
