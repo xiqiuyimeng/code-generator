@@ -1,4 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
+"""
+自定义表头类，实现了复选框全选功能
+"""
 from PyQt5 import QtWidgets, QtCore
 _author_ = 'luwt'
 _date_ = '2020/6/21 9:21'

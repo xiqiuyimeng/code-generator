@@ -2,16 +2,22 @@
 """
 处理所有关于树节点的操作
     双击节点事件
-    右键菜单
+    右键菜单生成菜单及菜单动作
     列表复选框
 """
-from gui_function import *
-from menu import *
-from sys_info_storage.sqlite import *
-from message_box import *
 from conn_dialog import test_connection
 from PyQt5.QtCore import Qt
 from abc import ABC, abstractmethod
+
+from connection_function import open_connection, close_connection
+from constant import *
+from gui_function import check_table_status, set_children_check_state, check_field_status
+from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
+from message_box import pop_question
+from sys_info_storage.sqlite import delete_conn
+from table_func import fill_table, clear_table, change_table_checkbox, close_table
+from tree_function import make_tree_item, add_conn_func, show_conn_dialog
+
 _author_ = 'luwt'
 _date_ = '2020/6/23 16:21'
 
@@ -26,6 +32,7 @@ def tree_node_factory(item):
                     表：第三级，父节点为库
     目前树的根节点为空，所以可以根据这一特性发现当前节点的层级，
     从而返回相应的实例
+    :param item: 当前的元素
     """
     # 如果父级为空，那么则为连接
     if item.parent() is None:
@@ -44,6 +51,9 @@ class Context:
     def open_item(self, item, gui):
         return self.tree_node.open_item(item, gui)
 
+    def close_item(self, item, gui):
+        return self.tree_node.close_item(item, gui)
+
     def change_check_box(self, item, gui):
         return self.tree_node.change_check_box(item, gui)
 
@@ -60,6 +70,9 @@ class TreeNodeAbstract(ABC):
     def open_item(self, item, gui): ...
 
     @abstractmethod
+    def close_item(self, item, gui): ...
+
+    @abstractmethod
     def change_check_box(self, item, gui): ...
 
     @abstractmethod
@@ -74,8 +87,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
     def open_item(self, item, gui):
         """
         打开连接，展示连接下的所有库列表
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
         # 仅当子元素不存在时，获取子元素并填充
         if item.childCount() == 0:
@@ -85,18 +98,31 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             for db in dbs:
                 make_tree_item(gui, item, db)
 
+    def close_item(self, item, gui):
+        """
+        关闭树的某项，将其下所有子项移除，并将扩展状态置为false
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
+        """
+        TreeNodeDB().close_item(item, gui)
+
     def change_check_box(self, item, gui): ...
 
     def get_menu_names(self, item, gui):
         """
         获取树中，第一级连接项的右键菜单名字列表
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
         return get_conn_menu_names(item)
 
     def handle_menu_func(self, item, func, gui):
-        """右键菜单中关于连接的处理"""
+        """
+        在连接层，右键菜单的功能实现
+        :param item: 当前点击树节点元素
+        :param func: 右键菜单中功能名称
+        :param gui: 启动的主窗口界面对象
+        """
         # 获取当前选中的连接id
         conn_id = int(item.text(1))
         # 打开连接
@@ -108,8 +134,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         elif func == CLOSE_CONN_MENU:
             # 关闭数据连接，关闭特定连接，id为标识
             close_connection(gui, conn_id)
-            item.takeChildren()
-            close_table(gui)
+            self.close_item(item, gui)
         # 测试连接
         elif func == TEST_CONN_MENU:
             test_connection(gui.conns_dict.get(conn_id))
@@ -123,7 +148,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             if reply:
                 # 关闭连接
                 close_connection(gui, conn_id)
-                close_tree_item(gui, item)
+                self.close_item(item, gui)
                 conn_info = gui.conns_dict.get(conn_id)
                 show_conn_dialog(gui, conn_info, func)
                 # 在子窗口更新完数据库和页面后，将页面的存储数据也更新
@@ -152,8 +177,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         """
         打开数据库，展示数据库下的所有表，
         并将表的复选框置为未选中
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
         # 仅当子元素不存在时，获取子元素并填充
         if item.childCount() == 0:
@@ -166,20 +191,35 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             for table in tables:
                 make_tree_item(gui, item, table, checkbox=Qt.Unchecked)
 
+    def close_item(self, item, gui):
+        """
+        关闭树的某项，将其下所有子项移除，并将扩展状态置为false
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
+        """
+        # 移除所有子项目
+        item.takeChildren()
+        TreeNodeTable().close_item(item, gui)
+
     def change_check_box(self, item, gui): ...
 
     def get_menu_names(self, item, gui):
         """
         获取树中，数据库项的右键菜单名字列表
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
         # 检查表的复选框状态
         check_state = check_table_status(item)
         return get_db_menu_names(item, check_state)
 
     def handle_menu_func(self, item, func, gui):
-        """右键菜单中关于数据库的处理"""
+        """
+        在数据库层，右键菜单的功能实现
+        :param item: 当前点击树节点元素
+        :param func: 右键菜单中功能名称
+        :param gui: 启动的主窗口界面对象
+        """
         # 打开数据库
         if func == OPEN_DB_MENU:
             self.open_item(item, gui)
@@ -187,13 +227,15 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             gui.treeWidget.repaint()
         # 关闭数据库
         elif func == CLOSE_DB_MENU:
-            close_tree_item(gui, item)
+            self.close_item(item, gui)
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
             set_children_check_state(item, Qt.Checked)
+            change_table_checkbox(gui, True)
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
             set_children_check_state(item, Qt.Unchecked)
+            change_table_checkbox(gui, False)
 
 
 class TreeNodeTable(TreeNodeAbstract, ABC):
@@ -202,28 +244,40 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         """
         打开表，可获取表中所有列名信息，然后展示在表格控件中，
         列的复选框与表格的复选框联动
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
-        # 获取连接id，从而获取该连接的数据库操作对象
-        conn_id = int(item.parent().parent().text(1))
-        executor = open_connection(gui, conn_id)
-        # 获取当前表下所有的列名
-        cols = executor.get_cols(item.text(0))
-        # 当前表复选框的状态，赋予表格中复选框的状态
-        fill_table(gui, cols, item.checkState(0))
-        # 如果表格复选框为选中，那么将表头的复选框也选中，默认表头复选框未选中
-        if item.checkState(0) == Qt.Checked:
-            gui.header.set_header_checked(True)
-        # 表格复选框改变事件
-        gui.tableWidget.cellChanged.connect(gui.on_cell_changed)
-        gui.current_table = item
+        if not gui.table_header.isVisible():
+            # 获取连接id，从而获取该连接的数据库操作对象
+            conn_id = int(item.parent().parent().text(1))
+            executor = open_connection(gui, conn_id)
+            # 获取当前表下所有的列名
+            cols = executor.get_cols(item.text(0))
+            # 当前表复选框的状态，赋予表格中复选框的状态
+            fill_table(gui, cols, item.checkState(0))
+            # 如果表格复选框为选中，那么将表头的复选框也选中，默认表头复选框未选中
+            if item.checkState(0) == Qt.Checked:
+                gui.table_header.set_header_checked(True)
+            # 表格复选框改变事件
+            gui.tableWidget.cellChanged.connect(gui.on_cell_changed_func)
+            gui.current_table = item
+
+    def close_item(self, item, gui):
+        """
+        关闭右侧表格
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
+        """
+        # 删除表格内容
+        clear_table(gui)
+        # 隐藏表头
+        gui.table_header.setVisible(False)
 
     def change_check_box(self, item, gui):
         """
         修改复选框状态，当前元素复选框状态应与表格控件中的复选框联动
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
         check_state = item.checkState(0)
         # 如果表已经选中，那么右侧表格需全选字段
@@ -235,8 +289,9 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
 
     def get_menu_names(self, item, gui):
         """
-        :param item 当前点击元素
-        :param gui 启动的主窗口界面对象
+        获取树中，表的右键菜单名字列表
+        :param item: 当前点击树节点元素
+        :param gui: 启动的主窗口界面对象
         """
         # 检查表格中字段复选框状态
         check_state = check_field_status(gui, item)
@@ -247,7 +302,12 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         return get_table_menu_names(table_opened, check_state)
 
     def handle_menu_func(self, item, func, gui):
-        """右键菜单关于表的处理"""
+        """
+        在表层，右键菜单的功能实现
+        :param item: 当前点击树节点元素
+        :param func: 右键菜单中功能名称
+        :param gui: 启动的主窗口界面对象
+        """
         # 打开表
         if func == OPEN_TABLE_MENU:
             gui.get_tree_list()

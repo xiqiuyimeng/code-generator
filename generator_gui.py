@@ -5,14 +5,16 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
-
-
-from tree_strategy import *
-from menu_bar_func import *
+from connection_function import close_connection
+from constant import TREE_HEADER_LABELS, TABLE_HEADER_LABELS
+from menu_bar_func import fill_menu_bar
 from sys_info_storage.sqlite import get_conns
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
+
+from table_func import on_cell_changed
 from table_header import CheckBoxHeader
-from gui_function import make_tree_item
+from tree_function import make_tree_item, add_conn_func
+from tree_strategy import tree_node_factory, Context
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -120,13 +122,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         Context(node).open_item(item, self)
 
     def table_check_box(self, item):
-        """处理树结构中，表的复选框"""
+        """
+        处理树结构中，表的复选框，实现表的复选框与表格控件中复选框联动效果
+        :param item: 当前点击树节点元素
+        """
         node = tree_node_factory(item)
         # 只处理表
         Context(node).change_check_box(item, self)
 
     def update_tree_item_name(self, item, name, col=0):
+        """
+        更新树的节点项名称
+        :param item: 当前树节点元素
+        :param name: 要更新的名字
+        :param col: 写入在哪一列，默认名字写在第一列，第二列为隐藏列，可写id作为隐藏属性
+        """
         item.setText(col, self._translate("MainWindow", name))
+
+    def update_table_item(self, item, field):
+        """
+        更新表格控件中表格的值
+        :param item: 当前表格元素
+        :param field: 要填写的值
+        """
+        item.setText(self._translate("MainWindow", field))
 
     def make_table_header(self):
         """设置表格列标题"""
@@ -143,15 +162,26 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 隐藏表格头部列标题
         self.table_header.setVisible(False)
 
-    def on_cell_changed(self, row, col):
-        """第一列checkbox状态改变时触发"""
+    def on_cell_changed_func(self, row, col):
+        """
+        第一列checkbox状态改变时触发
+        :param row: 表格中当前行
+        :param col: 表格中当前列
+        """
         on_cell_changed(self, row, col)
 
     def close_conn(self, conn_id=None):
-        """关闭连接"""
+        """
+        关闭连接
+        :param conn_id: 要关闭的连接id，若无，则关闭所有
+        """
         close_connection(self, conn_id)
 
     def right_click_menu(self, pos):
+        """
+        右键菜单功能，实现右键弹出菜单功能
+        :param pos:右键的坐标位置
+        """
         # 获取当前元素，只有在元素上才显示菜单
         item = self.treeWidget.itemAt(pos)
         if item:
@@ -166,7 +196,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             menu.exec_(QtGui.QCursor.pos())
 
     def menu_slot(self, act):
-        """点击右键菜单选项后触发事件"""
+        """
+        点击右键菜单选项后触发事件
+        :param act: 右键菜单中的动作
+        """
         # 获取右键点击的项
         item = self.treeWidget.currentItem()
         func = act.text()
