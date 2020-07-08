@@ -2,9 +2,11 @@
 """
 处理表格控件动作
 """
-from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidgetItem
+
 from table_header import all_header_combobox
+
 _author_ = 'luwt'
 _date_ = '2020/7/2 16:17'
 
@@ -14,9 +16,14 @@ checked_set = set()
 
 
 def fill_table(gui, cols, checked):
-    """将列名字段全数填充在表中，四列多行表"""
+    """
+    将列名字段全数填充在表中，四列多行表
+    :param gui: 启动的主窗口界面对象
+    :param cols: 列信息的数组，为二维数组
+    :param checked: 表格中复选框状态，作为初始化复选框依据
+    """
     # 显示列标题
-    gui.tableWidget.horizontalHeader().setVisible(True)
+    gui.table_header.setVisible(True)
     clear_table(gui)
     # 填充数据
     for i, col in enumerate(cols):
@@ -32,11 +39,15 @@ def fill_table(gui, cols, checked):
             # 建立一个新的对象，赋值，填充到表格中对应位置
             item = QTableWidgetItem()
             gui.tableWidget.setItem(i, n, item)
-            gui.update_tree_item_name(item, field)
+            gui.update_table_item(item, field)
 
 
 def change_table_checkbox(gui, checked):
-    """改变表格中checkbox中所有复选框状态，换言之，全选或清空选择"""
+    """
+    改变表格中checkbox中所有复选框状态，换言之，全选或清空选择
+    :param gui: 启动的主窗口界面对象
+    :param checked: 复选框选中状态
+    """
     # 通过表头是否展示，判定表是否已经展示
     visible = gui.tableWidget.horizontalHeader().isVisible()
     if visible:
@@ -45,7 +56,10 @@ def change_table_checkbox(gui, checked):
 
 
 def close_table(gui):
-    """关闭右侧表格"""
+    """
+    关闭右侧表格
+    :param gui: 启动的主窗口界面对象
+    """
     # 删除表格内容
     clear_table(gui)
     # 隐藏表头
@@ -53,7 +67,10 @@ def close_table(gui):
 
 
 def clear_table(gui):
-    """清空右侧表格"""
+    """
+    清空右侧表格，也一并清空选中的字段集合
+    :param gui: 启动的主窗口界面对象
+    """
     [gui.tableWidget.removeRow(0) for r in range(gui.tableWidget.rowCount())]
     # 清空选中集合
     checked_set.clear()
@@ -62,7 +79,12 @@ def clear_table(gui):
 
 
 def on_cell_changed(gui, row, col):
-    """第一列checkbox状态改变时触发"""
+    """
+    第一列checkbox状态改变时触发
+    :param gui 启动的主窗口界面对象
+    :param row 表格中当前行
+    :param col 表格中当前列
+    """
     if col == 0:
         # 检查第一列，checkbox选中状态
         item = gui.tableWidget.item(row, col)

@@ -1,4 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
+"""装饰器，负责全局异常的处理"""
 from functools import wraps
 from exception_enum import *
 _author_ = 'luwt'
@@ -28,9 +29,9 @@ def exc_handle():
     return handle
 
 
-@exc_handle()
-def a():
-    ExceptionEnum.param_path_error.assert_true()
-
-
-a()
+# @exc_handle()
+# def a():
+#     ExceptionEnum.param_path_error.assert_true()
+#
+#
+# a()

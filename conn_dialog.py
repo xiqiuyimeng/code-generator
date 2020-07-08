@@ -11,12 +11,13 @@
 
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QBrush, QPalette, QPixmap
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtGui import QBrush, QPalette
-from sys_info_storage.sqlite import *
-from db_info import DBExecutor
-from message_box import *
-from constant import *
+
+from connection_function import test_connection
+from constant import EDIT_CONN_MENU, ADD_CONN_MENU, SAVE_CONN_SUCCESS_PROMPT
+from message_box import pop_ok
+from sys_info_storage.sqlite import Connection, update_conn, add_conn, get_new_conn
 
 
 class Ui_Dialog(QDialog):
@@ -39,7 +40,7 @@ class Ui_Dialog(QDialog):
 
         # 设置背景图
         palette = QPalette()
-        palette.setBrush(self.backgroundRole(), QBrush(QPixmap('2.jpg')))
+        palette.setBrush(self.backgroundRole(), QBrush(QPixmap('dialog_bg.jpg')))
         self.setPalette(palette)
 
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.dialog)
@@ -174,23 +175,6 @@ class Ui_Dialog(QDialog):
         pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
         self.dialog.close()
         self.conn_signal.emit(self.gui_parent, new_conn)
-
-
-def test_connection(connection):
-    """测试连接"""
-    try:
-        with DBExecutor(
-                connection.host,
-                connection.port,
-                connection.user,
-                connection.pwd
-        ) as cur:
-            cur.test_conn()
-        pop_ok(TEST_CONN_MENU, TEST_CONN_SUCCESS_PROMPT)
-    except Exception as e:
-        pop_fail(TEST_CONN_MENU, f'{TEST_CONN_FAIL_PROMPT}\t\n'
-                                 f'{e.args[0]} - {e.args[1]}')
-        print(e)
 
 
 # if __name__ == '__main__':

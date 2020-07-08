@@ -1,4 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
+"""
+对数据库游标对象的一个代理类，暴露给其他服务进行调用，处理数据库相关操作
+"""
 import constant
 from get_cursor import Cursor
 _author_ = 'luwt'

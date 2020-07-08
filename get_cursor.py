@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+获取数据库游标
+"""
 import pymysql
 _author_ = 'luwt'
 _date_ = '2020/4/19 12:55'
