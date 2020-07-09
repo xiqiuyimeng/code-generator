@@ -72,6 +72,10 @@ PARAM_PATH_ERROR = "路径参数有误"
 # 执行成功提示语
 SUCCESS = "执行成功！五秒后退出"
 
+"""菜单栏"""
+FILE_MENU = '文件'
+HELP_MENU = '帮助'
+
 """关于连接的右键菜单"""
 # 打开连接
 OPEN_CONN_MENU = '打开连接'
@@ -124,6 +128,8 @@ SAVE_CONN_SUCCESS_PROMPT = '保存成功！'
 TEST_CONN_SUCCESS_PROMPT = '连接成功！'
 # 测试连接失败提示语
 TEST_CONN_FAIL_PROMPT = '连接失败！'
+# 检查系统库中连接名字存在提示语
+CONN_NAME_EXISTS = '连接名称已存在！'
 
 """表格列头"""
 TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "备注"]

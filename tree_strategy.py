@@ -168,7 +168,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
                 # 通过调用树型部件的indexOfTopLevelItem方法可以获得对应项在顶层项的位置，语法：indexOfTopLevelItem
                 #
                 # self.treeWidget.removeItemWidget，它从一个项中移除一个小部件，而不是QTreeWidgetItem。它对应于setItemWidget方法
-            gui.treeWidget.takeTopLevelItem(gui.treeWidget.indexOfTopLevelItem(item))
+                gui.treeWidget.takeTopLevelItem(gui.treeWidget.indexOfTopLevelItem(item))
 
 
 class TreeNodeDB(TreeNodeAbstract, ABC):
