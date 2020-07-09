@@ -14,6 +14,7 @@ from constant import *
 from gui_function import check_table_status, set_children_check_state, check_field_status
 from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from message_box import pop_question
+from selected_data import get_selected_data
 from sys_info_storage.sqlite import delete_conn
 from table_func import fill_table, clear_table, change_table_checkbox, close_table
 from tree_function import make_tree_item, add_conn_func, show_conn_dialog
@@ -94,7 +95,9 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 连接的id，存在于元素的第一列
             conn_id = int(item.text(1))
-            dbs = open_connection(gui, conn_id).get_dbs()
+            # 连接名称
+            conn_name = item.text(0)
+            dbs = open_connection(gui, conn_id, conn_name).get_dbs()
             for db in dbs:
                 make_tree_item(gui, item, db)
 
@@ -125,6 +128,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         """
         # 获取当前选中的连接id
         conn_id = int(item.text(1))
+        # 连接名称
+        conn_name = item.text(0)
         # 打开连接
         if func == OPEN_CONN_MENU:
             self.open_item(item, gui)
@@ -133,11 +138,11 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         # 关闭连接
         elif func == CLOSE_CONN_MENU:
             # 关闭数据连接，关闭特定连接，id为标识
-            close_connection(gui, conn_id)
+            close_connection(gui, conn_name)
             self.close_item(item, gui)
         # 测试连接
         elif func == TEST_CONN_MENU:
-            test_connection(gui.conns_dict.get(conn_id))
+            test_connection(gui.display_conn_dict.get(conn_id))
         # 添加连接
         elif func == ADD_CONN_MENU:
             add_conn_func(gui)
@@ -147,22 +152,22 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             reply = pop_question(func, EDIT_CONN_PROMPT)
             if reply:
                 # 关闭连接
-                close_connection(gui, conn_id)
+                close_connection(gui, conn_name)
                 self.close_item(item, gui)
-                conn_info = gui.conns_dict.get(conn_id)
+                conn_info = gui.display_conn_dict.get(conn_id)
                 show_conn_dialog(gui, conn_info, func)
                 # 在子窗口更新完数据库和页面后，将页面的存储数据也更新
-                gui.conns_dict[conn_id] = open_connection(gui, conn_id)
+                gui.display_conn_dict[conn_id] = open_connection(gui, conn_id, conn_name)
         # 删除连接
         elif func == DEL_CONN_MENU:
             # 弹出关闭连接确认框
             reply = pop_question(func, DEL_CONN_PROMPT)
             if reply:
                 # 关闭连接
-                close_connection(gui, conn_id)
-                conn_info = gui.conns_dict[conn_id]
+                close_connection(gui, conn_name)
+                conn_info = gui.display_conn_dict[conn_id]
                 delete_conn(conn_info.id)
-                del gui.conns_dict[conn_id]
+                del gui.display_conn_dict[conn_id]
                 # 删除树元素
                 # 树型部件的takeTopLevelItem方法可以从树型部件中删除对应项的节点并返回该项，语法：takeTopLevelItem(index)
                 # 通过调用树型部件的indexOfTopLevelItem方法可以获得对应项在顶层项的位置，语法：indexOfTopLevelItem
@@ -184,7 +189,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 获取连接id，从而获取该连接的数据库操作对象
             conn_id = int(item.parent().text(1))
-            executor = open_connection(gui, conn_id)
+            conn_name = item.parent().text(0)
+            executor = open_connection(gui, conn_id, conn_name)
             # 首先需要切换库
             executor.switch_db(item.text(0))
             tables = executor.get_tables()
@@ -231,6 +237,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
             set_children_check_state(item, Qt.Checked)
+            # 填充选中表列表，获取连接名，id，数据库名，表名
+            get_selected_data(item)
             change_table_checkbox(gui, True)
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
@@ -250,7 +258,8 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         if not gui.table_header.isVisible():
             # 获取连接id，从而获取该连接的数据库操作对象
             conn_id = int(item.parent().parent().text(1))
-            executor = open_connection(gui, conn_id)
+            conn_name = item.parent().parent().text(0)
+            executor = open_connection(gui, conn_id, conn_name)
             # 获取当前表下所有的列名
             cols = executor.get_cols(item.text(0))
             # 当前表复选框的状态，赋予表格中复选框的状态
@@ -297,7 +306,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         check_state = check_field_status(gui, item)
         # 检查表是否展示：表头如果展示，当前表对象就是当前点击元素，
         # 那么证明表格已经展示。否则可能展示的是其他表
-        table_opened = gui.tableWidget.horizontalHeader().isVisible() \
+        table_opened = gui.table_header.isVisible() \
             and gui.current_table is item
         return get_table_menu_names(table_opened, check_state)
 

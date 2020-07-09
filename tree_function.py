@@ -63,7 +63,7 @@ def add_conn_tree_item(gui, connection):
     :param gui: 启动的主窗口界面对象
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
     """
-    gui.conns_dict[connection.id] = connection
+    gui.display_conn_dict[connection.id] = connection
     make_tree_item(gui, gui.treeWidget, connection.name, connection.id)
 
 
@@ -73,6 +73,6 @@ def update_conn_tree_item(gui, connection):
     :param gui: 启动的主窗口界面对象
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
     """
-    gui.conns_dict[connection.id] = connection
+    gui.display_conn_dict[connection.id] = connection
     item = gui.treeWidget.currentItem()
     gui.update_tree_item_name(item, connection.name)
