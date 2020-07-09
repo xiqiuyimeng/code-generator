@@ -23,11 +23,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.main_window = main_window
 
-        # 已经连接数据库的连接，key为id，value为DBExecutor对象
+        # 已经连接数据库的连接，key为连接名，value为DBExecutor对象
         self.connected_dict = dict()
         self._translate = QtCore.QCoreApplication.translate
-        # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象
-        self.conns_dict = dict()
+        # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象，
+        # 因为在编辑连接后，连接名称可能会变化，无法作为唯一标识
+        self.display_conn_dict = dict()
         self.dbs = list()
         self.tables = list()
 
@@ -97,7 +98,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # item属性：id name host port user pwd
             # 根节点，展示连接的列表
             make_tree_item(self, self.treeWidget, item.name, item.id)
-            self.conns_dict[item.id] = item
+            self.display_conn_dict[item.id] = item
 
     def add_table(self):
         """添加表格"""
@@ -170,12 +171,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         on_cell_changed(self, row, col)
 
-    def close_conn(self, conn_id=None):
+    def close_conn(self, conn_name=None):
         """
         关闭连接
-        :param conn_id: 要关闭的连接id，若无，则关闭所有
+        :param conn_name: 要关闭的连接名称，若无，则关闭所有
         """
-        close_connection(self, conn_id)
+        close_connection(self, conn_name)
 
     def right_click_menu(self, pos):
         """
