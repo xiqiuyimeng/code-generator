@@ -4,7 +4,7 @@
 """
 from PyQt5 import QtGui, QtWidgets
 
-from constant import ADD_CONN_MENU, GENERATE_MENU
+from constant import ADD_CONN_MENU, GENERATE_MENU, FILE_MENU, HELP_MENU
 
 _author_ = 'luwt'
 _date_ = '2020/6/27 8:26'
@@ -15,12 +15,12 @@ def fill_menu_bar(gui):
     填充菜单栏
     :param gui: 启动的主窗口界面对象
     """
-    gui.file_menu = gui.menubar.addMenu('文件')
+    gui.file_menu = gui.menubar.addMenu(FILE_MENU)
     add_conn_menu(gui)
     generate_menu(gui)
     exit_app_menu(gui)
 
-    gui.help_menu = gui.menubar.addMenu('帮助')
+    gui.help_menu = gui.menubar.addMenu(HELP_MENU)
 
 
 def add_conn_menu(gui):

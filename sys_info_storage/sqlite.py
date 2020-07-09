@@ -25,6 +25,7 @@ conn_sql = {
     'update': f'update {CONN_TABLE} ',
     'delete': f'delete from {CONN_TABLE} where id = ',
     'select': f'select * from {CONN_TABLE}',
+    'select_name_exist': f'select count(*) > 0 from {CONN_TABLE} where name = ',
 }
 
 conn = sqlite3.connect(DB)
@@ -79,6 +80,14 @@ def get_new_conn():
     cursor.execute(sql)
     data = cursor.fetchone()
     return Connection(*data)
+
+
+def check_name_available(conn_name):
+    """检查连接名称是否可用，名称必须唯一"""
+    sql = conn_sql.get('select_name_exist') + f'"{conn_name}"'
+    cursor.execute(sql)
+    data = cursor.fetchone()
+    return data[0] == 0
 
 
 # connection = Connection(None, 'centos121', 'centos121', 3306, 'root', 'admin')

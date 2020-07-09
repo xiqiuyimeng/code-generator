@@ -17,13 +17,14 @@ class DBExecutor:
         self.pwd = pwd
         self.port = port
         self.get_cursor()
+        self.cursor = self.cursor_.cursor
 
     def __enter__(self):
         return self
 
     def get_cursor(self):
         """获取游标"""
-        self.cursor = Cursor(self.host, self.user, self.pwd, None, self.port).cursor
+        self.cursor_ = Cursor(self.host, self.user, self.pwd, None, self.port)
 
     def test_conn(self):
         self.cursor.execute(constant.TEST_CONN_SQL)
@@ -55,7 +56,7 @@ class DBExecutor:
         return list(map(lambda x: (x[0], x[1], x[3]), self.get_data(sql)))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.cursor.__exit__(exc_type, exc_val, exc_tb)
+        self.cursor_.__exit__(exc_type, exc_val, exc_tb)
 
     def exit(self):
         """关闭游标和链接"""

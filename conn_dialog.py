@@ -15,9 +15,9 @@ from PyQt5.QtGui import QBrush, QPalette, QPixmap
 from PyQt5.QtWidgets import QDialog
 
 from connection_function import test_connection
-from constant import EDIT_CONN_MENU, ADD_CONN_MENU, SAVE_CONN_SUCCESS_PROMPT
-from message_box import pop_ok
-from sys_info_storage.sqlite import Connection, update_conn, add_conn, get_new_conn
+from constant import EDIT_CONN_MENU, ADD_CONN_MENU, SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS
+from message_box import pop_ok, pop_fail
+from sys_info_storage.sqlite import Connection, update_conn, add_conn, get_new_conn, check_name_available
 
 
 class Ui_Dialog(QDialog):
@@ -167,14 +167,18 @@ class Ui_Dialog(QDialog):
     def handle_func(self):
         """添加新的连接记录到系统库中，或编辑连接信息"""
         new_conn = self.get_input()
-        if self.dialog_title == EDIT_CONN_MENU:
-            update_conn(new_conn)
-        elif self.dialog_title == ADD_CONN_MENU:
-            add_conn(new_conn)
-            new_conn = get_new_conn()
-        pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
-        self.dialog.close()
-        self.conn_signal.emit(self.gui_parent, new_conn)
+        name_available = check_name_available(new_conn.name)
+        if name_available:
+            if self.dialog_title == EDIT_CONN_MENU:
+                update_conn(new_conn)
+            elif self.dialog_title == ADD_CONN_MENU:
+                add_conn(new_conn)
+                new_conn = get_new_conn()
+            pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
+            self.dialog.close()
+            self.conn_signal.emit(self.gui_parent, new_conn)
+        else:
+            pop_fail(self.dialog_title, CONN_NAME_EXISTS)
 
 
 # if __name__ == '__main__':

@@ -49,7 +49,7 @@ def change_table_checkbox(gui, checked):
     :param checked: 复选框选中状态
     """
     # 通过表头是否展示，判定表是否已经展示
-    visible = gui.tableWidget.horizontalHeader().isVisible()
+    visible = gui.table_header.isVisible()
     if visible:
         gui.table_header.set_header_checked(checked)
         gui.table_header.change_state(checked)
