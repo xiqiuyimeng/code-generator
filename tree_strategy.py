@@ -5,16 +5,18 @@
     右键菜单生成菜单及菜单动作
     列表复选框
 """
-from conn_dialog import test_connection
-from PyQt5.QtCore import Qt
+
 from abc import ABC, abstractmethod
 
+from PyQt5.QtCore import Qt
+
+from conn_dialog import test_connection
 from connection_function import open_connection, close_connection
 from constant import *
-from gui_function import check_table_status, set_children_check_state, check_field_status
+from gui_function import check_table_status, set_children_check_state, check_field_status, get_children_names
 from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from message_box import pop_question
-from selected_data import get_selected_data
+from selected_data import SelectedData
 from sys_info_storage.sqlite import delete_conn
 from table_func import fill_table, clear_table, change_table_checkbox, close_table
 from tree_function import make_tree_item, add_conn_func, show_conn_dialog
@@ -93,10 +95,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         """
         # 仅当子元素不存在时，获取子元素并填充
         if item.childCount() == 0:
-            # 连接的id，存在于元素的第一列
-            conn_id = int(item.text(1))
-            # 连接名称
-            conn_name = item.text(0)
+            # 连接的id，连接名称
+            conn_id, conn_name = TreeNodeConn.get_node_info(item)
             dbs = open_connection(gui, conn_id, conn_name).get_dbs()
             for db in dbs:
                 make_tree_item(gui, item, db)
@@ -126,10 +126,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         :param func: 右键菜单中功能名称
         :param gui: 启动的主窗口界面对象
         """
-        # 获取当前选中的连接id
-        conn_id = int(item.text(1))
-        # 连接名称
-        conn_name = item.text(0)
+        # 获取当前选中的连接id，连接名称
+        conn_id, conn_name = TreeNodeConn.get_node_info(item)
         # 打开连接
         if func == OPEN_CONN_MENU:
             self.open_item(item, gui)
@@ -175,6 +173,13 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
                 # self.treeWidget.removeItemWidget，它从一个项中移除一个小部件，而不是QTreeWidgetItem。它对应于setItemWidget方法
                 gui.treeWidget.takeTopLevelItem(gui.treeWidget.indexOfTopLevelItem(item))
 
+    @staticmethod
+    def get_node_info(item):
+        """获取连接id和连接名称"""
+        conn_id = int(item.text(1))
+        conn_name = item.text(0)
+        return conn_id, conn_name
+
 
 class TreeNodeDB(TreeNodeAbstract, ABC):
 
@@ -187,12 +192,11 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         """
         # 仅当子元素不存在时，获取子元素并填充
         if item.childCount() == 0:
-            # 获取连接id，从而获取该连接的数据库操作对象
-            conn_id = int(item.parent().text(1))
-            conn_name = item.parent().text(0)
+            # 获取连接id和名称，从而获取该连接的数据库操作对象
+            conn_id, conn_name, db_name = TreeNodeDB.get_node_info(item)
             executor = open_connection(gui, conn_id, conn_name)
             # 首先需要切换库
-            executor.switch_db(item.text(0))
+            executor.switch_db(db_name)
             tables = executor.get_tables()
             for table in tables:
                 make_tree_item(gui, item, table, checkbox=Qt.Unchecked)
@@ -226,6 +230,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         :param func: 右键菜单中功能名称
         :param gui: 启动的主窗口界面对象
         """
+        conn_id, conn_name, db_name = TreeNodeDB.get_node_info(item)
         # 打开数据库
         if func == OPEN_DB_MENU:
             self.open_item(item, gui)
@@ -238,12 +243,24 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         elif func == SELECT_ALL_TB_MENU:
             set_children_check_state(item, Qt.Checked)
             # 填充选中表列表，获取连接名，id，数据库名，表名
-            get_selected_data(item)
+            tbs = get_children_names(item)
+            # 放入选中数据容器中
+            SelectedData().set_tbs(conn_name, db_name, tbs)
             change_table_checkbox(gui, True)
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
             set_children_check_state(item, Qt.Unchecked)
+            # 清空容器中的值
+            SelectedData().unset_tbs(conn_name, db_name)
             change_table_checkbox(gui, False)
+
+    @staticmethod
+    def get_node_info(item):
+        """获取连接id、连接名称、数据库名称"""
+        conn_id = int(item.parent().text(1))
+        conn_name = item.parent().text(0)
+        db_name = item.text(0)
+        return conn_id, conn_name, db_name
 
 
 class TreeNodeTable(TreeNodeAbstract, ABC):
@@ -257,11 +274,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         """
         if not gui.table_header.isVisible():
             # 获取连接id，从而获取该连接的数据库操作对象
-            conn_id = int(item.parent().parent().text(1))
-            conn_name = item.parent().parent().text(0)
-            executor = open_connection(gui, conn_id, conn_name)
-            # 获取当前表下所有的列名
-            cols = executor.get_cols(item.text(0))
+            cols = TreeNodeTable.get_cols(gui, item)
             # 当前表复选框的状态，赋予表格中复选框的状态
             fill_table(gui, cols, item.checkState(0))
             # 如果表格复选框为选中，那么将表头的复选框也选中，默认表头复选框未选中
@@ -288,12 +301,17 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
+        node = TreeNodeTable.get_node_info(item)
         check_state = item.checkState(0)
         # 如果表已经选中，那么右侧表格需全选字段
         if check_state == Qt.Checked:
             change_table_checkbox(gui, True)
+            # 添加表名到容器
+            SelectedData().set_tbs(node[1], node[2], (node[3], ))
         # 如果表未选中，那么右侧表格需清空选择
         elif check_state == Qt.Unchecked:
+            # 从容器删除表名
+            SelectedData().unset_tbs(node[1], node[2], (node[3], ))
             change_table_checkbox(gui, False)
 
     def get_menu_names(self, item, gui):
@@ -319,7 +337,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         """
         # 打开表
         if func == OPEN_TABLE_MENU:
-            gui.get_tree_list()
+            self.open_item(item, gui)
         # 关闭表
         elif func == CLOSE_TABLE_MENU:
             close_table(gui)
@@ -333,4 +351,20 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         elif func == GENERATE_MENU:
             pass
 
+    @staticmethod
+    def get_node_info(item):
+        """获取连接id，连接名称，数据库名，表名"""
+        conn_id = int(item.parent().parent().text(1))
+        conn_name = item.parent().parent().text(0)
+        db_name = item.parent().text(0)
+        tb_name = item.text(0)
+        return conn_id, conn_name, db_name, tb_name
+
+    @staticmethod
+    def get_cols(gui, item):
+        node = TreeNodeTable.get_node_info(item)
+        conn_id, conn_name = node[0], node[1]
+        executor = open_connection(gui, conn_id, conn_name)
+        # 获取当前表下所有的列信息，包含字段名、字段类型、注释
+        return executor.get_cols(item.text(0))
 
