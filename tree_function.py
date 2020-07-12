@@ -20,7 +20,7 @@ def make_tree_item(gui, parent, name, item_id=None, checkbox=None):
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param item_id: 构造的子节点隐藏属性id，可无
-    :param checkbox: 构造的子节点的复选框，可无
+    :param checkbox: 构造的子节点的复选框，可无。若存在，将当前状态写入第三列中
     """
     item = QTreeWidgetItem(parent)
     gui.update_tree_item_name(item, name)
@@ -29,6 +29,7 @@ def make_tree_item(gui, parent, name, item_id=None, checkbox=None):
         gui.update_tree_item_name(item, str(item_id), 1)
     if checkbox is not None:
         item.setCheckState(0, checkbox)
+        gui.update_tree_item_name(item, str(checkbox), 2)
 
 
 def add_conn_func(gui):
