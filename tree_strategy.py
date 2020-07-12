@@ -18,7 +18,7 @@ from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from message_box import pop_question
 from selected_data import SelectedData
 from sys_info_storage.sqlite import delete_conn
-from table_func import fill_table, clear_table, change_table_checkbox, close_table
+from table_func import fill_table, change_table_checkbox, close_table, clear_table
 from tree_function import make_tree_item, add_conn_func, show_conn_dialog
 
 _author_ = 'luwt'
@@ -245,13 +245,13 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             # 填充选中表列表，获取连接名，id，数据库名，表名
             tbs = get_children_names(item)
             # 放入选中数据容器中
-            SelectedData().set_tbs(conn_name, db_name, tbs)
+            SelectedData().set_tbs(gui, conn_name, db_name, tbs)
             change_table_checkbox(gui, True)
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
             set_children_check_state(item, Qt.Unchecked)
             # 清空容器中的值
-            SelectedData().unset_tbs(conn_name, db_name)
+            SelectedData().unset_tbs(gui, conn_name, db_name)
             change_table_checkbox(gui, False)
 
     @staticmethod
@@ -272,17 +272,22 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-        if not gui.table_header.isVisible():
-            # 获取连接id，从而获取该连接的数据库操作对象
-            cols = TreeNodeTable.get_cols(gui, item)
-            # 当前表复选框的状态，赋予表格中复选框的状态
-            fill_table(gui, cols, item.checkState(0))
-            # 如果表格复选框为选中，那么将表头的复选框也选中，默认表头复选框未选中
-            if item.checkState(0) == Qt.Checked:
-                gui.table_header.set_header_checked(True)
-            # 表格复选框改变事件
-            gui.tableWidget.cellChanged.connect(gui.on_cell_changed_func)
-            gui.current_table = item
+        # 如果当前展示的表存在且与欲打开之表不是同一表，先删除当前展示的表
+        if gui.table_header.isVisible() and gui.current_table is not item:
+            clear_table(gui)
+        # 如果当前打开表是欲打开之表，什么都不需要做
+        elif gui.table_header.isVisible() and gui.current_table is item:
+            return
+        # 获取连接id，从而获取该连接的数据库操作对象
+        cols = TreeNodeTable.get_cols(gui, item)
+        # 当前表复选框的状态，赋予表格中复选框的状态
+        fill_table(gui, cols, item.checkState(0))
+        # 如果表格复选框为选中，那么将表头的复选框也选中，默认表头复选框未选中
+        if item.checkState(0) == Qt.Checked:
+            gui.table_header.set_header_checked(True)
+        # 表格复选框改变事件
+        gui.tableWidget.cellChanged.connect(gui.on_cell_changed_func)
+        gui.current_table = item
 
     def close_item(self, item, gui):
         """
@@ -290,10 +295,8 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-        # 删除表格内容
-        clear_table(gui)
-        # 隐藏表头
-        gui.table_header.setVisible(False)
+        # 关闭表格
+        close_table(gui)
 
     def change_check_box(self, item, gui):
         """
@@ -301,18 +304,24 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-        node = TreeNodeTable.get_node_info(item)
+        # 取出已保存的复选框状态(存在于第三列中)，以此判断是否点击复选框
+        saved_check_state = int(item.text(2))
         check_state = item.checkState(0)
-        # 如果表已经选中，那么右侧表格需全选字段
-        if check_state == Qt.Checked:
-            change_table_checkbox(gui, True)
-            # 添加表名到容器
-            SelectedData().set_tbs(node[1], node[2], (node[3], ))
-        # 如果表未选中，那么右侧表格需清空选择
-        elif check_state == Qt.Unchecked:
-            # 从容器删除表名
-            SelectedData().unset_tbs(node[1], node[2], (node[3], ))
-            change_table_checkbox(gui, False)
+        # 如果当前复选框状态与保存的不同，说明点击了复选框
+        if check_state != saved_check_state:
+            node = TreeNodeTable.get_node_info(item)
+            # 如果表已经选中，那么右侧表格需全选字段
+            if check_state == Qt.Checked:
+                change_table_checkbox(gui, True)
+                # 添加表名到容器
+                SelectedData().set_tbs(gui, node[1], node[2], (node[3], ))
+            # 如果表未选中，那么右侧表格需清空选择
+            elif check_state == Qt.Unchecked:
+                # 从容器删除表名
+                SelectedData().unset_tbs(gui, node[1], node[2], (node[3], ))
+                change_table_checkbox(gui, False)
+            # 将复选框状态保存
+            gui.update_tree_item_name(item, str(check_state), 2)
 
     def get_menu_names(self, item, gui):
         """
