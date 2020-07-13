@@ -50,9 +50,9 @@ class DBExecutor:
         """获取数据库中所有表名列表"""
         return self.get_dbs_tables(constant.QUERY_TABLES_SQL)
 
-    def get_cols(self, table):
+    def get_cols(self, db, table):
         """从系统表查询表的所有字段名列表"""
-        sql = f'{constant.QUERY_SYS_TB} where table_name = "{table}"'
+        sql = f'{constant.QUERY_SYS_TB} where table_schema = "{db}" and table_name = "{table}"'
         return list(map(lambda x: (x[0], x[1], x[3]), self.get_data(sql)))
 
     def __exit__(self, exc_type, exc_val, exc_tb):

@@ -18,7 +18,7 @@ from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from message_box import pop_question
 from selected_data import SelectedData
 from sys_info_storage.sqlite import delete_conn
-from table_func import fill_table, change_table_checkbox, close_table, clear_table
+from table_func import fill_table, change_table_checkbox, close_table, add_table, check_table_opened
 from tree_function import make_tree_item, add_conn_func, show_conn_dialog
 
 _author_ = 'luwt'
@@ -207,9 +207,11 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
+        # 关闭表格，由于当前item不是表，所以应该使用当前表对象（如果有的话）
+        if hasattr(gui, 'current_table'):
+            TreeNodeTable().close_item(gui.current_table, gui)
         # 移除所有子项目
         item.takeChildren()
-        TreeNodeTable().close_item(item, gui)
 
     def change_check_box(self, item, gui): ...
 
@@ -246,13 +248,13 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             tbs = get_children_names(item)
             # 放入选中数据容器中
             SelectedData().set_tbs(gui, conn_name, db_name, tbs)
-            change_table_checkbox(gui, True)
+            change_table_checkbox(gui, item, True)
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
             set_children_check_state(item, Qt.Unchecked)
             # 清空容器中的值
             SelectedData().unset_tbs(gui, conn_name, db_name)
-            change_table_checkbox(gui, False)
+            change_table_checkbox(gui, item, False)
 
     @staticmethod
     def get_node_info(item):
@@ -273,11 +275,13 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param gui: 启动的主窗口界面对象
         """
         # 如果当前展示的表存在且与欲打开之表不是同一表，先删除当前展示的表
-        if gui.table_header.isVisible() and gui.current_table is not item:
-            clear_table(gui)
+        if hasattr(gui, 'tableWidget') and gui.current_table is not item:
+            close_table(gui)
         # 如果当前打开表是欲打开之表，什么都不需要做
-        elif gui.table_header.isVisible() and gui.current_table is item:
+        elif check_table_opened(gui, item):
             return
+        # 添加表格控件
+        add_table(gui)
         # 获取连接id，从而获取该连接的数据库操作对象
         cols = TreeNodeTable.get_cols(gui, item)
         # 当前表复选框的状态，赋予表格中复选框的状态
@@ -288,6 +292,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         # 表格复选框改变事件
         gui.tableWidget.cellChanged.connect(gui.on_cell_changed_func)
         gui.current_table = item
+        gui.statusbar.showMessage(f"当前展示的表为：{item.text(0)}")
 
     def close_item(self, item, gui):
         """
@@ -295,8 +300,9 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-        # 关闭表格
-        close_table(gui)
+        if check_table_opened(gui, item):
+            # 关闭表格
+            close_table(gui)
 
     def change_check_box(self, item, gui):
         """
@@ -312,14 +318,14 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
             node = TreeNodeTable.get_node_info(item)
             # 如果表已经选中，那么右侧表格需全选字段
             if check_state == Qt.Checked:
-                change_table_checkbox(gui, True)
+                change_table_checkbox(gui, item, True)
                 # 添加表名到容器
                 SelectedData().set_tbs(gui, node[1], node[2], (node[3], ))
             # 如果表未选中，那么右侧表格需清空选择
             elif check_state == Qt.Unchecked:
                 # 从容器删除表名
                 SelectedData().unset_tbs(gui, node[1], node[2], (node[3], ))
-                change_table_checkbox(gui, False)
+                change_table_checkbox(gui, item, False)
             # 将复选框状态保存
             gui.update_tree_item_name(item, str(check_state), 2)
 
@@ -329,12 +335,14 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-        # 检查表格中字段复选框状态
-        check_state = check_field_status(gui, item)
-        # 检查表是否展示：表头如果展示，当前表对象就是当前点击元素，
-        # 那么证明表格已经展示。否则可能展示的是其他表
-        table_opened = gui.table_header.isVisible() \
+
+        check_state = tuple()
+        table_opened = hasattr(gui, 'tableWidget') \
+            and gui.table_header.isVisible() \
             and gui.current_table is item
+        if check_table_opened(gui, item):
+            # 检查表格中字段复选框状态
+            check_state = check_field_status(gui, item)
         return get_table_menu_names(table_opened, check_state)
 
     def handle_menu_func(self, item, func, gui):
@@ -352,10 +360,10 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
             close_table(gui)
         # 全选字段
         elif func == SELECT_ALL_FIELD_MENU:
-            change_table_checkbox(gui, True)
+            change_table_checkbox(gui, item, True)
         # 取消选择字段
         elif func == UNSELECT_FIELD_MENU:
-            change_table_checkbox(gui, False)
+            change_table_checkbox(gui, item, False)
         # 生成
         elif func == GENERATE_MENU:
             pass
@@ -371,9 +379,8 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
 
     @staticmethod
     def get_cols(gui, item):
-        node = TreeNodeTable.get_node_info(item)
-        conn_id, conn_name = node[0], node[1]
+        conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
         executor = open_connection(gui, conn_id, conn_name)
         # 获取当前表下所有的列信息，包含字段名、字段类型、注释
-        return executor.get_cols(item.text(0))
+        return executor.get_cols(db_name, tb_name)
 
