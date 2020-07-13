@@ -2,14 +2,63 @@
 """
 处理表格控件动作
 """
+import sip
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTableWidgetItem
 
+from constant import TABLE_HEADER_LABELS
 from selected_data import SelectedData
-from table_header import all_header_combobox
+from table_header import all_header_combobox, CheckBoxHeader
 
 _author_ = 'luwt'
 _date_ = '2020/7/2 16:17'
+
+
+def add_table(gui):
+    """添加表格"""
+    gui.tableWidget = QtWidgets.QTableWidget(gui.centralwidget)
+    gui.tableWidget.setObjectName("tableWidget")
+    # 创建表格列标题，共四列
+    make_table_header(gui)
+
+    # 设置只读表格
+    gui.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+    # 让表格铺满整个控件
+    gui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+    # 在布局中添加表格
+    gui.horizontalLayout.addWidget(gui.tableWidget)
+    # 交替行颜色
+    gui.tableWidget.setAlternatingRowColors(True)
+
+
+def make_table_header(gui):
+    """设置表格列标题"""
+    # 表格设置为4列
+    gui.tableWidget.setColumnCount(4)
+    # 实例化自定义表头
+    gui.table_header = CheckBoxHeader()
+    # 设置表头
+    gui.tableWidget.setHorizontalHeader(gui.table_header)
+    # 设置表头字段
+    gui.tableWidget.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
+    # 表头复选框单击信号与槽
+    gui.table_header.select_all_clicked.connect(gui.table_header.change_state)
+
+
+def close_table(gui):
+    """
+    关闭右侧表格
+    :param gui: 启动的主窗口界面对象
+    """
+    # 在布局中移除表格
+    gui.horizontalLayout.removeWidget(gui.tableWidget)
+    # 必须调用sip才能彻底删除
+    sip.delete(gui.tableWidget)
+    # 删除tableWidget属性，方便后续判断
+    del gui.tableWidget
+    all_header_combobox.clear()
+    gui.statusbar.showMessage(f"成功关闭表：{gui.current_table.text(0)}")
 
 
 def fill_table(gui, cols, checked):
@@ -19,8 +68,6 @@ def fill_table(gui, cols, checked):
     :param cols: 列信息的数组，为二维数组
     :param checked: 表格中复选框状态，作为初始化复选框依据
     """
-    # 显示列标题
-    gui.table_header.setVisible(True)
     # 将当前表的列放入列表中
     gui.current_cols = list(map(lambda x: x[0], cols))
     print(gui.current_cols)
@@ -41,38 +88,29 @@ def fill_table(gui, cols, checked):
             gui.update_table_item(item, field)
 
 
-def change_table_checkbox(gui, checked):
+def change_table_checkbox(gui, item, checked):
     """
     改变表格中checkbox中所有复选框状态，换言之，全选或清空选择
     :param gui: 启动的主窗口界面对象
+    :param item: 当前点击树节点元素
     :param checked: 复选框选中状态
     """
-    # 通过表头是否展示，判定表是否已经展示
-    visible = gui.table_header.isVisible()
-    if visible:
+    # 判断表是否已经打开
+    if check_table_opened(gui, item):
         gui.table_header.set_header_checked(checked)
         gui.table_header.change_state(checked)
 
 
-def close_table(gui):
+def check_table_opened(gui, item):
     """
-    关闭右侧表格
+    检查表是否展示：首先检查表格是否存在，其次表头是否是显示状态，
+    最后检查当前表是否是当前点击元素，如果都满足则为打开状态。
+    如果前两项满足，而第三项不满足，则可能展示的是其他表
     :param gui: 启动的主窗口界面对象
+    :param item: 当前点击树节点元素
     """
-    # 删除表格内容
-    clear_table(gui)
-    # 隐藏表头
-    gui.table_header.setVisible(False)
-
-
-def clear_table(gui):
-    """
-    清空右侧表格，也一并清空选中的字段集合
-    :param gui: 启动的主窗口界面对象
-    """
-    [gui.tableWidget.removeRow(0) for r in range(gui.tableWidget.rowCount())]
-    all_header_combobox.clear()
-    gui.table_header.set_header_checked(False)
+    return hasattr(gui, 'tableWidget') \
+        and gui.current_table is item
 
 
 def on_cell_changed(gui, row, col):
@@ -82,7 +120,7 @@ def on_cell_changed(gui, row, col):
     :param row 表格中当前行
     :param col 表格中当前列
     """
-    if col == 0 and gui.tableWidget.item(row, 1):
+    if col == 0:
         print(row)
         # 检查第一列，checkbox选中状态
         item = gui.tableWidget.item(row, col)

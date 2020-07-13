@@ -5,14 +5,18 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction
+
 from connection_function import close_connection
-from constant import TREE_HEADER_LABELS, TABLE_HEADER_LABELS
+from constant import TREE_HEADER_LABELS
 from menu_bar_func import fill_menu_bar
 from sys_info_storage.sqlite import get_conns
-from PyQt5 import QtGui, QtCore, QtWidgets
-
 from table_func import on_cell_changed
-from table_header import CheckBoxHeader
+from tool_bar import fill_tool_bar
 from tree_function import make_tree_item, add_conn_func
 from tree_strategy import tree_node_factory, Context
 
@@ -59,8 +63,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.menubar = QtWidgets.QMenuBar(self.main_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
         self.menubar.setObjectName("menubar")
-        self.fill_menubar()
+        fill_menu_bar(self)
         self.main_window.setMenuBar(self.menubar)
+
+        # 工具栏
+        self.toolBar = QtWidgets.QToolBar(self.main_window)
+        self.toolBar.setObjectName("toolBar")
+        self.main_window.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        # 设置名称显示在图标下面（默认本来是只显示图标）
+        fill_tool_bar(self)
+        self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # 状态栏
         self.statusbar = QtWidgets.QStatusBar(self.main_window)
@@ -69,9 +81,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # 初始化树：初始化获取树结构的第一层元素，为数据库连接列表
         self.get_saved_conns()
-
-        # 初始化表格：隐式添加表格
-        self.add_table()
 
         # 双击树节点事件
         self.treeWidget.doubleClicked.connect(self.get_tree_list)
@@ -99,22 +108,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 根节点，展示连接的列表
             make_tree_item(self, self.treeWidget, item.name, item.id)
             self.display_conn_dict[item.id] = item
-
-    def add_table(self):
-        """添加表格"""
-        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableWidget.setObjectName("tableWidget")
-        # 创建表格列标题，共四列
-        self.make_table_header()
-
-        # 设置只读表格
-        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        # 让表格铺满整个控件
-        self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-
-        self.horizontalLayout.addWidget(self.tableWidget)
-        # 交替行颜色
-        self.tableWidget.setAlternatingRowColors(True)
 
     def get_tree_list(self):
         """获取树的子节点，双击触发，将连接 -> 数据库 -> 数据表，按顺序读取出来"""
@@ -147,21 +140,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :param field: 要填写的值
         """
         item.setText(self._translate("MainWindow", field))
-
-    def make_table_header(self):
-        """设置表格列标题"""
-        # 表格设置为4列
-        self.tableWidget.setColumnCount(4)
-        # 实例化自定义表头
-        self.table_header = CheckBoxHeader()
-        # 设置表头
-        self.tableWidget.setHorizontalHeader(self.table_header)
-        # 设置表头字段
-        self.tableWidget.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
-        # 表头复选框单击信号与槽
-        self.table_header.select_all_clicked.connect(self.table_header.change_state)
-        # 隐藏表格头部列标题
-        self.table_header.setVisible(False)
 
     def on_cell_changed_func(self, row, col):
         """
@@ -206,9 +184,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         func = act.text()
         node = tree_node_factory(item)
         Context(node).handle_menu_func(item, func, self)
-
-    def fill_menubar(self):
-        fill_menu_bar(self)
 
     def add_conn(self):
         add_conn_func(self)
