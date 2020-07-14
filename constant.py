@@ -28,6 +28,8 @@ CREATE_TEMP_TB = 'create temporary table tmp_table'
 QUERY_TEMP_TB = 'show full fields from tmp_table'
 # 查询系统表sql
 QUERY_SYS_TB = 'select column_name, data_type, column_key, column_comment from information_schema.columns'
+# 查询系统表和列sql
+QUERY_SYS_TB_COL = 'select column_name, table_name from information_schema.columns'
 
 # 生成路径前缀语
 OUTPUT_PREFIX = '生成的文件为：'

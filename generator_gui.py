@@ -8,8 +8,6 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
 
 from connection_function import close_connection
 from constant import TREE_HEADER_LABELS
@@ -40,7 +38,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setupUi(self):
         self.main_window.setObjectName("MainWindow")
-        self.main_window.resize(1123, 896)
+        self.main_window.resize(800, 700)
         self.centralwidget = QtWidgets.QWidget(self.main_window)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.centralwidget)
