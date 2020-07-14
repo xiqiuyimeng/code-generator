@@ -13,7 +13,8 @@
 第三层字典（表字典）：存放对应数据库下的表信息，key为表名，value为列表。称之为tb_dict
 第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list
 """
-import json
+from connection_function import open_connection
+from cursor_proxy import get_cols_group_by_table
 
 _author_ = 'luwt'
 _date_ = '2020/7/8 16:45'
@@ -30,6 +31,16 @@ def sort_dict(src_dict):
     return dict(zip(sorted_tuple[0], sorted_tuple[1]))
 
 
+def log(func):
+    def wrapper(data, *args, **kw):
+        func_name = func.__name__
+        print(f"{func_name}之前conn_dict is {data.conn_dict}")
+        res = func(data, *args, **kw)
+        print(f"{func_name}之后conn_dict is {data.conn_dict}")
+        return res
+    return wrapper
+
+
 class SelectedData:
 
     def __new__(cls, *args, **kwargs):
@@ -38,8 +49,10 @@ class SelectedData:
             SelectedData.instance = object.__new__(cls)
             # 存放连接信息的字典，key为连接名称，value为字典。为保证唯一，放在构造器中初始化
             SelectedData.instance.conn_dict = dict()
+            print('实例化容器')
         return SelectedData.instance
 
+    @log
     def get_db_dict(self, conn_name, allow_none=False):
         """
         从连接字典中取值，key为conn_name，获取对应的db_dict。用以存放数据库与其下表信息，
@@ -52,6 +65,7 @@ class SelectedData:
             self.conn_dict[conn_name] = dict()
         return self.conn_dict.get(conn_name)
 
+    @log
     def unset_db(self, gui, conn_name, db_name):
         """
         删除数据库字典中key为db_name的元素
@@ -67,6 +81,7 @@ class SelectedData:
         if not self.conn_dict.get(conn_name):
             del self.conn_dict[conn_name]
 
+    @log
     def get_tb_dict(self, conn_name, db_name, allow_none=False):
         """
         从数据库字典中取值，key为db_name，获取对应的tb_dict。用以存放表名与其下字段信息，
@@ -80,9 +95,13 @@ class SelectedData:
         if db_dict is None:
             return None
         if db_dict.get(db_name) is None:
-            db_dict[db_name] = dict()
+            if allow_none:
+                return None
+            else:
+                db_dict[db_name] = dict()
         return db_dict.get(db_name)
 
+    @log
     def replace_tb_dict(self, conn_name, db_name, tb_dict):
         """
         替换tb_dict
@@ -93,6 +112,7 @@ class SelectedData:
         db_dict = self.get_db_dict(conn_name)
         db_dict[db_name] = tb_dict
 
+    @log
     def get_col_list(self, conn_name, db_name, tb_name, allow_none=False):
         """
         从表字典中取值，key为tb_name，获取对应的col_list，用以存放指定表下的字段信息，
@@ -107,27 +127,34 @@ class SelectedData:
         if tb_dict is None:
             return None
         if tb_dict.get(tb_name) is None:
-            tb_dict[tb_name] = list()
+            if allow_none:
+                return None
+            else:
+                tb_dict[tb_name] = list()
         return tb_dict.get(tb_name)
 
-    def set_tbs(self, gui, conn_name, db_name, tb_names):
+    @log
+    def set_tbs(self, gui, conn_id, conn_name, db_name, tb_names=None):
         """
-        批量添加表名称，添加至表字典，key为表名，value为空列表
+        批量添加表名称，添加至表字典，key为表名，value为字段列表
         :param gui: 启动的主窗口界面对象
+        :param conn_id: 连接id
         :param conn_name: 连接名称，作为key存在于连接字典中
         :param db_name: 数据库名称，作为key存在于数据库字典中
-        :param tb_names: 表名称列表，作为key存在于表字典中
+        :param tb_names: 表名称列表，作为key存在于表字典中，若不传则为查询所有
         """
         tb_dict = self.get_tb_dict(conn_name, db_name)
-        for tb_name in tb_names:
-            tb_dict[tb_name] = list()
+        executor = open_connection(gui, conn_id, conn_name)
+        cols = executor.get_tb_cols(db_name, tb_names)
+        tb_cols_dict = get_cols_group_by_table(cols)
+        tb_dict.update(tb_cols_dict)
         sorted_dict = sort_dict(tb_dict)
         # 将原来的字典替换为排序后的字典
         self.replace_tb_dict(conn_name, db_name, sorted_dict)
         # 状态栏信息
         gui.statusbar.showMessage(f"已选择表：{list(sorted_dict.keys())}")
-        print(json.dumps(self.conn_dict, indent=4, ensure_ascii=False))
 
+    @log
     def unset_tbs(self, gui, conn_name, db_name, tb_names=None):
         """
         批量删除表名称，从表字典中删除元素，若无指定表名，则清空所有
@@ -145,8 +172,8 @@ class SelectedData:
             gui.statusbar.showMessage(f"取消选择表：{tb_names}")
         else:
             self.unset_db(gui, conn_name, db_name)
-        print(json.dumps(self.conn_dict, indent=4, ensure_ascii=False))
 
+    @log
     def set_cols(self, gui, conn_name, db_name, tb_name, cols):
         """
         批量添加字段名称，添加至字段列表中
@@ -159,11 +186,11 @@ class SelectedData:
         col_list = self.get_col_list(conn_name, db_name, tb_name)
         col_list.extend(cols)
         gui.statusbar.showMessage(f'{tb_name}表已选字段：{col_list}')
-        print(json.dumps(self.conn_dict, indent=4, ensure_ascii=False))
 
+    @log
     def unset_cols(self, gui, conn_name, db_name, tb_name, cols=None):
         """
-        批量删除字段名称，若无指定字典，情况所有
+        批量删除字段名称，若无指定字典，清空所有
         :param gui: 启动的主窗口界面对象
         :param conn_name: 连接名称，作为key存在于连接字典中
         :param db_name: 数据库名称，作为key存在于数据库字典中
@@ -181,3 +208,4 @@ class SelectedData:
             gui.statusbar.showMessage(f"取消选择字段：{cols}")
         else:
             self.unset_tbs(gui, conn_name, db_name, [tb_name, ])
+

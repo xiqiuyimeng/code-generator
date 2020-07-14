@@ -64,13 +64,3 @@ def set_children_check_state(item, check_state):
     for index in range(item.childCount()):
         item.child(index).setCheckState(0, check_state)
 
-
-def get_children_names(item):
-    """
-    获取当前节点下所有子节点的名称列表
-    :param item: 当前点击的树节点元素
-    """
-    names = list()
-    for index in range(item.childCount()):
-        names.append(item.child(index).text(0))
-    return names

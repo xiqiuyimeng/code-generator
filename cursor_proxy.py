@@ -2,8 +2,11 @@
 """
 对数据库游标对象的一个代理类，暴露给其他服务进行调用，处理数据库相关操作
 """
+from itertools import groupby
+
 import constant
 from get_cursor import Cursor
+
 _author_ = 'luwt'
 _date_ = '2020/6/11 10:20'
 
@@ -55,9 +58,31 @@ class DBExecutor:
         sql = f'{constant.QUERY_SYS_TB} where table_schema = "{db}" and table_name = "{table}"'
         return list(map(lambda x: (x[0], x[1], x[3]), self.get_data(sql)))
 
+    def get_tb_cols(self, db, table=None):
+        """从系统表中查询指定数据库下的所有字段，也可指定表名"""
+        sql = f'{constant.QUERY_SYS_TB_COL} where table_schema = "{db}"'
+        if table:
+            sql += f' and table_name in ("{",".join(table)}")'
+        return self.get_data(sql)
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cursor_.__exit__(exc_type, exc_val, exc_tb)
 
     def exit(self):
         """关闭游标和链接"""
         self.__exit__(None, None, None)
+
+
+def get_cols_group_by_table(cols):
+    """
+    将 get_tb_cols 方法查询出的结果进行分组，按表名分组，得到字典
+        tb: [col_A, col_B]
+    :param cols: 数据库中查询出的数据
+    """
+    res = dict()
+    cols.sort(key=cols.sort(key=lambda x: x[1]))
+    result = groupby(cols, lambda x: x[1])
+    for key, group in result:
+        cols = list(map(lambda x: x[0], list(group)))
+        res[key] = cols
+    return res

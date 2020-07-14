@@ -9,11 +9,13 @@
 from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QToolTip
 
 from conn_dialog import test_connection
 from connection_function import open_connection, close_connection
 from constant import *
-from gui_function import check_table_status, set_children_check_state, check_field_status, get_children_names
+from gui_function import check_table_status, set_children_check_state, check_field_status
 from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from message_box import pop_question
 from selected_data import SelectedData
@@ -245,16 +247,16 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         elif func == SELECT_ALL_TB_MENU:
             set_children_check_state(item, Qt.Checked)
             # 填充选中表列表，获取连接名，id，数据库名，表名
-            tbs = get_children_names(item)
-            # 放入选中数据容器中
-            SelectedData().set_tbs(gui, conn_name, db_name, tbs)
-            change_table_checkbox(gui, item, True)
+            SelectedData().set_tbs(gui, conn_id, conn_name, db_name)
+            if hasattr(gui, 'current_table') and gui.current_table.parent() is item:
+                change_table_checkbox(gui, gui.current_table, True)
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
             set_children_check_state(item, Qt.Unchecked)
             # 清空容器中的值
             SelectedData().unset_tbs(gui, conn_name, db_name)
-            change_table_checkbox(gui, item, False)
+            if hasattr(gui, 'current_table') and gui.current_table.parent() is item:
+                change_table_checkbox(gui, gui.current_table, False)
 
     @staticmethod
     def get_node_info(item):
@@ -284,15 +286,22 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         add_table(gui)
         # 获取连接id，从而获取该连接的数据库操作对象
         cols = TreeNodeTable.get_cols(gui, item)
+        conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
+        # 获取选中的字段，如果为空，则未选中，如果选中列表长度等于字段列表长度，那么为全选
+        selected_cols = SelectedData().get_col_list(conn_name, db_name, tb_name, True)
         # 当前表复选框的状态，赋予表格中复选框的状态
-        fill_table(gui, cols, item.checkState(0))
-        # 如果表格复选框为选中，那么将表头的复选框也选中，默认表头复选框未选中
-        if item.checkState(0) == Qt.Checked:
+        fill_table(gui, cols, selected_cols)
+        # 如果表格复选框为选中且选中的字段数等于总字段数，那么将表头的复选框也选中，默认表头复选框未选中
+        if item.checkState(0) == Qt.Checked and len(cols) == len(selected_cols):
             gui.table_header.set_header_checked(True)
         # 表格复选框改变事件
         gui.tableWidget.cellChanged.connect(gui.on_cell_changed_func)
         gui.current_table = item
+        # 状态栏提示
         gui.statusbar.showMessage(f"当前展示的表为：{item.text(0)}")
+        # 设置气泡提示
+        QToolTip.setFont(QFont('楷体', 13))
+        gui.tableWidget.setToolTip(f'当前表为{tb_name}')
 
     def close_item(self, item, gui):
         """
@@ -315,16 +324,16 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         check_state = item.checkState(0)
         # 如果当前复选框状态与保存的不同，说明点击了复选框
         if check_state != saved_check_state:
-            node = TreeNodeTable.get_node_info(item)
+            conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
             # 如果表已经选中，那么右侧表格需全选字段
             if check_state == Qt.Checked:
                 change_table_checkbox(gui, item, True)
                 # 添加表名到容器
-                SelectedData().set_tbs(gui, node[1], node[2], (node[3], ))
+                SelectedData().set_tbs(gui, conn_id, conn_name, db_name, (tb_name, ))
             # 如果表未选中，那么右侧表格需清空选择
             elif check_state == Qt.Unchecked:
                 # 从容器删除表名
-                SelectedData().unset_tbs(gui, node[1], node[2], (node[3], ))
+                SelectedData().unset_tbs(gui, conn_name, db_name, (tb_name, ))
                 change_table_checkbox(gui, item, False)
             # 将复选框状态保存
             gui.update_tree_item_name(item, str(check_state), 2)
