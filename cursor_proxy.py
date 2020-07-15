@@ -80,7 +80,7 @@ def get_cols_group_by_table(cols):
     :param cols: 数据库中查询出的数据
     """
     res = dict()
-    cols.sort(key=cols.sort(key=lambda x: x[1]))
+    cols.sort(key=lambda x: x[1])
     result = groupby(cols, lambda x: x[1])
     for key, group in result:
         cols = list(map(lambda x: x[0], list(group)))

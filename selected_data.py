@@ -13,6 +13,8 @@
 第三层字典（表字典）：存放对应数据库下的表信息，key为表名，value为列表。称之为tb_dict
 第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list
 """
+import json
+
 from connection_function import open_connection
 from cursor_proxy import get_cols_group_by_table
 
@@ -34,9 +36,9 @@ def sort_dict(src_dict):
 def log(func):
     def wrapper(data, *args, **kw):
         func_name = func.__name__
-        print(f"{func_name}之前conn_dict is {data.conn_dict}")
+        print(f"{func_name}之前conn_dict is {json.dumps(data.conn_dict, indent=4, ensure_ascii=False)}")
         res = func(data, *args, **kw)
-        print(f"{func_name}之后conn_dict is {data.conn_dict}")
+        print(f"{func_name}之后conn_dict is {json.dumps(data.conn_dict, indent=4, ensure_ascii=False)}")
         return res
     return wrapper
 

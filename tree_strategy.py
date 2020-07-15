@@ -110,6 +110,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         :param gui: 启动的主窗口界面对象
         """
         TreeNodeDB().close_item(item, gui)
+        item.setExpanded(False)
 
     def change_check_box(self, item, gui): ...
 
@@ -134,7 +135,6 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         if func == OPEN_CONN_MENU:
             self.open_item(item, gui)
             item.setExpanded(True)
-            gui.treeWidget.repaint()
         # 关闭连接
         elif func == CLOSE_CONN_MENU:
             # 关闭数据连接，关闭特定连接，id为标识
@@ -214,6 +214,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             TreeNodeTable().close_item(gui.current_table, gui)
         # 移除所有子项目
         item.takeChildren()
+        item.setExpanded(False)
 
     def change_check_box(self, item, gui): ...
 
@@ -239,7 +240,6 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         if func == OPEN_DB_MENU:
             self.open_item(item, gui)
             item.setExpanded(True)
-            gui.treeWidget.repaint()
         # 关闭数据库
         elif func == CLOSE_DB_MENU:
             self.close_item(item, gui)
