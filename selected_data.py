@@ -55,6 +55,14 @@ class SelectedData:
         return SelectedData.instance
 
     @log
+    def unset_conn(self, conn_name):
+        """
+        删除已选字典中的连接
+        :param conn_name: 连接名称
+        """
+        del self.conn_dict[conn_name]
+
+    @log
     def get_db_dict(self, conn_name, allow_none=False):
         """
         从连接字典中取值，key为conn_name，获取对应的db_dict。用以存放数据库与其下表信息，

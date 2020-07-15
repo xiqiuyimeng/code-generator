@@ -130,15 +130,14 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         :param gui: 启动的主窗口界面对象
         """
         # 获取当前选中的连接id，连接名称
-        conn_id, conn_name = TreeNodeConn.get_node_info(item)
+        conn_id, conn_name = self.get_node_info(item)
         # 打开连接
         if func == OPEN_CONN_MENU:
             self.open_item(item, gui)
             item.setExpanded(True)
         # 关闭连接
         elif func == CLOSE_CONN_MENU:
-            # 关闭数据连接，关闭特定连接，id为标识
-            close_connection(gui, conn_name)
+            self.close_conn(conn_name, func, gui)
             self.close_item(item, gui)
         # 测试连接
         elif func == TEST_CONN_MENU:
@@ -148,32 +147,105 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             add_conn_func(gui)
         # 编辑连接
         elif func == EDIT_CONN_MENU:
-            # 先弹关闭连接确认框
-            reply = pop_question(func, EDIT_CONN_PROMPT)
-            if reply:
-                # 关闭连接
-                close_connection(gui, conn_name)
-                self.close_item(item, gui)
-                conn_info = gui.display_conn_dict.get(conn_id)
-                show_conn_dialog(gui, conn_info, func)
-                # 在子窗口更新完数据库和页面后，将页面的存储数据也更新
-                gui.display_conn_dict[conn_id] = open_connection(gui, conn_id, conn_name)
+            self.edit_conn(func, gui, conn_name, conn_id, item)
         # 删除连接
         elif func == DEL_CONN_MENU:
-            # 弹出关闭连接确认框
-            reply = pop_question(func, DEL_CONN_PROMPT)
+            self.del_conn(func, gui, conn_name, conn_id, item)
+
+    @staticmethod
+    def close_conn(conn_name, func, gui):
+        """
+        关闭数据连接，关闭特定连接，name为标识，
+        如果在此连接下已选择了字段。那么弹窗确认是否关闭，
+        如果关闭将清空此连接所选的字段
+        :param conn_name: 连接名称
+        :param func: 功能名称，用于展示在弹窗标题处
+        :param gui: 启动的主窗口界面对象
+        """
+        if SelectedData().get_db_dict(conn_name, True):
+            reply = pop_question(func, CLOSE_CONN_PROMPT)
             if reply:
-                # 关闭连接
-                close_connection(gui, conn_name)
-                conn_info = gui.display_conn_dict[conn_id]
-                delete_conn(conn_info.id)
-                del gui.display_conn_dict[conn_id]
-                # 删除树元素
-                # 树型部件的takeTopLevelItem方法可以从树型部件中删除对应项的节点并返回该项，语法：takeTopLevelItem(index)
-                # 通过调用树型部件的indexOfTopLevelItem方法可以获得对应项在顶层项的位置，语法：indexOfTopLevelItem
-                #
-                # self.treeWidget.removeItemWidget，它从一个项中移除一个小部件，而不是QTreeWidgetItem。它对应于setItemWidget方法
-                gui.treeWidget.takeTopLevelItem(gui.treeWidget.indexOfTopLevelItem(item))
+                SelectedData().unset_conn(conn_name)
+            else:
+                return
+        close_connection(gui, conn_name)
+
+    def edit_conn(self, func, gui, conn_name, conn_id, item):
+        """
+        编辑连接，首先需要判断连接是否打开，
+        如果打开，进一步判断是否有选中的字段数据，如果有，
+        则弹窗提示需要先关闭连接并清空字段。
+        如果没有选中字段，则弹窗需要关闭连接。
+        否则直接弹编辑窗口
+        :param func: 功能名称
+        :param gui: 启动的主窗口界面对象
+        :param conn_name: 连接名称
+        :param conn_id: 连接id
+        :param item: 当前点击树节点元素
+        """
+        # 先判断是否打开
+        if item.isExpanded():
+            # 再判断是否有选中字段
+            if SelectedData().get_db_dict(conn_name, True):
+                if pop_question(func, EDIT_CONN_WITH_FIELD_PROMPT):
+                    SelectedData().unset_conn(conn_name)
+                    # 关闭连接
+                    close_connection(gui, conn_name)
+                    self.close_item(item, gui)
+                else:
+                    return
+            else:
+                if pop_question(func, EDIT_CONN_PROMPT):
+                    # 关闭连接
+                    close_connection(gui, conn_name)
+                    self.close_item(item, gui)
+                else:
+                    return
+        conn_info = gui.display_conn_dict.get(conn_id)
+        show_conn_dialog(gui, conn_info, func)
+        # 在子窗口更新完数据库和页面后，将页面的存储数据也更新
+        gui.display_conn_dict[conn_id] = open_connection(gui, conn_id, conn_name)
+
+    def del_conn(self, func, gui, conn_name, conn_id, item):
+        """
+        删除连接，如果连接下有选择字段，弹窗确认是否清空字段并删除连接，
+        否则弹窗是否删除连接
+        :param func: 功能名称
+        :param gui: 启动的主窗口界面对象
+        :param conn_name: 连接名称
+        :param conn_id: 连接id
+        :param item: 当前点击树节点元素
+        """
+        # 判断是否有选择字段
+        if SelectedData().get_db_dict(conn_name, True):
+            if pop_question(func, DEL_CONN_WITH_FIELD_PROMPT):
+                SelectedData().unset_conn(conn_name)
+                self.close_and_delete_conn(gui, conn_name, conn_id, item)
+        else:
+            # 弹出关闭连接确认框
+            if pop_question(func, DEL_CONN_PROMPT):
+                self.close_and_delete_conn(gui, conn_name, conn_id, item)
+
+    @staticmethod
+    def close_and_delete_conn(gui, conn_name, conn_id, item):
+        """
+        关闭连接，删除连接
+        :param gui: 启动的主窗口界面对象
+        :param conn_name: 连接名称
+        :param conn_id: 连接id
+        :param item: 当前点击树节点元素
+        """
+        # 关闭连接
+        close_connection(gui, conn_name)
+        conn_info = gui.display_conn_dict[conn_id]
+        delete_conn(conn_info.id)
+        del gui.display_conn_dict[conn_id]
+        # 删除树元素
+        # 树型部件的takeTopLevelItem方法可以从树型部件中删除对应项的节点并返回该项，语法：takeTopLevelItem(index)
+        # 通过调用树型部件的indexOfTopLevelItem方法可以获得对应项在顶层项的位置，语法：indexOfTopLevelItem
+        #
+        # self.treeWidget.removeItemWidget，它从一个项中移除一个小部件，而不是QTreeWidgetItem。它对应于setItemWidget方法
+        gui.treeWidget.takeTopLevelItem(gui.treeWidget.indexOfTopLevelItem(item))
 
     @staticmethod
     def get_node_info(item):
@@ -242,6 +314,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             item.setExpanded(True)
         # 关闭数据库
         elif func == CLOSE_DB_MENU:
+            self.close_db(item, func, conn_name, db_name, gui)
             self.close_item(item, gui)
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
@@ -257,6 +330,24 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             SelectedData().unset_tbs(gui, conn_name, db_name)
             if hasattr(gui, 'current_table') and gui.current_table.parent() is item:
                 change_table_checkbox(gui, gui.current_table, False)
+
+    @staticmethod
+    def close_db(item, func, conn_name, db_name, gui):
+        """
+        关闭数据库，如果此库下已选择了字段，弹窗确认是否关闭，
+        如果关闭，将清空此库下所选字段
+        :param item: 当前点击树节点元素，也就是库
+        :param func: 功能名称，用于展示在弹窗标题处
+        :param conn_name: 连接名称
+        :param db_name: 库名称
+        :param gui: 启动的主窗口界面对象
+        """
+        check_status = check_table_status(item)
+        if any(check_status):
+            if pop_question(func, CLOSE_DB_PROMPT):
+                SelectedData().unset_db(gui, conn_name, db_name)
+            else:
+                return
 
     @staticmethod
     def get_node_info(item):

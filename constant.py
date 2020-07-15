@@ -122,8 +122,13 @@ REJECT_BUTTON = '否'
 """操作连接时提示语"""
 # 编辑连接时的提示语
 EDIT_CONN_PROMPT = '编辑连接需要先关闭连接，是否继续？'
+# 编辑连接关闭时如有选择字段
+EDIT_CONN_WITH_FIELD_PROMPT = '编辑连接需要先关闭连接，此连接下有已选的字段，' \
+                              '如果继续将清空此连接下已选字段并关闭连接，是否继续？'
 # 删除连接时的提示语
 DEL_CONN_PROMPT = '是否要删除连接？'
+# 删除连接时如有选择字段
+DEL_CONN_WITH_FIELD_PROMPT = '此连接下有已选字段，如果继续将清空此连接下已选字段并删除连接，是否继续？'
 # 保存连接成功提示语
 SAVE_CONN_SUCCESS_PROMPT = '保存成功！'
 # 测试连接成功提示语
@@ -132,6 +137,12 @@ TEST_CONN_SUCCESS_PROMPT = '连接成功！'
 TEST_CONN_FAIL_PROMPT = '连接失败！'
 # 检查系统库中连接名字存在提示语
 CONN_NAME_EXISTS = '连接名称已存在！'
+# 关闭连接时的提示语
+CLOSE_CONN_PROMPT = '该连接下有已选的字段，强行关闭将清空连接下所选字段，是否继续'
+
+"""操作数据库时提示语"""
+# 关闭数据库时提示语
+CLOSE_DB_PROMPT = '该数据库下有已选的字段，强行关闭将清空库下所选字段，是否继续？'
 
 """表格列头"""
 TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "备注"]
