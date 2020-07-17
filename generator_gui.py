@@ -9,9 +9,12 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
+from confirm_select_dialog import DisplaySelectedDialog
 from connection_function import close_connection
 from constant import TREE_HEADER_LABELS
 from menu_bar_func import fill_menu_bar
+from message_box import pop_fail
+from selected_data import SelectedData
 from sys_info_storage.sqlite import get_conns
 from table_func import on_cell_changed
 from tool_bar import fill_tool_bar
@@ -19,7 +22,7 @@ from tree_function import make_tree_item, add_conn_func
 from tree_strategy import tree_node_factory, Context
 
 
-class Ui_MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, main_window):
         super().__init__()
@@ -34,9 +37,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.dbs = list()
         self.tables = list()
 
-        self.setupUi()
+        self.setup_ui()
 
-    def setupUi(self):
+    def setup_ui(self):
         self.main_window.setObjectName("MainWindow")
         self.main_window.resize(1123, 896)
         self.centralwidget = QtWidgets.QWidget(self.main_window)
@@ -186,7 +189,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def add_conn(self):
         add_conn_func(self)
 
-    def generate(self): ...
+    def generate(self):
+        selected_data = SelectedData().conn_dict
+        if selected_data:
+            generate_dialog = DisplaySelectedDialog(selected_data)
+            generate_dialog.setWindowModality(Qt.ApplicationModal)
+            generate_dialog.show()
+        else:
+            pop_fail("生成", "当前未选中数据，请选择后再执行！")
 
     def quit(self):
         self.main_window.close()

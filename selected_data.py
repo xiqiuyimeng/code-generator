@@ -11,7 +11,7 @@
 第一层字典（连接字典）：存放连接信息，key为连接名称，value为字典。称之为conn_dict
 第二层字典（数据库字典）：存放对应连接下的数据库信息，key为数据库名称，value为字典。称之为db_dict
 第三层字典（表字典）：存放对应数据库下的表信息，key为表名，value为列表。称之为tb_dict
-第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list
+第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list，如果全选字段，则为元祖类型，否则为列表
 """
 import json
 
@@ -184,6 +184,18 @@ class SelectedData:
             self.unset_db(gui, conn_name, db_name)
 
     @log
+    def replace_col_list(self, conn_name, db_name, tb_name, cols):
+        """
+        将原tb_dict中的列表替换为元祖，替换目的是将此类型作为全选的标识。或将元祖替换为列表
+        :param conn_name: 连接名称，作为key存在于连接字典中
+        :param db_name: 数据库名称，作为key存在于数据库字典中
+        :param tb_name: 表名称，作为key存在于表字典中
+        :param cols: 添加的字段名称列表或元祖，作为value存在于表字典中
+        """
+        tb_dict = self.get_tb_dict(conn_name, db_name)
+        tb_dict[tb_name] = cols
+
+    @log
     def set_cols(self, gui, conn_name, db_name, tb_name, cols):
         """
         批量添加字段名称，添加至字段列表中
@@ -194,8 +206,13 @@ class SelectedData:
         :param cols: 添加的字段名称列表，作为value存在于表字典中
         """
         col_list = self.get_col_list(conn_name, db_name, tb_name)
-        col_list.extend(cols)
-        gui.statusbar.showMessage(f'{tb_name}表已选字段：{col_list}')
+        if isinstance(col_list, list):
+            col_list.extend(cols)
+            # 若选中字段个数等于表中总字段数，将列表转为元祖，以此标识全选
+            if len(col_list) == len(gui.current_cols):
+                col_tuple = tuple(col_list)
+                self.replace_col_list(conn_name, db_name, tb_name, col_tuple)
+            gui.statusbar.showMessage(f'{tb_name}表已选字段：{col_list}')
 
     @log
     def unset_cols(self, gui, conn_name, db_name, tb_name, cols=None):
@@ -207,15 +224,17 @@ class SelectedData:
         :param tb_name: 表名称，作为key存在于表字典中
         :param cols: 需要删除的字段名称列表，作为value存在于表字典中
         """
-        # 若指定字段，且非所有已选字段，删除字段，否则应清空所有
-        col_list = self.get_col_list(conn_name, db_name, tb_name)
-        # 如果字段列表为空列表，认为是全选字段，将所有字段填充进去
-        if col_list is not None and len(col_list) == 0:
-            col_list.extend(gui.current_cols)
-        if cols and len(cols) != len(col_list):
-            [col_list.remove(col) for col in cols]
-            # 状态栏信息
-            gui.statusbar.showMessage(f"取消选择字段：{cols}")
-        else:
-            self.unset_tbs(gui, conn_name, db_name, [tb_name, ])
+        col_list = self.get_col_list(conn_name, db_name, tb_name, True)
+        if col_list:
+            # 判断 col_list 类型，如果是tuple，那么需要将其转为list
+            if isinstance(col_list, tuple):
+                col_list = list(col_list)
+                self.replace_col_list(conn_name, db_name, tb_name, col_list)
+            # 若指定字段，且非所有已选字段，删除字段，否则应清空所有
+            if cols and len(cols) != len(col_list):
+                [col_list.remove(col) for col in cols]
+                # 状态栏信息
+                gui.statusbar.showMessage(f"取消选择字段：{cols}")
+            else:
+                self.unset_tbs(gui, conn_name, db_name, [tb_name, ])
 
