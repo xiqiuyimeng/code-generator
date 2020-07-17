@@ -5,7 +5,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from conn_dialog import Ui_Dialog
+from conn_dialog import ConnDialog
 from constant import ADD_CONN_MENU, EDIT_CONN_MENU
 from sys_info_storage.sqlite import Connection
 
@@ -49,7 +49,7 @@ def show_conn_dialog(gui, conn_info, title):
         将在弹窗界面回显数据，若无数据，则为添加操作
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
     """
-    dialog = Ui_Dialog(conn_info, title, gui)
+    dialog = ConnDialog(conn_info, title, gui)
     dialog.setWindowModality(Qt.ApplicationModal)
     dialog.show()
     if title == ADD_CONN_MENU:

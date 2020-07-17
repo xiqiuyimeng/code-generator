@@ -26,6 +26,7 @@ conn_sql = {
     'delete': f'delete from {CONN_TABLE} where id = ',
     'select': f'select * from {CONN_TABLE}',
     'select_name_exist': f'select count(*) > 0 from {CONN_TABLE} where name = ',
+    'select_id_by_name': f'select id from {CONN_TABLE} where name = ',
 }
 
 conn = sqlite3.connect(DB)
@@ -88,6 +89,14 @@ def check_name_available(conn_name):
     cursor.execute(sql)
     data = cursor.fetchone()
     return data[0] == 0
+
+
+def get_id_by_name(conn_name):
+    """根据连接名称查询id，连接名称是唯一的，所以可以这样查"""
+    sql = conn_sql.get('select_id_by_name') + f'"{conn_name}"'
+    cursor.execute(sql)
+    data = cursor.fetchone()
+    return data[0]
 
 
 # connection = Connection(None, 'centos121', 'centos121', 3306, 'root', 'admin')

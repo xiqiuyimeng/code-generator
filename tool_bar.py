@@ -34,6 +34,8 @@ def add_refresh_tool(gui):
 
 def add_generate_tool(gui):
     generate_tool = QAction(QIcon('exec.jpg'), '生成', gui)
+    generate_tool.setStatusTip('根据选择执行生成命令')
+    generate_tool.triggered.connect(gui.generate)
     gui.toolBar.addAction(generate_tool)
 
 

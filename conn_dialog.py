@@ -11,6 +11,7 @@
 
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QPalette, QPixmap
 from PyQt5.QtWidgets import QDialog
 
@@ -20,7 +21,7 @@ from message_box import pop_ok, pop_fail
 from sys_info_storage.sqlite import Connection, update_conn, add_conn, get_new_conn, check_name_available
 
 
-class Ui_Dialog(QDialog):
+class ConnDialog(QDialog):
 
     conn_signal = QtCore.pyqtSignal(object, Connection)
 
@@ -32,9 +33,9 @@ class Ui_Dialog(QDialog):
         self.dialog_title = dialog_title
         self.connection = connection
         self._translate = QtCore.QCoreApplication.translate
-        self.setupUi()
+        self.setup_ui()
 
-    def setupUi(self):
+    def setup_ui(self):
         self.dialog.setObjectName("Dialog")
         self.dialog.resize(387, 332)
 
@@ -42,6 +43,9 @@ class Ui_Dialog(QDialog):
         palette = QPalette()
         palette.setBrush(self.backgroundRole(), QBrush(QPixmap('dialog_bg.jpg')))
         self.setPalette(palette)
+
+        # 取消窗口右上角的问号按钮
+        self.dialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
 
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.dialog)
         self.verticalLayout_3.setObjectName("verticalLayout_3")

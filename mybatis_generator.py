@@ -199,15 +199,14 @@ class MybatisGenerator:
         if self.exec_sql:
             sql = QUERY_TEMP_TB
         elif self.column_name:
-            columns = list(map(lambda x: x.strip(), self.column_name.split(',')))
             # 如果只有一个值，就不需要循环了
-            if len(columns) == 1:
-                sql += f' and column_name in ("{columns[0]}")'
+            if len(self.column_name) == 1:
+                sql += f' and column_name in ("{self.column_name[0]}")'
             else:
-                for i, col_name in enumerate(columns):
+                for i, col_name in enumerate(self.column_name):
                     if i == 0:
                         sql += f' and column_name in ("{col_name}", '
-                    elif col_name == columns[-1]:
+                    elif col_name == self.column_name[-1]:
                         sql += f'"{col_name}")'
                     else:
                         sql += f'"{col_name}", '
