@@ -16,7 +16,8 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QTreeWidgetItem
 
-from constant import CONFIRM_TREE_HEADER_LABELS
+from constant import CONFIRM_TREE_HEADER_LABELS, NEXT_STEP_BUTTON, CANCEL_BUTTON, COLLAPSE_BUTTON, EXPAND_BUTTON
+from font import set_font
 from select_generator_ui import setup_tab_ui
 
 
@@ -32,7 +33,11 @@ class DisplaySelectedDialog(QDialog):
 
     def setup_ui(self):
         self.dialog.setObjectName("Dialog")
-        self.dialog.resize(791, 633)
+        # 固定大小，不允许缩放
+        self.dialog.setFixedSize(1000, 800)
+
+        self.dialog.setFont(set_font())
+
         self.verticalLayout = QtWidgets.QVBoxLayout(self.dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.widget = QtWidgets.QWidget(self.dialog)
@@ -42,6 +47,8 @@ class DisplaySelectedDialog(QDialog):
         self.treeWidget = QtWidgets.QTreeWidget(self.widget)
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "1")
+        # 字体
+        self.treeWidget.setFont(set_font())
         self.verticalLayout_2.addWidget(self.treeWidget)
         self.first_splitter = QtWidgets.QSplitter(self.widget)
         self.first_splitter.setOrientation(QtCore.Qt.Horizontal)
@@ -64,6 +71,7 @@ class DisplaySelectedDialog(QDialog):
         # 按钮响应事件
         self.first_buttonBox.accepted.connect(self.next_step)
         self.first_buttonBox.rejected.connect(self.dialog.close)
+        self.first_buttonBox_2.accepted.connect(self.expand_close)
         self.make_tree()
 
         self.retranslateUi()
@@ -72,9 +80,10 @@ class DisplaySelectedDialog(QDialog):
     def retranslateUi(self):
         self.dialog.setWindowTitle(self._translate("Dialog", "Dialog"))
         self.treeWidget.headerItem().setText(0, self._translate("Dialog", CONFIRM_TREE_HEADER_LABELS))
-        self.first_buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok).setText('关闭所有表')
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText('下一步')
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText('取消')
+        self.expand_collapse_button = self.first_buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
+        self.expand_collapse_button.setText(COLLAPSE_BUTTON)
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(NEXT_STEP_BUTTON)
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
 
     def make_tree(self):
         """根据选中数据构建树"""
@@ -92,6 +101,16 @@ class DisplaySelectedDialog(QDialog):
         item = QTreeWidgetItem(parent)
         item.setText(0, self._translate("Dialog", name))
         return item
+
+    def expand_close(self):
+        # 如果当前是展开，就关闭所有项，并将按钮文字改为展开所有，
+        #  如果是关闭状态，就展开所有项，将按钮文字改为关闭所有
+        if self.expand_collapse_button.text() == EXPAND_BUTTON:
+            self.expand_collapse_button.setText(COLLAPSE_BUTTON)
+            self.treeWidget.expandAll()
+        else:
+            self.expand_collapse_button.setText(EXPAND_BUTTON)
+            self.treeWidget.collapseAll()
 
     def next_step(self):
         # 隐藏树控件

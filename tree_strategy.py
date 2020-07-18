@@ -9,12 +9,12 @@
 from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QToolTip
 
 from conn_dialog import test_connection
 from connection_function import open_connection, close_connection
 from constant import *
+from font import set_font
 from gui_function import check_table_status, set_children_check_state, check_field_status
 from menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from message_box import pop_question
@@ -314,8 +314,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             item.setExpanded(True)
         # 关闭数据库
         elif func == CLOSE_DB_MENU:
-            self.close_db(item, func, conn_name, db_name, gui)
-            self.close_item(item, gui)
+            if self.close_db(item, func, conn_name, db_name, gui):
+                self.close_item(item, gui)
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
             set_children_check_state(item, Qt.Checked)
@@ -347,7 +347,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             if pop_question(func, CLOSE_DB_PROMPT):
                 SelectedData().unset_db(gui, conn_name, db_name)
             else:
-                return
+                return False
+        return True
 
     @staticmethod
     def get_node_info(item):
@@ -391,7 +392,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         # 状态栏提示
         gui.statusbar.showMessage(f"当前展示的表为：{item.text(0)}")
         # 设置气泡提示
-        QToolTip.setFont(QFont('楷体', 13))
+        QToolTip.setFont(set_font())
         gui.tableWidget.setToolTip(f'当前表为{tb_name}')
 
     def close_item(self, item, gui):

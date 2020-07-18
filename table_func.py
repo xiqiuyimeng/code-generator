@@ -93,6 +93,7 @@ def fill_table(gui, cols, selected_cols):
             item = QTableWidgetItem()
             gui.tableWidget.setItem(i, n, item)
             gui.update_table_item(item, field)
+    gui.tableWidget.resizeRowsToContents()
 
 
 def change_table_checkbox(gui, item, checked):

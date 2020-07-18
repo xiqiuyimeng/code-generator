@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QDialog
 
 from connection_function import test_connection
 from constant import EDIT_CONN_MENU, ADD_CONN_MENU, SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS
+from font import set_font, set_title_font
 from message_box import pop_ok, pop_fail
 from sys_info_storage.sqlite import Connection, update_conn, add_conn, get_new_conn, check_name_available
 
@@ -37,7 +38,10 @@ class ConnDialog(QDialog):
 
     def setup_ui(self):
         self.dialog.setObjectName("Dialog")
-        self.dialog.resize(387, 332)
+        # 固定大小
+        self.dialog.setFixedSize(387, 332)
+        # 字体
+        self.setFont(set_font())
 
         # 设置背景图
         palette = QPalette()
@@ -129,7 +133,7 @@ class ConnDialog(QDialog):
 
     def retranslateUi(self):
         self.dialog.setWindowTitle(self._translate("Dialog", self.dialog_title))
-        self.title.setText(self._translate("Dialog", "<html><head/><body><p><span style=\" font-size:16pt; font-weight:600;\">mysql连接</span></p></body></html>"))
+        self.title.setText(self._translate("Dialog", set_title_font("mysql连接")))
         self.conn_name.setText(self._translate("Dialog", "连接名："))
         self.host.setText(self._translate("Dialog", "主机："))
         self.port.setText(self._translate("Dialog", "端口号："))
@@ -183,13 +187,3 @@ class ConnDialog(QDialog):
             self.conn_signal.emit(self.gui_parent, new_conn)
         else:
             pop_fail(self.dialog_title, CONN_NAME_EXISTS)
-
-
-# if __name__ == '__main__':
-#     import sys
-#
-#     app = QtWidgets.QApplication(sys.argv)
-#     conn = Connection(None, 'centos121', 'centos121', 3306, 'root', 'admin')
-#     ui = Ui_Dialog(conn, '添加连接')
-#     ui.show()
-#     sys.exit(app.exec_())
