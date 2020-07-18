@@ -52,7 +52,7 @@ def quit_app(gui):
     退出主窗口
     :param gui: 启动的主窗口界面对象
     """
-    gui.main_window.close()
+    gui.close()
 
 
 def set_children_check_state(item, check_state):

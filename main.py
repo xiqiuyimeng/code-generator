@@ -9,9 +9,8 @@ _date_ = '2020/6/15 17:20'
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = QtWidgets.QMainWindow()
-    ui = MainWindow(window)
-    window.show()
+    ui = MainWindow()
+    ui.show()
     app.exec_()
     ui.close_conn()
     print('退出')
