@@ -8,10 +8,12 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPalette, QBrush, QPixmap
 
 from confirm_select_dialog import DisplaySelectedDialog
 from connection_function import close_connection
 from constant import TREE_HEADER_LABELS
+from font import set_font
 from menu_bar_func import fill_menu_bar
 from message_box import pop_fail
 from selected_data import SelectedData
@@ -49,10 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget = QtWidgets.QTreeWidget(self.centralwidget)
 
         # 树结构的字体设置
-        font = QtGui.QFont()
-        font.setFamily("楷体")
-        font.setPointSize(13)
-        self.treeWidget.setFont(font)
+        self.treeWidget.setFont(set_font())
         self.treeWidget.setObjectName("treeWidget")
         self.horizontalLayout.addWidget(self.treeWidget)
         self.horizontalLayout_2.addLayout(self.horizontalLayout)

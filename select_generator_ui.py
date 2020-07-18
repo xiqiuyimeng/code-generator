@@ -4,6 +4,13 @@
 """
 from PyQt5 import QtWidgets, QtCore
 
+from constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE_BUTTON, CANCEL_BUTTON, MYBATIS_TITLE, IS_LOMBOK, \
+    MYBATIS_GENERATOR_DESC, LOMBOK_DESC, JAVA_PATH, JAVA_PATH_DESC, JAVA_SRC_PATH, JAVA_SRC_PATH_DESC, MODEL_PACKAGE, \
+    MODEL_PACKAGE_DESC, MAPPER_PACKAGE, MAPPER_PACKAGE_DESC, XML_PATH, XML_PATH_DESC, MYBATIS_TAB_TITLE, \
+    SPRING_TAB_TITLE, SPRING_TITLE, SPRING_GENERATOR_DESC, SERVICE_PACKAGE, SERVICE_PACKAGE_DESC, SERVICE_IMPL_PACKAGE, \
+    SERVICE_IMPL_PACKAGE_DESC, CONTROLLER_PACKAGE, CONTROLLER_PACKAGE_DESC
+from font import set_label_font, set_title_font
+
 _author_ = 'luwt'
 _date_ = '2020/7/18 11:47'
 
@@ -232,36 +239,36 @@ def fill_text(confirm_select_ui):
     :return:
     """
     confirm_select_ui.mybatis_title.setText(
-        confirm_select_ui._translate("Dialog", "<html><head/><body><p align=\"center\">mybatis 生成器输出配置</p></body></html>"))
-    confirm_select_ui.mybatis_desc.setText(confirm_select_ui._translate("Dialog", "mybatis解释"))
-    confirm_select_ui.lombok.setText(confirm_select_ui._translate("Dialog", "是否启用lombok注解"))
+        confirm_select_ui._translate("Dialog", set_title_font(MYBATIS_TITLE)))
+    confirm_select_ui.mybatis_desc.setText(confirm_select_ui._translate("Dialog", MYBATIS_GENERATOR_DESC))
+    confirm_select_ui.lombok.setText(confirm_select_ui._translate("Dialog", set_label_font(IS_LOMBOK)))
     confirm_select_ui.lombok_comboBox.setItemText(0, confirm_select_ui._translate("Dialog", "True"))
     confirm_select_ui.lombok_comboBox.setItemText(1, confirm_select_ui._translate("Dialog", "False"))
-    confirm_select_ui.lombok_desc.setText(confirm_select_ui._translate("Dialog", "lombok解释"))
-    confirm_select_ui.java.setText(confirm_select_ui._translate("Dialog", "java项目地址"))
-    confirm_select_ui.java_desc.setText(confirm_select_ui._translate("Dialog", "java项目解释"))
-    confirm_select_ui.java_src.setText(confirm_select_ui._translate("Dialog", "java_src"))
-    confirm_select_ui.java_src_desc.setText(confirm_select_ui._translate("Dialog", "java_src解释"))
-    confirm_select_ui.model.setText(confirm_select_ui._translate("Dialog", "model"))
-    confirm_select_ui.model_desc.setText(confirm_select_ui._translate("Dialog", "model解释"))
-    confirm_select_ui.mapper.setText(confirm_select_ui._translate("Dialog", "mapper"))
-    confirm_select_ui.mapper_desc.setText(confirm_select_ui._translate("Dialog", "mapper解释"))
-    confirm_select_ui.xml.setText(confirm_select_ui._translate("Dialog", "xml"))
-    confirm_select_ui.xml_desc.setText(confirm_select_ui._translate("Dialog", "xml解释"))
+    confirm_select_ui.lombok_desc.setText(confirm_select_ui._translate("Dialog", LOMBOK_DESC))
+    confirm_select_ui.java.setText(confirm_select_ui._translate("Dialog", set_label_font(JAVA_PATH)))
+    confirm_select_ui.java_desc.setText(confirm_select_ui._translate("Dialog", JAVA_PATH_DESC))
+    confirm_select_ui.java_src.setText(confirm_select_ui._translate("Dialog", set_label_font(JAVA_SRC_PATH)))
+    confirm_select_ui.java_src_desc.setText(confirm_select_ui._translate("Dialog", JAVA_SRC_PATH_DESC))
+    confirm_select_ui.model.setText(confirm_select_ui._translate("Dialog", set_label_font(MODEL_PACKAGE)))
+    confirm_select_ui.model_desc.setText(confirm_select_ui._translate("Dialog", MODEL_PACKAGE_DESC))
+    confirm_select_ui.mapper.setText(confirm_select_ui._translate("Dialog", set_label_font(MAPPER_PACKAGE)))
+    confirm_select_ui.mapper_desc.setText(confirm_select_ui._translate("Dialog", MAPPER_PACKAGE_DESC))
+    confirm_select_ui.xml.setText(confirm_select_ui._translate("Dialog", set_label_font(XML_PATH)))
+    confirm_select_ui.xml_desc.setText(confirm_select_ui._translate("Dialog", XML_PATH_DESC))
     confirm_select_ui.tabWidget.setTabText(confirm_select_ui.tabWidget.indexOf(confirm_select_ui.mybatis_tab),
-                                      confirm_select_ui._translate("Dialog", "mybatis生成器"))
+                                      confirm_select_ui._translate("Dialog", MYBATIS_TAB_TITLE))
     confirm_select_ui.spring_title.setText(
-        confirm_select_ui._translate("Dialog", "<html><head/><body><p align=\"center\">spring 生成器配置</p></body></html>"))
-    confirm_select_ui.spring_desc.setText(confirm_select_ui._translate("Dialog", "spring解释"))
-    confirm_select_ui.service.setText(confirm_select_ui._translate("Dialog", "service"))
-    confirm_select_ui.service_desc.setText(confirm_select_ui._translate("Dialog", "service解释"))
-    confirm_select_ui.service_impl.setText(confirm_select_ui._translate("Dialog", "service_impl"))
-    confirm_select_ui.service_impl_desc.setText(confirm_select_ui._translate("Dialog", "service_impl 解释"))
-    confirm_select_ui.controller.setText(confirm_select_ui._translate("Dialog", "controller"))
-    confirm_select_ui.controller_desc.setText(confirm_select_ui._translate("Dialog", "controller解释"))
+        confirm_select_ui._translate("Dialog", set_title_font(SPRING_TITLE)))
+    confirm_select_ui.spring_desc.setText(confirm_select_ui._translate("Dialog", SPRING_GENERATOR_DESC))
+    confirm_select_ui.service.setText(confirm_select_ui._translate("Dialog", set_label_font(SERVICE_PACKAGE)))
+    confirm_select_ui.service_desc.setText(confirm_select_ui._translate("Dialog", SERVICE_PACKAGE_DESC))
+    confirm_select_ui.service_impl.setText(confirm_select_ui._translate("Dialog", set_label_font(SERVICE_IMPL_PACKAGE)))
+    confirm_select_ui.service_impl_desc.setText(confirm_select_ui._translate("Dialog", SERVICE_IMPL_PACKAGE_DESC))
+    confirm_select_ui.controller.setText(confirm_select_ui._translate("Dialog", set_label_font(CONTROLLER_PACKAGE)))
+    confirm_select_ui.controller_desc.setText(confirm_select_ui._translate("Dialog", CONTROLLER_PACKAGE_DESC))
     confirm_select_ui.tabWidget.setTabText(confirm_select_ui.tabWidget.indexOf(confirm_select_ui.spring_tab),
-                                      confirm_select_ui._translate("Dialog", "spring生成器"))
-    confirm_select_ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText('清空本页配置')
-    confirm_select_ui.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText('上一步')
-    confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok).setText('开始生成')
-    confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setText('取消')
+                                      confirm_select_ui._translate("Dialog", SPRING_TAB_TITLE))
+    confirm_select_ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(CLEAR_CONFIG_BUTTON)
+    confirm_select_ui.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(PRE_STEP_BUTTON)
+    confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok).setText(GENERATE_BUTTON)
+    confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
