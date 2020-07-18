@@ -5,19 +5,22 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
+"""
+点击生成按钮，弹窗页面。
+第一个页面为选择表字段展示页面。
+第二个页面为生成器输出配置页面
+"""
 
 
-from PyQt5 import QtCore, QtWidgets, QtGui
-import sip
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QTreeWidgetItem
 
 from constant import CONFIRM_TREE_HEADER_LABELS
+from select_generator_ui import setup_tab_ui
 
 
 class DisplaySelectedDialog(QDialog):
-
-    QtCore.pyqtSignal(object)
 
     def __init__(self, selected_data):
         super().__init__()
@@ -29,44 +32,49 @@ class DisplaySelectedDialog(QDialog):
 
     def setup_ui(self):
         self.dialog.setObjectName("Dialog")
-        self.dialog.resize(600, 700)
+        self.dialog.resize(791, 633)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.dialog)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.verticalLayout_confirm = QtWidgets.QVBoxLayout()
-        self.verticalLayout_confirm.setObjectName("verticalLayout_confirm")
-
-        self.treeWidget = QtWidgets.QTreeWidget(self.dialog)
+        self.widget = QtWidgets.QWidget(self.dialog)
+        self.widget.setObjectName("widget")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.treeWidget = QtWidgets.QTreeWidget(self.widget)
         self.treeWidget.setObjectName("treeWidget")
-        self.verticalLayout_confirm.addWidget(self.treeWidget)
-        # 树结构的字体设置
-        font = QtGui.QFont()
-        font.setFamily("楷体")
-        font.setPointSize(13)
-        self.treeWidget.setFont(font)
+        self.treeWidget.headerItem().setText(0, "1")
+        self.verticalLayout_2.addWidget(self.treeWidget)
+        self.first_splitter = QtWidgets.QSplitter(self.widget)
+        self.first_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.first_splitter.setObjectName("first_splitter")
         # 按钮
-        self.buttonBox = QtWidgets.QDialogButtonBox(self.dialog)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+        self.first_buttonBox_2 = QtWidgets.QDialogButtonBox(self.first_splitter)
+        self.first_buttonBox_2.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
+        self.first_buttonBox_2.setObjectName("first_buttonBox_2")
+        self.first_buttonBox_2.setLayoutDirection(Qt.RightToLeft)
+        self.first_buttonBox = QtWidgets.QDialogButtonBox(self.first_splitter)
+        self.first_buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+        self.first_buttonBox.setObjectName("first_buttonBox")
 
-        self.buttonBox.setObjectName("buttonBox")
-        self.verticalLayout_confirm.addWidget(self.buttonBox)
-        self.verticalLayout.addLayout(self.verticalLayout_confirm)
+        self.verticalLayout_2.addWidget(self.first_splitter)
+        self.verticalLayout.addWidget(self.widget)
+
         # 去掉窗口右上角的问号
         self.dialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
 
         # 按钮响应事件
-        self.buttonBox.accepted.connect(self.accept_ok)
-        self.buttonBox.rejected.connect(self.reject_ok)
+        self.first_buttonBox.accepted.connect(self.next_step)
+        self.first_buttonBox.rejected.connect(self.dialog.close)
         self.make_tree()
+
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self.dialog)
 
     def retranslateUi(self):
         self.dialog.setWindowTitle(self._translate("Dialog", "Dialog"))
         self.treeWidget.headerItem().setText(0, self._translate("Dialog", CONFIRM_TREE_HEADER_LABELS))
-        self.button_ok = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
-        self.button_ok.setText('下一步')
-        self.button_cancel = self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel)
-        self.button_cancel.setText('取消')
+        self.first_buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok).setText('关闭所有表')
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText('下一步')
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText('取消')
 
     def make_tree(self):
         """根据选中数据构建树"""
@@ -85,17 +93,18 @@ class DisplaySelectedDialog(QDialog):
         item.setText(0, self._translate("Dialog", name))
         return item
 
-    def accept_ok(self):
-        # 删除树控件
-        self.verticalLayout.removeItem(self.verticalLayout_confirm)
-        sip.delete(self.verticalLayout_confirm)
-        # 展示日历控件
-        self.calendarWidget = QtWidgets.QCalendarWidget(self.dialog)
-        self.calendarWidget.setObjectName("calendarWidget")
-        self.verticalLayout.addWidget(self.calendarWidget)
-        print("接收")
+    def next_step(self):
+        # 隐藏树控件
+        self.widget.hide()
+        # 打开下一页
+        if hasattr(self, 'widget_generator'):
+            self.widget_generator.show()
+        else:
+            setup_tab_ui(self)
 
-    def reject_ok(self):
-        print('拒绝')
-        self.dialog.close()
+    def pre_step(self):
+        # 隐藏选择生成器界面
+        self.widget_generator.hide()
+        # 展示树控件
+        self.widget.show()
 

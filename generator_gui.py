@@ -24,10 +24,8 @@ from tree_strategy import tree_node_factory, Context
 
 class MainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self, main_window):
+    def __init__(self):
         super().__init__()
-        self.main_window = main_window
-
         # 已经连接数据库的连接，key为连接名，value为DBExecutor对象
         self.connected_dict = dict()
         self._translate = QtCore.QCoreApplication.translate
@@ -40,9 +38,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup_ui()
 
     def setup_ui(self):
-        self.main_window.setObjectName("MainWindow")
-        self.main_window.resize(1123, 896)
-        self.centralwidget = QtWidgets.QWidget(self.main_window)
+        self.setObjectName("MainWindow")
+        self.resize(1123, 896)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -59,26 +57,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout.addWidget(self.treeWidget)
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
 
-        self.main_window.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(self.centralwidget)
         # 菜单栏
-        self.menubar = QtWidgets.QMenuBar(self.main_window)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
         self.menubar.setObjectName("menubar")
         fill_menu_bar(self)
-        self.main_window.setMenuBar(self.menubar)
+        self.setMenuBar(self.menubar)
 
         # 工具栏
-        self.toolBar = QtWidgets.QToolBar(self.main_window)
+        self.toolBar = QtWidgets.QToolBar(self)
         self.toolBar.setObjectName("toolBar")
-        self.main_window.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         # 设置名称显示在图标下面（默认本来是只显示图标）
         fill_tool_bar(self)
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # 状态栏
-        self.statusbar = QtWidgets.QStatusBar(self.main_window)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-        self.main_window.setStatusBar(self.statusbar)
+        self.setStatusBar(self.statusbar)
 
         # 初始化树：初始化获取树结构的第一层元素，为数据库连接列表
         self.get_saved_conns()
@@ -92,10 +90,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
 
         self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self.main_window)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
-        self.main_window.setWindowTitle(self._translate("MainWindow", "MainWindow"))
+        self.setWindowTitle(self._translate("MainWindow", "MainWindow"))
         self.treeWidget.headerItem().setText(0, self._translate("MainWindow", TREE_HEADER_LABELS))
         __sortingEnabled = self.treeWidget.isSortingEnabled()
         self.treeWidget.setSortingEnabled(False)
@@ -199,5 +197,5 @@ class MainWindow(QtWidgets.QMainWindow):
             pop_fail("生成", "当前未选中数据，请选择后再执行！")
 
     def quit(self):
-        self.main_window.close()
+        self.close()
 
