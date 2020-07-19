@@ -48,6 +48,7 @@ def setup_tab_ui(confirm_select_ui):
     confirm_select_ui.verticalLayout.addWidget(confirm_select_ui.widget_generator)
 
     # 按钮点击事件
+    confirm_select_ui.buttonBox.accepted.connect(confirm_select_ui.clear_current_param)
     confirm_select_ui.buttonBox.rejected.connect(confirm_select_ui.pre_step)
     confirm_select_ui.buttonBox_2.accepted.connect(confirm_select_ui.generate)
     confirm_select_ui.buttonBox_2.rejected.connect(confirm_select_ui.close)
@@ -135,9 +136,12 @@ def setup_mybatis_tab_ui(confirm_select_ui):
     confirm_select_ui.java_src.setObjectName("java_src")
     confirm_select_ui.java_src_button = QtWidgets.QPushButton(confirm_select_ui.splitter_java_src)
     confirm_select_ui.java_src_button.setObjectName("java_src_button")
+    # 初始不可用
     confirm_select_ui.java_src_button.setDisabled(True)
     confirm_select_ui.java_src_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_java_src)
     confirm_select_ui.java_src_lineEdit.setObjectName("java_src_lineEdit")
+    # 初始不可用
+    confirm_select_ui.java_src_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_3.addWidget(confirm_select_ui.splitter_java_src)
     confirm_select_ui.java_src_desc = QtWidgets.QLabel(confirm_select_ui.mybatis_tab)
     confirm_select_ui.java_src_desc.setObjectName("java_src_desc")
@@ -150,9 +154,12 @@ def setup_mybatis_tab_ui(confirm_select_ui):
     confirm_select_ui.model.setObjectName("model")
     confirm_select_ui.model_button = QtWidgets.QPushButton(confirm_select_ui.splitter_model)
     confirm_select_ui.model_button.setObjectName("model_button")
+    # 初始不可用
     confirm_select_ui.model_button.setDisabled(True)
     confirm_select_ui.model_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_model)
     confirm_select_ui.model_lineEdit.setObjectName("model_lineEdit")
+    # 初始不可用
+    confirm_select_ui.model_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_3.addWidget(confirm_select_ui.splitter_model)
     confirm_select_ui.model_desc = QtWidgets.QLabel(confirm_select_ui.mybatis_tab)
     confirm_select_ui.model_desc.setObjectName("model_desc")
@@ -165,9 +172,12 @@ def setup_mybatis_tab_ui(confirm_select_ui):
     confirm_select_ui.mapper.setObjectName("mapper")
     confirm_select_ui.mapper_button = QtWidgets.QPushButton(confirm_select_ui.splitter_mapper)
     confirm_select_ui.mapper_button.setObjectName("mapper_button")
+    # 初始不可用
     confirm_select_ui.mapper_button.setDisabled(True)
     confirm_select_ui.mapper_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_mapper)
     confirm_select_ui.mapper_lineEdit.setObjectName("mapper_lineEdit")
+    # 初始不可用
+    confirm_select_ui.mapper_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_3.addWidget(confirm_select_ui.splitter_mapper)
     confirm_select_ui.mapper_desc = QtWidgets.QLabel(confirm_select_ui.mybatis_tab)
     confirm_select_ui.mapper_desc.setObjectName("mapper_desc")
@@ -180,9 +190,12 @@ def setup_mybatis_tab_ui(confirm_select_ui):
     confirm_select_ui.xml.setObjectName("xml")
     confirm_select_ui.xml_button = QtWidgets.QPushButton(confirm_select_ui.splitter_xml)
     confirm_select_ui.xml_button.setObjectName("xml_button")
+    # 初始不可用
     confirm_select_ui.xml_button.setDisabled(True)
     confirm_select_ui.xml_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_xml)
     confirm_select_ui.xml_lineEdit.setObjectName("xml_lineEdit")
+    # 初始不可用
+    confirm_select_ui.xml_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_3.addWidget(confirm_select_ui.splitter_xml)
     confirm_select_ui.xml_desc = QtWidgets.QLabel(confirm_select_ui.mybatis_tab)
     confirm_select_ui.xml_desc.setObjectName("xml_desc")
@@ -235,9 +248,12 @@ def setup_spring_tab_ui(confirm_select_ui):
     confirm_select_ui.service.setObjectName("service")
     confirm_select_ui.service_button = QtWidgets.QPushButton(confirm_select_ui.splitter_service)
     confirm_select_ui.service_button.setObjectName("service_button")
+    # 初始不可用
     confirm_select_ui.service_button.setDisabled(True)
     confirm_select_ui.service_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_service)
     confirm_select_ui.service_lineEdit.setObjectName("service_lineEdit")
+    # 初始不可用
+    confirm_select_ui.service_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_4.addWidget(confirm_select_ui.splitter_service)
     confirm_select_ui.service_desc = QtWidgets.QLabel(confirm_select_ui.spring_tab)
     confirm_select_ui.service_desc.setObjectName("service_desc")
@@ -250,9 +266,12 @@ def setup_spring_tab_ui(confirm_select_ui):
     confirm_select_ui.service_impl.setObjectName("service_impl")
     confirm_select_ui.service_impl_button = QtWidgets.QPushButton(confirm_select_ui.splitter_service_impl)
     confirm_select_ui.service_impl_button.setObjectName("service_impl_button")
+    # 初始不可用
     confirm_select_ui.service_impl_button.setDisabled(True)
     confirm_select_ui.service_impl_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_service_impl)
     confirm_select_ui.service_impl_lineEdit.setObjectName("service_impl_lineEdit")
+    # 初始不可用
+    confirm_select_ui.service_impl_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_4.addWidget(confirm_select_ui.splitter_service_impl)
     confirm_select_ui.service_impl_desc = QtWidgets.QLabel(confirm_select_ui.spring_tab)
     confirm_select_ui.service_impl_desc.setObjectName("service_impl_desc")
@@ -265,9 +284,12 @@ def setup_spring_tab_ui(confirm_select_ui):
     confirm_select_ui.controller.setObjectName("controller")
     confirm_select_ui.controller_button = QtWidgets.QPushButton(confirm_select_ui.splitter_controller)
     confirm_select_ui.controller_button.setObjectName("controller_button")
+    # 初始不可用
     confirm_select_ui.controller_button.setDisabled(True)
     confirm_select_ui.controller_lineEdit = QtWidgets.QLineEdit(confirm_select_ui.splitter_controller)
     confirm_select_ui.controller_lineEdit.setObjectName("controller_lineEdit")
+    # 初始不可用
+    confirm_select_ui.controller_lineEdit.setDisabled(True)
     confirm_select_ui.verticalLayout_4.addWidget(confirm_select_ui.splitter_controller)
     confirm_select_ui.controller_desc = QtWidgets.QLabel(confirm_select_ui.spring_tab)
     confirm_select_ui.controller_desc.setObjectName("controller_desc")
