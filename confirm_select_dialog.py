@@ -135,6 +135,15 @@ class DisplaySelectedDialog(QDialog):
         # 展示树控件
         self.widget.show()
 
+    def clear_current_param(self):
+        # spring tab页，清空spring页
+        if self.tabWidget.currentIndex() == 1:
+            self.clear_spring_input()
+        else:
+            self.lombok_comboBox.setCurrentIndex(0)
+            self.clear_spring_input()
+            self.clear_mybatis_input()
+
     def generate(self):
         # lombok选值
         self.output_config_dict['lombok'] = eval(self.lombok_comboBox.currentText())
@@ -192,6 +201,48 @@ class DisplaySelectedDialog(QDialog):
         """java项目地址输入框"""
         if self.java_lineEdit.text():
             self.set_java_path(self.java_lineEdit.text())
+        else:
+            # 如果清空了输入框，那么就其余输入都关闭
+            self.unset_all_button_status()
+
+    def unset_all_button_status(self):
+        # 重置所有按钮的状态
+        # mybatis
+        self.java_src_button.setDisabled(True)
+        self.java_src_lineEdit.setDisabled(True)
+        self.model_button.setDisabled(True)
+        self.model_lineEdit.setDisabled(True)
+        self.mapper_button.setDisabled(True)
+        self.mapper_lineEdit.setDisabled(True)
+        self.xml_button.setDisabled(True)
+        self.xml_lineEdit.setDisabled(True)
+        # spring
+        self.service_button.setDisabled(True)
+        self.service_lineEdit.setDisabled(True)
+        self.service_impl_button.setDisabled(True)
+        self.service_impl_lineEdit.setDisabled(True)
+        self.controller_button.setDisabled(True)
+        self.controller_lineEdit.setDisabled(True)
+
+    def open_src_xml_button(self):
+        """解锁源码包和xml输入框按钮"""
+        self.java_src_button.setDisabled(False)
+        self.java_src_lineEdit.setDisabled(False)
+        self.xml_button.setDisabled(False)
+        self.xml_lineEdit.setDisabled(False)
+
+    def set_package_button(self, status):
+        """改变需要输入包名的按钮状态"""
+        self.model_button.setDisabled(status)
+        self.model_lineEdit.setDisabled(status)
+        self.mapper_button.setDisabled(status)
+        self.mapper_lineEdit.setDisabled(status)
+        self.service_button.setDisabled(status)
+        self.service_lineEdit.setDisabled(status)
+        self.service_impl_button.setDisabled(status)
+        self.service_impl_lineEdit.setDisabled(status)
+        self.controller_button.setDisabled(status)
+        self.controller_lineEdit.setDisabled(status)
 
     def set_java_path(self, directory):
         # java源码包地址
@@ -203,16 +254,16 @@ class DisplaySelectedDialog(QDialog):
             # 绝对路径
             self.abs_java_src = directory + '/' + DEFAULT_JAVA_SRC_RELATIVE_PATH
             self.fill_java_src(java_src)
-        # 解锁源码包，xml选择文件夹按钮
+        # 解锁源码包，xml选择文件夹按钮及输入框
         if os.path.isdir(directory):
-            self.java_src_button.setDisabled(False)
-            self.xml_button.setDisabled(False)
+            self.open_src_xml_button()
 
     def choose_java_src_dir(self):
         """选择java源码包相对路径"""
         directory = QFileDialog.getExistingDirectory(self.widget_generator, CHOOSE_DIRECTORY, self.java_path)
         self.abs_java_src = directory
         java_src = directory[len(self.java_path) + 1:]
+        self.java_src_lineEdit.setText(java_src)
         self.fill_java_src(java_src)
 
     def input_java_src_path(self):
@@ -221,17 +272,15 @@ class DisplaySelectedDialog(QDialog):
         if java_src:
             self.abs_java_src = self.java_path + '/' + java_src
             self.fill_java_src(java_src)
+        else:
+            # 关闭输入框
+            self.set_package_button(True)
 
     def fill_java_src(self, java_src):
         """填充java_src路径，并解锁相关按钮"""
-        self.java_src_lineEdit.setText(java_src)
         self.output_config_dict['java_src_relative'] = java_src
         # 解锁剩余的五个包名选择文件夹按钮
-        self.model_button.setDisabled(False)
-        self.mapper_button.setDisabled(False)
-        self.service_button.setDisabled(False)
-        self.service_impl_button.setDisabled(False)
-        self.controller_button.setDisabled(False)
+        self.set_package_button(False)
 
     def choose_model_dir(self):
         """选择java实体类包名"""
@@ -326,3 +375,50 @@ class DisplaySelectedDialog(QDialog):
         if controller_package:
             self.controller_path = self.package_to_path(controller_package)
             self.output_config_dict['controller_package'] = controller_package
+
+    def clear_mybatis_input(self):
+        """清空mybatis页输入的参数"""
+        # lombok置为默认的True
+        self.java_lineEdit.setText("")
+        if hasattr(self, 'java_path'):
+            del self.java_path
+        if self.output_config_dict.get('java_path'):
+            del self.output_config_dict['java_path']
+        self.java_src_lineEdit.setText("")
+        if hasattr(self, 'abs_java_src'):
+            del self.abs_java_src
+        if self.output_config_dict.get('java_src_relative'):
+            del self.output_config_dict['java_src_relative']
+        self.model_lineEdit.setText("")
+        if hasattr(self, 'model_path'):
+            del self.model_path
+        if self.output_config_dict.get('model_package'):
+            del self.output_config_dict['model_package']
+        self.mapper_lineEdit.setText("")
+        if hasattr(self, 'mapper_path'):
+            del self.mapper_path
+        if self.output_config_dict.get('mapper_package'):
+            del self.output_config_dict['mapper_package']
+        self.xml_lineEdit.setText("")
+        if hasattr(self, 'xml_path'):
+            del self.xml_path
+        if self.output_config_dict.get('xml_path'):
+            del self.output_config_dict['xml_path']
+
+    def clear_spring_input(self):
+        """清空spring页输入的参数"""
+        self.service_lineEdit.setText("")
+        if hasattr(self, 'service_path'):
+            del self.service_path
+        if self.output_config_dict.get('service_package'):
+            del self.output_config_dict['service_package']
+        self.service_impl_lineEdit.setText("")
+        if hasattr(self, 'service_impl_path'):
+            del self.service_impl_path
+        if self.output_config_dict.get('service_impl_package'):
+            del self.output_config_dict['service_impl_package']
+        self.controller_lineEdit.setText("")
+        if hasattr(self, 'controller_path'):
+            del self.controller_path
+        if self.output_config_dict.get('controller_package'):
+            del self.output_config_dict['controller_package']
