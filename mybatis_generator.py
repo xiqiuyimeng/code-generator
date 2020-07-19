@@ -132,7 +132,7 @@ class MybatisGenerator:
             lstrip_blocks=True,
             trim_blocks=True
         )
-        self.separator = '\\' if sys.platform.startswith("win") else '/'
+        self.separator = '/'
         # 默认输出目录"./输出目录"
         self.path = default_path
         # java项目地址，绝对路径 D:\java_workspaces\demo
@@ -140,24 +140,20 @@ class MybatisGenerator:
         # xml 路径
         self.xml_path = xml_path
         # java项目源码包相对路径 src/main/java
-        self.java_src_relative = java_src_relative.replace('/', '\\') \
-            if sys.platform.startswith("win") else java_src_relative.replace("\\", '/')
+        self.java_src_relative = java_src_relative.replace("\\", '/')
         self.model_package = model_package
         self.mapper_package = mapper_package
         # model实体类文件的存放目录
         model_absolute_path = self.get_path(self.model_package)
         # model文件输出路径
-        self.java_output_path = os.path.join(model_absolute_path,
-                                             f'{self.class_name}.java')
+        self.java_output_path = model_absolute_path + '/' + f'{self.class_name}.java'
         # xml文件输出路径，根据实体类文件的存放目录是否是默认的目录来判断xml目录地址，
         # 如果是默认目录，那么说明xml也应该输出到默认目录，否则应该输出到xml_path
         xml_absolute_path = self.path if self.path == model_absolute_path else self.xml_path
-        self.xml_output_path = os.path.join(xml_absolute_path, f'{self.class_name}Mapper.xml')
+        self.xml_output_path = xml_absolute_path + '/' + f'{self.class_name}Mapper.xml'
         # mapper文件输出路径，如果是任意字段组合（主要用于多表字段联合情况），不需要生成Mapper.java
-        self.mapper_output_path = os.path.join(
-            self.get_path(self.mapper_package),
-            f'{self.class_name}Mapper.java'
-        ) if self.mapper else None
+        self.mapper_output_path = self.get_path(self.mapper_package) + '/' + \
+                                  f'{self.class_name}Mapper.java' if self.mapper else None
         self.model_namespace = f'{self.model_package}.{self.class_name}' \
             if self.model_package else DEFAULT_MODEL_NS
         self.mapper_namespace = f'{self.mapper_package}.{self.class_name}Mapper' \
@@ -178,11 +174,7 @@ class MybatisGenerator:
                         package
                 )
         ):
-            return os.path.join(
-                self.java_path,
-                self.java_src_relative,
-                package.replace(".", self.separator)
-            )
+            return self.java_path + '/' + self.java_src_relative + '/' + package.replace(".", self.separator)
         elif self.path:
             return self.path
         else:

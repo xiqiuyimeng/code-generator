@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="mybatis">
          <property name="maximumSize">
@@ -112,6 +112,11 @@
                 </property>
                </widget>
                <widget class="QLineEdit" name="java_path_value"/>
+               <widget class="QPushButton" name="java_button">
+                <property name="text">
+                 <string>PushButton</string>
+                </property>
+               </widget>
               </widget>
              </item>
              <item>
