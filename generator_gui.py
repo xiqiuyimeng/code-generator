@@ -8,11 +8,10 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette, QBrush, QPixmap
 
 from confirm_select_dialog import DisplaySelectedDialog
 from connection_function import close_connection
-from constant import TREE_HEADER_LABELS
+from constant import TREE_HEADER_LABELS, WRONG_UNSELECT_DATA, WRONG_TITLE
 from font import set_font
 from menu_bar_func import fill_menu_bar
 from message_box import pop_fail
@@ -189,11 +188,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def generate(self):
         selected_data = SelectedData().conn_dict
         if selected_data:
-            generate_dialog = DisplaySelectedDialog(selected_data)
+            generate_dialog = DisplaySelectedDialog(self, selected_data)
             generate_dialog.setWindowModality(Qt.ApplicationModal)
             generate_dialog.show()
         else:
-            pop_fail("生成", "当前未选中数据，请选择后再执行！")
+            pop_fail(WRONG_TITLE, WRONG_UNSELECT_DATA)
 
     def quit(self):
         self.close()

@@ -85,18 +85,15 @@ class SpringGenerator(MybatisGenerator):
         # service文件命名空间
         self.service_namespace = f'{self.service_package}.{self.class_name}Service'
         # service文件保存路径
-        self.service_path = os.path.join(self.get_path(self.service_package),
-                                         f'{self.class_name}Service.java')
+        self.service_path = self.get_path(self.service_package) + '/' + f'{self.class_name}Service.java'
         # serviceImpl文件命名空间
         self.service_impl_namespace = f'{self.service_impl_package}.{self.class_name}ServiceImpl'
         # serviceImpl文件保存路径
-        self.service_impl_path = os.path.join(self.get_path(self.service_impl_package),
-                                              f'{self.class_name}ServiceImpl.java')
+        self.service_impl_path = self.get_path(self.service_impl_package) + '/' + f'{self.class_name}ServiceImpl.java'
         # controller文件命名空间
         self.controller_namespace = f'{self.controller_package}.{self.class_name}Controller'
         # controller文件保存路径
-        self.controller_path = os.path.join(self.get_path(self.controller_package),
-                                            f'{self.class_name}Controller.java')
+        self.controller_path = self.get_path(self.controller_package) + '/' + f'{self.class_name}Controller.java'
 
     def generate_service(self):
         content = self.env.get_template(self.service_tp).render(
@@ -128,76 +125,3 @@ class SpringGenerator(MybatisGenerator):
         self.generate_service_impl()
         self.generate_controller()
 
-
-def check_illegal_table(tables):
-    """检查表名是否正确，返回错误的表名"""
-    with Cursor(
-            params.get('host'),
-            params.get('user'),
-            params.get('pwd'),
-            params.get('db')
-    ) as cursor:
-        cursor.execute(QUERY_TABLES_SQL)
-        data = cursor.fetchall()
-        data = set(map(lambda x: x[0], data))
-        # data为数据库中真实表名集合，tables为配置文件中取到的表名，
-        # 通过集合运算，取出tables中不在data中的表名，先求并集在求差集
-        wrong_tables = (data | tables) - data
-        if wrong_tables:
-            print(f'发现了非法的表名：{wrong_tables}，系统将不会生成这些表的文件！')
-            return tables - wrong_tables
-        return tables
-
-
-if __name__ == '__main__':
-    try:
-        choose = int(input(CHOOSE_GENERATOR_TYPE))
-        # 对参数进行校验，如果填入java_output和xml_output，
-        # 则model_package,mapper_package,service_package,
-        # service_impl_package,controller_package必须都存在
-        packages = params.get('model_package'), \
-            params.get('mapper_package'), \
-            params.get('service_package'), \
-            params.get('service_impl_package'), \
-            params.get('controller_package')
-        if all((params.get('java_path'), params.get('xml_path'), not all(packages))):
-            raise KeyboardInterrupt(PATH_ERROR)
-        if choose == 1:
-            # 如果可执行语句存在或者指定列名存在就不应该循环执行
-            if (params.get('exec_sql') or params.get('column_name')) \
-                    and len(params.get('table_names')) == 1:
-                params['table_name'] = list(params.get('table_names'))[0].strip()
-                generator = MybatisGenerator(**params)
-                generator.main()
-                print(SUCCESS)
-                time.sleep(5)
-            elif len(params.get('table_names')) >= 1:
-                for t_name in check_illegal_table(params.get('table_names')):
-                    params['table_name'] = t_name.strip()
-                    generator = MybatisGenerator(**params)
-                    generator.main()
-                print(SUCCESS)
-                time.sleep(5)
-            else:
-                input(PARAM_ERROR)
-        elif choose == 2:
-            # 如果是选择spring生成器，那么不支持自定义sql或者指定列名
-            if all(
-                    (
-                            len(params.get('table_names')) >= 1,
-                            not params.get('exec_sql'),
-                            not params.get('column_name')
-                    )
-            ):
-                for t_name in check_illegal_table(params.get('table_names')):
-                    params['table_name'] = t_name.strip()
-                    generator = SpringGenerator(**params)
-                    generator.main()
-                print(SUCCESS)
-                time.sleep(5)
-            else:
-                input(SPRING_ERROR)
-        else:
-            input(INPUT_ILLEGAL)
-    except Exception as e:
-        input(f"执行出错：=>\n\n{e}\n\n按任意键退出")

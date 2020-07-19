@@ -2,11 +2,11 @@
 """
 消息弹窗
 """
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMessageBox
 
-from constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON
+from constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
 
 _author_ = 'luwt'
 _date_ = '2020/6/21 16:08'
@@ -59,3 +59,17 @@ def pop_question(title, msg):
     msg_box.addButton(REJECT_BUTTON, QMessageBox.RejectRole)
     reply = msg_box.exec()
     return True if reply == QMessageBox.AcceptRole else False
+
+
+def pop_warning(title, msg):
+    """
+    弹出警告信息框
+    :param title: 弹窗标题
+    :param msg: 弹窗消息
+    """
+    msg_box = QMessageBox(QMessageBox.Warning, title, msg)
+    msg_box.addButton(WARNING_OK, QMessageBox.AcceptRole)
+    msg_box.addButton(WARNING_RESELECT, QMessageBox.RejectRole)
+    reply = msg_box.exec()
+    return True if reply == QMessageBox.AcceptRole else False
+

@@ -8,23 +8,6 @@ _author_ = 'luwt'
 _date_ = '2020/7/15 14:25'
 
 
-param_dict = {
-    'lombok': False,
-    'java_path': r'D:\java_workspaces\demo',
-    'java_src_relative': 'src/main/java',
-    'model_package': 'com.demo.model',
-    'mapper_package': 'com.demo.dao',
-    'xml_path': r'D:\java_workspaces\demo\src\main\resources\test',
-}
-spring_param_dict = {
-    'service_package': 'com.demo.service',
-    'service_impl_package': 'com.demo.service.impl',
-    'controller_package': 'com.demo.controller'
-}
-
-spring_param_dict.update(param_dict)
-
-
 def get_params(gui, selected_data):
     """
     拼接生成器需要的参数。数据库游标，数据库名称，表名称，列名列表（如果是部分选择字段的话）
@@ -48,7 +31,7 @@ def get_params(gui, selected_data):
     return params
 
 
-def mybatis_generate(gui, selected_data):
+def mybatis_generate(gui, param_dict, selected_data):
     params = get_params(gui, selected_data)
     for param in params:
         param.update(param_dict)
@@ -56,9 +39,19 @@ def mybatis_generate(gui, selected_data):
         generator.main()
 
 
-def spring_generate(gui, selected_data):
+def spring_generate(gui, spring_param_dict, selected_data):
     params = get_params(gui, selected_data)
     for param in params:
         param.update(spring_param_dict)
         generator = SpringGenerator(**param)
         generator.main()
+
+
+def dispatch_generate(gui, param_dict, selected_data):
+    # spring生成器
+    if 'service_package' in param_dict \
+            and 'service_impl_package' in param_dict \
+            and 'controller_package' in param_dict:
+        spring_generate(gui, param_dict, selected_data)
+    else:
+        mybatis_generate(gui, param_dict, selected_data)

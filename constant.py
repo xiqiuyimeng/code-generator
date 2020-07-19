@@ -114,6 +114,15 @@ UNSELECT_FIELD_MENU = '取消选择字段'
 # 生成
 GENERATE_MENU = '生成'
 
+""""消息弹窗"""
+WARNING_TITLE = '警告信息'
+PARAM_WARNING_MSG = '系统检测到以下路径:\n{}\n可能存在问题，请确认，以免影响生成结果'
+WARNING_NONE = '有参数未填！请检查参数'
+WARNING_OK = '确认无误'
+WARNING_RESELECT = '重新选择'
+WRONG_TITLE = '错误'
+WRONG_UNSELECT_DATA = '当前未选中数据，请选择后再执行！'
+
 """消息框按钮文字"""
 OK_BUTTON = '确定'
 ACCEPT_BUTTON = '是'
@@ -127,6 +136,7 @@ EXPAND_BUTTON = '一键展开所有项'
 COLLAPSE_BUTTON = '一键折叠所有项'
 CLEAR_CONFIG_BUTTON = '清空本页配置'
 GENERATE_BUTTON = '开始生成'
+CHOOSE_DIRECTORY = '请选择文件夹'
 
 """操作连接时提示语"""
 # 编辑连接时的提示语
@@ -177,16 +187,16 @@ IS_LOMBOK = '是否启用lombok注解'
 LOMBOK_DESC = 'lombok注解：如果选择开启，那么在生成的Java实体类中，将不复生成get与set方法，\n' \
               '以@Data注解代替之，否则，将生成完整的get与set方法。'
 JAVA_PATH = 'Java项目地址'
-JAVA_PATH_DESC = 'java项目地址：即为java项目的根目录所在的绝对路径，例如：D:\\workspace\\demo'
+JAVA_PATH_DESC = 'java项目地址：即为java项目的根目录所在的绝对路径，例如：D:/workspace/demo'
 JAVA_SRC_PATH = 'Java项目源码包相对路径'
-JAVA_SRC_PATH_DESC = 'Java项目源码包相对路径：在Java项目根目录下，到Java源码包的路径，\n一般为src\\main\\java'
+JAVA_SRC_PATH_DESC = 'Java项目源码包相对路径：在Java项目根目录下，到Java源码包的路径，\n一般为src/main/java'
 MODEL_PACKAGE = 'Java实体类包名'
 MODEL_PACKAGE_DESC = 'Java实体类包名：您希望输出的Java实体类的包名，例如：com.demo.model'
 MAPPER_PACKAGE = 'mapper接口包名'
 MAPPER_PACKAGE_DESC = 'mapper接口包名：您希望输出的mapper接口文件的包名，例如：com.demo.dao'
 XML_PATH = 'xml文件输出路径'
 XML_PATH_DESC = 'xml输出路径：您希望输出的mybatis xml文件存放路径，\n' \
-                '例如：D:\\workspace\\demo\\src\\main\\resources\\mybatis'
+                '例如：D:/workspace/demo/src/main/resources/mybatis'
 
 """生成弹窗tab页，spring"""
 # spring的tab页名称
