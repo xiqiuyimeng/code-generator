@@ -10,6 +10,8 @@ Connection = namedtuple('Connection', 'id name host port user pwd')
 
 
 DB = os.path.dirname(__file__) + '/mysql_generator'
+if not os.path.exists(os.path.dirname(__file__)):
+    os.mkdir(os.path.dirname(__file__))
 SYS_TABLE = ''
 CONN_TABLE = 'connection'
 

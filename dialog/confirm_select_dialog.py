@@ -194,6 +194,22 @@ class DisplaySelectedDialog(QDialog):
             wrong_params.append(CONTROLLER_PACKAGE)
         return wrong_params
 
+    def check_mybatis_lineEdit(self):
+        """检查mybatis配置页所有输入是否都有值"""
+        java_path = self.java_lineEdit.text()
+        java_src = self.java_src_lineEdit.text()
+        model_package = self.model_lineEdit.text()
+        mapper_package = self.mapper_lineEdit.text()
+        xml_path = self.xml_lineEdit.text()
+        return all((java_path, java_src, model_package, mapper_package, xml_path))
+
+    def check_spring_lineEdit(self):
+        """检查spring配置页所有输入是否都有值"""
+        service_package = self.service_lineEdit.text()
+        service_impl_package = self.service_impl_lineEdit.text()
+        controller_package = self.controller_lineEdit.text()
+        return all((service_package, service_impl_package, controller_package))
+
     def choose_java_dir(self):
         """选择java项目地址"""
         directory = QFileDialog.getExistingDirectory(self.widget_generator, CHOOSE_DIRECTORY, '/')
@@ -226,6 +242,8 @@ class DisplaySelectedDialog(QDialog):
         self.service_impl_lineEdit.setDisabled(True)
         self.controller_button.setDisabled(True)
         self.controller_lineEdit.setDisabled(True)
+        # 生成按钮
+        self.generate_button.setDisabled(True)
 
     def open_src_xml_button(self):
         """解锁源码包和xml输入框按钮"""
