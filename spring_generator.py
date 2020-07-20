@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-import time
-import os
 
-from xml_parser import params
 from constant import *
 from mybatis_generator import MybatisGenerator
-from get_cursor import Cursor
+
 _author_ = 'luwt'
 _date_ = '2020/4/19 23:37'
 
@@ -95,33 +92,34 @@ class SpringGenerator(MybatisGenerator):
         # controller文件保存路径
         self.controller_path = self.get_path(self.controller_package) + '/' + f'{self.class_name}Controller.java'
 
-    def generate_service(self):
+    def generate_service(self, count, file_count, consumer):
         content = self.env.get_template(self.service_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_package=self.service_package, param=self.param, key=self.key
         )
-        self.save(self.service_path, content)
+        return self.save(self.service_path, content, count, file_count, consumer)
 
-    def generate_service_impl(self):
+    def generate_service_impl(self, count, file_count, consumer):
         content = self.env.get_template(self.service_impl_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             mapper_namespace=self.mapper_namespace, param=self.param, key=self.key,
             service_impl_package=self.service_impl_package, hump_cls_name=self.hump_cls_name,
             service_namespace=self.service_namespace
         )
-        self.save(self.service_impl_path, content)
+        return self.save(self.service_impl_path, content, count, file_count, consumer)
 
-    def generate_controller(self):
+    def generate_controller(self, count, file_count, consumer):
         content = self.env.get_template(self.controller_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_namespace=self.service_namespace, param=self.param, key=self.key,
             controller_package=self.controller_package, hump_cls_name=self.hump_cls_name
         )
-        self.save(self.controller_path, content)
+        return self.save(self.controller_path, content, count, file_count, consumer)
 
-    def main(self):
-        super().main()
-        self.generate_service()
-        self.generate_service_impl()
-        self.generate_controller()
+    def main(self, count, file_count, consumer):
+        count = super().main(count, file_count, consumer)
+        count = self.generate_service(count, file_count, consumer)
+        count = self.generate_service_impl(count, file_count, consumer)
+        count = self.generate_controller(count, file_count, consumer)
+        return count
 

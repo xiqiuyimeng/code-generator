@@ -29,7 +29,7 @@ conn_sql = {
     'select_id_by_name': f'select id from {CONN_TABLE} where name = ',
 }
 
-conn = sqlite3.connect(DB)
+conn = sqlite3.connect(DB, check_same_thread=False)
 cursor = conn.cursor()
 cursor.execute(conn_sql.get('create'))
 
@@ -98,10 +98,3 @@ def get_id_by_name(conn_name):
     data = cursor.fetchone()
     return data[0]
 
-
-# connection = Connection(None, 'centos121', 'centos121', 3306, 'root', 'admin')
-# add_conn(connection)
-# conns = get_conns()
-# print(conns)
-# conn = get_new_conn()
-# print(conn)

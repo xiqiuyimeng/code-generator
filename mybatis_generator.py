@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from constant import *
-import mysql_type as mt
-from jinja2 import Environment, FileSystemLoader
 import os
-import sys
+
+from jinja2 import Environment, FileSystemLoader
+
+import mysql_type as mt
+from constant import *
+
 _author_ = 'luwt'
 _date_ = '2019/3/5 15:17'
 
@@ -261,7 +263,7 @@ class MybatisGenerator:
             self.param, self.key = self.deal_type(self.primary[0][1])[1], \
                                    self.deal_column_name(self.primary[0][0])
 
-    def generate_java(self):
+    def generate_java(self, count, file_count, consumer):
         java_list = []
         import_list = set()
         for line in self.data:
@@ -278,18 +280,19 @@ class MybatisGenerator:
             lombok=self.lombok, import_list=import_list,
             model_package=self.model_package
         )
-        self.save(self.java_output_path, content)
+        return self.save(self.java_output_path, content, count, file_count, consumer)
 
-    def generate_mapper(self):
+    def generate_mapper(self, count, file_count, consumer):
         if self.mapper:
             content = self.env.get_template(self.mapper_tp).render(
                 cls_name=self.class_name, param=self.param, key=self.key,
                 need_update=self.need_update, model_namespace=self.model_namespace,
                 mapper_package=self.mapper_package, hump_cls_name=self.hump_cls_name
             )
-            self.save(self.mapper_output_path, content)
+            return self.save(self.mapper_output_path, content, count, file_count, consumer)
+        return count
 
-    def generate_xml(self):
+    def generate_xml(self, count, file_count, consumer):
         # resultMap, base_column_list, 主键params, java类型（用于在）
         result_map, columns, params, java_type = [], [], [], ''
         # 生成base_column_list
@@ -317,7 +320,7 @@ class MybatisGenerator:
             mapper=self.mapper, any_column=self.exec_sql,
             model_namespace=self.model_namespace, mapper_namespace=self.mapper_namespace
         )
-        self.save(self.xml_output_path, content)
+        return self.save(self.xml_output_path, content, count, file_count, consumer)
 
     @staticmethod
     def rm_pri(update_columns, params):
@@ -351,16 +354,20 @@ class MybatisGenerator:
             result_map.append(data)
 
     @staticmethod
-    def save(path, content):
+    def save(path, content, count, file_count, consumer):
         parent_dir = os.path.split(path)[0]
         if not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
         with open(path, 'w+', encoding='utf-8')as f:
             f.write(content)
             print(f'{OUTPUT_PREFIX}{path}')
+            count += 1
+            consumer.send([round(count * 100 / file_count), f'{OUTPUT_PREFIX}{path}'])
+        return count
 
-    def main(self):
-        self.generate_java()
-        self.generate_mapper()
-        self.generate_xml()
+    def main(self, count, file_count, consumer):
+        count = self.generate_java(count, file_count, consumer)
+        count = self.generate_mapper(count, file_count, consumer)
+        count = self.generate_xml(count, file_count, consumer)
+        return count
 
