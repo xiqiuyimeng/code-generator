@@ -1,7 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
-from PyQt5 import sip
-from generator_gui import MainWindow
+from main_window.generator_gui import MainWindow
 import sys
 _author_ = 'luwt'
 _date_ = '2020/6/15 17:20'
