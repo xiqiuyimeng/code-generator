@@ -8,11 +8,6 @@ _date_ = '2020/4/20 10:40'
 # 默认配置文件地址
 DEFAULT_CONFIG_PATH = 'config.xml'
 
-# 数据库默认端口
-DEFAULT_DB_PORT = 3306
-# 数据库默认字符集
-DEFAULT_DB_CHARSET = 'utf8'
-
 # 测试数据库连接，查询数据库版本信息
 TEST_CONN_SQL = 'select version();'
 
@@ -57,22 +52,8 @@ DEFAULT_CONTROLLER_TP = 'controller.txt'
 # 默认java项目源码包的相对路径结构
 DEFAULT_JAVA_SRC_RELATIVE_PATH = 'src/main/java'
 
-# 选择生成器类型
-CHOOSE_GENERATOR_TYPE = "请选择生成下面哪一种代码：\r\n1.mybatis(mapper, xml, model)\r\n" \
-                           "2.spring(controller, service, serviceImpl, mapper, xml, model)"
-# 路径
-PATH_ERROR = "请检查config.xml中else标签参数，因为已选java_output和xml_output，所以else标签参数必不可少"
-# 参数有误
-PARAM_ERROR = "请检查config.xml中参数，按任意键退出"
-# spring生成器错误提示
-SPRING_ERROR = "spring代码不支持指定列和自定义sql，请检查config.xml中参数，按任意键退出"
-# 输入不合法错误
-INPUT_ILLEGAL = "输入不合法，按任意键退出"
 # 路径参数有误
 PARAM_PATH_ERROR = "路径参数有误"
-
-# 执行成功提示语
-SUCCESS = "执行成功！五秒后退出"
 
 """菜单栏"""
 FILE_MENU = '文件'
@@ -111,8 +92,6 @@ CLOSE_TABLE_MENU = '关闭表'
 SELECT_ALL_FIELD_MENU = '全选表中所有字段'
 # 取消选择字段
 UNSELECT_FIELD_MENU = '取消选择字段'
-# 生成
-GENERATE_MENU = '生成'
 
 """"消息弹窗"""
 WARNING_TITLE = '警告信息'

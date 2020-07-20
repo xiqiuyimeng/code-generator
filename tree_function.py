@@ -2,7 +2,6 @@
 """
 处理树节点相关操作
 """
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from conn_dialog import ConnDialog
@@ -50,8 +49,7 @@ def show_conn_dialog(gui, conn_info, title):
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
     """
     dialog = ConnDialog(conn_info, title, gui)
-    dialog.setWindowModality(Qt.ApplicationModal)
-    dialog.show()
+    dialog.exec()
     if title == ADD_CONN_MENU:
         dialog.conn_signal.connect(add_conn_tree_item)
     elif title == EDIT_CONN_MENU:

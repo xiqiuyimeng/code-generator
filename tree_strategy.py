@@ -465,9 +465,6 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         # 取消选择字段
         elif func == UNSELECT_FIELD_MENU:
             change_table_checkbox(gui, item, False)
-        # 生成
-        elif func == GENERATE_MENU:
-            pass
 
     @staticmethod
     def get_node_info(item):

@@ -79,6 +79,5 @@ def get_table_menu_names(table_opened, checked):
             menu_names.append(SELECT_ALL_FIELD_MENU)
     else:
         menu_names.append(OPEN_TABLE_MENU)
-    menu_names.append(GENERATE_MENU)
     return menu_names
 

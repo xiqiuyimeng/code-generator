@@ -20,8 +20,9 @@ from constant import CONFIRM_TREE_HEADER_LABELS, NEXT_STEP_BUTTON, CANCEL_BUTTON
     CHOOSE_DIRECTORY, DEFAULT_JAVA_SRC_RELATIVE_PATH, WARNING_TITLE, JAVA_SRC_PATH, MODEL_PACKAGE, \
     MAPPER_PACKAGE, XML_PATH, SERVICE_PACKAGE, SERVICE_IMPL_PACKAGE, CONTROLLER_PACKAGE, PARAM_WARNING_MSG, \
     WARNING_NONE, WRONG_TITLE
-from do_generate import dispatch_generate
+# from do_generate import dispatch_generate
 from font import set_font
+from generate_result import GenerateResultDialog
 from message_box import pop_warning, pop_fail
 from select_generator_ui import setup_tab_ui
 
@@ -156,7 +157,9 @@ class DisplaySelectedDialog(QDialog):
             reply = pop_warning(WARNING_TITLE, PARAM_WARNING_MSG.format(wrong_params))
             if not reply:
                 return
-        dispatch_generate(self.gui, self.output_config_dict, self.selected_data)
+        dialog = GenerateResultDialog(self.gui, self.output_config_dict, self.selected_data)
+        dialog.close_parent_signal.connect(self.dialog.close)
+        dialog.exec()
 
     def check_no_none(self):
         """检查是否都有值"""
@@ -253,6 +256,7 @@ class DisplaySelectedDialog(QDialog):
             java_src = DEFAULT_JAVA_SRC_RELATIVE_PATH
             # 绝对路径
             self.abs_java_src = directory + '/' + DEFAULT_JAVA_SRC_RELATIVE_PATH
+            self.java_src_lineEdit.setText(java_src)
             self.fill_java_src(java_src)
         # 解锁源码包，xml选择文件夹按钮及输入框
         if os.path.isdir(directory):

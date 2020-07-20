@@ -189,8 +189,7 @@ class MainWindow(QtWidgets.QMainWindow):
         selected_data = SelectedData().conn_dict
         if selected_data:
             generate_dialog = DisplaySelectedDialog(self, selected_data)
-            generate_dialog.setWindowModality(Qt.ApplicationModal)
-            generate_dialog.show()
+            generate_dialog.exec()
         else:
             pop_fail(WRONG_TITLE, WRONG_UNSELECT_DATA)
 
