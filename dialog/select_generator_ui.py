@@ -350,7 +350,10 @@ def fill_text(confirm_select_ui):
     # 按钮
     confirm_select_ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(CLEAR_CONFIG_BUTTON)
     confirm_select_ui.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(PRE_STEP_BUTTON)
-    confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok).setText(GENERATE_BUTTON)
+    # 生成按钮
+    confirm_select_ui.generate_button = confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
+    confirm_select_ui.generate_button.setText(GENERATE_BUTTON)
+    confirm_select_ui.generate_button.setDisabled(True)
     confirm_select_ui.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
     # 选择文件夹按钮
     confirm_select_ui.java_button.setText(CHOOSE_DIRECTORY)
