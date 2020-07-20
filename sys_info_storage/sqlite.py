@@ -1,4 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
+import os
 from collections import namedtuple
 import sqlite3
 _author_ = 'luwt'
@@ -8,7 +9,7 @@ _date_ = '2020/6/19 19:41'
 Connection = namedtuple('Connection', 'id name host port user pwd')
 
 
-DB = 'mysql_generator'
+DB = os.path.dirname(__file__) + '/mysql_generator'
 SYS_TABLE = ''
 CONN_TABLE = 'connection'
 
