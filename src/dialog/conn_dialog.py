@@ -8,18 +8,17 @@
 """
 添加、编辑连接对话框界面
 """
-import os
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QPalette, QPixmap
 from PyQt5.QtWidgets import QDialog
 
-from src.func.connection_function import test_connection
 from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
-    SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS
-from src.sys.settings.font import set_font, set_title_font
+    SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS, BG_DIR
+from src.func.connection_function import test_connection
 from src.little_widget.message_box import pop_ok, pop_fail
+from src.sys.settings.font import set_font, set_title_font
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
 
@@ -41,94 +40,113 @@ class ConnDialog(QDialog):
     def setup_ui(self):
         self.dialog.setObjectName("Dialog")
         # 固定大小
-        self.dialog.setFixedSize(387, 332)
+        self.dialog.setFixedSize(400, 350)
         # 字体
         self.setFont(set_font())
 
         # 设置背景图
         palette = QPalette()
-        palette.setBrush(self.backgroundRole(), QBrush(QPixmap(
-            os.path.dirname(__file__) + '/../../static/bg_jpg/dialog_bg.jpg'
-        )))
+        palette.setBrush(self.backgroundRole(), QBrush(QPixmap(BG_DIR + 'dialog_bg.jpg')))
         self.setPalette(palette)
+        # 不透明度
+        self.setWindowOpacity(0.9)
 
         # 取消窗口右上角的问号按钮
         self.dialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
 
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.dialog)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.dialog)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.top_blank = QtWidgets.QLabel(self.dialog)
+        self.top_blank.setText("")
+        self.top_blank.setObjectName("top_blank")
+        self.verticalLayout.addWidget(self.top_blank)
         self.title = QtWidgets.QLabel(self.dialog)
         self.title.setObjectName("title")
-        self.verticalLayout.addWidget(self.title, 0, QtCore.Qt.AlignHCenter)
-        self.verticalLayout_2.addLayout(self.verticalLayout)
-        self.formLayout_2 = QtWidgets.QFormLayout()
-        self.formLayout_2.setObjectName("formLayout_2")
-        self.conn_name = QtWidgets.QLabel(self.dialog)
-        self.conn_name.setObjectName("conn_name")
-        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.conn_name)
-        self.conn_name_text = QtWidgets.QLineEdit(self.dialog)
-        self.conn_name_text.setObjectName("conn_name_text")
-        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.conn_name_text)
-        self.verticalLayout_2.addLayout(self.formLayout_2)
-        self.formLayout = QtWidgets.QFormLayout()
-        self.formLayout.setObjectName("formLayout")
+        self.verticalLayout.addWidget(self.title)
+        self.under_title_first_blank = QtWidgets.QLabel(self.dialog)
+        self.under_title_first_blank.setText("")
+        self.under_title_first_blank.setObjectName("under_title_first_blank")
+        self.verticalLayout.addWidget(self.under_title_first_blank)
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+        self.user_value = QtWidgets.QLineEdit(self.dialog)
+        self.user_value.setObjectName("user_value")
+        self.gridLayout.addWidget(self.user_value, 6, 2, 1, 1)
+        self.grid_layout_blank = QtWidgets.QLabel(self.dialog)
+        self.grid_layout_blank.setText("")
+        self.grid_layout_blank.setObjectName("grid_layout_blank")
+        self.gridLayout.addWidget(self.grid_layout_blank, 0, 1, 1, 1)
+        self.name_check = QtWidgets.QLabel(self.dialog)
+        self.name_check.setObjectName("name_check")
+        self.gridLayout.addWidget(self.name_check, 1, 2, 1, 1)
+        self.host_value = QtWidgets.QLineEdit(self.dialog)
+        self.host_value.setObjectName("host_value")
+        self.gridLayout.addWidget(self.host_value, 2, 2, 1, 1)
         self.host = QtWidgets.QLabel(self.dialog)
         self.host.setObjectName("host")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.host)
-        self.host_text = QtWidgets.QLineEdit(self.dialog)
-        self.host_text.setObjectName("host_text")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.host_text)
-        self.port = QtWidgets.QLabel(self.dialog)
-        self.port.setObjectName("port")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.port)
-        self.port_text = QtWidgets.QLineEdit(self.dialog)
-        self.port_text.setObjectName("port_text")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.port_text)
+        self.gridLayout.addWidget(self.host, 2, 0, 1, 1)
         self.user = QtWidgets.QLabel(self.dialog)
         self.user.setObjectName("user")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.user)
-        self.user_text = QtWidgets.QLineEdit(self.dialog)
-        self.user_text.setObjectName("user_text")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.user_text)
-        self.pwd = QtWidgets.QLabel(self.dialog)
-        self.pwd.setObjectName("pwd")
-        self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.pwd)
-        self.pwd_text = QtWidgets.QLineEdit(self.dialog)
-        self.pwd_text.setObjectName("pwd_text")
-        self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.pwd_text)
-        self.verticalLayout_2.addLayout(self.formLayout)
-        self.blank = QtWidgets.QLabel(self.dialog)
-        self.blank.setText("")
-        self.blank.setObjectName("blank")
-        self.verticalLayout_2.addWidget(self.blank)
+        self.gridLayout.addWidget(self.user, 6, 0, 1, 1)
+        self.passwd = QtWidgets.QLabel(self.dialog)
+        self.passwd.setObjectName("passwd")
+        self.gridLayout.addWidget(self.passwd, 8, 0, 1, 1)
+        self.port_value = QtWidgets.QLineEdit(self.dialog)
+        self.port_value.setObjectName("port_value")
+        self.gridLayout.addWidget(self.port_value, 4, 2, 1, 1)
+        self.conn_name = QtWidgets.QLabel(self.dialog)
+        self.conn_name.setObjectName("conn_name")
+        self.gridLayout.addWidget(self.conn_name, 0, 0, 1, 1)
+        self.passwd_value = QtWidgets.QLineEdit(self.dialog)
+        self.passwd_value.setObjectName("passwd_value")
+        self.gridLayout.addWidget(self.passwd_value, 8, 2, 1, 1)
+        self.conn_name_value = QtWidgets.QLineEdit(self.dialog)
+        self.conn_name_value.setObjectName("conn_name_value")
+        self.gridLayout.addWidget(self.conn_name_value, 0, 2, 1, 1)
+        self.port = QtWidgets.QLabel(self.dialog)
+        self.port.setObjectName("port")
+        self.gridLayout.addWidget(self.port, 4, 0, 1, 1)
+        self.verticalLayout.addLayout(self.gridLayout)
+        self.bottom_blank = QtWidgets.QLabel(self.dialog)
+        self.bottom_blank.setText("")
+        self.bottom_blank.setObjectName("bottom_blank")
+        self.verticalLayout.addWidget(self.bottom_blank)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.test_conn = QtWidgets.QPushButton(self.dialog)
-        self.test_conn.setObjectName("test_conn")
-        self.horizontalLayout.addWidget(self.test_conn)
-        self.label = QtWidgets.QLabel(self.dialog)
-        self.label.setText("")
-        self.label.setObjectName("label")
-        self.horizontalLayout.addWidget(self.label)
-        self.ok = QtWidgets.QPushButton(self.dialog)
-        self.ok.setObjectName("ok")
-        # todo 确定按钮默认不可用，只有当输入框都有值才可用
-        self.ok.setDisabled(False)
-        self.horizontalLayout.addWidget(self.ok)
-        self.cancel = QtWidgets.QPushButton(self.dialog)
-        self.cancel.setObjectName("cancel")
-        self.horizontalLayout.addWidget(self.cancel)
-        self.verticalLayout_2.addLayout(self.horizontalLayout)
-        self.verticalLayout_3.addLayout(self.verticalLayout_2)
+        self.buttonBox_2 = QtWidgets.QDialogButtonBox(self.dialog)
+        self.buttonBox_2.setLayoutDirection(Qt.RightToLeft)
+        self.buttonBox_2.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
+        self.test_conn = self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox_2.setObjectName("buttonBox_2")
+        self.horizontalLayout.addWidget(self.buttonBox_2)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self.dialog)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+        self.ok = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
+        self.cancel = self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel)
+        self.buttonBox.setObjectName("buttonBox")
+        self.horizontalLayout.addWidget(self.buttonBox)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        # 设置tab键的顺序
+        self.dialog.setTabOrder(self.conn_name_value, self.host_value)
+        self.dialog.setTabOrder(self.host_value, self.port_value)
+        self.dialog.setTabOrder(self.port_value, self.user_value)
+        self.dialog.setTabOrder(self.user_value, self.passwd_value)
+        # 设置端口号只能输入数字
+        self.port_value.setValidator(QtGui.QIntValidator())
+
+        self.conn_name_value.textEdited.connect(self.check_input)
+        self.host_value.textEdited.connect(self.check_input)
+        self.port_value.textEdited.connect(self.check_input)
+        self.user_value.textEdited.connect(self.check_input)
+        self.passwd_value.textEdited.connect(self.check_input)
 
         # 测试连接按钮：点击触发测试mysql连接功能
         self.test_conn.clicked.connect(self.test_connection)
         # 确定按钮：点击触发添加连接记录到系统库中，并增加到展示界面
         self.ok.clicked.connect(self.handle_func)
+        # 确定、测试连接按钮默认不可用，只有当输入框都有值才可用
+        self.ok.setDisabled(True)
+        self.test_conn.setDisabled(True)
         # 取消按钮：点击则关闭对话框
         self.cancel.clicked.connect(self.dialog.close)
 
@@ -142,43 +160,54 @@ class ConnDialog(QDialog):
         self.host.setText(self._translate("Dialog", "主机："))
         self.port.setText(self._translate("Dialog", "端口号："))
         self.user.setText(self._translate("Dialog", "用户名："))
-        self.pwd.setText(self._translate("Dialog", "密码："))
+        self.passwd.setText(self._translate("Dialog", "密码："))
+        # 按钮
         self.test_conn.setText(self._translate("Dialog", "测试连接"))
         self.ok.setText(self._translate("Dialog", "确定"))
         self.cancel.setText(self._translate("Dialog", "取消"))
         # 回显
         if self.connection.id:
-            self.conn_name_text.setText(self._translate("Dialog", self.connection.name))
-            self.host_text.setText(self._translate("Dialog", self.connection.host))
+            self.conn_name_value.setText(self._translate("Dialog", self.connection.name))
+            self.host_value.setText(self._translate("Dialog", self.connection.host))
             port = str(self.connection.port) if self.connection.port else None
-            self.port_text.setText(self._translate("Dialog", port))
-            self.user_text.setText(self._translate("Dialog", self.connection.user))
-            self.pwd_text.setText(self._translate("Dialog", self.connection.pwd))
+            self.port_value.setText(self._translate("Dialog", port))
+            self.user_value.setText(self._translate("Dialog", self.connection.user))
+            self.passwd_value.setText(self._translate("Dialog", self.connection.pwd))
         else:
-            self.host_text.setText(self._translate("Dialog", "localhost"))
-            self.port_text.setText(self._translate("Dialog", "3306"))
-            self.user_text.setText(self._translate("Dialog", "root"))
+            self.host_value.setText(self._translate("Dialog", "localhost"))
+            self.port_value.setText(self._translate("Dialog", "3306"))
+            self.user_value.setText(self._translate("Dialog", "root"))
 
-    def check_text(self, foc):
-        # todo 释焦事件，检查是否都有值
-        print(foc)
+    def check_input(self):
+        # 检查是否都有值
+        conn = self.get_input()
+        # 如果输入框都有值，那么就开放按钮，否则关闭
+        if all(conn):
+            self.ok.setDisabled(False)
+            self.test_conn.setDisabled(False)
+        else:
+            self.ok.setDisabled(True)
+            self.test_conn.setDisabled(True)
+
+    def get_input_connection(self):
+        return Connection(self.connection.id, *self.get_input())
 
     def get_input(self):
-        conn_name = self.conn_name_text.text()
-        host = self.host_text.text()
-        port = int(self.port_text.text())
-        user = self.user_text.text()
-        pwd = self.pwd_text.text()
-        return Connection(self.connection.id, conn_name, host, port, user, pwd)
+        conn_name = self.conn_name_value.text()
+        host = self.host_value.text()
+        port = int(self.port_value.text())
+        user = self.user_value.text()
+        pwd = self.passwd_value.text()
+        return conn_name, host, port, user, pwd
 
     def test_connection(self):
         """测试连接"""
-        new_conn = self.get_input()
+        new_conn = self.get_input_connection()
         test_connection(new_conn)
 
     def handle_func(self):
         """添加新的连接记录到系统库中，或编辑连接信息"""
-        new_conn = self.get_input()
+        new_conn = self.get_input_connection()
         name_available = check_name_available(new_conn.name, self.connection.id)
         if name_available:
             if self.dialog_title == EDIT_CONN_MENU:
