@@ -12,8 +12,10 @@ a = Analysis(py_files,
              binaries=[],
              datas=[
              ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\bg_jpg\\*.jpg', './static/bg_jpg'),
+             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\boot\\*.jpg', './static/boot'),
              ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\icon\\*.jpg', './static/icon'),
-             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\template\\*.txt', './static/template')],
+             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\template\\*.txt', './static/template')
+             ],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
