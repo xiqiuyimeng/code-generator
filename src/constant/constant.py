@@ -119,7 +119,8 @@ ACCEPT_BUTTON = '是'
 REJECT_BUTTON = '否'
 
 """按钮文字"""
-NEXT_STEP_BUTTON = '下一步'
+PROJECT_GENERATOR_BUTTON = '选择生成到指定项目'
+PATH_GENERATOR_BUTTON = '选择生成到指定路径'
 PRE_STEP_BUTTON = '上一步'
 CANCEL_BUTTON = '取消'
 EXPAND_BUTTON = '一键展开所有项'
@@ -173,24 +174,30 @@ MYBATIS_GENERATOR_DESC = 'mybatis生成器：根据官方生成器生成的代�
                          '\n3. 当前支持整表生成，也支持选择部分表字段生成，需要注意的是，' \
                          '部分选择字段时，仅生成当前的Java实体类中\n\b\b需要新增的类属性代码' \
                          '及xml文件中需要新增的代码，例如resultMap与插入更新代码块。' \
-                         '\n4. 以下参数皆为必填项，填写Java项目地址后，才可开启其他项。'
+                         '\n4. 以下参数皆为必填项，填写Java项目地址后，将开启其他项，生成器会直接将文件生成到您指定的项目目录中。'
+MYBATIS_PATH_GENERATOR_DESC = 'mybatis生成器：根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
+                         'mapper接口文件，xml文件。\n1. 默认增加了列表查询语句。' \
+                         '\n2. 可根据配置决定是否生成set和get方法，默认不生成，生成@Data注解。'\
+                         '\n3. 当前支持整表生成，也支持选择部分表字段生成，需要注意的是，' \
+                         '部分选择字段时，仅生成当前的Java实体类中\n\b\b需要新增的类属性代码' \
+                         '及xml文件中需要新增的代码，例如resultMap与插入更新代码块。' \
+                         '\n4. 参数解释：支持指定路径生成，指定路径后，将开启其他输入项，生成的所有文件都会存放在您指定的目录中。'
 IS_LOMBOK = '是否启用lombok注解'
 LOMBOK_DESC = 'lombok注解：如果选择开启，那么在生成的Java实体类中，将不复生成get与set方法，' \
               '以@Data注解代替之，\n\t否则，将生成完整的get与set方法。'
+OUTPUT_PATH = '输出的指定路径'
+OUTPUT_PATH_DESC = '输出的指定路径：生成器会把所有生成的文件都存放到您指定的目录中，方便您查看和使用。'
 JAVA_PATH = 'Java项目地址'
-JAVA_PATH_DESC = 'java项目地址：即为java项目的根目录所在的绝对路径，例如：D:/workspace/demo'
+JAVA_PATH_DESC = 'java项目地址：即为java项目的根目录所在的绝对路径，例如：D:/workspace/demo，\n输入后将开始源码包和xml地址的输入'
 JAVA_SRC_PATH = 'Java项目源码包相对路径'
-JAVA_SRC_PATH_DESC = 'Java项目源码包相对路径：在Java项目根目录下，到Java源码包的路径，一般为src/main/java' \
-                     '\n\t填写Java项目地址后开启'
+JAVA_SRC_PATH_DESC = 'Java项目源码包相对路径：在Java项目根目录下，到Java源码包的路径，一般为src/main/java，\n输入后将开启所有的包名输入'
 MODEL_PACKAGE = 'Java实体类包名'
-MODEL_PACKAGE_DESC = 'Java实体类包名：您希望输出的Java实体类的包名，例如：com.demo.model' \
-                     '\n\t填写Java项目源码包相对路径后开启'
+MODEL_PACKAGE_DESC = 'Java实体类包名：您希望输出的Java实体类的包名，例如：com.demo.model'
 MAPPER_PACKAGE = 'mapper接口包名'
-MAPPER_PACKAGE_DESC = 'mapper接口包名：您希望输出的mapper接口文件的包名，例如：com.demo.dao' \
-                      '\n\t填写Java项目源码包相对路径后开启'
+MAPPER_PACKAGE_DESC = 'mapper接口包名：您希望输出的mapper接口文件的包名，例如：com.demo.dao'
 XML_PATH = 'xml文件输出路径'
 XML_PATH_DESC = 'xml输出路径：您希望输出的mybatis xml文件存放路径，' \
-                '例如：D:/workspace/demo/src/main/resources/mybatis\n\t填写Java项目地址后开启'
+                '例如：D:/workspace/demo/src/main/resources/mybatis'
 
 """生成弹窗tab页，spring"""
 # spring的tab页名称
@@ -205,12 +212,9 @@ SPRING_GENERATOR_DESC = 'spring生成器：对于mybatis生成器进行扩展，
                         '\n3. 以下参数为是否使用spring生成器的标识，如果填写了，则会使用spring生成器。' \
                         '\n4. 在本页清空配置将只影响本页的参数，在mybatis参数配置页清空，将一并清空本页配置。'
 SERVICE_PACKAGE = 'service接口包名'
-SERVICE_PACKAGE_DESC = 'service接口包名：您希望输出的service接口文件的包名，例如：com.demo.service' \
-                       '\n\t填写Java项目源码包相对路径后开启'
+SERVICE_PACKAGE_DESC = 'service接口包名：您希望输出的service接口文件的包名，例如：com.demo.service'
 SERVICE_IMPL_PACKAGE = 'service实现类包名'
-SERVICE_IMPL_PACKAGE_DESC = 'service实现类包名：您希望输出的service实现类的包名，例如：com.demo.service.impl' \
-                            '\n\t填写Java项目源码包相对路径后开启'
+SERVICE_IMPL_PACKAGE_DESC = 'service实现类包名：您希望输出的service实现类的包名，例如：com.demo.service.impl'
 CONTROLLER_PACKAGE = 'controller类包名'
 CONTROLLER_PACKAGE_DESC = 'controller类包名：您希望输出的controller文件的包名，例如：com.demo.controller' \
-                          '\n\t填写Java项目源码包相对路径后开启'
 

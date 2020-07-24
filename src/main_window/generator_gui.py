@@ -10,7 +10,7 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
-from src.dialog.confirm_select_dialog import DisplaySelectedDialog
+from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
 from src.sys.settings.font import set_font
 from src.little_widget.menu_bar_func import fill_menu_bar

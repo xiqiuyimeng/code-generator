@@ -173,6 +173,8 @@ class ConnDialog(QDialog):
             self.port_value.setText(self._translate("Dialog", port))
             self.user_value.setText(self._translate("Dialog", self.connection.user))
             self.passwd_value.setText(self._translate("Dialog", self.connection.pwd))
+            self.ok.setDisabled(False)
+            self.test_conn.setDisabled(False)
         else:
             self.host_value.setText(self._translate("Dialog", "localhost"))
             self.port_value.setText(self._translate("Dialog", "3306"))
