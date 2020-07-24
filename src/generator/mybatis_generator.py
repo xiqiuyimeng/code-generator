@@ -47,7 +47,7 @@ class MybatisGenerator:
             mapper.java接口文件的模板，默认为当前目录下的mapper.txt文件，目录可选为当前目录下的子目录
         `xml_tp`
             mapper.xml配置文件的模板，默认为当前目录下的xml.txt文件，目录可选为当前目录下的子目录
-        `default_path`
+        `output_path`
             输出路径，默认为'./输出目录'，可修改
         `lombok`
             在生成java类时是否生成lombok的@Data注释，默认true，若配置为false则生成getter和setter方法
@@ -64,7 +64,7 @@ class MybatisGenerator:
             mapper文件所在包命名空间，例如com.demo.dao，该命名空间将被作为mapper文件头部的引包声明，若无则不声明包命名空间。
             由包命名空间，生成器可生成mapper文件的命名空间，此命名空间将用于xml中作为namespace存在，若无，则默认填写“待填写”
         `java_path`
-            java项目路径，如果此参数有效，将忽视path参数。
+            java项目路径，如果此参数有效，将忽视path参数。如果存在，将生成到指定项目，否则生成到output_path输出目录。
                 绝对路径 D:\java_workspaces\demo
         `xml_path`
             xml文件输出路径，如果此参数有效，将忽视path参数
@@ -81,7 +81,7 @@ class MybatisGenerator:
             java_tp=DEFAULT_JAVA_TP,
             mapper_tp=DEFAULT_MAPPER_TP,
             xml_tp=DEFAULT_XML_TP,
-            default_path=DEFAULT_PATH,
+            output_path=DEFAULT_PATH,
             lombok=True,
             exec_sql=None,
             model_package=None,
@@ -138,7 +138,7 @@ class MybatisGenerator:
         )
         self.separator = '/'
         # 默认输出目录"./输出目录"
-        self.path = default_path
+        self.path = output_path
         # java项目地址，绝对路径 D:\java_workspaces\demo
         self.java_path = java_path
         # xml 路径
