@@ -4,8 +4,8 @@
 """
 import sip
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QHeaderView
 
 from src.constant.constant import TABLE_HEADER_LABELS
 from src.func.selected_data import SelectedData
@@ -16,20 +16,29 @@ _date_ = '2020/7/2 16:17'
 
 
 def add_table(gui):
+    gui.table_frame = QtWidgets.QFrame(gui.centralwidget)
+    gui.table_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+    gui.table_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+    gui.table_frame.setObjectName("table_frame")
+    gui.table_verticalLayout = QtWidgets.QVBoxLayout(gui.table_frame)
+    gui.table_verticalLayout.setObjectName("table_verticalLayout")
+    gui.table_header_label = QtWidgets.QLabel(gui.table_frame)
+    gui.table_header_label.setObjectName("table_header_label")
+    gui.table_verticalLayout.addWidget(gui.table_header_label)
     """添加表格"""
-    gui.tableWidget = QtWidgets.QTableWidget(gui.centralwidget)
+    gui.tableWidget = QtWidgets.QTableWidget(gui.table_frame)
     gui.tableWidget.setObjectName("tableWidget")
-    # 创建表格列标题，共四列
-    make_table_header(gui)
-
+    # 在布局中添加表格
+    gui.table_verticalLayout.addWidget(gui.tableWidget)
+    gui.horizontalLayout.addWidget(gui.table_frame)
     # 设置只读表格
     gui.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-    # 让表格铺满整个控件
-    gui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-    # 在布局中添加表格
-    gui.horizontalLayout.addWidget(gui.tableWidget)
     # 交替行颜色
     gui.tableWidget.setAlternatingRowColors(True)
+    # 表格控件样式
+    gui.tableWidget.setStyleSheet("#tableWidget{background-color:LightGreen;border-style:solid;}")
+    # 创建表格列标题，共四列
+    make_table_header(gui)
 
 
 def make_table_header(gui):
@@ -42,6 +51,14 @@ def make_table_header(gui):
     gui.tableWidget.setHorizontalHeader(gui.table_header)
     # 设置表头字段
     gui.tableWidget.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
+    # 设置表头列宽度，第一列全选列
+    gui.tableWidget.horizontalHeader().resizeSection(0, 60)
+    # 第二列字段列，根据大小自动调整宽度
+    gui.tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+    # 最后备注列拉伸到最大
+    gui.tableWidget.horizontalHeader().setStretchLastSection(True)
+    # 默认行号隐藏
+    gui.tableWidget.verticalHeader().setHidden(True)
     # 表头复选框单击信号与槽
     gui.table_header.select_all_clicked.connect(gui.table_header.change_state)
 
@@ -52,23 +69,25 @@ def close_table(gui):
     :param gui: 启动的主窗口界面对象
     """
     # 在布局中移除表格
-    gui.horizontalLayout.removeWidget(gui.tableWidget)
+    gui.horizontalLayout.removeWidget(gui.table_frame)
     # 必须调用sip才能彻底删除
-    sip.delete(gui.tableWidget)
-    # 删除tableWidget属性，方便后续判断
-    del gui.tableWidget
+    sip.delete(gui.table_frame)
+    # 删除table_frame属性，方便后续判断
+    del gui.table_frame
     all_header_combobox.clear()
     gui.statusbar.showMessage(f"成功关闭表：{gui.current_table.text(0)}")
 
 
-def fill_table(gui, cols, selected_cols):
+def fill_table(gui, cols, selected_cols, tb_name):
     """
     将列名字段全数填充在表中，四列多行表
     :param gui: 启动的主窗口界面对象
     :param cols: 字段信息的数组，为二维数组
     :param selected_cols: 已经选中的字段，如果为空，则证明是未选择。
         如果列表中有值，应将此数组中包含的字段复选框置为选中，其余未选中。
+    :param tb_name: 表名称，用来展示当前表头信息
     """
+    gui.set_table_header_label(tb_name)
     # 将当前表的列放入列表中
     gui.current_cols = list(map(lambda x: x[0], cols))
     # 填充数据
@@ -85,6 +104,8 @@ def fill_table(gui, cols, selected_cols):
             else:
                 check_status = Qt.Unchecked
         check.setCheckState(check_status)
+        # 加上行号
+        check.setText(str(i + 1))
         gui.tableWidget.setItem(i, 0, check)
         all_header_combobox.append(check)
 
@@ -93,6 +114,7 @@ def fill_table(gui, cols, selected_cols):
             item = QTableWidgetItem()
             gui.tableWidget.setItem(i, n, item)
             gui.update_table_item(item, field)
+    # 设置表格根据内容调整行高
     gui.tableWidget.resizeRowsToContents()
 
 
@@ -117,7 +139,7 @@ def check_table_opened(gui, item):
     :param gui: 启动的主窗口界面对象
     :param item: 当前点击树节点，必须是表级别
     """
-    return hasattr(gui, 'tableWidget') \
+    return hasattr(gui, 'table_frame') \
         and gui.current_table is item
 
 

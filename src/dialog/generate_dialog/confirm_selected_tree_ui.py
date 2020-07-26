@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QTreeWidgetItem
 
 from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, \
     EXPAND_BUTTON, PATH_GENERATOR_BUTTON
-from src.sys.settings.font import set_font
+from src.sys.settings.font import set_font, set_label_font
 
 _author_ = 'luwt'
 _date_ = '2020/7/23 15:51'
@@ -21,19 +21,29 @@ class TreeWidgetUI:
         self.setup_tree_ui()
 
     def setup_tree_ui(self):
-        self.widget = QtWidgets.QWidget(self.parent)
+        self.widget = QtWidgets.QWidget(self.parent.frame)
         self.widget.setObjectName("little_widget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.tree_header_label = QtWidgets.QLabel(self.widget)
+        self.tree_header_label.setObjectName("tree_header_label")
+        self.verticalLayout_2.addWidget(self.tree_header_label)
         self.treeWidget = QtWidgets.QTreeWidget(self.widget)
         self.parent.treeWidget = self.treeWidget
         self.treeWidget.setObjectName("treeWidget")
+        # 树控件背景透明
+        self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.treeWidget.setStyleSheet("#treeWidget{border-style:solid;border-radius:25px;background-color:LightYellow;}")
+
         # 字体
         self.treeWidget.setFont(set_font())
         self.verticalLayout_2.addWidget(self.treeWidget)
+
         self.first_splitter = QtWidgets.QSplitter(self.widget)
         self.first_splitter.setOrientation(QtCore.Qt.Horizontal)
         self.first_splitter.setObjectName("first_splitter")
+        # 分隔线隐藏
+        self.first_splitter.setHandleWidth(0)
         # 按钮
         self.first_buttonBox_2 = QtWidgets.QDialogButtonBox(self.first_splitter)
         self.first_buttonBox_2.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
@@ -72,13 +82,19 @@ class TreeWidgetUI:
 
     def retranslateUi(self):
         self.parent.setWindowTitle(self._translate("Dialog", "Dialog"))
-        self.treeWidget.headerItem().setText(0, self._translate("Dialog", CONFIRM_TREE_HEADER_LABELS))
+        self.treeWidget.headerItem().setHidden(True)
+        self.tree_header_label.setFont(set_font())
+        self.tree_header_label.setText(self._translate("Dialog", set_label_font(CONFIRM_TREE_HEADER_LABELS)))
         self.expand_collapse_button = self.first_buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
         self.parent.expand_collapse_button = self.expand_collapse_button
         self.expand_collapse_button.setText(COLLAPSE_BUTTON)
+        self.expand_collapse_button.setFont(set_font())
         self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(PROJECT_GENERATOR_BUTTON)
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setFont(set_font())
         self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Yes).setText(PATH_GENERATOR_BUTTON)
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Yes).setFont(set_font())
         self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
+        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
 
     def expand_collapse(self):
         """提供给确认数据页，树结构的展开和折叠"""

@@ -64,7 +64,7 @@ class OutputPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         if ui.output_lineEdit.text():
-            ui.parent.output_config_dict['output_path'] = ui.output_lineEdit.text()
+            ui.path_output_dict['output_path'] = ui.output_lineEdit.text()
         else:
             # 如果清空了输入框，那么就将其余输入都关闭
             self.clear_output_path_input(ui)
@@ -79,7 +79,7 @@ class OutputPathInputHandler(PathInputHandlerAbstract):
         directory = QFileDialog.getExistingDirectory(ui.widget, CHOOSE_DIRECTORY, '/')
         if directory:
             ui.output_lineEdit.setText(directory)
-            ui.parent.output_config_dict['output_path'] = directory
+            ui.path_output_dict['output_path'] = directory
             # 解锁剩余可输入框
             self.disable_package_button(ui, False)
             set_generate_button_available(ui)
@@ -106,8 +106,8 @@ class OutputPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         ui.output_lineEdit.setText("")
-        if ui.parent.output_config_dict.get('output_path'):
-            del ui.parent.output_config_dict['output_path']
+        if ui.path_output_dict.get('output_path'):
+            del ui.path_output_dict['output_path']
         OutputPathInputHandler.disable_package_button(ui, True)
         ModelPathInputHandler.clear_model_package_input(ui)
         MapperPathInputHandler.clear_mapper_package_input(ui)
@@ -119,7 +119,7 @@ class ModelPathInputHandler(PathInputHandlerAbstract):
     def input(self, ui):
         model_package = ui.model_lineEdit.text()
         if model_package:
-            ui.parent.output_config_dict['model_package'] = model_package
+            ui.path_output_dict['model_package'] = model_package
         else:
             # 清空数据
             self.clear_model_package_input(ui)
@@ -133,8 +133,8 @@ class ModelPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         ui.model_lineEdit.setText("")
-        if ui.parent.output_config_dict.get('model_package'):
-            del ui.parent.output_config_dict['model_package']
+        if ui.path_output_dict.get('model_package'):
+            del ui.path_output_dict['model_package']
 
 
 class MapperPathInputHandler(PathInputHandlerAbstract):
@@ -147,7 +147,7 @@ class MapperPathInputHandler(PathInputHandlerAbstract):
         """
         mapper_package = ui.mapper_lineEdit.text()
         if mapper_package:
-            ui.parent.output_config_dict['mapper_package'] = mapper_package
+            ui.path_output_dict['mapper_package'] = mapper_package
         else:
             # 清空数据
             self.clear_mapper_package_input(ui)
@@ -161,8 +161,8 @@ class MapperPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         ui.mapper_lineEdit.setText("")
-        if ui.parent.output_config_dict.get('mapper_package'):
-            del ui.parent.output_config_dict['mapper_package']
+        if ui.path_output_dict.get('mapper_package'):
+            del ui.path_output_dict['mapper_package']
 
 
 class ServicePathInputHandler(PathInputHandlerAbstract):
@@ -175,7 +175,7 @@ class ServicePathInputHandler(PathInputHandlerAbstract):
         """
         service_package = ui.service_lineEdit.text()
         if service_package:
-            ui.parent.output_config_dict['service_package'] = service_package
+            ui.path_output_dict['service_package'] = service_package
         else:
             # 清空数据
             self.clear_service_package_input(ui)
@@ -189,8 +189,8 @@ class ServicePathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         ui.service_lineEdit.setText("")
-        if ui.parent.output_config_dict.get('service_package'):
-            del ui.parent.output_config_dict['service_package']
+        if ui.path_output_dict.get('service_package'):
+            del ui.path_output_dict['service_package']
 
 
 class ServiceImplPathInputHandler(PathInputHandlerAbstract):
@@ -203,7 +203,7 @@ class ServiceImplPathInputHandler(PathInputHandlerAbstract):
         """
         service_impl_package = ui.service_impl_lineEdit.text()
         if service_impl_package:
-            ui.parent.output_config_dict['service_impl_package'] = service_impl_package
+            ui.path_output_dict['service_impl_package'] = service_impl_package
         else:
             # 清空数据
             self.clear_service_impl_package_input(ui)
@@ -217,8 +217,8 @@ class ServiceImplPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         ui.service_impl_lineEdit.setText("")
-        if ui.parent.output_config_dict.get('service_impl_package'):
-            del ui.parent.output_config_dict['service_impl_package']
+        if ui.path_output_dict.get('service_impl_package'):
+            del ui.path_output_dict['service_impl_package']
 
 
 class ControllerPathInputHandler(PathInputHandlerAbstract):
@@ -231,7 +231,7 @@ class ControllerPathInputHandler(PathInputHandlerAbstract):
         """
         controller_package = ui.controller_lineEdit.text()
         if controller_package:
-            ui.parent.output_config_dict['controller_package'] = controller_package
+            ui.path_output_dict['controller_package'] = controller_package
         else:
             # 清空数据
             self.clear_controller_package_input(ui)
@@ -245,5 +245,5 @@ class ControllerPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         ui.controller_lineEdit.setText("")
-        if ui.parent.output_config_dict.get('controller_package'):
-            del ui.parent.output_config_dict['controller_package']
+        if ui.path_output_dict.get('controller_package'):
+            del ui.path_output_dict['controller_package']

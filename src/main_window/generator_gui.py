@@ -8,11 +8,12 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QBrush
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
-from src.sys.settings.font import set_font
+from src.sys.settings.font import set_font, set_label_font
 from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
 from src.func.selected_data import SelectedData
@@ -43,25 +44,35 @@ class MainWindow(QtWidgets.QMainWindow):
         self.resize(1123, 896)
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.centralwidget)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.treeWidget = QtWidgets.QTreeWidget(self.centralwidget)
+        self.tree_frame = QtWidgets.QFrame(self.centralwidget)
+        self.tree_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.tree_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.tree_frame.setObjectName("tree_frame")
+        self.tree_verticalLayout = QtWidgets.QVBoxLayout(self.tree_frame)
+        self.tree_verticalLayout.setObjectName("verticalLayout")
+        self.tree_header_label = QtWidgets.QLabel(self.tree_frame)
+        self.tree_header_label.setObjectName("tree_header_label")
+        self.tree_verticalLayout.addWidget(self.tree_header_label)
+        self.treeWidget = QtWidgets.QTreeWidget(self.tree_frame)
 
         # 树结构的字体设置
         self.treeWidget.setFont(set_font())
+
         self.treeWidget.setObjectName("treeWidget")
-        self.horizontalLayout.addWidget(self.treeWidget)
-        self.horizontalLayout_2.addLayout(self.horizontalLayout)
+        self.treeWidget.headerItem().setHidden(True)
+        self.tree_verticalLayout.addWidget(self.treeWidget)
+        self.horizontalLayout.addWidget(self.tree_frame)
 
         self.setCentralWidget(self.centralwidget)
         # 菜单栏
         self.menubar = QtWidgets.QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1123, 23))
         self.menubar.setObjectName("menubar")
         fill_menu_bar(self)
+        self.file_menu.setStyleSheet('#file_menu{background-color:LightGreen}')
         self.setMenuBar(self.menubar)
+        self.menubar.setStyleSheet('#menubar{border-style:solid}')
 
         # 工具栏
         self.toolBar = QtWidgets.QToolBar(self)
@@ -70,6 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置名称显示在图标下面（默认本来是只显示图标）
         fill_tool_bar(self)
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.toolBar.setStyleSheet('#toolBar{border-style:solid}')
 
         # 状态栏
         self.statusbar = QtWidgets.QStatusBar(self)
@@ -86,16 +98,29 @@ class MainWindow(QtWidgets.QMainWindow):
         # 右击事件
         self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
+        # 树控件背景透明
+        self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.setStyleSheet("#MainWindow,#treeWidget{background-color:LightGreen;border-style:solid;}")
+        # 不透明度
+        self.setWindowOpacity(0.9)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         self.setWindowTitle(self._translate("MainWindow", "MainWindow"))
-        self.treeWidget.headerItem().setText(0, self._translate("MainWindow", TREE_HEADER_LABELS))
         __sortingEnabled = self.treeWidget.isSortingEnabled()
         self.treeWidget.setSortingEnabled(False)
         self.treeWidget.setSortingEnabled(__sortingEnabled)
+        self.set_tree_header_label()
+
+    def set_tree_header_label(self):
+        self.tree_header_label.setFont(set_font())
+        self.tree_header_label.setText(self._translate("MainWindow", set_label_font(TREE_HEADER_LABELS)))
+
+    def set_table_header_label(self, text):
+        self.table_header_label.setFont(set_font())
+        self.table_header_label.setText(self._translate("MainWindow", set_label_font(f"当前展示表为：{text}")))
 
     def get_saved_conns(self):
         """获取所有已存储的连接，生成页面树结构第一层"""

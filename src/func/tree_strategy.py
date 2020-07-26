@@ -370,7 +370,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param gui: 启动的主窗口界面对象
         """
         # 如果当前展示的表存在且与欲打开之表不是同一表，先删除当前展示的表
-        if hasattr(gui, 'tableWidget') and gui.current_table is not item:
+        if hasattr(gui, 'table_frame') and gui.current_table is not item:
             close_table(gui)
         # 如果当前打开表是欲打开之表，什么都不需要做
         elif check_table_opened(gui, item):
@@ -383,7 +383,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         # 获取选中的字段，如果为空，则未选中，如果选中列表长度等于字段列表长度，那么为全选
         selected_cols = SelectedData().get_col_list(conn_name, db_name, tb_name, True)
         # 当前表复选框的状态，赋予表格中复选框的状态
-        fill_table(gui, cols, selected_cols)
+        fill_table(gui, cols, selected_cols, tb_name)
         # 如果表格复选框为选中且选中的字段数等于总字段数，那么将表头的复选框也选中，默认表头复选框未选中
         if item.checkState(0) == Qt.Checked and len(cols) == len(selected_cols):
             gui.table_header.set_header_checked(True)
@@ -437,9 +437,8 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-
         check_state = tuple()
-        table_opened = hasattr(gui, 'tableWidget') \
+        table_opened = hasattr(gui, 'table_frame') \
             and gui.table_header.isVisible() \
             and gui.current_table is item
         if check_table_opened(gui, item):

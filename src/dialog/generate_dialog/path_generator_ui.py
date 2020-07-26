@@ -9,8 +9,8 @@
 from PyQt5 import QtCore, QtWidgets
 
 from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE_BUTTON, \
-    CANCEL_BUTTON, MYBATIS_TITLE, IS_LOMBOK, MYBATIS_GENERATOR_DESC, LOMBOK_DESC, \
-    JAVA_PATH, JAVA_PATH_DESC, MODEL_PACKAGE, \
+    CANCEL_BUTTON, MYBATIS_TITLE, IS_LOMBOK, LOMBOK_DESC, \
+    MODEL_PACKAGE, \
     MODEL_PACKAGE_DESC, MAPPER_PACKAGE, MAPPER_PACKAGE_DESC, MYBATIS_TAB_TITLE, SPRING_TAB_TITLE, SPRING_TITLE, \
     SPRING_GENERATOR_DESC, \
     SERVICE_PACKAGE, SERVICE_PACKAGE_DESC, SERVICE_IMPL_PACKAGE, SERVICE_IMPL_PACKAGE_DESC, \
@@ -18,7 +18,7 @@ from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE
     OUTPUT_PATH_DESC
 from src.func.path_generator_input import OutputPathInputHandler, clear_current_param, ModelPathInputHandler, \
     MapperPathInputHandler, ServicePathInputHandler, ServiceImplPathInputHandler, ControllerPathInputHandler
-from src.sys.settings.font import set_title_font, set_label_font
+from src.sys.settings.font import set_title_font, set_label_font, set_font
 
 
 class PathGeneratorUI:
@@ -26,6 +26,8 @@ class PathGeneratorUI:
 
     def __init__(self, dialog):
         self.parent = dialog
+        # 存储指定路径输出的配置
+        self.path_output_dict = dict()
         self._translate = self.parent._translate
         self.setup_tab_ui()
 
@@ -34,7 +36,7 @@ class PathGeneratorUI:
         构建选择项目生成器的tab标签界面
         :param self: 弹窗确认生成器配置页的主窗口对象
         """
-        self.widget = QtWidgets.QWidget(self.parent)
+        self.widget = QtWidgets.QWidget(self.parent.frame)
         self.widget.setObjectName("little_widget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -44,12 +46,17 @@ class PathGeneratorUI:
         self.setup_mybatis_tab_ui()
         # spring标签页
         self.setup_spring_tab_ui()
-
         self.tabWidget.addTab(self.mybatis_tab, "")
         self.tabWidget.addTab(self.spring_tab, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
+        self.tabWidget.setFont(set_font())
+
+        self.tabWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.tabWidget.setStyleSheet("QTabWidget:pane{border-style:solid;border-radius:25px;background-color:LightYellow;}")
         # 按钮部分
         self.splitter = QtWidgets.QSplitter(self.widget)
+        # 分隔线隐藏
+        self.splitter.setHandleWidth(0)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName("splitter")
         self.buttonBox = QtWidgets.QDialogButtonBox(self.splitter)
@@ -64,7 +71,7 @@ class PathGeneratorUI:
         # 按钮点击事件
         self.buttonBox.accepted.connect(lambda: clear_current_param(self))
         self.buttonBox.rejected.connect(lambda: self.pre_step())
-        self.buttonBox_2.accepted.connect(lambda: self.parent.generate())
+        self.buttonBox_2.accepted.connect(lambda: self.parent.generate(self.path_output_dict))
         self.buttonBox_2.rejected.connect(self.parent.close)
         # # 选择文件夹按钮
         self.output_button.clicked.connect(lambda: OutputPathInputHandler().choose_dir(self))
@@ -87,6 +94,7 @@ class PathGeneratorUI:
         :return:
         """
         self.mybatis_tab = QtWidgets.QWidget()
+        self.mybatis_tab.setFont(set_font())
         self.mybatis_tab.setObjectName("mybatis_tab")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_tab)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -108,10 +116,12 @@ class PathGeneratorUI:
         self.splitter_lombok = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_lombok.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_lombok.setObjectName("splitter_lombok")
+        self.splitter_lombok.setHandleWidth(0)
         self.lombok = QtWidgets.QLabel(self.splitter_lombok)
         self.lombok.setObjectName("lombok")
         self.lombok_comboBox = QtWidgets.QComboBox(self.splitter_lombok)
         self.lombok_comboBox.setObjectName("lombok_comboBox")
+        self.lombok_comboBox.setFixedWidth(100)
         self.lombok_comboBox.addItem("")
         self.lombok_comboBox.addItem("")
         self.verticalLayout_3.addWidget(self.splitter_lombok)
@@ -122,12 +132,15 @@ class PathGeneratorUI:
         self.splitter_output = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_output.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_output.setObjectName("splitter_output")
+        self.splitter_output.setHandleWidth(0)
         self.output = QtWidgets.QLabel(self.splitter_output)
         self.output.setObjectName("output")
         self.output_button = QtWidgets.QPushButton(self.splitter_output)
         self.output_button.setObjectName("output_button")
+        self.output_button.setFixedWidth(120)
         self.output_lineEdit = QtWidgets.QLineEdit(self.splitter_output)
         self.output_lineEdit.setObjectName("output_lineEdit")
+        self.output_lineEdit.setFixedWidth(500)
         self.verticalLayout_3.addWidget(self.splitter_output)
         self.output_desc = QtWidgets.QLabel(self.mybatis_tab)
         self.output_desc.setObjectName("output_desc")
@@ -141,10 +154,12 @@ class PathGeneratorUI:
         self.splitter_model = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_model.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_model.setObjectName("splitter_model")
+        self.splitter_model.setHandleWidth(0)
         self.model = QtWidgets.QLabel(self.splitter_model)
         self.model.setObjectName("model")
         self.model_lineEdit = QtWidgets.QLineEdit(self.splitter_model)
         self.model_lineEdit.setObjectName("model_lineEdit")
+        self.model_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.model_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_model)
@@ -155,10 +170,12 @@ class PathGeneratorUI:
         self.splitter_mapper = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_mapper.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_mapper.setObjectName("splitter_mapper")
+        self.splitter_mapper.setHandleWidth(0)
         self.mapper = QtWidgets.QLabel(self.splitter_mapper)
         self.mapper.setObjectName("mapper")
         self.mapper_lineEdit = QtWidgets.QLineEdit(self.splitter_mapper)
         self.mapper_lineEdit.setObjectName("mapper_lineEdit")
+        self.mapper_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.mapper_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_mapper)
@@ -182,6 +199,7 @@ class PathGeneratorUI:
         :return:
         """
         self.spring_tab = QtWidgets.QWidget()
+        self.spring_tab.setFont(set_font())
         self.spring_tab.setObjectName("spring_tab")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.spring_tab)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
@@ -215,10 +233,12 @@ class PathGeneratorUI:
         self.splitter_service = QtWidgets.QSplitter(self.spring_tab)
         self.splitter_service.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_service.setObjectName("splitter_service")
+        self.splitter_service.setHandleWidth(0)
         self.service = QtWidgets.QLabel(self.splitter_service)
         self.service.setObjectName("service")
         self.service_lineEdit = QtWidgets.QLineEdit(self.splitter_service)
         self.service_lineEdit.setObjectName("service_lineEdit")
+        self.service_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.service_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service)
@@ -229,10 +249,12 @@ class PathGeneratorUI:
         self.splitter_service_impl = QtWidgets.QSplitter(self.spring_tab)
         self.splitter_service_impl.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_service_impl.setObjectName("splitter_service_impl")
+        self.splitter_service_impl.setHandleWidth(0)
         self.service_impl = QtWidgets.QLabel(self.splitter_service_impl)
         self.service_impl.setObjectName("service_impl")
         self.service_impl_lineEdit = QtWidgets.QLineEdit(self.splitter_service_impl)
         self.service_impl_lineEdit.setObjectName("service_impl_lineEdit")
+        self.service_impl_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.service_impl_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service_impl)
@@ -243,10 +265,12 @@ class PathGeneratorUI:
         self.splitter_controller = QtWidgets.QSplitter(self.spring_tab)
         self.splitter_controller.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_controller.setObjectName("splitter_controller")
+        self.splitter_controller.setHandleWidth(0)
         self.controller = QtWidgets.QLabel(self.splitter_controller)
         self.controller.setObjectName("controller")
         self.controller_lineEdit = QtWidgets.QLineEdit(self.splitter_controller)
         self.controller_lineEdit.setObjectName("controller_lineEdit")
+        self.controller_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.controller_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_controller)
@@ -300,12 +324,16 @@ class PathGeneratorUI:
                                           self._translate("Dialog", SPRING_TAB_TITLE))
         # 按钮
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(CLEAR_CONFIG_BUTTON)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setFont(set_font())
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(PRE_STEP_BUTTON)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
         # 生成按钮
         self.generate_button = self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
         self.generate_button.setText(GENERATE_BUTTON)
+        self.generate_button.setFont(set_font())
         self.generate_button.setDisabled(True)
         self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
+        self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
         # 选择文件夹按钮
         self.output_button.setText(CHOOSE_DIRECTORY)
 
