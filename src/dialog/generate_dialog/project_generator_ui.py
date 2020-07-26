@@ -15,7 +15,7 @@ from src.func.project_generator_input import JavaInputHandler, JavaSrcInputHandl
     MapperInputHandler, XmlInputHandler, ServiceInputHandler, ServiceImplInputHandler, ControllerInputHandler, \
     clear_current_param, check_params
 from src.little_widget.message_box import pop_warning
-from src.sys.settings.font import set_label_font, set_title_font
+from src.sys.settings.font import set_label_font, set_title_font, set_font
 
 _author_ = 'luwt'
 _date_ = '2020/7/18 11:47'
@@ -26,6 +26,8 @@ class ProjectGeneratorUI:
 
     def __init__(self, dialog):
         self.parent = dialog
+        # 存储指定项目的输出配置
+        self.project_output_dict = dict()
         self._translate = self.parent._translate
         self.setup_tab_ui()
     
@@ -34,7 +36,7 @@ class ProjectGeneratorUI:
         构建选择项目生成器的tab标签界面
         :param self: 弹窗确认生成器配置页的主窗口对象
         """
-        self.widget = QtWidgets.QWidget(self.parent)
+        self.widget = QtWidgets.QWidget(self.parent.frame)
         self.widget.setObjectName("little_widget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -48,8 +50,14 @@ class ProjectGeneratorUI:
         self.tabWidget.addTab(self.mybatis_tab, "")
         self.tabWidget.addTab(self.spring_tab, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
+        self.tabWidget.setFont(set_font())
+
+        self.tabWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.tabWidget.setStyleSheet("QTabWidget:pane{border-style:solid;border-radius:25px;background-color:LightYellow;}")
         # 按钮部分
         self.splitter = QtWidgets.QSplitter(self.widget)
+        # 分隔线隐藏
+        self.splitter.setHandleWidth(0)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName("splitter")
         self.buttonBox = QtWidgets.QDialogButtonBox(self.splitter)
@@ -64,7 +72,7 @@ class ProjectGeneratorUI:
         # 按钮点击事件
         self.buttonBox.accepted.connect(lambda: clear_current_param(self))
         self.buttonBox.rejected.connect(self.pre_step)
-        self.buttonBox_2.accepted.connect(lambda: self.parent.generate(self))
+        self.buttonBox_2.accepted.connect(lambda: self.parent.generate(self, self.project_output_dict))
         self.buttonBox_2.rejected.connect(self.parent.close)
         # 选择文件夹按钮
         self.java_button.clicked.connect(lambda: JavaInputHandler().choose_dir(self))
@@ -96,6 +104,7 @@ class ProjectGeneratorUI:
         :return:
         """
         self.mybatis_tab = QtWidgets.QWidget()
+        self.mybatis_tab.setFont(set_font())
         self.mybatis_tab.setObjectName("mybatis_tab")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_tab)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -117,10 +126,12 @@ class ProjectGeneratorUI:
         self.splitter_lombok = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_lombok.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_lombok.setObjectName("splitter_lombok")
+        self.splitter_lombok.setHandleWidth(0)
         self.lombok = QtWidgets.QLabel(self.splitter_lombok)
         self.lombok.setObjectName("lombok")
         self.lombok_comboBox = QtWidgets.QComboBox(self.splitter_lombok)
         self.lombok_comboBox.setObjectName("lombok_comboBox")
+        self.lombok_comboBox.setFixedWidth(100)
         self.lombok_comboBox.addItem("")
         self.lombok_comboBox.addItem("")
         self.verticalLayout_3.addWidget(self.splitter_lombok)
@@ -131,12 +142,15 @@ class ProjectGeneratorUI:
         self.splitter_java = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_java.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_java.setObjectName("splitter_java")
+        self.splitter_java.setHandleWidth(0)
         self.java = QtWidgets.QLabel(self.splitter_java)
         self.java.setObjectName("java")
         self.java_button = QtWidgets.QPushButton(self.splitter_java)
         self.java_button.setObjectName("java_button")
+        self.java_button.setFixedWidth(120)
         self.java_lineEdit = QtWidgets.QLineEdit(self.splitter_java)
         self.java_lineEdit.setObjectName("java_lineEdit")
+        self.java_lineEdit.setFixedWidth(500)
         self.verticalLayout_3.addWidget(self.splitter_java)
         self.java_desc = QtWidgets.QLabel(self.mybatis_tab)
         self.java_desc.setObjectName("java_desc")
@@ -145,14 +159,17 @@ class ProjectGeneratorUI:
         self.splitter_java_src = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_java_src.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_java_src.setObjectName("splitter_java_src")
+        self.splitter_java_src.setHandleWidth(0)
         self.java_src = QtWidgets.QLabel(self.splitter_java_src)
         self.java_src.setObjectName("java_src")
         self.java_src_button = QtWidgets.QPushButton(self.splitter_java_src)
         self.java_src_button.setObjectName("java_src_button")
+        self.java_src_button.setFixedWidth(120)
         # 初始不可用
         self.java_src_button.setDisabled(True)
         self.java_src_lineEdit = QtWidgets.QLineEdit(self.splitter_java_src)
         self.java_src_lineEdit.setObjectName("java_src_lineEdit")
+        self.java_src_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.java_src_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_java_src)
@@ -163,14 +180,17 @@ class ProjectGeneratorUI:
         self.splitter_model = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_model.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_model.setObjectName("splitter_model")
+        self.splitter_model.setHandleWidth(0)
         self.model = QtWidgets.QLabel(self.splitter_model)
         self.model.setObjectName("model")
         self.model_button = QtWidgets.QPushButton(self.splitter_model)
         self.model_button.setObjectName("model_button")
+        self.model_button.setFixedWidth(120)
         # 初始不可用
         self.model_button.setDisabled(True)
         self.model_lineEdit = QtWidgets.QLineEdit(self.splitter_model)
         self.model_lineEdit.setObjectName("model_lineEdit")
+        self.model_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.model_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_model)
@@ -181,14 +201,17 @@ class ProjectGeneratorUI:
         self.splitter_mapper = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_mapper.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_mapper.setObjectName("splitter_mapper")
+        self.splitter_mapper.setHandleWidth(0)
         self.mapper = QtWidgets.QLabel(self.splitter_mapper)
         self.mapper.setObjectName("mapper")
         self.mapper_button = QtWidgets.QPushButton(self.splitter_mapper)
         self.mapper_button.setObjectName("mapper_button")
+        self.mapper_button.setFixedWidth(120)
         # 初始不可用
         self.mapper_button.setDisabled(True)
         self.mapper_lineEdit = QtWidgets.QLineEdit(self.splitter_mapper)
         self.mapper_lineEdit.setObjectName("mapper_lineEdit")
+        self.mapper_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.mapper_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_mapper)
@@ -199,14 +222,17 @@ class ProjectGeneratorUI:
         self.splitter_xml = QtWidgets.QSplitter(self.mybatis_tab)
         self.splitter_xml.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_xml.setObjectName("splitter_xml")
+        self.splitter_xml.setHandleWidth(0)
         self.xml = QtWidgets.QLabel(self.splitter_xml)
         self.xml.setObjectName("xml")
         self.xml_button = QtWidgets.QPushButton(self.splitter_xml)
         self.xml_button.setObjectName("xml_button")
+        self.xml_button.setFixedWidth(120)
         # 初始不可用
         self.xml_button.setDisabled(True)
         self.xml_lineEdit = QtWidgets.QLineEdit(self.splitter_xml)
         self.xml_lineEdit.setObjectName("xml_lineEdit")
+        self.xml_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.xml_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_xml)
@@ -221,6 +247,7 @@ class ProjectGeneratorUI:
         :return:
         """
         self.spring_tab = QtWidgets.QWidget()
+        self.spring_tab.setFont(set_font())
         self.spring_tab.setObjectName("spring_tab")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.spring_tab)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
@@ -254,14 +281,17 @@ class ProjectGeneratorUI:
         self.splitter_service = QtWidgets.QSplitter(self.spring_tab)
         self.splitter_service.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_service.setObjectName("splitter_service")
+        self.splitter_service.setHandleWidth(0)
         self.service = QtWidgets.QLabel(self.splitter_service)
         self.service.setObjectName("service")
         self.service_button = QtWidgets.QPushButton(self.splitter_service)
         self.service_button.setObjectName("service_button")
+        self.service_button.setFixedWidth(120)
         # 初始不可用
         self.service_button.setDisabled(True)
         self.service_lineEdit = QtWidgets.QLineEdit(self.splitter_service)
         self.service_lineEdit.setObjectName("service_lineEdit")
+        self.service_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.service_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service)
@@ -272,14 +302,17 @@ class ProjectGeneratorUI:
         self.splitter_service_impl = QtWidgets.QSplitter(self.spring_tab)
         self.splitter_service_impl.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_service_impl.setObjectName("splitter_service_impl")
+        self.splitter_service_impl.setHandleWidth(0)
         self.service_impl = QtWidgets.QLabel(self.splitter_service_impl)
         self.service_impl.setObjectName("service_impl")
         self.service_impl_button = QtWidgets.QPushButton(self.splitter_service_impl)
         self.service_impl_button.setObjectName("service_impl_button")
+        self.service_impl_button.setFixedWidth(120)
         # 初始不可用
         self.service_impl_button.setDisabled(True)
         self.service_impl_lineEdit = QtWidgets.QLineEdit(self.splitter_service_impl)
         self.service_impl_lineEdit.setObjectName("service_impl_lineEdit")
+        self.service_impl_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.service_impl_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service_impl)
@@ -290,14 +323,17 @@ class ProjectGeneratorUI:
         self.splitter_controller = QtWidgets.QSplitter(self.spring_tab)
         self.splitter_controller.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_controller.setObjectName("splitter_controller")
+        self.splitter_controller.setHandleWidth(0)
         self.controller = QtWidgets.QLabel(self.splitter_controller)
         self.controller.setObjectName("controller")
         self.controller_button = QtWidgets.QPushButton(self.splitter_controller)
         self.controller_button.setObjectName("controller_button")
+        self.controller_button.setFixedWidth(120)
         # 初始不可用
         self.controller_button.setDisabled(True)
         self.controller_lineEdit = QtWidgets.QLineEdit(self.splitter_controller)
         self.controller_lineEdit.setObjectName("controller_lineEdit")
+        self.controller_lineEdit.setFixedWidth(500)
         # 初始不可用
         self.controller_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_controller)
@@ -355,12 +391,16 @@ class ProjectGeneratorUI:
                                           self._translate("Dialog", SPRING_TAB_TITLE))
         # 按钮
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(CLEAR_CONFIG_BUTTON)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setFont(set_font())
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(PRE_STEP_BUTTON)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
         # 生成按钮
         self.generate_button = self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
         self.generate_button.setText(GENERATE_BUTTON)
         self.generate_button.setDisabled(True)
+        self.generate_button.setFont(set_font())
         self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
+        self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
         # 选择文件夹按钮
         self.java_button.setText(CHOOSE_DIRECTORY)
         self.java_src_button.setText(CHOOSE_DIRECTORY)
@@ -379,13 +419,13 @@ class ProjectGeneratorUI:
 
     def generate(self):
         # lombok选值
-        self.parent.output_config_dict['lombok'] = eval(self.lombok_comboBox.currentText())
+        self.project_output_dict['lombok'] = eval(self.lombok_comboBox.currentText())
         # 检验输入是否正确，只做警告提示
         wrong_params = check_params(self)
         if wrong_params:
             reply = pop_warning(WARNING_TITLE, PARAM_WARNING_MSG.format(wrong_params))
             if not reply:
                 return
-        self.parent.generate()
+        self.parent.generate(self.project_output_dict)
 
 

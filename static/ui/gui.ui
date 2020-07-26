@@ -14,73 +14,107 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QTreeWidget" name="treeWidget">
-        <column>
+     <widget class="QFrame" name="frame">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string notr="true"/>
+          <string>TextLabel</string>
          </property>
-        </column>
-        <item>
-         <property name="text">
-          <string>root</string>
-         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTreeWidget" name="treeWidget">
+         <column>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </column>
          <item>
           <property name="text">
-           <string>child</string>
+           <string>root</string>
           </property>
           <item>
            <property name="text">
-            <string>child_child</string>
+            <string>child</string>
            </property>
+           <item>
+            <property name="text">
+             <string>child_child</string>
+            </property>
+           </item>
           </item>
          </item>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTableWidget" name="tableWidget">
-        <row>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="frame_2">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>第一行</string>
+          <string>TextLabel</string>
          </property>
-        </row>
-        <column>
-         <property name="text">
-          <string>字段名</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>数据类型</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>备注</string>
-         </property>
-        </column>
-        <item row="0" column="0">
-         <property name="text">
-          <string>id</string>
-         </property>
-        </item>
-        <item row="0" column="1">
-         <property name="text">
-          <string>int</string>
-         </property>
-        </item>
-        <item row="0" column="2">
-         <property name="text">
-          <string>主键</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="tableWidget">
+         <row>
+          <property name="text">
+           <string>第一行</string>
+          </property>
+         </row>
+         <column>
+          <property name="text">
+           <string>字段名</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>数据类型</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>备注</string>
+          </property>
+         </column>
+         <item row="0" column="0">
+          <property name="text">
+           <string>id</string>
+          </property>
+         </item>
+         <item row="0" column="1">
+          <property name="text">
+           <string>int</string>
+          </property>
+         </item>
+         <item row="0" column="2">
+          <property name="text">
+           <string>主键</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>

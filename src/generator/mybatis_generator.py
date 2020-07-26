@@ -364,7 +364,7 @@ class MybatisGenerator:
             f.write(content)
             print(f'{OUTPUT_PREFIX}{path}')
             count += 1
-            consumer.send([round(count * 100 / file_count), f'{OUTPUT_PREFIX}{path}'])
+            consumer.send([file_count, round(count * 100 / file_count), f'{OUTPUT_PREFIX}{path}'])
         return count
 
     def main(self, count, file_count, consumer):

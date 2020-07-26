@@ -134,7 +134,7 @@ class JavaInputHandler(ProjectInputHandlerAbstract):
         :param directory: 文件夹
         """
         # java源码包地址
-        ui.parent.output_config_dict['java_path'] = directory
+        ui.project_output_dict['java_path'] = directory
         ui.java_path = directory
         # 自动检索并填充java源码包路径
         if os.path.isdir(directory + '/' + DEFAULT_JAVA_SRC_RELATIVE_PATH):
@@ -157,8 +157,8 @@ class JavaInputHandler(ProjectInputHandlerAbstract):
         ui.java_lineEdit.setText("")
         if hasattr(ui, 'java_path'):
             del ui.java_path
-        if ui.parent.output_config_dict.get('java_path'):
-            del ui.parent.output_config_dict['java_path']
+        if ui.project_output_dict.get('java_path'):
+            del ui.project_output_dict['java_path']
         # 禁用src和xml的按钮输入框并清空内容
         JavaInputHandler.disable_src_xml_button(ui, True)
         JavaSrcInputHandler.clear_src_input(ui)
@@ -217,7 +217,7 @@ class JavaSrcInputHandler(ProjectInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         :param java_src: java源码包相对路径
         """
-        ui.parent.output_config_dict['java_src_relative'] = java_src
+        ui.project_output_dict['java_src_relative'] = java_src
         # 解锁剩余的五个包名选择文件夹按钮
         JavaSrcInputHandler.disable_package_button(ui, False)
 
@@ -231,8 +231,8 @@ class JavaSrcInputHandler(ProjectInputHandlerAbstract):
         ui.java_src_lineEdit.setText("")
         if hasattr(ui, 'abs_java_src'):
             del ui.abs_java_src
-        if ui.parent.output_config_dict.get('java_src_relative'):
-            del ui.parent.output_config_dict['java_src_relative']
+        if ui.project_output_dict.get('java_src_relative'):
+            del ui.project_output_dict['java_src_relative']
         # 禁用所有包名输入框按钮并清空内容
         JavaSrcInputHandler.disable_package_button(ui, True)
         ModelInputHandler.clear_model_package_input(ui)
@@ -272,7 +272,7 @@ class ModelInputHandler(ProjectInputHandlerAbstract):
             ui.model_path = directory
             model_package = (directory[len(ui.abs_java_src) + 1:]).replace("/", ".")
             ui.model_lineEdit.setText(model_package)
-            ui.parent.output_config_dict['model_package'] = model_package
+            ui.project_output_dict['model_package'] = model_package
             set_generate_button_available(ui)
 
     def input(self, ui):
@@ -284,7 +284,7 @@ class ModelInputHandler(ProjectInputHandlerAbstract):
         model_package = ui.model_lineEdit.text()
         if model_package:
             ui.model_path = package_to_path(ui, model_package)
-            ui.parent.output_config_dict['model_package'] = model_package
+            ui.project_output_dict['model_package'] = model_package
         else:
             # 清空数据
             self.clear_model_package_input(ui)
@@ -300,8 +300,8 @@ class ModelInputHandler(ProjectInputHandlerAbstract):
         ui.model_lineEdit.setText("")
         if hasattr(ui, 'model_path'):
             del ui.model_path
-        if ui.parent.output_config_dict.get('model_package'):
-            del ui.parent.output_config_dict['model_package']
+        if ui.project_output_dict.get('model_package'):
+            del ui.project_output_dict['model_package']
 
 
 class MapperInputHandler(ProjectInputHandlerAbstract):
@@ -317,7 +317,7 @@ class MapperInputHandler(ProjectInputHandlerAbstract):
             ui.mapper_path = directory
             mapper_package = (directory[len(ui.abs_java_src) + 1:]).replace("/", ".")
             ui.mapper_lineEdit.setText(mapper_package)
-            ui.parent.output_config_dict['mapper_package'] = mapper_package
+            ui.project_output_dict['mapper_package'] = mapper_package
             set_generate_button_available(ui)
 
     def input(self, ui):
@@ -329,7 +329,7 @@ class MapperInputHandler(ProjectInputHandlerAbstract):
         mapper_package = ui.mapper_lineEdit.text()
         if mapper_package:
             ui.mapper_path = package_to_path(ui, mapper_package)
-            ui.parent.output_config_dict['mapper_package'] = mapper_package
+            ui.project_output_dict['mapper_package'] = mapper_package
         else:
             # 清空数据
             self.clear_mapper_package_input(ui)
@@ -345,8 +345,8 @@ class MapperInputHandler(ProjectInputHandlerAbstract):
         ui.mapper_lineEdit.setText("")
         if hasattr(ui, 'mapper_path'):
             del ui.mapper_path
-        if ui.parent.output_config_dict.get('mapper_package'):
-            del ui.parent.output_config_dict['mapper_package']
+        if ui.project_output_dict.get('mapper_package'):
+            del ui.project_output_dict['mapper_package']
 
 
 class XmlInputHandler(ProjectInputHandlerAbstract):
@@ -361,7 +361,7 @@ class XmlInputHandler(ProjectInputHandlerAbstract):
         if directory:
             ui.xml_path = directory
             ui.xml_lineEdit.setText(directory)
-            ui.parent.output_config_dict['xml_path'] = directory
+            ui.project_output_dict['xml_path'] = directory
             set_generate_button_available(ui)
 
     def input(self, ui):
@@ -373,7 +373,7 @@ class XmlInputHandler(ProjectInputHandlerAbstract):
         xml_path = ui.xml_lineEdit.text()
         if xml_path:
             ui.xml_path = xml_path
-            ui.parent.output_config_dict['xml_path'] = xml_path
+            ui.project_output_dict['xml_path'] = xml_path
         else:
             # 清空数据
             self.clear_xml_input(ui)
@@ -389,8 +389,8 @@ class XmlInputHandler(ProjectInputHandlerAbstract):
         ui.xml_lineEdit.setText("")
         if hasattr(ui, 'xml_path'):
             del ui.xml_path
-        if ui.parent.output_config_dict.get('xml_path'):
-            del ui.parent.output_config_dict['xml_path']
+        if ui.project_output_dict.get('xml_path'):
+            del ui.project_output_dict['xml_path']
 
 
 class ServiceInputHandler(ProjectInputHandlerAbstract):
@@ -406,7 +406,7 @@ class ServiceInputHandler(ProjectInputHandlerAbstract):
             ui.service_path = directory
             service_package = (directory[len(ui.abs_java_src) + 1:]).replace("/", ".")
             ui.service_lineEdit.setText(service_package)
-            ui.parent.output_config_dict['service_package'] = service_package
+            ui.project_output_dict['service_package'] = service_package
             set_generate_button_available(ui)
 
     def input(self, ui):
@@ -418,7 +418,7 @@ class ServiceInputHandler(ProjectInputHandlerAbstract):
         service_package = ui.service_lineEdit.text()
         if service_package:
             ui.service_path = package_to_path(ui, service_package)
-            ui.parent.output_config_dict['service_package'] = service_package
+            ui.project_output_dict['service_package'] = service_package
         else:
             # 清空数据
             self.clear_service_package_input(ui)
@@ -434,8 +434,8 @@ class ServiceInputHandler(ProjectInputHandlerAbstract):
         ui.service_lineEdit.setText("")
         if hasattr(ui, 'service_path'):
             del ui.service_path
-        if ui.parent.output_config_dict.get('service_package'):
-            del ui.parent.output_config_dict['service_package']
+        if ui.project_output_dict.get('service_package'):
+            del ui.project_output_dict['service_package']
 
 
 class ServiceImplInputHandler(ProjectInputHandlerAbstract):
@@ -451,7 +451,7 @@ class ServiceImplInputHandler(ProjectInputHandlerAbstract):
             ui.service_impl_path = directory
             service_impl_package = (directory[len(ui.abs_java_src) + 1:]).replace("/", ".")
             ui.service_impl_lineEdit.setText(service_impl_package)
-            ui.parent.output_config_dict['service_impl_package'] = service_impl_package
+            ui.project_output_dict['service_impl_package'] = service_impl_package
             set_generate_button_available(ui)
 
     def input(self, ui):
@@ -463,7 +463,7 @@ class ServiceImplInputHandler(ProjectInputHandlerAbstract):
         service_impl_package = ui.service_impl_lineEdit.text()
         if service_impl_package:
             ui.service_impl_path = package_to_path(ui, service_impl_package)
-            ui.parent.output_config_dict['service_impl_package'] = service_impl_package
+            ui.project_output_dict['service_impl_package'] = service_impl_package
         else:
             # 清空数据
             self.clear_service_impl_package_input(ui)
@@ -479,8 +479,8 @@ class ServiceImplInputHandler(ProjectInputHandlerAbstract):
         ui.service_impl_lineEdit.setText("")
         if hasattr(ui, 'service_impl_path'):
             del ui.service_impl_path
-        if ui.parent.output_config_dict.get('service_impl_package'):
-            del ui.parent.output_config_dict['service_impl_package']
+        if ui.project_output_dict.get('service_impl_package'):
+            del ui.project_output_dict['service_impl_package']
 
 
 class ControllerInputHandler(ProjectInputHandlerAbstract):
@@ -496,7 +496,7 @@ class ControllerInputHandler(ProjectInputHandlerAbstract):
             ui.controller_path = directory
             controller_package = (directory[len(ui.abs_java_src) + 1:]).replace("/", ".")
             ui.controller_lineEdit.setText(controller_package)
-            ui.parent.output_config_dict['controller_package'] = controller_package
+            ui.project_output_dict['controller_package'] = controller_package
             set_generate_button_available(ui)
 
     def input(self, ui):
@@ -508,7 +508,7 @@ class ControllerInputHandler(ProjectInputHandlerAbstract):
         controller_package = ui.controller_lineEdit.text()
         if controller_package:
             ui.controller_path = package_to_path(ui, controller_package)
-            ui.parent.output_config_dict['controller_package'] = controller_package
+            ui.project_output_dict['controller_package'] = controller_package
         else:
             # 清空数据
             self.clear_controller_package_input(ui)
@@ -524,8 +524,8 @@ class ControllerInputHandler(ProjectInputHandlerAbstract):
         ui.controller_lineEdit.setText("")
         if hasattr(ui, 'controller_path'):
             del ui.controller_path
-        if ui.parent.output_config_dict.get('controller_package'):
-            del ui.parent.output_config_dict['controller_package']
+        if ui.project_output_dict.get('controller_package'):
+            del ui.project_output_dict['controller_package']
 
 
 

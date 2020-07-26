@@ -17,6 +17,7 @@ def fill_menu_bar(gui):
     :param gui: 启动的主窗口界面对象
     """
     gui.file_menu = gui.menubar.addMenu(FILE_MENU)
+    gui.file_menu.setObjectName("file_menu")
     add_conn_menu(gui)
     generate_menu(gui)
     exit_app_menu(gui)

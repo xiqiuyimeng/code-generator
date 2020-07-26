@@ -1,7 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
-from pydev_ipython.qt import QtGui
 
 from src.constant.constant import BOOT_DIR
 from src.main_window.generator_gui import MainWindow
