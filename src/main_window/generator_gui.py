@@ -100,9 +100,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
         # 树控件背景透明
         self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet("#MainWindow,#treeWidget{background-color:LightGreen;border-style:solid;}")
+        self.setStyleSheet("#MainWindow,#treeWidget{background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 LightGreen,stop:1 LimeGreen);;border-style:solid;}")
         # 不透明度
-        self.setWindowOpacity(0.9)
+        self.setWindowOpacity(0.93)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
