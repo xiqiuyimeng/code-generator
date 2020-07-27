@@ -72,7 +72,7 @@ class ProjectGeneratorUI:
         # 按钮点击事件
         self.buttonBox.accepted.connect(lambda: clear_current_param(self))
         self.buttonBox.rejected.connect(self.pre_step)
-        self.buttonBox_2.accepted.connect(lambda: self.parent.generate(self, self.project_output_dict))
+        self.buttonBox_2.accepted.connect(lambda: self.parent.generate(self.project_output_dict))
         self.buttonBox_2.rejected.connect(self.parent.close)
         # 选择文件夹按钮
         self.java_button.clicked.connect(lambda: JavaInputHandler().choose_dir(self))
