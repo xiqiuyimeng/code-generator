@@ -3,6 +3,7 @@
 点击生成按钮，弹窗的第二步页面，负责配置生成器的输出配置
 """
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QScrollArea
 
 from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE_BUTTON, \
     CANCEL_BUTTON, MYBATIS_TITLE, IS_LOMBOK, MYBATIS_GENERATOR_DESC, LOMBOK_DESC, \
@@ -29,12 +30,13 @@ class ProjectGeneratorUI:
         # 存储指定项目的输出配置
         self.project_output_dict = dict()
         self._translate = self.parent._translate
+        self.button_width = self.parent.screen_rect.width() * 0.15
+        self.line_edit_width = self.parent.screen_rect.width() * 0.4
         self.setup_tab_ui()
     
     def setup_tab_ui(self):
         """
         构建选择项目生成器的tab标签界面
-        :param self: 弹窗确认生成器配置页的主窗口对象
         """
         self.widget = QtWidgets.QWidget(self.parent.frame)
         self.widget.setObjectName("little_widget")
@@ -100,30 +102,35 @@ class ProjectGeneratorUI:
     def setup_mybatis_tab_ui(self):
         """
         构建mybatis生成器配置标签页
-        :param self: 弹窗确认生成器配置页的主窗口对象
-        :return:
         """
         self.mybatis_tab = QtWidgets.QWidget()
         self.mybatis_tab.setFont(set_font())
         self.mybatis_tab.setObjectName("mybatis_tab")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_tab)
+        self.verticalLayout_scroll = QtWidgets.QVBoxLayout(self.mybatis_tab)
+        self.verticalLayout_scroll.setObjectName("verticalLayout_scroll")
+        self.mybatis_scrollArea = QScrollArea(self.mybatis_tab)
+        self.mybatis_scrollArea.setWidgetResizable(True)
+        self.mybatis_scrollArea.setObjectName("mybatis_scrollArea")
+        self.mybatis_scroll_widget = QtWidgets.QWidget()
+        self.mybatis_scroll_widget.setObjectName("mybatis_scroll_widget")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_scroll_widget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.mybatis_title = QtWidgets.QLabel(self.mybatis_tab)
+        self.mybatis_title = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.mybatis_title.setObjectName("mybatis_title")
         self.verticalLayout_3.addWidget(self.mybatis_title)
-        self.mybatis_first_blank = QtWidgets.QLabel(self.mybatis_tab)
+        self.mybatis_first_blank = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.mybatis_first_blank.setText("")
         self.mybatis_first_blank.setObjectName("mybatis_first_blank")
         self.verticalLayout_3.addWidget(self.mybatis_first_blank)
-        self.mybatis_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.mybatis_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.mybatis_desc.setObjectName("mybatis_desc")
         self.verticalLayout_3.addWidget(self.mybatis_desc)
-        self.mybatis_second_blank = QtWidgets.QLabel(self.mybatis_tab)
+        self.mybatis_second_blank = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.mybatis_second_blank.setText("")
         self.mybatis_second_blank.setObjectName("mybatis_second_blank")
         self.verticalLayout_3.addWidget(self.mybatis_second_blank)
         # lombok
-        self.splitter_lombok = QtWidgets.QSplitter(self.mybatis_tab)
+        self.splitter_lombok = QtWidgets.QSplitter(self.mybatis_scroll_widget)
         self.splitter_lombok.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_lombok.setObjectName("splitter_lombok")
         self.splitter_lombok.setHandleWidth(0)
@@ -131,15 +138,15 @@ class ProjectGeneratorUI:
         self.lombok.setObjectName("lombok")
         self.lombok_comboBox = QtWidgets.QComboBox(self.splitter_lombok)
         self.lombok_comboBox.setObjectName("lombok_comboBox")
-        self.lombok_comboBox.setFixedWidth(100)
+        self.lombok_comboBox.setFixedWidth(self.button_width)
         self.lombok_comboBox.addItem("")
         self.lombok_comboBox.addItem("")
         self.verticalLayout_3.addWidget(self.splitter_lombok)
-        self.lombok_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.lombok_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.lombok_desc.setObjectName("lombok_desc")
         self.verticalLayout_3.addWidget(self.lombok_desc)
         # java_path
-        self.splitter_java = QtWidgets.QSplitter(self.mybatis_tab)
+        self.splitter_java = QtWidgets.QSplitter(self.mybatis_scroll_widget)
         self.splitter_java.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_java.setObjectName("splitter_java")
         self.splitter_java.setHandleWidth(0)
@@ -147,16 +154,16 @@ class ProjectGeneratorUI:
         self.java.setObjectName("java")
         self.java_button = QtWidgets.QPushButton(self.splitter_java)
         self.java_button.setObjectName("java_button")
-        self.java_button.setFixedWidth(120)
+        self.java_button.setFixedWidth(self.button_width)
         self.java_lineEdit = QtWidgets.QLineEdit(self.splitter_java)
         self.java_lineEdit.setObjectName("java_lineEdit")
-        self.java_lineEdit.setFixedWidth(500)
+        self.java_lineEdit.setFixedWidth(self.line_edit_width)
         self.verticalLayout_3.addWidget(self.splitter_java)
-        self.java_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.java_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.java_desc.setObjectName("java_desc")
         self.verticalLayout_3.addWidget(self.java_desc)
         # java_src
-        self.splitter_java_src = QtWidgets.QSplitter(self.mybatis_tab)
+        self.splitter_java_src = QtWidgets.QSplitter(self.mybatis_scroll_widget)
         self.splitter_java_src.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_java_src.setObjectName("splitter_java_src")
         self.splitter_java_src.setHandleWidth(0)
@@ -164,20 +171,20 @@ class ProjectGeneratorUI:
         self.java_src.setObjectName("java_src")
         self.java_src_button = QtWidgets.QPushButton(self.splitter_java_src)
         self.java_src_button.setObjectName("java_src_button")
-        self.java_src_button.setFixedWidth(120)
+        self.java_src_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.java_src_button.setDisabled(True)
         self.java_src_lineEdit = QtWidgets.QLineEdit(self.splitter_java_src)
         self.java_src_lineEdit.setObjectName("java_src_lineEdit")
-        self.java_src_lineEdit.setFixedWidth(500)
+        self.java_src_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.java_src_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_java_src)
-        self.java_src_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.java_src_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.java_src_desc.setObjectName("java_src_desc")
         self.verticalLayout_3.addWidget(self.java_src_desc)
         # model
-        self.splitter_model = QtWidgets.QSplitter(self.mybatis_tab)
+        self.splitter_model = QtWidgets.QSplitter(self.mybatis_scroll_widget)
         self.splitter_model.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_model.setObjectName("splitter_model")
         self.splitter_model.setHandleWidth(0)
@@ -185,20 +192,20 @@ class ProjectGeneratorUI:
         self.model.setObjectName("model")
         self.model_button = QtWidgets.QPushButton(self.splitter_model)
         self.model_button.setObjectName("model_button")
-        self.model_button.setFixedWidth(120)
+        self.model_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.model_button.setDisabled(True)
         self.model_lineEdit = QtWidgets.QLineEdit(self.splitter_model)
         self.model_lineEdit.setObjectName("model_lineEdit")
-        self.model_lineEdit.setFixedWidth(500)
+        self.model_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.model_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_model)
-        self.model_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.model_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.model_desc.setObjectName("model_desc")
         self.verticalLayout_3.addWidget(self.model_desc)
         # mapper
-        self.splitter_mapper = QtWidgets.QSplitter(self.mybatis_tab)
+        self.splitter_mapper = QtWidgets.QSplitter(self.mybatis_scroll_widget)
         self.splitter_mapper.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_mapper.setObjectName("splitter_mapper")
         self.splitter_mapper.setHandleWidth(0)
@@ -206,20 +213,20 @@ class ProjectGeneratorUI:
         self.mapper.setObjectName("mapper")
         self.mapper_button = QtWidgets.QPushButton(self.splitter_mapper)
         self.mapper_button.setObjectName("mapper_button")
-        self.mapper_button.setFixedWidth(120)
+        self.mapper_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.mapper_button.setDisabled(True)
         self.mapper_lineEdit = QtWidgets.QLineEdit(self.splitter_mapper)
         self.mapper_lineEdit.setObjectName("mapper_lineEdit")
-        self.mapper_lineEdit.setFixedWidth(500)
+        self.mapper_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.mapper_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_mapper)
-        self.mapper_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.mapper_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.mapper_desc.setObjectName("mapper_desc")
         self.verticalLayout_3.addWidget(self.mapper_desc)
         # xml
-        self.splitter_xml = QtWidgets.QSplitter(self.mybatis_tab)
+        self.splitter_xml = QtWidgets.QSplitter(self.mybatis_scroll_widget)
         self.splitter_xml.setOrientation(QtCore.Qt.Horizontal)
         self.splitter_xml.setObjectName("splitter_xml")
         self.splitter_xml.setHandleWidth(0)
@@ -227,18 +234,23 @@ class ProjectGeneratorUI:
         self.xml.setObjectName("xml")
         self.xml_button = QtWidgets.QPushButton(self.splitter_xml)
         self.xml_button.setObjectName("xml_button")
-        self.xml_button.setFixedWidth(120)
+        self.xml_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.xml_button.setDisabled(True)
         self.xml_lineEdit = QtWidgets.QLineEdit(self.splitter_xml)
         self.xml_lineEdit.setObjectName("xml_lineEdit")
-        self.xml_lineEdit.setFixedWidth(500)
+        self.xml_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.xml_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_xml)
-        self.xml_desc = QtWidgets.QLabel(self.mybatis_tab)
+        self.xml_desc = QtWidgets.QLabel(self.mybatis_scroll_widget)
         self.xml_desc.setObjectName("xml_desc")
         self.verticalLayout_3.addWidget(self.xml_desc)
+        self.mybatis_scroll_widget.setLayout(self.verticalLayout_3)
+
+        self.mybatis_scrollArea.setWidget(self.mybatis_scroll_widget)
+        self.verticalLayout_scroll.addWidget(self.mybatis_scrollArea)
+        self.mybatis_tab.setLayout(self.verticalLayout_scroll)
 
     def setup_spring_tab_ui(self):
         """
@@ -286,12 +298,12 @@ class ProjectGeneratorUI:
         self.service.setObjectName("service")
         self.service_button = QtWidgets.QPushButton(self.splitter_service)
         self.service_button.setObjectName("service_button")
-        self.service_button.setFixedWidth(120)
+        self.service_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.service_button.setDisabled(True)
         self.service_lineEdit = QtWidgets.QLineEdit(self.splitter_service)
         self.service_lineEdit.setObjectName("service_lineEdit")
-        self.service_lineEdit.setFixedWidth(500)
+        self.service_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.service_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service)
@@ -307,12 +319,12 @@ class ProjectGeneratorUI:
         self.service_impl.setObjectName("service_impl")
         self.service_impl_button = QtWidgets.QPushButton(self.splitter_service_impl)
         self.service_impl_button.setObjectName("service_impl_button")
-        self.service_impl_button.setFixedWidth(120)
+        self.service_impl_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.service_impl_button.setDisabled(True)
         self.service_impl_lineEdit = QtWidgets.QLineEdit(self.splitter_service_impl)
         self.service_impl_lineEdit.setObjectName("service_impl_lineEdit")
-        self.service_impl_lineEdit.setFixedWidth(500)
+        self.service_impl_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.service_impl_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service_impl)
@@ -328,12 +340,12 @@ class ProjectGeneratorUI:
         self.controller.setObjectName("controller")
         self.controller_button = QtWidgets.QPushButton(self.splitter_controller)
         self.controller_button.setObjectName("controller_button")
-        self.controller_button.setFixedWidth(120)
+        self.controller_button.setFixedWidth(self.button_width)
         # 初始不可用
         self.controller_button.setDisabled(True)
         self.controller_lineEdit = QtWidgets.QLineEdit(self.splitter_controller)
         self.controller_lineEdit.setObjectName("controller_lineEdit")
-        self.controller_lineEdit.setFixedWidth(500)
+        self.controller_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.controller_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_controller)
@@ -361,6 +373,7 @@ class ProjectGeneratorUI:
         """
         self.mybatis_title.setText(
             self._translate("Dialog", set_title_font(MYBATIS_TITLE)))
+        self.mybatis_desc.setWordWrap(True)
         self.mybatis_desc.setText(self._translate("Dialog", MYBATIS_GENERATOR_DESC))
         self.lombok.setText(self._translate("Dialog", set_label_font(IS_LOMBOK)))
         self.lombok_comboBox.setItemText(0, self._translate("Dialog", "True"))
@@ -375,6 +388,7 @@ class ProjectGeneratorUI:
         self.mapper.setText(self._translate("Dialog", set_label_font(MAPPER_PACKAGE)))
         self.mapper_desc.setText(self._translate("Dialog", MAPPER_PACKAGE_DESC))
         self.xml.setText(self._translate("Dialog", set_label_font(XML_PATH)))
+        self.xml_desc.setWordWrap(True)
         self.xml_desc.setText(self._translate("Dialog", XML_PATH_DESC))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.mybatis_tab),
                                           self._translate("Dialog", MYBATIS_TAB_TITLE))

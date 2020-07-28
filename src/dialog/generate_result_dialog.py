@@ -19,18 +19,20 @@ class GenerateResultDialog(QDialog):
     # 定义信号，关闭父窗口
     close_parent_signal = pyqtSignal()
 
-    def __init__(self, gui, output_config_dict, selected_data):
+    def __init__(self, gui, output_config_dict, selected_data, screen_rect):
         super().__init__()
         self.gui = gui
         self._translate = QtCore.QCoreApplication.translate
         self.output_config_dict = output_config_dict
         self.selected_data = selected_data
+        self.parent_screen_rect = screen_rect
         self.setup_ui()
 
     def setup_ui(self):
         self.setFont(set_font())
         self.setObjectName("Dialog")
-        self.setFixedSize(600, 400)
+        # 当前窗口大小根据父窗口大小计算
+        self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.6)
         self.verticalLayout_frame = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_frame.setObjectName("verticalLayout_frame")
         self.frame = QtWidgets.QFrame(self)

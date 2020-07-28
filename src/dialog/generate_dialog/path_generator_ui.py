@@ -29,6 +29,8 @@ class PathGeneratorUI:
         # 存储指定路径输出的配置
         self.path_output_dict = dict()
         self._translate = self.parent._translate
+        self.button_width = self.parent.screen_rect.width() * 0.15
+        self.line_edit_width = self.parent.screen_rect.width() * 0.55
         self.setup_tab_ui()
 
     def setup_tab_ui(self):
@@ -121,7 +123,8 @@ class PathGeneratorUI:
         self.lombok.setObjectName("lombok")
         self.lombok_comboBox = QtWidgets.QComboBox(self.splitter_lombok)
         self.lombok_comboBox.setObjectName("lombok_comboBox")
-        self.lombok_comboBox.setFixedWidth(100)
+        # 计算lombok按钮宽度
+        self.lombok_comboBox.setFixedWidth(self.button_width)
         self.lombok_comboBox.addItem("")
         self.lombok_comboBox.addItem("")
         self.verticalLayout_3.addWidget(self.splitter_lombok)
@@ -137,10 +140,12 @@ class PathGeneratorUI:
         self.output.setObjectName("output")
         self.output_button = QtWidgets.QPushButton(self.splitter_output)
         self.output_button.setObjectName("output_button")
-        self.output_button.setFixedWidth(120)
+        # 按钮宽度
+        self.output_button.setFixedWidth(self.button_width)
         self.output_lineEdit = QtWidgets.QLineEdit(self.splitter_output)
         self.output_lineEdit.setObjectName("output_lineEdit")
-        self.output_lineEdit.setFixedWidth(500)
+        # 计算输入框宽度
+        self.output_lineEdit.setFixedWidth(self.line_edit_width)
         self.verticalLayout_3.addWidget(self.splitter_output)
         self.output_desc = QtWidgets.QLabel(self.mybatis_tab)
         self.output_desc.setObjectName("output_desc")
@@ -159,7 +164,7 @@ class PathGeneratorUI:
         self.model.setObjectName("model")
         self.model_lineEdit = QtWidgets.QLineEdit(self.splitter_model)
         self.model_lineEdit.setObjectName("model_lineEdit")
-        self.model_lineEdit.setFixedWidth(500)
+        self.model_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.model_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_model)
@@ -175,7 +180,7 @@ class PathGeneratorUI:
         self.mapper.setObjectName("mapper")
         self.mapper_lineEdit = QtWidgets.QLineEdit(self.splitter_mapper)
         self.mapper_lineEdit.setObjectName("mapper_lineEdit")
-        self.mapper_lineEdit.setFixedWidth(500)
+        self.mapper_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.mapper_lineEdit.setDisabled(True)
         self.verticalLayout_3.addWidget(self.splitter_mapper)
@@ -187,10 +192,6 @@ class PathGeneratorUI:
         self.mybatis_fourth_blank.setObjectName("mybatis_fourth_blank")
         self.mybatis_fourth_blank.setText("")
         self.verticalLayout_3.addWidget(self.mybatis_fourth_blank)
-        self.mybatis_fifth_blank = QtWidgets.QLabel(self.mybatis_tab)
-        self.mybatis_fifth_blank.setObjectName("mybatis_fifth_blank")
-        self.mybatis_fifth_blank.setText("")
-        self.verticalLayout_3.addWidget(self.mybatis_fifth_blank)
 
     def setup_spring_tab_ui(self):
         """
@@ -238,7 +239,7 @@ class PathGeneratorUI:
         self.service.setObjectName("service")
         self.service_lineEdit = QtWidgets.QLineEdit(self.splitter_service)
         self.service_lineEdit.setObjectName("service_lineEdit")
-        self.service_lineEdit.setFixedWidth(500)
+        self.service_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.service_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service)
@@ -254,7 +255,7 @@ class PathGeneratorUI:
         self.service_impl.setObjectName("service_impl")
         self.service_impl_lineEdit = QtWidgets.QLineEdit(self.splitter_service_impl)
         self.service_impl_lineEdit.setObjectName("service_impl_lineEdit")
-        self.service_impl_lineEdit.setFixedWidth(500)
+        self.service_impl_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.service_impl_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_service_impl)
@@ -270,7 +271,7 @@ class PathGeneratorUI:
         self.controller.setObjectName("controller")
         self.controller_lineEdit = QtWidgets.QLineEdit(self.splitter_controller)
         self.controller_lineEdit.setObjectName("controller_lineEdit")
-        self.controller_lineEdit.setFixedWidth(500)
+        self.controller_lineEdit.setFixedWidth(self.line_edit_width)
         # 初始不可用
         self.controller_lineEdit.setDisabled(True)
         self.verticalLayout_4.addWidget(self.splitter_controller)
@@ -298,6 +299,7 @@ class PathGeneratorUI:
         """
         self.mybatis_title.setText(
             self._translate("Dialog", set_title_font(MYBATIS_TITLE)))
+        self.mybatis_desc.setWordWrap(True)
         self.mybatis_desc.setText(self._translate("Dialog", MYBATIS_PATH_GENERATOR_DESC))
         self.lombok.setText(self._translate("Dialog", set_label_font(IS_LOMBOK)))
         self.lombok_comboBox.setItemText(0, self._translate("Dialog", "True"))

@@ -17,14 +17,14 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
 from src.dialog.conn_dialog import test_connection
 from src.func.connection_function import open_connection, close_connection
-from src.sys.settings.font import set_font
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
+from src.func.selected_data import SelectedData
+from src.func.table_func import fill_table, change_table_checkbox, close_table, add_table, check_table_opened
+from src.func.tree_function import make_tree_item, show_conn_dialog
 from src.little_widget.menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.little_widget.message_box import pop_question
-from src.func.selected_data import SelectedData
+from src.sys.settings.font import set_font
 from src.sys.sys_info_storage.sqlite import delete_conn
-from src.func.table_func import fill_table, change_table_checkbox, close_table, add_table, check_table_opened
-from src.func.tree_function import make_tree_item, add_conn_func, show_conn_dialog
 
 _author_ = 'luwt'
 _date_ = '2020/6/23 16:21'
@@ -147,7 +147,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             test_connection(gui.display_conn_dict.get(conn_id))
         # 添加连接
         elif func == ADD_CONN_MENU:
-            add_conn_func(gui)
+            gui.add_conn()
         # 编辑连接
         elif func == EDIT_CONN_MENU:
             self.edit_conn(func, gui, conn_name, conn_id, item)

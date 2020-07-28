@@ -8,25 +8,25 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt5.QtWidgets import QApplication
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
-from src.sys.settings.font import set_font, set_label_font
-from src.little_widget.menu_bar_func import fill_menu_bar
-from src.little_widget.message_box import pop_fail
 from src.func.selected_data import SelectedData
-from src.sys.sys_info_storage.sqlite import get_conns
 from src.func.table_func import on_cell_changed
-from src.little_widget.tool_bar import fill_tool_bar
 from src.func.tree_function import make_tree_item, add_conn_func
 from src.func.tree_strategy import tree_node_factory, Context
+from src.little_widget.menu_bar_func import fill_menu_bar
+from src.little_widget.message_box import pop_fail
+from src.little_widget.tool_bar import fill_tool_bar
+from src.sys.settings.font import set_font, set_label_font
+from src.sys.sys_info_storage.sqlite import get_conns
 
 
 class MainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self):
+    def __init__(self, screen_rect):
         super().__init__()
         # 已经连接数据库的连接，key为连接名，value为DBExecutor对象
         self.connected_dict = dict()
@@ -36,12 +36,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.display_conn_dict = dict()
         self.dbs = list()
         self.tables = list()
+        # 当前屏幕的分辨率大小
+        self.desktop_screen_rect = screen_rect
 
         self.setup_ui()
 
     def setup_ui(self):
         self.setObjectName("MainWindow")
-        self.resize(1123, 896)
+        # 按当前分辨率计算窗口大小
+        self.resize(self.desktop_screen_rect.width() * 0.6, self.desktop_screen_rect.height() * 0.75)
+        # 当前窗口的分辨率大小，其他窗口以此为参考
+        self.screen_rect = self.geometry()
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -208,12 +213,12 @@ class MainWindow(QtWidgets.QMainWindow):
         Context(node).handle_menu_func(item, func, self)
 
     def add_conn(self):
-        add_conn_func(self)
+        add_conn_func(self, self.screen_rect)
 
     def generate(self):
         selected_data = SelectedData().conn_dict
         if selected_data:
-            generate_dialog = DisplaySelectedDialog(self, selected_data)
+            generate_dialog = DisplaySelectedDialog(self, selected_data, self.screen_rect)
             generate_dialog.exec()
         else:
             pop_fail(WRONG_TITLE, WRONG_UNSELECT_DATA)

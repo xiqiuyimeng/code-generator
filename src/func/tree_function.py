@@ -31,24 +31,26 @@ def make_tree_item(gui, parent, name, item_id=None, checkbox=None):
         gui.update_tree_item_name(item, str(checkbox), 2)
 
 
-def add_conn_func(gui):
+def add_conn_func(gui, screen_rect):
     """
     添加连接，打开弹窗，接收输入，保存系统库
     :param gui: 启动的主窗口界面对象
+    :param screen_rect: 主窗口大小
     """
     conn_info = Connection(None, None, None, None, None, None)
-    show_conn_dialog(gui, conn_info, ADD_CONN_MENU)
+    show_conn_dialog(gui, conn_info, ADD_CONN_MENU, screen_rect)
 
 
-def show_conn_dialog(gui, conn_info, title):
+def show_conn_dialog(gui, conn_info, title, screen_rect):
     """
     打开添加、编辑连接子窗口
     :param gui: 启动的主窗口界面对象
     :param conn_info: Connection对象，若该对象有id值，则认为操作为编辑操作，
         将在弹窗界面回显数据，若无数据，则为添加操作
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
+    :param screen_rect: 主窗口大小
     """
-    dialog = ConnDialog(conn_info, title, gui)
+    dialog = ConnDialog(conn_info, title, gui, screen_rect)
     if title == ADD_CONN_MENU:
         dialog.conn_signal.connect(add_conn_tree_item)
     elif title == EDIT_CONN_MENU:
