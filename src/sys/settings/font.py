@@ -15,11 +15,16 @@ def set_font():
 
 def set_title_font(title):
     return "<html><head/><body><p align=\"center\"><span " \
-           "style=\" font-size:20pt; font-weight:600;\">" \
+           "style=\" font-size:20pt; font-weight:600;font-family:楷体;\">" \
            f"{title}</span></p></body></html>"
 
 
 def set_label_font(text):
     return "<html><span style=\" font-size:15pt; " \
-           f"font-weight:600;\">{text}</span></html>"
+           f"font-weight:600;font-family:楷体;\">{text}</span></html>"
+
+
+def set_desc_font(text):
+    return "<html><span style=\" font-size:13pt; " \
+           f"font-family:楷体;\">{text}</span></html>"
 

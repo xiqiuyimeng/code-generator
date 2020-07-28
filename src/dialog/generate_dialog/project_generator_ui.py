@@ -16,7 +16,7 @@ from src.func.project_generator_input import JavaInputHandler, JavaSrcInputHandl
     MapperInputHandler, XmlInputHandler, ServiceInputHandler, ServiceImplInputHandler, ControllerInputHandler, \
     clear_current_param, check_params
 from src.little_widget.message_box import pop_warning
-from src.sys.settings.font import set_label_font, set_title_font, set_font
+from src.sys.settings.font import set_label_font, set_title_font, set_font, set_desc_font
 
 _author_ = 'luwt'
 _date_ = '2020/7/18 11:47'
@@ -111,8 +111,10 @@ class ProjectGeneratorUI:
         self.mybatis_scrollArea = QScrollArea(self.mybatis_tab)
         self.mybatis_scrollArea.setWidgetResizable(True)
         self.mybatis_scrollArea.setObjectName("mybatis_scrollArea")
+        self.mybatis_scrollArea.setStyleSheet('#mybatis_scrollArea{border-style:solid;border-radius:25px;background-color:LightYellow;}')
         self.mybatis_scroll_widget = QtWidgets.QWidget()
         self.mybatis_scroll_widget.setObjectName("mybatis_scroll_widget")
+        self.mybatis_scroll_widget.setStyleSheet('#mybatis_scroll_widget{border-style:solid;border-radius:25px;background-color:LightYellow;}')
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_scroll_widget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.mybatis_title = QtWidgets.QLabel(self.mybatis_scroll_widget)
@@ -374,27 +376,27 @@ class ProjectGeneratorUI:
         self.mybatis_title.setText(
             self._translate("Dialog", set_title_font(MYBATIS_TITLE)))
         self.mybatis_desc.setWordWrap(True)
-        self.mybatis_desc.setText(self._translate("Dialog", MYBATIS_GENERATOR_DESC))
+        self.mybatis_desc.setText(self._translate("Dialog", set_desc_font(MYBATIS_GENERATOR_DESC)))
         self.lombok.setText(self._translate("Dialog", set_label_font(IS_LOMBOK)))
         self.lombok_comboBox.setItemText(0, self._translate("Dialog", "True"))
         self.lombok_comboBox.setItemText(1, self._translate("Dialog", "False"))
         self.lombok_desc.setWordWrap(True)
-        self.lombok_desc.setText(self._translate("Dialog", LOMBOK_DESC))
+        self.lombok_desc.setText(self._translate("Dialog", set_desc_font(LOMBOK_DESC)))
         self.java.setText(self._translate("Dialog", set_label_font(JAVA_PATH)))
         self.java_desc.setWordWrap(True)
-        self.java_desc.setText(self._translate("Dialog", JAVA_PATH_DESC))
+        self.java_desc.setText(self._translate("Dialog", set_desc_font(JAVA_PATH_DESC)))
         self.java_src.setText(self._translate("Dialog", set_label_font(JAVA_SRC_PATH)))
         self.java_src_desc.setWordWrap(True)
-        self.java_src_desc.setText(self._translate("Dialog", JAVA_SRC_PATH_DESC))
+        self.java_src_desc.setText(self._translate("Dialog", set_desc_font(JAVA_SRC_PATH_DESC)))
         self.model.setText(self._translate("Dialog", set_label_font(MODEL_PACKAGE)))
         self.model_desc.setWordWrap(True)
-        self.model_desc.setText(self._translate("Dialog", MODEL_PACKAGE_DESC))
+        self.model_desc.setText(self._translate("Dialog", set_desc_font(MODEL_PACKAGE_DESC)))
         self.mapper.setText(self._translate("Dialog", set_label_font(MAPPER_PACKAGE)))
         self.mapper_desc.setWordWrap(True)
-        self.mapper_desc.setText(self._translate("Dialog", MAPPER_PACKAGE_DESC))
+        self.mapper_desc.setText(self._translate("Dialog", set_desc_font(MAPPER_PACKAGE_DESC)))
         self.xml.setText(self._translate("Dialog", set_label_font(XML_PATH)))
         self.xml_desc.setWordWrap(True)
-        self.xml_desc.setText(self._translate("Dialog", XML_PATH_DESC))
+        self.xml_desc.setText(self._translate("Dialog", set_desc_font(XML_PATH_DESC)))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.mybatis_tab),
                                           self._translate("Dialog", MYBATIS_TAB_TITLE))
         self.spring_title.setText(
