@@ -18,7 +18,10 @@ if __name__ == "__main__":
     # 显示启动界面
     splash.show()
     QtWidgets.qApp.processEvents()
-    ui = MainWindow()
+    # 获取当前屏幕分辨率
+    desktop = QtWidgets.QApplication.desktop()
+    screen_rect = desktop.screenGeometry()
+    ui = MainWindow(screen_rect)
     ui.show()
     splash.finish(ui)
     app.exec_()

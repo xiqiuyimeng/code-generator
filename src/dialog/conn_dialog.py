@@ -26,7 +26,7 @@ class ConnDialog(QDialog):
 
     conn_signal = QtCore.pyqtSignal(object, Connection)
 
-    def __init__(self, connection, dialog_title, gui):
+    def __init__(self, connection, dialog_title, gui, screen_rect):
         super().__init__()
         # 只是为了维护一个主窗口对象，方便其他操作
         self.gui_parent = gui
@@ -34,12 +34,13 @@ class ConnDialog(QDialog):
         self.dialog_title = dialog_title
         self.connection = connection
         self._translate = QtCore.QCoreApplication.translate
+        self.main_screen_rect = screen_rect
         self.setup_ui()
 
     def setup_ui(self):
         self.dialog.setObjectName("Dialog")
-        # 固定大小
-        self.dialog.setFixedSize(400, 350)
+        # 当前窗口大小根据主窗口大小计算
+        self.dialog.resize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
         # 字体
         self.setFont(set_font())
         # 不透明度

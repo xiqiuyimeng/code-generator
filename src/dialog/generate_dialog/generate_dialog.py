@@ -24,20 +24,22 @@ from src.sys.settings.font import set_font
 
 class DisplaySelectedDialog(QDialog):
 
-    def __init__(self, gui, selected_data):
+    def __init__(self, gui, selected_data, screen_rect):
         super().__init__()
         # 维护主界面窗口对象
         self.gui = gui
         # 选中的数据，以此来渲染树
         self.selected_data = selected_data
         self._translate = _translate = QtCore.QCoreApplication.translate
+        self.main_screen_rect = screen_rect
         self.setup_ui()
 
     def setup_ui(self):
         self.setObjectName("Dialog")
-        # 固定大小，不允许缩放
-        self.setFixedSize(1000, 800)
-
+        # 当前窗口大小根据主窗口大小计算
+        self.setFixedSize(self.main_screen_rect.width() * 0.8, self.main_screen_rect.height() * 0.8)
+        # 获取当前窗口大小
+        self.screen_rect = self.geometry()
         self.verticalLayout_frame = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_frame.setObjectName("verticalLayout_frame")
         self.frame = QtWidgets.QFrame(self)
@@ -87,7 +89,7 @@ class DisplaySelectedDialog(QDialog):
             self.verticalLayout.addWidget(self.path_generator_widget)
 
     def generate(self, output_dict):
-        dialog = GenerateResultDialog(self.gui, output_dict, self.selected_data)
+        dialog = GenerateResultDialog(self.gui, output_dict, self.selected_data, self.screen_rect)
         dialog.close_parent_signal.connect(self.close)
         dialog.exec()
 

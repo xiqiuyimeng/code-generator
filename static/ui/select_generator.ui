@@ -29,12 +29,18 @@
            <height>541</height>
           </size>
          </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
          <attribute name="title">
           <string>Tab 1</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QFrame" name="frame">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -112,37 +118,12 @@
                 </property>
                </widget>
                <widget class="QLineEdit" name="java_path_value"/>
-               <widget class="QPushButton" name="java_button">
-                <property name="text">
-                 <string>PushButton</string>
-                </property>
-               </widget>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="java_path_desc">
                <property name="text">
                 <string>java项目地址解释</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSplitter" name="java_src_splitter">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <widget class="QLabel" name="java_src_relative">
-                <property name="text">
-                 <string>Java项目源码包地址</string>
-                </property>
-               </widget>
-               <widget class="QLineEdit" name="java_src_relative_value"/>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="java_src_desc">
-               <property name="text">
-                <string>java项目源码报地址解释</string>
                </property>
               </widget>
              </item>
@@ -186,27 +167,14 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QSplitter" name="xml_splitter">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <widget class="QLabel" name="xml_path">
-                <property name="text">
-                 <string>mybatis xml文件地址</string>
-                </property>
-               </widget>
-               <widget class="QLineEdit" name="xml_path_value"/>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="xml_desc">
-               <property name="text">
-                <string>mybatisxml文件地址解释</string>
-               </property>
-              </widget>
-             </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QScrollBar" name="verticalScrollBar">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
            </widget>
           </item>
          </layout>
@@ -357,6 +325,9 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QDialogButtonBox" name="buttonBox_2">
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
       <property name="standardButtons">
        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
       </property>
