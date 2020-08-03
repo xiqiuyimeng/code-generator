@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QTreeWidgetItem
 
 from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, \
     EXPAND_BUTTON, PATH_GENERATOR_BUTTON
-from src.sys.settings.font import set_font, set_label_font
+from src.sys.settings.font import set_font
 
 _author_ = 'luwt'
 _date_ = '2020/7/23 15:51'
@@ -33,10 +33,9 @@ class TreeWidgetUI:
         self.treeWidget.setObjectName("treeWidget")
         # 树控件背景透明
         self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.treeWidget.setStyleSheet("#treeWidget{border-style:solid;border-radius:25px;background-color:LightYellow;}")
 
         # 字体
-        self.treeWidget.setFont(set_font())
+        # self.treeWidget.setFont(set_font())
         self.verticalLayout_2.addWidget(self.treeWidget)
 
         self.first_splitter = QtWidgets.QSplitter(self.widget)
@@ -83,8 +82,8 @@ class TreeWidgetUI:
     def retranslateUi(self):
         self.parent.setWindowTitle(self._translate("Dialog", "Dialog"))
         self.treeWidget.headerItem().setHidden(True)
-        self.tree_header_label.setFont(set_font())
-        self.tree_header_label.setText(self._translate("Dialog", set_label_font(CONFIRM_TREE_HEADER_LABELS)))
+        # self.tree_header_label.setFont(set_font())
+        self.tree_header_label.setText(CONFIRM_TREE_HEADER_LABELS)
         self.expand_collapse_button = self.first_buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
         self.parent.expand_collapse_button = self.expand_collapse_button
         self.expand_collapse_button.setText(COLLAPSE_BUTTON)

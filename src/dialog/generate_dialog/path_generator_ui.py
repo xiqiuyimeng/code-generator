@@ -18,7 +18,7 @@ from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE
     OUTPUT_PATH_DESC
 from src.func.path_generator_input import OutputPathInputHandler, clear_current_param, ModelPathInputHandler, \
     MapperPathInputHandler, ServicePathInputHandler, ServiceImplPathInputHandler, ControllerPathInputHandler
-from src.sys.settings.font import set_title_font, set_label_font, set_font
+from src.sys.settings.font import set_font
 
 
 class PathGeneratorUI:
@@ -51,10 +51,8 @@ class PathGeneratorUI:
         self.tabWidget.addTab(self.mybatis_tab, "")
         self.tabWidget.addTab(self.spring_tab, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
-        self.tabWidget.setFont(set_font())
 
         self.tabWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.tabWidget.setStyleSheet("QTabWidget:pane{border-style:solid;border-radius:25px;background-color:LightYellow;}")
         # 按钮部分
         self.splitter = QtWidgets.QSplitter(self.widget)
         # 分隔线隐藏
@@ -96,7 +94,6 @@ class PathGeneratorUI:
         :return:
         """
         self.mybatis_tab = QtWidgets.QWidget()
-        self.mybatis_tab.setFont(set_font())
         self.mybatis_tab.setObjectName("mybatis_tab")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_tab)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -200,7 +197,6 @@ class PathGeneratorUI:
         :return:
         """
         self.spring_tab = QtWidgets.QWidget()
-        self.spring_tab.setFont(set_font())
         self.spring_tab.setObjectName("spring_tab")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.spring_tab)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
@@ -297,31 +293,29 @@ class PathGeneratorUI:
         对界面上的文字样式控制
         :param self: 弹窗确认生成器配置页的主窗口对象
         """
-        self.mybatis_title.setText(
-            self._translate("Dialog", set_title_font(MYBATIS_TITLE)))
+        self.mybatis_title.setText(MYBATIS_TITLE)
         self.mybatis_desc.setWordWrap(True)
-        self.mybatis_desc.setText(self._translate("Dialog", MYBATIS_PATH_GENERATOR_DESC))
-        self.lombok.setText(self._translate("Dialog", set_label_font(IS_LOMBOK)))
-        self.lombok_comboBox.setItemText(0, self._translate("Dialog", "True"))
-        self.lombok_comboBox.setItemText(1, self._translate("Dialog", "False"))
-        self.lombok_desc.setText(self._translate("Dialog", LOMBOK_DESC))
-        self.output.setText(self._translate("Dialog", set_label_font(OUTPUT_PATH)))
-        self.output_desc.setText(self._translate("Dialog", OUTPUT_PATH_DESC))
-        self.model.setText(self._translate("Dialog", set_label_font(MODEL_PACKAGE)))
-        self.model_desc.setText(self._translate("Dialog", MODEL_PACKAGE_DESC))
-        self.mapper.setText(self._translate("Dialog", set_label_font(MAPPER_PACKAGE)))
-        self.mapper_desc.setText(self._translate("Dialog", MAPPER_PACKAGE_DESC))
+        self.mybatis_desc.setText(MYBATIS_PATH_GENERATOR_DESC)
+        self.lombok.setText(IS_LOMBOK)
+        self.lombok_comboBox.setItemText(0, "True")
+        self.lombok_comboBox.setItemText(1, "False")
+        self.lombok_desc.setText(LOMBOK_DESC)
+        self.output.setText(OUTPUT_PATH)
+        self.output_desc.setText(OUTPUT_PATH_DESC)
+        self.model.setText(MODEL_PACKAGE)
+        self.model_desc.setText(MODEL_PACKAGE_DESC)
+        self.mapper.setText(MAPPER_PACKAGE)
+        self.mapper_desc.setText(MAPPER_PACKAGE_DESC)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.mybatis_tab),
                                           self._translate("Dialog", MYBATIS_TAB_TITLE))
-        self.spring_title.setText(
-            self._translate("Dialog", set_title_font(SPRING_TITLE)))
-        self.spring_desc.setText(self._translate("Dialog", SPRING_GENERATOR_DESC))
-        self.service.setText(self._translate("Dialog", set_label_font(SERVICE_PACKAGE)))
-        self.service_desc.setText(self._translate("Dialog", SERVICE_PACKAGE_DESC))
-        self.service_impl.setText(self._translate("Dialog", set_label_font(SERVICE_IMPL_PACKAGE)))
-        self.service_impl_desc.setText(self._translate("Dialog", SERVICE_IMPL_PACKAGE_DESC))
-        self.controller.setText(self._translate("Dialog", set_label_font(CONTROLLER_PACKAGE)))
-        self.controller_desc.setText(self._translate("Dialog", CONTROLLER_PACKAGE_DESC))
+        self.spring_title.setText(SPRING_TITLE)
+        self.spring_desc.setText(SPRING_GENERATOR_DESC)
+        self.service.setText(SERVICE_PACKAGE)
+        self.service_desc.setText(SERVICE_PACKAGE_DESC)
+        self.service_impl.setText(SERVICE_IMPL_PACKAGE)
+        self.service_impl_desc.setText(SERVICE_IMPL_PACKAGE_DESC)
+        self.controller.setText(CONTROLLER_PACKAGE)
+        self.controller_desc.setText(CONTROLLER_PACKAGE_DESC)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.spring_tab),
                                           self._translate("Dialog", SPRING_TAB_TITLE))
         # 按钮

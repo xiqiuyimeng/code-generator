@@ -16,6 +16,7 @@ _date_ = '2020/7/2 16:17'
 
 
 def add_table(gui):
+    """添加表格"""
     gui.table_frame = QtWidgets.QFrame(gui.centralwidget)
     gui.table_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
     gui.table_frame.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -25,7 +26,7 @@ def add_table(gui):
     gui.table_header_label = QtWidgets.QLabel(gui.table_frame)
     gui.table_header_label.setObjectName("table_header_label")
     gui.table_verticalLayout.addWidget(gui.table_header_label)
-    """添加表格"""
+
     gui.tableWidget = QtWidgets.QTableWidget(gui.table_frame)
     gui.tableWidget.setObjectName("tableWidget")
     # 在布局中添加表格
@@ -35,8 +36,6 @@ def add_table(gui):
     gui.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
     # 交替行颜色
     gui.tableWidget.setAlternatingRowColors(True)
-    # 表格控件样式
-    gui.tableWidget.setStyleSheet("#tableWidget{background-color:LightGreen;border-style:solid;}")
     # 创建表格列标题，共四列
     make_table_header(gui)
 

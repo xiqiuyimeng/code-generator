@@ -29,7 +29,6 @@ class GenerateResultDialog(QDialog):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setFont(set_font())
         self.setObjectName("Dialog")
         # 当前窗口大小根据父窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.6)
@@ -45,7 +44,7 @@ class GenerateResultDialog(QDialog):
         self.label_blank.setText("")
         self.verticalLayout.addWidget(self.label_blank)
         self.label = QtWidgets.QLabel(self.frame)
-        self.label.setObjectName("label")
+        self.label.setObjectName("title")
         self.verticalLayout.addWidget(self.label)
         self.progressBar = QtWidgets.QProgressBar(self.frame)
         self.progressBar.setObjectName("progressBar")
@@ -70,7 +69,9 @@ class GenerateResultDialog(QDialog):
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         # 样式
-        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:Gainsboro;}")
+        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:Gainsboro;}"
+                           "QLabel,QProgressBar,QTextBrowser{font-size:18px;font-family:楷体;}"
+                           "#title{font-size:20px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}")
 
         # 创建并启用子线程
         self.thread_1 = Worker(self.gui, self.output_config_dict, self.selected_data)
@@ -95,7 +96,7 @@ class GenerateResultDialog(QDialog):
 
     def retranslateUi(self):
         self.setWindowTitle(self._translate("Dialog", "Dialog"))
-        self.label.setText(self._translate("Dialog", set_title_font("完成进度")))
+        self.label.setText("完成进度")
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText("确定")
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setFont(set_font())
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText("返回配置页")

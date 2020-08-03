@@ -9,7 +9,6 @@
 from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QToolTip
 
 from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MENU, ADD_CONN_MENU, EDIT_CONN_MENU, \
     DEL_CONN_MENU, CLOSE_CONN_PROMPT, EDIT_CONN_WITH_FIELD_PROMPT, EDIT_CONN_PROMPT, DEL_CONN_WITH_FIELD_PROMPT, \
@@ -23,7 +22,6 @@ from src.func.table_func import fill_table, change_table_checkbox, close_table, 
 from src.func.tree_function import make_tree_item, show_conn_dialog
 from src.little_widget.menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.little_widget.message_box import pop_question
-from src.sys.settings.font import set_font
 from src.sys.sys_info_storage.sqlite import delete_conn
 
 _author_ = 'luwt'
@@ -393,7 +391,6 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         # 状态栏提示
         gui.statusbar.showMessage(f"当前展示的表为：{item.text(0)}")
         # 设置气泡提示
-        QToolTip.setFont(set_font())
         gui.tableWidget.setToolTip(f'当前表为{tb_name}')
 
     def close_item(self, item, gui):

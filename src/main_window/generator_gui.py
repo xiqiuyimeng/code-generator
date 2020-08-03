@@ -8,7 +8,6 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
@@ -20,7 +19,6 @@ from src.func.tree_strategy import tree_node_factory, Context
 from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
 from src.little_widget.tool_bar import fill_tool_bar
-from src.sys.settings.font import set_font, set_label_font
 from src.sys.sys_info_storage.sqlite import get_conns
 
 
@@ -28,6 +26,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, screen_rect):
         super().__init__()
+        self.setStyleSheet("#MainWindow,#treeWidget{background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
+                           "stop:0 LightGreen,stop:1 LimeGreen);border-style:solid;}"
+                           "#treeWidget{font-size:18px;font-family:楷体;}"
+                           "#file_menu{background-color:LightGreen}"
+                           "#menubar{border-style:solid}"
+                           "#toolBar{border-style:solid}"
+                           "#tableWidget{background-color:LightGreen;border-style:solid;}"
+                           "#tree_header_label,#table_header_label{font-size:20px;font-family:楷体;font-weight:500;}"
+                           "QToolTip{font-size:18px;font-family:楷体;}")
         # 已经连接数据库的连接，key为连接名，value为DBExecutor对象
         self.connected_dict = dict()
         self._translate = QtCore.QCoreApplication.translate
@@ -62,9 +69,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tree_verticalLayout.addWidget(self.tree_header_label)
         self.treeWidget = QtWidgets.QTreeWidget(self.tree_frame)
 
-        # 树结构的字体设置
-        self.treeWidget.setFont(set_font())
-
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setHidden(True)
         self.tree_verticalLayout.addWidget(self.treeWidget)
@@ -75,9 +79,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setObjectName("menubar")
         fill_menu_bar(self)
-        self.file_menu.setStyleSheet('#file_menu{background-color:LightGreen}')
         self.setMenuBar(self.menubar)
-        self.menubar.setStyleSheet('#menubar{border-style:solid}')
 
         # 工具栏
         self.toolBar = QtWidgets.QToolBar(self)
@@ -86,7 +88,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置名称显示在图标下面（默认本来是只显示图标）
         fill_tool_bar(self)
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.toolBar.setStyleSheet('#toolBar{border-style:solid}')
 
         # 状态栏
         self.statusbar = QtWidgets.QStatusBar(self)
@@ -105,7 +106,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)
         # 树控件背景透明
         self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet("#MainWindow,#treeWidget{background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 LightGreen,stop:1 LimeGreen);;border-style:solid;}")
         # 不透明度
         self.setWindowOpacity(0.93)
 
@@ -120,12 +120,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.set_tree_header_label()
 
     def set_tree_header_label(self):
-        self.tree_header_label.setFont(set_font())
-        self.tree_header_label.setText(self._translate("MainWindow", set_label_font(TREE_HEADER_LABELS)))
+        self.tree_header_label.setText(TREE_HEADER_LABELS)
 
     def set_table_header_label(self, text):
-        self.table_header_label.setFont(set_font())
-        self.table_header_label.setText(self._translate("MainWindow", set_label_font(f"当前展示表为：{text}")))
+        self.table_header_label.setText(f"当前展示表为：{text}")
 
     def get_saved_conns(self):
         """获取所有已存储的连接，生成页面树结构第一层"""

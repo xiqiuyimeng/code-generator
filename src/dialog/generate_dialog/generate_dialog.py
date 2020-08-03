@@ -19,7 +19,6 @@ from src.dialog.generate_dialog.confirm_selected_tree_ui import TreeWidgetUI
 from src.dialog.generate_dialog.path_generator_ui import PathGeneratorUI
 from src.dialog.generate_dialog.project_generator_ui import ProjectGeneratorUI
 from src.dialog.generate_result_dialog import GenerateResultDialog
-from src.sys.settings.font import set_font
 
 
 class DisplaySelectedDialog(QDialog):
@@ -46,8 +45,6 @@ class DisplaySelectedDialog(QDialog):
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
-        # 设置字体
-        self.setFont(set_font())
         # 建立布局
         self.verticalLayout = QtWidgets.QVBoxLayout(self.frame)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -63,7 +60,17 @@ class DisplaySelectedDialog(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet("#frame{border-style:solid;border-radius:25px;background-color:LightYellow;}")
+        self.setStyleSheet("#frame{border-style:solid;border-radius:25px;background-color:LightYellow;}"
+                           "#treeWidget{border-style:solid;border-radius:25px;background-color:LightYellow;font-size:16px;font-family:楷体}"
+                           "#tree_header_label{font-size:20px;font-family:楷体;font-weight:500;}"
+                           "QTabWidget:pane{border-style:solid;border-radius:25px;background-color:LightYellow;}"
+                           "#mybatis_scrollArea{border-style:solid;border-radius:25px;background-color:LightYellow;}"
+                           "#mybatis_scroll_widget{border-style:solid;border-radius:25px;background-color:LightYellow;}"
+                           "#tabWidget{font-size:18px;font-family:楷体;}"
+                           "QLabel,QComboBox,QLineEdit{font-size:16px;font-family:楷体;}"
+                           "QPushButton{font-size:16px;font-family:楷体;}"
+                           "#lombok,#java,#java_src,#model,#mapper,#xml,#service,#service_impl,#controller,#output{font-size:18px;font-family:楷体;font-weight:500}"
+                           "#mybatis_title,#spring_title{font-size:25px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}")
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def select_project_generator(self):

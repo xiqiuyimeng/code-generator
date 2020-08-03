@@ -17,7 +17,6 @@ from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
     SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS
 from src.func.connection_function import test_connection
 from src.little_widget.message_box import pop_ok, pop_fail
-from src.sys.settings.font import set_font, set_title_font
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
 
@@ -42,7 +41,9 @@ class ConnDialog(QDialog):
         # 当前窗口大小根据主窗口大小计算
         self.dialog.resize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
         # 字体
-        self.setFont(set_font())
+        self.setStyleSheet("#title{font-size:30px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}"
+                           "QLabel,QLineEdit{font-size:18px;font-family:楷体;}"
+                           "#frame{border-style:solid;border-radius:25px;background-color:Gainsboro;}")
         # 不透明度
         self.setWindowOpacity(0.95)
         # 隐藏窗口边框
@@ -129,8 +130,6 @@ class ConnDialog(QDialog):
         self.horizontalLayout.addWidget(self.buttonBox)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout_frame.addWidget(self.frame)
-        # 样式
-        self.setStyleSheet("#frame{border-style:solid;border-radius:25px;background-color:Gainsboro;}")
         # 设置tab键的顺序
         self.dialog.setTabOrder(self.conn_name_value, self.host_value)
         self.dialog.setTabOrder(self.host_value, self.port_value)
@@ -159,12 +158,12 @@ class ConnDialog(QDialog):
         QtCore.QMetaObject.connectSlotsByName(self.dialog)
 
     def retranslateUi(self):
-        self.title.setText(self._translate("Dialog", set_title_font(self.dialog_title)))
-        self.conn_name.setText(self._translate("Dialog", "连接名："))
-        self.host.setText(self._translate("Dialog", "主机："))
-        self.port.setText(self._translate("Dialog", "端口号："))
-        self.user.setText(self._translate("Dialog", "用户名："))
-        self.passwd.setText(self._translate("Dialog", "密码："))
+        self.title.setText(self.dialog_title)
+        self.conn_name.setText("连接名：")
+        self.host.setText("主机：")
+        self.port.setText("端口号：")
+        self.user.setText("用户名：")
+        self.passwd.setText("密码：")
         # 按钮
         self.test_conn.setText(self._translate("Dialog", "测试连接"))
         self.ok.setText(self._translate("Dialog", "确定"))
