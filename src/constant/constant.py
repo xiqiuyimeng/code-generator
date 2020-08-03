@@ -168,14 +168,14 @@ CONFIRM_TREE_HEADER_LABELS = '已选择的表字段列表'
 MYBATIS_TAB_TITLE = 'mybatis生成器'
 # mybatis页面标题
 MYBATIS_TITLE = 'mybatis生成器输出配置'
-MYBATIS_GENERATOR_DESC = 'mybatis生成器：根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
+MYBATIS_GENERATOR_DESC = '根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
                          'mapper接口文件，xml文件。\n1. 默认增加了列表查询语句。' \
                          '\n2. 可根据配置决定是否生成set和get方法，默认不生成，生成@Data注解。'\
                          '\n3. 当前支持整表生成，也支持选择部分表字段生成，需要注意的是，' \
                          '部分选择字段时，仅生成当前的Java实体类中需要新增的类属性代码' \
                          '及xml文件中需要新增的代码，例如resultMap与插入更新代码块。' \
                          '\n4. 以下参数皆为必填项，填写Java项目地址后，将开启其他项，生成器会直接将文件生成到您指定的项目目录中。'
-MYBATIS_PATH_GENERATOR_DESC = 'mybatis生成器：根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
+MYBATIS_PATH_GENERATOR_DESC = '根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
                          'mapper接口文件，xml文件。\n1. 默认增加了列表查询语句。' \
                          '\n2. 可根据配置决定是否生成set和get方法，默认不生成，生成@Data注解。'\
                          '\n3. 当前支持整表生成，也支持选择部分表字段生成，需要注意的是，' \
@@ -204,7 +204,7 @@ XML_PATH_DESC = 'xml输出路径：您希望输出的mybatis xml文件存放路�
 SPRING_TAB_TITLE = 'spring生成器'
 # spring页面标题
 SPRING_TITLE = 'spring 生成器输出配置'
-SPRING_GENERATOR_DESC = 'spring生成器：对于mybatis生成器进行扩展，可以生成相应的service、serviceImpl、controller类。' \
+SPRING_GENERATOR_DESC = '对于mybatis生成器进行扩展，可以生成相应的service、serviceImpl、controller类。' \
                         '\n1. 当前仅支持整表选择生成，字段部分选择情况暂不支持。' \
                         '因为部分选择字段意味着您的项目中已经存在了这些代码，' \
                         '\n\b\b再次生成将会覆盖，带来不必要的麻烦。' \
@@ -216,5 +216,5 @@ SERVICE_PACKAGE_DESC = 'service接口包名：您希望输出的service接口文
 SERVICE_IMPL_PACKAGE = 'service实现类包名'
 SERVICE_IMPL_PACKAGE_DESC = 'service实现类包名：您希望输出的service实现类的包名，例如：com.demo.service.impl'
 CONTROLLER_PACKAGE = 'controller类包名'
-CONTROLLER_PACKAGE_DESC = 'controller类包名：您希望输出的controller文件的包名，例如：com.demo.controller' \
+CONTROLLER_PACKAGE_DESC = 'controller类包名：您希望输出的controller文件的包名，例如：com.demo.controller'
 

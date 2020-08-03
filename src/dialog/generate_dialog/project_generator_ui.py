@@ -16,7 +16,7 @@ from src.func.project_generator_input import JavaInputHandler, JavaSrcInputHandl
     MapperInputHandler, XmlInputHandler, ServiceInputHandler, ServiceImplInputHandler, ControllerInputHandler, \
     clear_current_param, check_params
 from src.little_widget.message_box import pop_warning
-from src.sys.settings.font import set_label_font, set_title_font, set_font, set_desc_font
+from src.sys.settings.font import set_font
 
 _author_ = 'luwt'
 _date_ = '2020/7/18 11:47'
@@ -52,10 +52,8 @@ class ProjectGeneratorUI:
         self.tabWidget.addTab(self.mybatis_tab, "")
         self.tabWidget.addTab(self.spring_tab, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
-        self.tabWidget.setFont(set_font())
 
         self.tabWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.tabWidget.setStyleSheet("QTabWidget:pane{border-style:solid;border-radius:25px;background-color:LightYellow;}")
         # 按钮部分
         self.splitter = QtWidgets.QSplitter(self.widget)
         # 分隔线隐藏
@@ -104,17 +102,14 @@ class ProjectGeneratorUI:
         构建mybatis生成器配置标签页
         """
         self.mybatis_tab = QtWidgets.QWidget()
-        self.mybatis_tab.setFont(set_font())
         self.mybatis_tab.setObjectName("mybatis_tab")
         self.verticalLayout_scroll = QtWidgets.QVBoxLayout(self.mybatis_tab)
         self.verticalLayout_scroll.setObjectName("verticalLayout_scroll")
         self.mybatis_scrollArea = QScrollArea(self.mybatis_tab)
         self.mybatis_scrollArea.setWidgetResizable(True)
         self.mybatis_scrollArea.setObjectName("mybatis_scrollArea")
-        self.mybatis_scrollArea.setStyleSheet('#mybatis_scrollArea{border-style:solid;border-radius:25px;background-color:LightYellow;}')
         self.mybatis_scroll_widget = QtWidgets.QWidget()
         self.mybatis_scroll_widget.setObjectName("mybatis_scroll_widget")
-        self.mybatis_scroll_widget.setStyleSheet('#mybatis_scroll_widget{border-style:solid;border-radius:25px;background-color:LightYellow;}')
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.mybatis_scroll_widget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.mybatis_title = QtWidgets.QLabel(self.mybatis_scroll_widget)
@@ -261,7 +256,6 @@ class ProjectGeneratorUI:
         :return:
         """
         self.spring_tab = QtWidgets.QWidget()
-        self.spring_tab.setFont(set_font())
         self.spring_tab.setObjectName("spring_tab")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.spring_tab)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
@@ -373,41 +367,39 @@ class ProjectGeneratorUI:
         对界面上的文字样式控制
         :param self: 弹窗确认生成器配置页的主窗口对象
         """
-        self.mybatis_title.setText(
-            self._translate("Dialog", set_title_font(MYBATIS_TITLE)))
+        self.mybatis_title.setText(MYBATIS_TITLE)
         self.mybatis_desc.setWordWrap(True)
-        self.mybatis_desc.setText(self._translate("Dialog", set_desc_font(MYBATIS_GENERATOR_DESC)))
-        self.lombok.setText(self._translate("Dialog", set_label_font(IS_LOMBOK)))
-        self.lombok_comboBox.setItemText(0, self._translate("Dialog", "True"))
-        self.lombok_comboBox.setItemText(1, self._translate("Dialog", "False"))
+        self.mybatis_desc.setText(MYBATIS_GENERATOR_DESC)
+        self.lombok.setText(IS_LOMBOK)
+        self.lombok_comboBox.setItemText(0, "True")
+        self.lombok_comboBox.setItemText(1, "False")
         self.lombok_desc.setWordWrap(True)
-        self.lombok_desc.setText(self._translate("Dialog", set_desc_font(LOMBOK_DESC)))
-        self.java.setText(self._translate("Dialog", set_label_font(JAVA_PATH)))
+        self.lombok_desc.setText(LOMBOK_DESC)
+        self.java.setText(JAVA_PATH)
         self.java_desc.setWordWrap(True)
-        self.java_desc.setText(self._translate("Dialog", set_desc_font(JAVA_PATH_DESC)))
-        self.java_src.setText(self._translate("Dialog", set_label_font(JAVA_SRC_PATH)))
+        self.java_desc.setText(JAVA_PATH_DESC)
+        self.java_src.setText(JAVA_SRC_PATH)
         self.java_src_desc.setWordWrap(True)
-        self.java_src_desc.setText(self._translate("Dialog", set_desc_font(JAVA_SRC_PATH_DESC)))
-        self.model.setText(self._translate("Dialog", set_label_font(MODEL_PACKAGE)))
+        self.java_src_desc.setText(JAVA_SRC_PATH_DESC)
+        self.model.setText(MODEL_PACKAGE)
         self.model_desc.setWordWrap(True)
-        self.model_desc.setText(self._translate("Dialog", set_desc_font(MODEL_PACKAGE_DESC)))
-        self.mapper.setText(self._translate("Dialog", set_label_font(MAPPER_PACKAGE)))
+        self.model_desc.setText(MODEL_PACKAGE_DESC)
+        self.mapper.setText(MAPPER_PACKAGE)
         self.mapper_desc.setWordWrap(True)
-        self.mapper_desc.setText(self._translate("Dialog", set_desc_font(MAPPER_PACKAGE_DESC)))
-        self.xml.setText(self._translate("Dialog", set_label_font(XML_PATH)))
+        self.mapper_desc.setText(MAPPER_PACKAGE_DESC)
+        self.xml.setText(XML_PATH)
         self.xml_desc.setWordWrap(True)
-        self.xml_desc.setText(self._translate("Dialog", set_desc_font(XML_PATH_DESC)))
+        self.xml_desc.setText(XML_PATH_DESC)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.mybatis_tab),
                                           self._translate("Dialog", MYBATIS_TAB_TITLE))
-        self.spring_title.setText(
-            self._translate("Dialog", set_title_font(SPRING_TITLE)))
-        self.spring_desc.setText(self._translate("Dialog", SPRING_GENERATOR_DESC))
-        self.service.setText(self._translate("Dialog", set_label_font(SERVICE_PACKAGE)))
-        self.service_desc.setText(self._translate("Dialog", SERVICE_PACKAGE_DESC))
-        self.service_impl.setText(self._translate("Dialog", set_label_font(SERVICE_IMPL_PACKAGE)))
-        self.service_impl_desc.setText(self._translate("Dialog", SERVICE_IMPL_PACKAGE_DESC))
-        self.controller.setText(self._translate("Dialog", set_label_font(CONTROLLER_PACKAGE)))
-        self.controller_desc.setText(self._translate("Dialog", CONTROLLER_PACKAGE_DESC))
+        self.spring_title.setText(SPRING_TITLE)
+        self.spring_desc.setText(SPRING_GENERATOR_DESC)
+        self.service.setText(SERVICE_PACKAGE)
+        self.service_desc.setText(SERVICE_PACKAGE_DESC)
+        self.service_impl.setText(SERVICE_IMPL_PACKAGE)
+        self.service_impl_desc.setText(SERVICE_IMPL_PACKAGE_DESC)
+        self.controller.setText(CONTROLLER_PACKAGE)
+        self.controller_desc.setText(CONTROLLER_PACKAGE_DESC)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.spring_tab),
                                           self._translate("Dialog", SPRING_TAB_TITLE))
         # 按钮
