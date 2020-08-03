@@ -4,8 +4,8 @@
 """
 import sip
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QTableWidgetItem, QFrame, QHeaderView
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 from src.constant.constant import TABLE_HEADER_LABELS
 from src.func.selected_data import SelectedData
@@ -29,6 +29,7 @@ def add_table(gui):
 
     gui.tableWidget = QtWidgets.QTableWidget(gui.table_frame)
     gui.tableWidget.setObjectName("tableWidget")
+    gui.tableWidget.setAttribute(Qt.WA_TranslucentBackground, True)
     # 在布局中添加表格
     gui.table_verticalLayout.addWidget(gui.tableWidget)
     gui.horizontalLayout.addWidget(gui.table_frame)
@@ -46,6 +47,7 @@ def make_table_header(gui):
     gui.tableWidget.setColumnCount(4)
     # 实例化自定义表头
     gui.table_header = CheckBoxHeader()
+    gui.table_header.setObjectName("table_header")
     # 设置表头
     gui.tableWidget.setHorizontalHeader(gui.table_header)
     # 设置表头字段
