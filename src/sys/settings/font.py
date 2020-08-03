@@ -13,8 +13,3 @@ def set_font():
     return font
 
 
-def set_title_font(title):
-    return "<html><head/><body><p align=\"center\"><span " \
-           "style=\" font-size:20pt; font-weight:600;font-family:楷体;\">" \
-           f"{title}</span></p></body></html>"
-
