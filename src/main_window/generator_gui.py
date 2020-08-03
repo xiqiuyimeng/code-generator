@@ -30,9 +30,9 @@ class MainWindow(QtWidgets.QMainWindow):
                            "stop:0 LightGreen,stop:1 LimeGreen);border-style:solid;}"
                            "#treeWidget{font-size:18px;font-family:楷体;}"
                            "#file_menu{background-color:LightGreen}"
-                           "#menubar{border-style:solid}"
-                           "#toolBar{border-style:solid}"
-                           "#tableWidget{background-color:LightGreen;border-style:solid;}"
+                           "#menubar,#toolBar{border-style:solid}"
+                           "#tableWidget{alternate-background-color:yellow;background-color:LightGreen;border-style:solid;}"
+                           "#table_header{color:yellow}"
                            "#tree_header_label,#table_header_label{font-size:20px;font-family:楷体;font-weight:500;}"
                            "QToolTip{font-size:18px;font-family:楷体;}")
         # 已经连接数据库的连接，key为连接名，value为DBExecutor对象
