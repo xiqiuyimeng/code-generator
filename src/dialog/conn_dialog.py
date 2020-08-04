@@ -42,7 +42,7 @@ class ConnDialog(QDialog):
         self.dialog.resize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
         # 字体
         self.setStyleSheet("#title{font-size:30px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}"
-                           "QLabel,QLineEdit{font-size:18px;font-family:楷体;}"
+                           "QLabel,QLineEdit,QPushButton{font-size:18px;font-family:楷体;}"
                            "#frame{border-style:solid;border-radius:25px;background-color:Gainsboro;}")
         # 不透明度
         self.setWindowOpacity(0.95)
@@ -114,21 +114,23 @@ class ConnDialog(QDialog):
         self.bottom_blank.setText("")
         self.bottom_blank.setObjectName("bottom_blank")
         self.verticalLayout.addWidget(self.bottom_blank)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.buttonBox_2 = QtWidgets.QDialogButtonBox(self.frame)
-        self.buttonBox_2.setLayoutDirection(Qt.RightToLeft)
-        self.buttonBox_2.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
-        self.test_conn = self.buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
-        self.buttonBox_2.setObjectName("buttonBox_2")
-        self.horizontalLayout.addWidget(self.buttonBox_2)
-        self.buttonBox = QtWidgets.QDialogButtonBox(self.frame)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
-        self.ok = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
-        self.cancel = self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel)
-        self.buttonBox.setObjectName("buttonBox")
-        self.horizontalLayout.addWidget(self.buttonBox)
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        # 按钮
+        self.gridLayout_2 = QtWidgets.QGridLayout()
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.test_conn = QtWidgets.QPushButton(self.frame)
+        self.test_conn.setObjectName("test_conn")
+        self.gridLayout_2.addWidget(self.test_conn, 0, 0, 1, 1)
+        self.button_blank = QtWidgets.QLabel(self.frame)
+        self.button_blank.setObjectName("button_blank")
+        self.gridLayout_2.addWidget(self.button_blank, 0, 1, 1, 1)
+        self.ok = QtWidgets.QPushButton(self.frame)
+        self.ok.setObjectName("ok")
+        self.gridLayout_2.addWidget(self.ok, 0, 2, 1, 1)
+        self.cancel = QtWidgets.QPushButton(self.frame)
+        self.cancel.setObjectName("cancel")
+        self.gridLayout_2.addWidget(self.cancel, 0, 3, 1, 1)
+
+        self.verticalLayout.addLayout(self.gridLayout_2)
         self.verticalLayout_frame.addWidget(self.frame)
         # 设置tab键的顺序
         self.dialog.setTabOrder(self.conn_name_value, self.host_value)
@@ -165,9 +167,9 @@ class ConnDialog(QDialog):
         self.user.setText("用户名：")
         self.passwd.setText("密码：")
         # 按钮
-        self.test_conn.setText(self._translate("Dialog", "测试连接"))
-        self.ok.setText(self._translate("Dialog", "确定"))
-        self.cancel.setText(self._translate("Dialog", "取消"))
+        self.test_conn.setText("测试连接")
+        self.ok.setText("确定")
+        self.cancel.setText("取消")
         # 回显
         if self.connection.id:
             self.conn_name_value.setText(self._translate("Dialog", self.connection.name))
