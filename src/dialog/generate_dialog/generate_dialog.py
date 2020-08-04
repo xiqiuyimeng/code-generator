@@ -67,8 +67,9 @@ class DisplaySelectedDialog(QDialog):
                            "#mybatis_scrollArea,#spring_scrollArea{border-style:solid;border-radius:25px;background-color:LightYellow;}"
                            "#mybatis_scroll_widget,#spring_scroll_widget{border-style:solid;border-radius:25px;background-color:LightYellow;}"
                            "#tabWidget{font-size:18px;font-family:楷体;}"
-                           "QLabel,QComboBox,QLineEdit{font-size:16px;font-family:楷体;qproperty-wordWrap: true}"
-                           "QPushButton{font-size:16px;font-family:楷体;}"
+                           "QLabel,QComboBox,QLineEdit{font-size:16px;font-family:楷体;qproperty-wordWrap:true}"
+                           "QTabWidget QPushButton{font-size:16px;font-family:楷体;background-color:lightblue;border-radius:8px}"
+                           "QPushButton{font-size:18px;font-family:楷体;background-color:lightgreen;border-radius:5px}"
                            "#lombok,#java,#java_src,#model,#mapper,#xml,#service,#service_impl,#controller,#output{font-size:18px;font-family:楷体;font-weight:500}"
                            "#mybatis_title,#spring_title{font-size:25px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}")
         QtCore.QMetaObject.connectSlotsByName(self)

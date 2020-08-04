@@ -168,14 +168,14 @@ CONFIRM_TREE_HEADER_LABELS = '已选择的表字段列表'
 MYBATIS_TAB_TITLE = 'mybatis生成器'
 # mybatis页面标题
 MYBATIS_TITLE = 'mybatis生成器输出配置'
-MYBATIS_GENERATOR_DESC = '根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
+MYBATIS_GENERATOR_DESC = '\n根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
                          'mapper接口文件，xml文件。\n1. 默认增加了列表查询语句。' \
                          '\n2. 可根据配置决定是否生成set和get方法，默认不生成，生成@Data注解。'\
                          '\n3. 当前支持整表生成，也支持选择部分表字段生成，需要注意的是，' \
                          '部分选择字段时，仅生成当前的Java实体类中需要新增的类属性代码' \
                          '及xml文件中需要新增的代码，例如resultMap与插入更新代码块。' \
                          '\n4. 以下参数皆为必填项，填写Java项目地址后，将开启其他项，生成器会直接将文件生成到您指定的项目目录中。'
-MYBATIS_PATH_GENERATOR_DESC = '根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
+MYBATIS_PATH_GENERATOR_DESC = '\n根据官方生成器生成的代码样例制作。可以生成Java实体类文件，' \
                          'mapper接口文件，xml文件。\n1. 默认增加了列表查询语句。' \
                          '\n2. 可根据配置决定是否生成set和get方法，默认不生成，生成@Data注解。'\
                          '\n3. 当前支持整表生成，也支持选择部分表字段生成，需要注意的是，' \
