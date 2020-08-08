@@ -44,13 +44,15 @@ class ConnDialog(QDialog):
         self.setStyleSheet("#title{font-size:30px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}"
                            "QLabel,QLineEdit{font-size:18px;font-family:楷体;}"
                            "QPushButton{font-size:20px;font-family:楷体;font-weight:500px;color:black;"
-                           "background-color:lightgreen;border-radius:8px;border-style:outset;border-width:2px;"
-                           "border-color:red;padding-top:1px;padding-left:1px;padding-bottom:3px;padding-right:3px;}"
+                           "background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
+                           "stop:0 lightgreen,stop:1 SpringGreen);border-radius:8px;border-style:outset;border-width:2px;"
+                           "border-color:Thistle;padding-top:1px;padding-left:1px;padding-bottom:3px;padding-right:3px;}"
                            "QPushButton:hover{background-color:LimeGreen;}"
                            "QPushButton:pressed{background-color:green;border-style:inset;padding-top:3px;"
                            "padding-left:3px}"
                            "QPushButton:disabled{background-color:Silver;border:none}"
-                           "#frame{border-style:solid;border-radius:25px;background-color:Gainsboro;}")
+                           "#frame{border-style:solid;border-radius:25px;background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
+                           "stop:0 lightyellow,stop:1 wheat);}")
         # 不透明度
         self.setWindowOpacity(0.95)
         # 隐藏窗口边框
