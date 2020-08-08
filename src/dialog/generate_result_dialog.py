@@ -76,8 +76,7 @@ class GenerateResultDialog(QDialog):
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         # 样式
-        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:qlineargradient("
-                           "x1:0, y1:0, x2:1, y2:0, stop:0 lightyellow,stop:1 wheat);}"
+        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:wheat}"
                            "QPushButton{font-size:20px;font-family:楷体;font-weight:500px;color:black;"
                            "background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
                            "stop:0 lightgreen,stop:1 SpringGreen);border-radius:8px;border-style:outset;border-width:2px;"
