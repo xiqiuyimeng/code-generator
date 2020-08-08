@@ -27,12 +27,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, screen_rect):
         super().__init__()
         self.setStyleSheet("#MainWindow,#treeWidget{background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-                           "stop:0 LightGreen,stop:1 LimeGreen);border-style:solid;}"
+                           "stop:0 Wheat,stop:1 lightyellow);border-style:solid;}"
                            "#treeWidget{font-size:18px;font-family:楷体;}"
                            "#file_menu{background-color:LightGreen}"
                            "#menubar,#toolBar{border-style:solid}"
-                           "#tableWidget{alternate-background-color:yellow;background-color:LightGreen;border-style:solid;}"
-                           "#table_header{color:red}"
+                           "#tableWidget{alternate-background-color:white;background-color:wheat;border-style:solid;}"
                            "#tree_header_label,#table_header_label{font-size:20px;font-family:楷体;font-weight:500;}"
                            "QToolTip{font-size:18px;font-family:楷体;}")
         # 已经连接数据库的连接，key为连接名，value为DBExecutor对象

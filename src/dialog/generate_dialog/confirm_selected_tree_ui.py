@@ -33,31 +33,34 @@ class TreeWidgetUI:
         self.treeWidget.setObjectName("treeWidget")
         # 树控件背景透明
         self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-
-        # 字体
-        # self.treeWidget.setFont(set_font())
         self.verticalLayout_2.addWidget(self.treeWidget)
 
-        self.first_splitter = QtWidgets.QSplitter(self.widget)
-        self.first_splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.first_splitter.setObjectName("first_splitter")
-        # 分隔线隐藏
-        self.first_splitter.setHandleWidth(0)
         # 按钮
-        self.first_buttonBox_2 = QtWidgets.QDialogButtonBox(self.first_splitter)
-        self.first_buttonBox_2.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
-        self.first_buttonBox_2.setObjectName("first_buttonBox_2")
-        self.first_buttonBox_2.setLayoutDirection(Qt.RightToLeft)
-        self.first_buttonBox = QtWidgets.QDialogButtonBox(self.first_splitter)
-        self.first_buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel
-                                                | QtWidgets.QDialogButtonBox.Ok
-                                                | QtWidgets.QDialogButtonBox.Yes)
-        self.first_buttonBox.setObjectName("first_buttonBox")
-        self.verticalLayout_2.addWidget(self.first_splitter)
+        self.gridLayout_button = QtWidgets.QGridLayout()
+        self.gridLayout_button.setObjectName("gridLayout_button")
+        self.expand_collapse_button = QtWidgets.QPushButton(self.widget)
+        self.expand_collapse_button.setObjectName("expand_collapse_button")
+        self.gridLayout_button.addWidget(self.expand_collapse_button, 0, 0, 1, 1)
+        self.button_blank = QtWidgets.QLabel(self.widget)
+        self.button_blank.setObjectName("button_blank")
+        self.gridLayout_button.addWidget(self.button_blank, 0, 1, 1, 1)
+        self.path_generator_button = QtWidgets.QPushButton(self.widget)
+        self.path_generator_button.setObjectName("path_generator_button")
+        self.gridLayout_button.addWidget(self.path_generator_button, 0, 2, 1, 1)
+        self.project_generator_button = QtWidgets.QPushButton(self.widget)
+        self.project_generator_button.setObjectName("project_generator_button")
+        self.gridLayout_button.addWidget(self.project_generator_button, 0, 3, 1, 1)
+        self.cancel_button = QtWidgets.QPushButton(self.widget)
+        self.cancel_button.setObjectName("cancel_button")
+        self.gridLayout_button.addWidget(self.cancel_button, 0, 4, 1, 1)
+        self.verticalLayout_2.addLayout(self.gridLayout_button)
 
         # 按钮响应事件
-        self.first_buttonBox.clicked.connect(self.first_buttonBox_func)
-        self.first_buttonBox_2.accepted.connect(lambda: self.expand_collapse())
+        self.expand_collapse_button.clicked.connect(lambda: self.expand_collapse())
+        self.path_generator_button.clicked.connect(lambda: self.parent.select_path_generator())
+        self.project_generator_button.clicked.connect(lambda: self.parent.select_project_generator())
+        self.cancel_button.clicked.connect(lambda: self.parent.close)
+
         self.make_tree()
 
         self.retranslateUi()
@@ -82,18 +85,11 @@ class TreeWidgetUI:
     def retranslateUi(self):
         self.parent.setWindowTitle(self._translate("Dialog", "Dialog"))
         self.treeWidget.headerItem().setHidden(True)
-        # self.tree_header_label.setFont(set_font())
         self.tree_header_label.setText(CONFIRM_TREE_HEADER_LABELS)
-        self.expand_collapse_button = self.first_buttonBox_2.button(QtWidgets.QDialogButtonBox.Ok)
-        self.parent.expand_collapse_button = self.expand_collapse_button
         self.expand_collapse_button.setText(COLLAPSE_BUTTON)
-        self.expand_collapse_button.setFont(set_font())
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(PROJECT_GENERATOR_BUTTON)
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setFont(set_font())
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Yes).setText(PATH_GENERATOR_BUTTON)
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Yes).setFont(set_font())
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(CANCEL_BUTTON)
-        self.first_buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
+        self.path_generator_button.setText(PATH_GENERATOR_BUTTON)
+        self.project_generator_button.setText(PROJECT_GENERATOR_BUTTON)
+        self.cancel_button.setText(CANCEL_BUTTON)
 
     def expand_collapse(self):
         """提供给确认数据页，树结构的展开和折叠"""
@@ -105,13 +101,4 @@ class TreeWidgetUI:
         else:
             self.expand_collapse_button.setText(EXPAND_BUTTON)
             self.treeWidget.collapseAll()
-
-    def first_buttonBox_func(self, btn):
-        """第一个按钮组功能，分发选择项目生成器、路径生成器、父窗口退出功能"""
-        if btn.text() == PROJECT_GENERATOR_BUTTON:
-            self.parent.select_project_generator()
-        elif btn.text() == PATH_GENERATOR_BUTTON:
-            self.parent.select_path_generator()
-        elif btn.text() == CANCEL_BUTTON:
-            self.parent.close()
 

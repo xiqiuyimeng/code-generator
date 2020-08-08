@@ -56,10 +56,17 @@ class GenerateResultDialog(QDialog):
         self.textBrowser = QtWidgets.QTextBrowser(self.frame)
         self.textBrowser.setObjectName("textBrowser")
         self.verticalLayout.addWidget(self.textBrowser)
-        self.buttonBox = QtWidgets.QDialogButtonBox(self.frame)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName("buttonBox")
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+        self.cancel_button = QtWidgets.QPushButton(self.frame)
+        self.cancel_button.setObjectName("cancel_button")
+        self.gridLayout.addWidget(self.cancel_button, 0, 0, 1, 1)
+        self.button_blank = QtWidgets.QLabel(self.frame)
+        self.gridLayout.addWidget(self.button_blank, 0, 1, 1, 2)
+        self.ok_button = QtWidgets.QPushButton(self.frame)
+        self.ok_button.setObjectName("ok_button")
+        self.gridLayout.addWidget(self.ok_button, 0, 2, 1, 1)
+        self.verticalLayout.addLayout(self.gridLayout)
         self.verticalLayout_frame.addWidget(self.frame)
 
         # 不透明度
@@ -69,7 +76,15 @@ class GenerateResultDialog(QDialog):
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         # 样式
-        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:Gainsboro;}"
+        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:qlineargradient("
+                           "x1:0, y1:0, x2:1, y2:0, stop:0 lightyellow,stop:1 wheat);}"
+                           "QPushButton{font-size:20px;font-family:楷体;font-weight:500px;color:black;"
+                           "background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
+                           "stop:0 lightgreen,stop:1 SpringGreen);border-radius:8px;border-style:outset;border-width:2px;"
+                           "border-color:Thistle;padding-top:1px;padding-left:1px;padding-bottom:3px;padding-right:3px;}"
+                           "QPushButton:hover{background-color:LimeGreen;}"
+                           "QPushButton:pressed{background-color:green;border-style:inset;padding-top:3px;"
+                           "padding-left:3px}"
                            "QLabel,QProgressBar,QTextBrowser{font-size:18px;font-family:楷体;}"
                            "#title{font-size:20px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}")
 
@@ -79,8 +94,8 @@ class GenerateResultDialog(QDialog):
         self.thread_1.start()
 
         # 按钮事件
-        self.buttonBox.accepted.connect(self.close_parent)
-        self.buttonBox.rejected.connect(self.close)
+        self.cancel_button.clicked.connect(self.close)
+        self.ok_button.clicked.connect(self.close_parent)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
@@ -95,12 +110,9 @@ class GenerateResultDialog(QDialog):
         self.close_parent_signal.emit()
 
     def retranslateUi(self):
-        self.setWindowTitle(self._translate("Dialog", "Dialog"))
         self.label.setText("完成进度")
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText("确定")
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setFont(set_font())
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText("返回配置页")
-        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setFont(set_font())
+        self.cancel_button.setText("返回配置页")
+        self.ok_button.setText("确定")
 
 
 class Worker(QThread):

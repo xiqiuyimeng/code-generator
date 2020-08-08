@@ -203,7 +203,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
                 else:
                     return
         conn_info = gui.display_conn_dict.get(conn_id)
-        show_conn_dialog(gui, conn_info, func)
+        show_conn_dialog(gui, conn_info, func, gui.screen_rect)
 
     def del_conn(self, func, gui, conn_name, conn_id, item):
         """
