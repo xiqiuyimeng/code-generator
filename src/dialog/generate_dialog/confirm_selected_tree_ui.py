@@ -59,7 +59,7 @@ class TreeWidgetUI:
         self.expand_collapse_button.clicked.connect(lambda: self.expand_collapse())
         self.path_generator_button.clicked.connect(lambda: self.parent.select_path_generator())
         self.project_generator_button.clicked.connect(lambda: self.parent.select_project_generator())
-        self.cancel_button.clicked.connect(lambda: self.parent.close)
+        self.cancel_button.clicked.connect(lambda: self.parent.close())
 
         self.make_tree()
 
