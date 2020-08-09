@@ -2,12 +2,10 @@
 """
 工具栏
 """
-import os
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
-
-from src.constant.constant import ICON_DIR
+from static import image_rc
 
 _author_ = 'luwt'
 _date_ = '2020/7/13 14:28'
@@ -22,14 +20,14 @@ def fill_tool_bar(gui):
 
 def add_insert_conn_tool(gui):
     # 指定图标
-    insert_tool = QAction(QIcon(ICON_DIR + 'add.jpg'), '添加连接', gui)
+    insert_tool = QAction(QIcon(':/icon/add.jpg'), '添加连接', gui)
     insert_tool.setStatusTip('在左侧列表中添加一条连接')
     insert_tool.triggered.connect(gui.add_conn)
     gui.toolBar.addAction(insert_tool)
 
 
 def add_refresh_tool(gui):
-    refresh_tool = QAction(QIcon(ICON_DIR + 'refresh.jpg'), '刷新', gui)
+    refresh_tool = QAction(QIcon(':/icon/refresh.jpg'), '刷新', gui)
     refresh_tool.setStatusTip('刷新')
     refresh_tool.setShortcut('F5')
     refresh_tool.triggered.connect(refresh)
@@ -37,14 +35,14 @@ def add_refresh_tool(gui):
 
 
 def add_generate_tool(gui):
-    generate_tool = QAction(QIcon(ICON_DIR + 'exec.jpg'), '生成', gui)
+    generate_tool = QAction(QIcon(':/icon/exec.jpg'), '生成', gui)
     generate_tool.setStatusTip('根据选择执行生成命令')
     generate_tool.triggered.connect(gui.generate)
     gui.toolBar.addAction(generate_tool)
 
 
 def add_exit_tool(gui):
-    exit_tool = QAction(QIcon(ICON_DIR + 'exit.jpg'), '退出程序', gui)
+    exit_tool = QAction(QIcon(':/icon/exit.jpg'), '退出程序', gui)
     exit_tool.setStatusTip('退出应用程序')
     exit_tool.triggered.connect(gui.quit)
     gui.toolBar.addSeparator()

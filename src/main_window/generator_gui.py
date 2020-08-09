@@ -20,14 +20,14 @@ from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
 from src.little_widget.tool_bar import fill_tool_bar
 from src.sys.sys_info_storage.sqlite import get_conns
+from static import image_rc
 
 
 class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, screen_rect):
         super().__init__()
-        self.setStyleSheet("#MainWindow,#treeWidget{background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-                           "stop:0 Wheat,stop:1 lightgreen);border-style:solid;}"
+        self.setStyleSheet("#MainWindow,#treeWidget{border-image:url(:/bg_jpg/window_bg.jpg);border-style:solid;}"
                            "#treeWidget{font-size:18px;font-family:楷体;}"
                            "#file_menu{background-color:LightGreen}"
                            "#menubar,#toolBar{border-style:solid}"
@@ -106,7 +106,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 树控件背景透明
         self.treeWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         # 不透明度
-        self.setWindowOpacity(0.93)
+        self.setWindowOpacity(0.95)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)

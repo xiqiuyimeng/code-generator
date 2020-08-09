@@ -8,7 +8,9 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
 from src.constant.constant import OK_BUTTON, ACCEPT_BUTTON, \
-    REJECT_BUTTON, WARNING_OK, WARNING_RESELECT, ICON_DIR
+    REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
+from static import image_rc
+
 
 _author_ = 'luwt'
 _date_ = '2020/6/21 16:08'
@@ -32,7 +34,7 @@ def pop_ok(title, msg):
     :param msg: 弹窗消息
     """
     msg_box = QMessageBox(QMessageBox.NoIcon, title, msg)
-    pix = QPixmap(ICON_DIR + "right.jpg")\
+    pix = QPixmap(":/icon/right.jpg")\
         .scaled(30, 30, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
     msg_box.setIconPixmap(pix)
     msg_box.addButton(OK_BUTTON, QMessageBox.AcceptRole)
