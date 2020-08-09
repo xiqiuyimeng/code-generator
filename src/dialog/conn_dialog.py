@@ -19,6 +19,7 @@ from src.func.connection_function import test_connection
 from src.little_widget.message_box import pop_ok, pop_fail
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
+from static import image_rc
 
 
 class ConnDialog(QDialog):
@@ -51,8 +52,7 @@ class ConnDialog(QDialog):
                            "QPushButton:pressed{background-color:green;border-style:inset;padding-top:3px;"
                            "padding-left:3px}"
                            "QPushButton:disabled{background-color:Silver;border:none}"
-                           "#frame{border-style:solid;border-radius:25px;background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-                           "stop:0 lightyellow,stop:1 wheat);}")
+                           "#frame{border-style:solid;border-radius:25px;border-image:url(:/bg_jpg/conn_dialog_bg.jpg)}")
         # 不透明度
         self.setWindowOpacity(0.95)
         # 隐藏窗口边框

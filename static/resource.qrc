@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="/icon">
+    <file alias="add.jpg">icon/add.jpg</file>
+    <file alias="exec.jpg">icon/exec.jpg</file>
+    <file alias="exit.jpg">icon/exit.jpg</file>
+    <file alias="refresh.jpg">icon/refresh.jpg</file>
+    <file alias="right.jpg">icon/right.jpg</file>
+  </qresource>
+  <qresource prefix="/bg_jpg">
+    <file alias="window_bg.jpg">bg_jpg/window_bg.jpg</file>
+    <file alias="conn_dialog_bg.jpg">bg_jpg/conn_dialog_bg.jpg</file>
+  </qresource>
+  <qresource prefix="/boot_jpg">
+    <file alias="boot.jpg">boot/boot.jpg</file>
+  </qresource>
+</RCC>

@@ -38,12 +38,6 @@ DEFAULT_MODEL_NS = "实体类"
 
 # 默认输出目录
 DEFAULT_PATH = "./输出目录"
-# icon 目录
-ICON_DIR = os.path.dirname(__file__) + '/../../static/icon/'
-# bg 目录
-BG_DIR = os.path.dirname(__file__) + '/../../static/bg_jpg/'
-# 启动图像目录
-BOOT_DIR = os.path.dirname(__file__) + '/../../static/boot/'
 
 # 项目目录
 TEMPLATE_PATH = (os.path.split(os.path.dirname(__file__))[0]).replace("\\", "/") + "/../static/template"
