@@ -11,7 +11,6 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QDialog
 
 from src.func.do_generate import dispatch_generate
-from src.sys.settings.font import set_font
 
 
 class GenerateResultDialog(QDialog):

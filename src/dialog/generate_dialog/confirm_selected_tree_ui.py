@@ -21,7 +21,7 @@ class TreeWidgetUI:
         self.setup_tree_ui()
 
     def setup_tree_ui(self):
-        self.widget = QtWidgets.QWidget(self.parent.frame)
+        self.widget = QtWidgets.QWidget(self.parent.generate_frame)
         self.widget.setObjectName("little_widget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
