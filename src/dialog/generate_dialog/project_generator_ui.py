@@ -35,7 +35,7 @@ class ProjectGeneratorUI:
         """
         构建选择项目生成器的tab标签界面
         """
-        self.widget = QtWidgets.QWidget(self.parent.frame)
+        self.widget = QtWidgets.QWidget(self.parent.generate_frame)
         self.widget.setObjectName("little_widget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")

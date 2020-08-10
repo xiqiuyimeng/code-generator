@@ -41,18 +41,18 @@ class DisplaySelectedDialog(QDialog):
         self.screen_rect = self.geometry()
         self.verticalLayout_frame = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_frame.setObjectName("verticalLayout_frame")
-        self.frame = QtWidgets.QFrame(self)
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
+        self.generate_frame = QtWidgets.QFrame(self)
+        self.generate_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.generate_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.generate_frame.setObjectName("generate_frame")
         # 建立布局
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.frame)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.generate_frame)
         self.verticalLayout.setObjectName("verticalLayout")
         # 展示已选中数据的树结构
         self.tree_widget_ui = TreeWidgetUI(self)
         self.tree_widget = self.tree_widget_ui.widget
         self.verticalLayout.addWidget(self.tree_widget)
-        self.verticalLayout_frame.addWidget(self.frame)
+        self.verticalLayout_frame.addWidget(self.generate_frame)
 
         # 不透明度
         self.setWindowOpacity(0.95)
