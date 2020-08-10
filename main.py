@@ -1,9 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QFile, QIODevice, QTextStream
 
 from src.main_window.generator_gui import MainWindow
 from static import image_rc
+from static import style_rc
 
 
 import sys
@@ -22,6 +23,10 @@ if __name__ == "__main__":
     QtWidgets.qApp.processEvents()
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
+    file = QFile(":/style.qss")
+    file.open(QIODevice.ReadOnly)
+    app.setStyleSheet(QTextStream(file).readAll())
+    file.close()
     screen_rect = desktop.screenGeometry()
     ui = MainWindow(screen_rect)
     ui.show()

@@ -60,31 +60,6 @@ class DisplaySelectedDialog(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet("#frame{border-style:solid;border-radius:25px;background-color:LightYellow;}"
-                           "#treeWidget{border-style:solid;border-radius:25px;background-color:LightYellow;font-size:16px;font-family:楷体}"
-                           "#tree_header_label{font-size:20px;font-family:楷体;font-weight:500;}"
-                           "QTabWidget:pane{border-style:solid;border-radius:25px;background-color:LightYellow;}"
-                           "#mybatis_scrollArea,#spring_scrollArea{border-style:solid;border-radius:25px;background-color:LightYellow;}"
-                           "#mybatis_scroll_widget,#spring_scroll_widget{border-style:solid;border-radius:25px;background-color:LightYellow;}"
-                           "#tabWidget{font-size:18px;font-family:楷体;}"
-                           "QLabel,QComboBox,QLineEdit{font-size:16px;font-family:楷体;qproperty-wordWrap:true}"
-                           "QTabWidget QPushButton{font-size:16px;font-family:楷体;font-weight:300px;background-color:lightblue;"
-                           "border-radius:8px;border-style:outset;border-width:2px;border-color:Thistle;padding-top:1px;"
-                           "padding-left:1px;padding-bottom:3px;padding-right:3px;}"
-                           "QTabWidget QPushButton:hover{background-color:DeepSkyBlue;}"
-                           "QTabWidget QPushButton:pressed{background-color:RoyalBlue;border-style:inset;padding-top:3px;"
-                           "padding-left:3px}"
-                           "QTabWidget QPushButton:disabled{background-color:Silver;border:none}"
-                           "QPushButton{font-size:20px;font-family:楷体;font-weight:500px;color:black;"
-                           "background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-                           "stop:0 lightgreen,stop:1 SpringGreen);border-radius:8px;border-style:outset;border-width:2px;"
-                           "border-color:Thistle;padding-top:1px;padding-left:1px;padding-bottom:3px;padding-right:3px;}"
-                           "QPushButton:hover{background-color:LimeGreen;}"
-                           "QPushButton:pressed{background-color:green;border-style:inset;padding-top:3px;"
-                           "padding-left:3px}"
-                           "QPushButton:disabled{background-color:Silver;border:none}"
-                           "#lombok,#java,#java_src,#model,#mapper,#xml,#service,#service_impl,#controller,#output{font-size:18px;font-family:楷体;font-weight:500}"
-                           "#mybatis_title,#spring_title{font-size:25px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}")
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def select_project_generator(self):
