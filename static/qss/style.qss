@@ -54,7 +54,8 @@ QLineEdit{
 }
 /*输入框悬停，使用时边框颜色*/
 QLineEdit:hover{
-    border:2px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 green,stop:1 red);
+    border:2px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+stop:0 green,stop:0.5 LimeGreen,stop:0.5 LimeGreen, stop:1 green);
 }
 /*输入框禁用边框颜色*/
 QLineEdit:disabled{
