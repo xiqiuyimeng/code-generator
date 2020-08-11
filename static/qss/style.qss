@@ -55,7 +55,7 @@ QLineEdit{
 /*输入框悬停，使用时边框颜色*/
 QLineEdit:hover{
     border:2px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
-stop:0 green,stop:0.5 LimeGreen,stop:0.5 LimeGreen, stop:1 green);
+        stop:0 green, stop:0.5 LimeGreen, stop:1 DarkSeaGreen);
 }
 /*输入框禁用边框颜色*/
 QLineEdit:disabled{
@@ -78,7 +78,7 @@ QTabWidget{
     font-size:18px;
     font-family:楷体;
 }
-/*标签页中的窗格样式*/
+/*标签页中的窗格样式The tab widget frame*/
 QTabWidget:pane{
     border-style:solid;
     border-radius:25px;
@@ -99,11 +99,37 @@ QTabWidget:tab-bar{
 #mybatis_scroll_widget,#spring_scroll_widget{
     background:transparent
 }
+/*滚动条背景色透明，需要同时设置add-page sub-page*/
+QScrollBar:vertical {
+    /*设置滑块宽度*/
+    width: 14px;
+    background: transparent;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: transparent;
+}
+/*滚动条上的滑块设置*/
+QScrollBar::handle:vertical {
+    border-radius: 7px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 60),stop:1 rgba(65, 105, 225, 60));
+}
+/*滚动条鼠标悬浮，颜色加深*/
+QScrollBar::handle:vertical:hover {
+    border-radius: 7px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(100, 100, 100, 100),stop:1 rgba(0, 0, 128, 100));
+}
+/*滚动条末端箭头按钮隐藏*/
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical{
+    border: none;
+    background: none;
+}
+/*标签页的label和下拉列表样式*/
 QTabWidget QLabel,QComboBox{
     font-size:16px;
     font-family:楷体;
     qproperty-wordWrap:true
 }
+/*标签页的按钮样式*/
 QTabWidget QPushButton{
     font-size:16px;
     font-family:楷体;
@@ -118,19 +144,23 @@ QTabWidget QPushButton{
     padding-bottom:3px;
     padding-right:3px;
 }
+/*标签页按钮，鼠标悬浮状态*/
 QTabWidget QPushButton:hover{
     background-color:DeepSkyBlue;
 }
+/*标签页按钮鼠标点击状态*/
 QTabWidget QPushButton:pressed{
     background-color:RoyalBlue;
     border-style:inset;
     padding-top:3px;
     padding-left:3px
 }
+/*标签页按钮禁用状态*/
 QTabWidget QPushButton:disabled{
     background-color:Silver;
     border:none
 }
+/*按钮样式*/
 QPushButton{
     font-size:20px;
     font-family:楷体;
@@ -146,24 +176,29 @@ QPushButton{
     padding-bottom:3px;
     padding-right:3px;
 }
+/*按钮悬浮*/
 QPushButton:hover{
     background-color:LimeGreen;
 }
+/*按钮点击*/
 QPushButton:pressed{
     background-color:green;
     border-style:inset;
     padding-top:3px;
     padding-left:3px
 }
+/*按钮禁用*/
 QPushButton:disabled{
     background-color:Silver;
     border:none
 }
+/*特定label样式*/
 #lombok,#java,#java_src,#model,#mapper,#xml,#service,#service_impl,#controller,#output{
     font-size:18px;
     font-family:楷体;
     font-weight:500
 }
+/*标题label*/
 #mybatis_title,#spring_title{
     font-size:25px;
     font-family:楷体;
