@@ -33,58 +33,45 @@ class GenerateResultDialog(QDialog):
         self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.6)
         self.verticalLayout_frame = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_frame.setObjectName("verticalLayout_frame")
-        self.frame = QtWidgets.QFrame(self)
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.frame)
+        self.result_frame = QtWidgets.QFrame(self)
+        self.result_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.result_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.result_frame.setObjectName("result_frame")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.result_frame)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.label_blank = QtWidgets.QLabel(self.frame)
+        self.label_blank = QtWidgets.QLabel(self.result_frame)
         self.label_blank.setText("")
         self.verticalLayout.addWidget(self.label_blank)
-        self.label = QtWidgets.QLabel(self.frame)
+        self.label = QtWidgets.QLabel(self.result_frame)
         self.label.setObjectName("title")
         self.verticalLayout.addWidget(self.label)
-        self.progressBar = QtWidgets.QProgressBar(self.frame)
+        self.progressBar = QtWidgets.QProgressBar(self.result_frame)
         self.progressBar.setObjectName("progressBar")
         self.progressBar.setValue(0)
         self.verticalLayout.addWidget(self.progressBar)
-        self.log_label = QtWidgets.QLabel(self.frame)
+        self.log_label = QtWidgets.QLabel(self.result_frame)
         self.log_label.setObjectName("log_label")
         self.verticalLayout.addWidget(self.log_label)
-        self.textBrowser = QtWidgets.QTextBrowser(self.frame)
+        self.textBrowser = QtWidgets.QTextBrowser(self.result_frame)
         self.textBrowser.setObjectName("textBrowser")
         self.verticalLayout.addWidget(self.textBrowser)
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.cancel_button = QtWidgets.QPushButton(self.frame)
+        self.cancel_button = QtWidgets.QPushButton(self.result_frame)
         self.cancel_button.setObjectName("cancel_button")
         self.gridLayout.addWidget(self.cancel_button, 0, 0, 1, 1)
-        self.button_blank = QtWidgets.QLabel(self.frame)
+        self.button_blank = QtWidgets.QLabel(self.result_frame)
         self.gridLayout.addWidget(self.button_blank, 0, 1, 1, 2)
-        self.ok_button = QtWidgets.QPushButton(self.frame)
+        self.ok_button = QtWidgets.QPushButton(self.result_frame)
         self.ok_button.setObjectName("ok_button")
         self.gridLayout.addWidget(self.ok_button, 0, 2, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout)
-        self.verticalLayout_frame.addWidget(self.frame)
+        self.verticalLayout_frame.addWidget(self.result_frame)
 
-        # 不透明度
-        self.setWindowOpacity(0.96)
         # 隐藏窗口边框
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        # 样式
-        self.setStyleSheet("#frame,#textBrowser{border-style:solid;border-radius:20px;background-color:wheat}"
-                           "QPushButton{font-size:20px;font-family:楷体;font-weight:500px;color:black;"
-                           "background-color:qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-                           "stop:0 lightgreen,stop:1 SpringGreen);border-radius:8px;border-style:outset;border-width:2px;"
-                           "border-color:Thistle;padding-top:1px;padding-left:1px;padding-bottom:3px;padding-right:3px;}"
-                           "QPushButton:hover{background-color:LimeGreen;}"
-                           "QPushButton:pressed{background-color:green;border-style:inset;padding-top:3px;"
-                           "padding-left:3px}"
-                           "QLabel,QProgressBar,QTextBrowser{font-size:18px;font-family:楷体;}"
-                           "#title{font-size:20px;font-family:楷体;font-weight:500;qproperty-alignment:AlignHCenter;}")
 
         # 创建并启用子线程
         self.thread_1 = Worker(self.gui, self.output_config_dict, self.selected_data)

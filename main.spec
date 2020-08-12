@@ -2,18 +2,11 @@
 
 block_cipher = None
 
-py_files = [
-    'main.py',
-]
 
-
-a = Analysis(py_files,
+a = Analysis(['main.py'],
              pathex=['D:\\python_workspaces\\python_tools\\mysql_generator'],
              binaries=[],
              datas=[
-             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\bg_jpg\\*.jpg', './static/bg_jpg'),
-             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\boot\\*.jpg', './static/boot'),
-             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\icon\\*.jpg', './static/icon'),
              ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\template\\*.txt', './static/template')
              ],
              hiddenimports=[],
