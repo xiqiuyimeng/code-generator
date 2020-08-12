@@ -113,7 +113,7 @@ class PathGeneratorUI:
         self.mybatis_desc.setObjectName("mybatis_desc")
         self.verticalLayout_3.addWidget(self.mybatis_desc)
         self.mybatis_blank = QtWidgets.QLabel(self.mybatis_scroll_widget)
-        self.mybatis_blank.setObjectName("mybatis_blankd")
+        self.mybatis_blank.setObjectName("mybatis_blank")
         self.verticalLayout_3.addWidget(self.mybatis_blank)
         # 表格布局
         self.mybatis_gridLayout = QtWidgets.QGridLayout()

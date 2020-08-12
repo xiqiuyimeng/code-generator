@@ -9,6 +9,7 @@
   <qresource prefix="/bg_jpg">
     <file alias="window_bg.jpg">bg_jpg/window_bg.jpg</file>
     <file alias="conn_dialog_bg.jpg">bg_jpg/conn_dialog_bg.jpg</file>
+    <file alias="result_dialog_bg.jpg">bg_jpg/result_dialog_bg.jpg</file>
   </qresource>
   <qresource prefix="/boot_jpg">
     <file alias="boot.jpg">boot/boot.jpg</file>

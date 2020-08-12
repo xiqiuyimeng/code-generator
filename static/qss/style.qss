@@ -205,3 +205,25 @@ QPushButton:disabled{
     font-weight:500;
     qproperty-alignment:AlignHCenter;
 }
+#result_frame{
+    border-style:solid;
+    border-radius:20px;
+    border-image:url(:/bg_jpg/result_dialog_bg.jpg);
+}
+QTextBrowser{
+    border-style: groove;
+    background: transparent;
+    font-size:18px;
+    font-family:楷体;
+}
+QProgressBar{
+    font-size:18px;
+    font-family:楷体;
+    border: none;
+    border-radius: 10%;
+    text-align: center;
+}
+QProgressBar::chunk {
+    background: #16b816;
+    border-radius: 10%;
+}
