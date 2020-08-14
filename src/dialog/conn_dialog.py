@@ -8,9 +8,11 @@
 """
 添加、编辑连接对话框界面
 """
+import time
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QMovie, QPixmap
 from PyQt5.QtWidgets import QDialog
 
 from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
@@ -19,7 +21,7 @@ from src.func.connection_function import test_connection
 from src.little_widget.message_box import pop_ok, pop_fail
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
-
+from static import image_rc
 
 class ConnDialog(QDialog):
 
@@ -66,45 +68,53 @@ class ConnDialog(QDialog):
         self.under_title_first_blank.setText("")
         self.under_title_first_blank.setObjectName("under_title_first_blank")
         self.verticalLayout.addWidget(self.under_title_first_blank)
+        # 表格布局
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.user_value = QtWidgets.QLineEdit(self.conn_frame)
-        self.user_value.setObjectName("user_value")
-        self.gridLayout.addWidget(self.user_value, 6, 2, 1, 1)
+        self.conn_name = QtWidgets.QLabel(self.conn_frame)
+        self.conn_name.setObjectName("conn_name")
+        self.gridLayout.addWidget(self.conn_name, 0, 0, 1, 1)
         self.grid_layout_blank = QtWidgets.QLabel(self.conn_frame)
         self.grid_layout_blank.setText("")
         self.grid_layout_blank.setObjectName("grid_layout_blank")
         self.gridLayout.addWidget(self.grid_layout_blank, 0, 1, 1, 1)
-        self.name_check = QtWidgets.QLabel(self.conn_frame)
-        self.name_check.setObjectName("name_check")
-        self.gridLayout.addWidget(self.name_check, 1, 2, 1, 1)
-        self.host_value = QtWidgets.QLineEdit(self.conn_frame)
-        self.host_value.setObjectName("host_value")
-        self.gridLayout.addWidget(self.host_value, 2, 2, 1, 1)
-        self.host = QtWidgets.QLabel(self.conn_frame)
-        self.host.setObjectName("host")
-        self.gridLayout.addWidget(self.host, 2, 0, 1, 1)
-        self.user = QtWidgets.QLabel(self.conn_frame)
-        self.user.setObjectName("user")
-        self.gridLayout.addWidget(self.user, 6, 0, 1, 1)
-        self.passwd = QtWidgets.QLabel(self.conn_frame)
-        self.passwd.setObjectName("passwd")
-        self.gridLayout.addWidget(self.passwd, 8, 0, 1, 1)
-        self.port_value = QtWidgets.QLineEdit(self.conn_frame)
-        self.port_value.setObjectName("port_value")
-        self.gridLayout.addWidget(self.port_value, 4, 2, 1, 1)
-        self.conn_name = QtWidgets.QLabel(self.conn_frame)
-        self.conn_name.setObjectName("conn_name")
-        self.gridLayout.addWidget(self.conn_name, 0, 0, 1, 1)
-        self.passwd_value = QtWidgets.QLineEdit(self.conn_frame)
-        self.passwd_value.setObjectName("passwd_value")
-        self.gridLayout.addWidget(self.passwd_value, 8, 2, 1, 1)
         self.conn_name_value = QtWidgets.QLineEdit(self.conn_frame)
         self.conn_name_value.setObjectName("conn_name_value")
         self.gridLayout.addWidget(self.conn_name_value, 0, 2, 1, 1)
+        self.name_check_splitter = QtWidgets.QSplitter(self.conn_frame)
+        self.name_check_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.name_check_splitter.setObjectName("name_check_splitter")
+        self.name_check_splitter.setHandleWidth(0)
+        self.gridLayout.addWidget(self.name_check_splitter, 1, 2, 1, 1)
+        self.name_check_pic = QtWidgets.QLabel(self.name_check_splitter)
+        self.name_check_pic.setObjectName("name_check_pic")
+        self.name_check_prompt = QtWidgets.QLabel(self.name_check_splitter)
+        self.name_check_prompt.setObjectName("name_check_prompt")
+        self.host = QtWidgets.QLabel(self.conn_frame)
+        self.host.setObjectName("host")
+        self.gridLayout.addWidget(self.host, 2, 0, 1, 1)
+        self.host_value = QtWidgets.QLineEdit(self.conn_frame)
+        self.host_value.setObjectName("host_value")
+        self.gridLayout.addWidget(self.host_value, 2, 2, 1, 1)
         self.port = QtWidgets.QLabel(self.conn_frame)
         self.port.setObjectName("port")
-        self.gridLayout.addWidget(self.port, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.port, 3, 0, 1, 1)
+        self.port_value = QtWidgets.QLineEdit(self.conn_frame)
+        self.port_value.setObjectName("port_value")
+        self.gridLayout.addWidget(self.port_value, 3, 2, 1, 1)
+        self.user = QtWidgets.QLabel(self.conn_frame)
+        self.user.setObjectName("user")
+        self.gridLayout.addWidget(self.user, 4, 0, 1, 1)
+        self.user_value = QtWidgets.QLineEdit(self.conn_frame)
+        self.user_value.setObjectName("user_value")
+        self.gridLayout.addWidget(self.user_value, 4, 2, 1, 1)
+        self.passwd = QtWidgets.QLabel(self.conn_frame)
+        self.passwd.setObjectName("passwd")
+        self.gridLayout.addWidget(self.passwd, 5, 0, 1, 1)
+        self.passwd_value = QtWidgets.QLineEdit(self.conn_frame)
+        self.passwd_value.setObjectName("passwd_value")
+        self.gridLayout.addWidget(self.passwd_value, 5, 2, 1, 1)
+
         self.verticalLayout.addLayout(self.gridLayout)
         self.bottom_blank = QtWidgets.QLabel(self.conn_frame)
         self.bottom_blank.setText("")
@@ -151,6 +161,7 @@ class ConnDialog(QDialog):
         self.test_conn.setDisabled(True)
         # 取消按钮：点击则关闭对话框
         self.cancel.clicked.connect(self.dialog.close)
+        self.conn_name_value.textEdited.connect(self.check_name_available)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self.dialog)
@@ -180,6 +191,31 @@ class ConnDialog(QDialog):
             self.host_value.setText(self._translate("Dialog", "localhost"))
             self.port_value.setText(self._translate("Dialog", "3306"))
             self.user_value.setText(self._translate("Dialog", "root"))
+
+    def check_name_available(self, conn_name):
+        """检查名称是否可用"""
+        if conn_name:
+            self.name_check_pic.clear()
+            self.movie = QMovie(":/gif/loading_simple.gif")
+            self.movie.setSpeed(200)
+            self.name_check_pic.setMovie(self.movie)
+            # 指定动画的尺寸
+            label_height = self.conn_name.geometry().height()
+            self.name_check_pic.setFixedWidth(label_height * 0.8)
+            self.movie.setScaledSize(QSize(label_height, label_height))
+            self.movie.start()
+            name_available = check_name_available(conn_name, self.connection.id)
+            if name_available:
+                self.name_check_pic.setPixmap(QPixmap(":/icon/right.jpg")
+                                              .scaled(label_height, label_height,
+                                                      Qt.IgnoreAspectRatio, Qt.SmoothTransformation))
+                prompt = "当前名称可用"
+                style = "color:green"
+            else:
+                prompt = "当前名称不可用"
+                style = "color:red"
+            self.name_check_prompt.setStyleSheet(style)
+            self.name_check_prompt.setText(prompt)
 
     def check_input(self):
         # 检查是否都有值
@@ -211,15 +247,12 @@ class ConnDialog(QDialog):
     def handle_func(self):
         """添加新的连接记录到系统库中，或编辑连接信息"""
         new_conn = self.get_input_connection()
-        name_available = check_name_available(new_conn.name, self.connection.id)
-        if name_available:
-            if self.dialog_title == EDIT_CONN_MENU:
-                update_conn(new_conn)
-            elif self.dialog_title == ADD_CONN_MENU:
-                add_conn(new_conn)
-                new_conn = get_new_conn()
-            pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
-            self.dialog.close()
-            self.conn_signal.emit(self.gui_parent, new_conn)
-        else:
-            pop_fail(self.dialog_title, CONN_NAME_EXISTS)
+        if self.dialog_title == EDIT_CONN_MENU:
+            update_conn(new_conn)
+        elif self.dialog_title == ADD_CONN_MENU:
+            add_conn(new_conn)
+            new_conn = get_new_conn()
+        pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
+        self.dialog.close()
+        self.conn_signal.emit(self.gui_parent, new_conn)
+        # pop_fail(self.dialog_title, CONN_NAME_EXISTS)
