@@ -14,4 +14,7 @@
   <qresource prefix="/boot_jpg">
     <file alias="boot.jpg">boot/boot.jpg</file>
   </qresource>
+  <qresource prefix="/gif">
+    <file alias="loading_simple.gif">gif/loading_simple.gif</file>
+  </qresource>
 </RCC>
