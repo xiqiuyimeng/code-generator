@@ -14,14 +14,14 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     DEL_CONN_MENU, CLOSE_CONN_PROMPT, EDIT_CONN_WITH_FIELD_PROMPT, EDIT_CONN_PROMPT, DEL_CONN_WITH_FIELD_PROMPT, \
     DEL_CONN_PROMPT, OPEN_DB_MENU, CLOSE_DB_MENU, SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, \
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
-from src.dialog.conn_dialog import test_connection
+from src.dialog.conn_dialog import test_connection, TestConnWorker
 from src.func.connection_function import open_connection, close_connection
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
 from src.func.selected_data import SelectedData
 from src.func.table_func import fill_table, change_table_checkbox, close_table, add_table, check_table_opened
 from src.func.tree_function import make_tree_item, show_conn_dialog
 from src.little_widget.menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
-from src.little_widget.message_box import pop_question
+from src.little_widget.message_box import pop_question, pop_ok, pop_fail
 from src.sys.sys_info_storage.sqlite import delete_conn
 
 _author_ = 'luwt'
@@ -142,7 +142,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             self.close_item(item, gui)
         # 测试连接
         elif func == TEST_CONN_MENU:
-            test_connection(gui.display_conn_dict.get(conn_id))
+            self.test_conn(gui.display_conn_dict.get(conn_id))
         # 添加连接
         elif func == ADD_CONN_MENU:
             gui.add_conn()
@@ -152,6 +152,19 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         # 删除连接
         elif func == DEL_CONN_MENU:
             self.del_conn(func, gui, conn_name, conn_id, item)
+
+    def test_conn(self, conn):
+        test_conn_thread = TestConnWorker(conn)
+        test_conn_thread.result.connect(lambda: self.get_test_result(test_conn_thread.result))
+        test_conn_thread.start()
+
+    def get_test_result(self, test_res):
+        # todo 这里需要优化，获取返回结果，打开连接处应该打开失败时弹窗，和这里类似
+        if test_res[0]:
+            print("ok")
+            pop_ok(TEST_CONN_MENU, test_res[1])
+        else:
+            pop_fail(TEST_CONN_MENU, test_res[1])
 
     @staticmethod
     def close_conn(conn_name, func, gui):

@@ -74,9 +74,9 @@ class GenerateResultDialog(QDialog):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 
         # 创建并启用子线程
-        self.thread_1 = Worker(self.gui, self.output_config_dict, self.selected_data)
-        self.thread_1.result.connect(self.progress)
-        self.thread_1.start()
+        self.generate_thread = GenerateWorker(self.gui, self.output_config_dict, self.selected_data)
+        self.generate_thread.result.connect(self.progress)
+        self.generate_thread.start()
 
         # 按钮事件
         self.cancel_button.clicked.connect(self.close)
@@ -100,7 +100,7 @@ class GenerateResultDialog(QDialog):
         self.ok_button.setText("确定")
 
 
-class Worker(QThread):
+class GenerateWorker(QThread):
 
     # 定义信号，返回已生成文件数，总文件数，当前进度值及文件名
     result = pyqtSignal(int, int, int, str)

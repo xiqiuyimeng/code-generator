@@ -1,13 +1,14 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt, QFile, QIODevice, QTextStream
+from PyQt5.QtCore import Qt
 
 from src.main_window.generator_gui import MainWindow
+from src.style.qss import read_qss
 from static import image_rc
-from static import style_rc
-
 
 import sys
+
+
 _author_ = 'luwt'
 _date_ = '2020/6/15 17:20'
 
@@ -23,10 +24,7 @@ if __name__ == "__main__":
     QtWidgets.qApp.processEvents()
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
-    file = QFile(":/style.qss")
-    file.open(QIODevice.ReadOnly)
-    app.setStyleSheet(QTextStream(file).readAll())
-    file.close()
+    app.setStyleSheet(read_qss())
     screen_rect = desktop.screenGeometry()
     ui = MainWindow(screen_rect)
     ui.show()
