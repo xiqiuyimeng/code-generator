@@ -59,4 +59,5 @@ def test_connection(connection):
             cur.test_conn()
         return True, TEST_CONN_SUCCESS_PROMPT
     except Exception as e:
-        return False, f'{TEST_CONN_FAIL_PROMPT}\t\n {e.args[0]} - {e.args[1]}'
+        return False, f'{TEST_CONN_FAIL_PROMPT}：[{connection.name}]' \
+                      f'\t\n {e.args[0]} - {e.args[1]}'

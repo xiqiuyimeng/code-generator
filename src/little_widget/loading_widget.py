@@ -19,13 +19,16 @@ class LoadingMask(QWidget):
         self.label.setMovie(self.movie)
         self.label.setFixedSize(QSize(160, 160))
         self.label.setScaledContents(True)
+        self.setObjectName("loading_mask")
+        self.label.setStyleSheet("#loading_mask{border-style:solid;border-radius:25px}")
         self.movie.start()
 
         layout = QHBoxLayout(self)
         layout.addWidget(self.label)
 
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
-        self.setWindowOpacity(0.4)
+        self.setWindowOpacity(0.8)
+        # self.setAttribute(Qt.WA_TranslucentBackground, True)
 
     def eventFilter(self, widget, event):
         """过滤移动事件，让遮罩层跟随父窗口移动"""

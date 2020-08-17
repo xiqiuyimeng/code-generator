@@ -6,6 +6,7 @@
     <file alias="refresh.jpg">icon/refresh.jpg</file>
     <file alias="right.jpg">icon/right.jpg</file>
     <file alias="right.png">icon/right.png</file>
+    <file alias="wrong.png">icon/wrong.png</file>
   </qresource>
   <qresource prefix="/bg_jpg">
     <file alias="window_bg.jpg">bg_jpg/window_bg.jpg</file>
@@ -16,6 +17,6 @@
     <file alias="boot.jpg">boot/boot.jpg</file>
   </qresource>
   <qresource prefix="/gif">
-    <file alias="loading_simple.gif">gif/loading_simple.gif</file>
+    <file alias="loading.gif">gif/loading.gif</file>
   </qresource>
 </RCC>

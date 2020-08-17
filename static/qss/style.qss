@@ -61,6 +61,9 @@ QLineEdit:hover{
 QLineEdit:disabled{
     border:1px solid gray;
 }
+#name_check_prompt{
+    font-size:15px;
+}
 /*添加连接对话框背景图*/
 #conn_frame{
     border-style:solid;

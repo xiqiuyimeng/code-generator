@@ -155,11 +155,11 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
 
     def test_conn(self, conn):
         test_conn_thread = TestConnWorker(conn)
-        test_conn_thread.result.connect(lambda: self.get_test_result(test_conn_thread.result))
+        test_conn_thread.result.connect(lambda res: self.get_test_result(res))
         test_conn_thread.start()
 
     def get_test_result(self, test_res):
-        # todo 这里需要优化，获取返回结果，打开连接处应该打开失败时弹窗，和这里类似
+        # todo 打开连接处应该打开失败时弹窗，和这里类似
         if test_res[0]:
             print("ok")
             pop_ok(TEST_CONN_MENU, test_res[1])
