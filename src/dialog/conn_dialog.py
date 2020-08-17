@@ -197,7 +197,7 @@ class ConnDialog(QDialog):
     def check_name_available(self, conn_name):
         """检查名称是否可用"""
         label_height = self.conn_name.geometry().height()
-        self.name_check_pic.setFixedWidth(label_height * 0.8)
+        self.name_check_pic.setFixedWidth(label_height)
         if conn_name:
             name_available = check_name_available(conn_name, self.connection.id)
             if name_available:
@@ -205,17 +205,18 @@ class ConnDialog(QDialog):
                 style = "color:green"
                 # 重载样式表
                 self.conn_name_value.setStyleSheet(read_qss())
-                # todo 当前图片不好看
-                pm = QPixmap(":/icon/right.png").scaled(label_height,
-                                                        label_height,
+                pm = QPixmap(":/icon/right.png").scaled(label_height * 0.6,
+                                                        label_height * 0.6,
                                                         Qt.IgnoreAspectRatio,
                                                         Qt.SmoothTransformation)
             else:
                 prompt = CONN_NAME_EXISTS.format(conn_name)
                 style = "color:red"
                 self.conn_name_value.setStyleSheet("#conn_name_value{border-color:red;color:red}")
-                # todo 错误的图片
-                pm = QPixmap().scaled(label_height, label_height, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+                pm = QPixmap(":/icon/wrong.png").scaled(label_height * 0.6,
+                                                        label_height * 0.6,
+                                                        Qt.IgnoreAspectRatio,
+                                                        Qt.SmoothTransformation)
             self.name_available = name_available
             self.name_check_pic.setPixmap(pm)
             self.name_check_prompt.setStyleSheet(style)
@@ -245,7 +246,7 @@ class ConnDialog(QDialog):
 
     def test_connection(self):
         """测试连接"""
-        self.loading_mask = LoadingMask(self.dialog, ":/gif/loading_simple.gif")
+        self.loading_mask = LoadingMask(self.dialog, ":/gif/loading.gif")
         self.loading_mask.show()
         self.dialog.installEventFilter(self.loading_mask)
         new_conn = self.get_input_connection()
