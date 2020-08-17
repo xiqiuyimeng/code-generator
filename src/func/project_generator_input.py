@@ -118,7 +118,11 @@ class JavaInputHandler(ProjectInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         if ui.java_lineEdit.text():
-            self.set_java_path(ui, ui.java_lineEdit.text())
+            if os.path.isdir(ui.java_lineEdit.text()):
+                self.set_java_path(ui, ui.java_lineEdit.text())
+            else:
+                # 屏蔽其他输入框
+                self.disable_src_xml_button(ui, True)
         else:
             # 如果清空了输入框，那么就将其余输入都关闭
             self.clear_java_path_input(ui)
@@ -154,7 +158,7 @@ class JavaInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.java_lineEdit.setText("")
+        ui.java_lineEdit.clear()
         if hasattr(ui, 'java_path'):
             del ui.java_path
         if ui.project_output_dict.get('java_path'):
@@ -228,7 +232,7 @@ class JavaSrcInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.java_src_lineEdit.setText("")
+        ui.java_src_lineEdit.clear()
         if hasattr(ui, 'abs_java_src'):
             del ui.abs_java_src
         if ui.project_output_dict.get('java_src_relative'):
@@ -297,7 +301,7 @@ class ModelInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.model_lineEdit.setText("")
+        ui.model_lineEdit.clear()
         if hasattr(ui, 'model_path'):
             del ui.model_path
         if ui.project_output_dict.get('model_package'):
@@ -342,7 +346,7 @@ class MapperInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.mapper_lineEdit.setText("")
+        ui.mapper_lineEdit.clear()
         if hasattr(ui, 'mapper_path'):
             del ui.mapper_path
         if ui.project_output_dict.get('mapper_package'):
@@ -386,7 +390,7 @@ class XmlInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.xml_lineEdit.setText("")
+        ui.xml_lineEdit.clear()
         if hasattr(ui, 'xml_path'):
             del ui.xml_path
         if ui.project_output_dict.get('xml_path'):
@@ -431,7 +435,7 @@ class ServiceInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.service_lineEdit.setText("")
+        ui.service_lineEdit.clear()
         if hasattr(ui, 'service_path'):
             del ui.service_path
         if ui.project_output_dict.get('service_package'):
@@ -476,7 +480,7 @@ class ServiceImplInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.service_impl_lineEdit.setText("")
+        ui.service_impl_lineEdit.clear()
         if hasattr(ui, 'service_impl_path'):
             del ui.service_impl_path
         if ui.project_output_dict.get('service_impl_package'):
@@ -521,7 +525,7 @@ class ControllerInputHandler(ProjectInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.controller_lineEdit.setText("")
+        ui.controller_lineEdit.clear()
         if hasattr(ui, 'controller_path'):
             del ui.controller_path
         if ui.project_output_dict.get('controller_package'):

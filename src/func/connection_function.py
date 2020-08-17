@@ -3,9 +3,8 @@
 处理连接相关功能，打开连接、关闭连接、测试连接
 
 """
-from src.constant.constant import TEST_CONN_MENU, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
+from src.constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
 from src.db.cursor_proxy import DBExecutor
-from src.little_widget.message_box import pop_ok, pop_fail
 
 _author_ = 'luwt'
 _date_ = '2020/7/7 16:09'
@@ -58,7 +57,6 @@ def test_connection(connection):
                 connection.pwd
         ) as cur:
             cur.test_conn()
-        pop_ok(TEST_CONN_MENU, TEST_CONN_SUCCESS_PROMPT)
+        return True, TEST_CONN_SUCCESS_PROMPT
     except Exception as e:
-        pop_fail(TEST_CONN_MENU, f'{TEST_CONN_FAIL_PROMPT}\t\n'
-                                 f'{e.args[0]} - {e.args[1]}')
+        return False, f'{TEST_CONN_FAIL_PROMPT}\t\n {e.args[0]} - {e.args[1]}'

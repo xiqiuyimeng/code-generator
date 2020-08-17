@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 from PyQt5.QtWidgets import QFileDialog
 from src.constant.constant import CHOOSE_DIRECTORY
+import os
 
 _author_ = 'luwt'
 _date_ = '2020/7/24 17:30'
@@ -12,7 +13,8 @@ def check_path_mybatis_lineEdit(ui):
     output_path = ui.output_lineEdit.text()
     model_package = ui.model_lineEdit.text()
     mapper_package = ui.mapper_lineEdit.text()
-    return all((output_path, model_package, mapper_package))
+    return all((output_path, model_package, mapper_package)) \
+           and os.path.isdir(output_path)
 
 
 def check_path_spring_lineEdit(ui):
@@ -64,11 +66,17 @@ class OutputPathInputHandler(PathInputHandlerAbstract):
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
         if ui.output_lineEdit.text():
-            ui.path_output_dict['output_path'] = ui.output_lineEdit.text()
+            if os.path.isdir(ui.output_lineEdit.text()):
+                ui.path_output_dict['output_path'] = ui.output_lineEdit.text()
+                # 解锁剩余可输入框
+                self.disable_package_button(ui, False)
+                set_generate_button_available(ui)
+            else:
+                # 屏蔽所有输入框
+                self.disable_package_button(ui, True)
         else:
             # 如果清空了输入框，那么就将其余输入都关闭
             self.clear_output_path_input(ui)
-        set_generate_button_available(ui)
 
     def choose_dir(self, ui):
         """
@@ -105,7 +113,7 @@ class OutputPathInputHandler(PathInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.output_lineEdit.setText("")
+        ui.output_lineEdit.clear()
         if ui.path_output_dict.get('output_path'):
             del ui.path_output_dict['output_path']
         OutputPathInputHandler.disable_package_button(ui, True)
@@ -132,7 +140,7 @@ class ModelPathInputHandler(PathInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.model_lineEdit.setText("")
+        ui.model_lineEdit.clear()
         if ui.path_output_dict.get('model_package'):
             del ui.path_output_dict['model_package']
 
@@ -160,7 +168,7 @@ class MapperPathInputHandler(PathInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.mapper_lineEdit.setText("")
+        ui.mapper_lineEdit.clear()
         if ui.path_output_dict.get('mapper_package'):
             del ui.path_output_dict['mapper_package']
 
@@ -188,7 +196,7 @@ class ServicePathInputHandler(PathInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.service_lineEdit.setText("")
+        ui.service_lineEdit.clear()
         if ui.path_output_dict.get('service_package'):
             del ui.path_output_dict['service_package']
 
@@ -216,7 +224,7 @@ class ServiceImplPathInputHandler(PathInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.service_impl_lineEdit.setText("")
+        ui.service_impl_lineEdit.clear()
         if ui.path_output_dict.get('service_impl_package'):
             del ui.path_output_dict['service_impl_package']
 
@@ -244,6 +252,6 @@ class ControllerPathInputHandler(PathInputHandlerAbstract):
         :param ui: ui对象，维护的父级对象为生成器对话框对象DisplaySelectedDialog
             属性widget为包含了所有页面元素的小部件对象，用于在布局中互相替换，实现换页
         """
-        ui.controller_lineEdit.setText("")
+        ui.controller_lineEdit.clear()
         if ui.path_output_dict.get('controller_package'):
             del ui.path_output_dict['controller_package']

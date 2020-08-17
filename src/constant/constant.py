@@ -140,7 +140,8 @@ TEST_CONN_SUCCESS_PROMPT = '连接成功！'
 # 测试连接失败提示语
 TEST_CONN_FAIL_PROMPT = '连接失败！'
 # 检查系统库中连接名字存在提示语
-CONN_NAME_EXISTS = '连接名称已存在！'
+CONN_NAME_EXISTS = '当前名称不可用，{}已存在！'
+CONN_NAME_AVAILABLE = '连接名称{}可用'
 # 关闭连接时的提示语
 CLOSE_CONN_PROMPT = '该连接下有已选的字段，强行关闭将清空连接下所选字段，是否继续'
 

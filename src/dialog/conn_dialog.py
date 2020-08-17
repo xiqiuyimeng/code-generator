@@ -8,20 +8,22 @@
 """
 添加、编辑连接对话框界面
 """
-import time
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QMovie, QPixmap
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QDialog
 
 from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
-    SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS
+    SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE, TEST_CONN_MENU
 from src.func.connection_function import test_connection
+from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_ok, pop_fail
+from src.style.qss import read_qss
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
 from static import image_rc
+
 
 class ConnDialog(QDialog):
 
@@ -146,6 +148,7 @@ class ConnDialog(QDialog):
         # 设置端口号只能输入数字
         self.port_value.setValidator(QtGui.QIntValidator())
 
+        self.conn_name_value.textEdited.connect(self.check_name_available)
         self.conn_name_value.textEdited.connect(self.check_input)
         self.host_value.textEdited.connect(self.check_input)
         self.port_value.textEdited.connect(self.check_input)
@@ -161,7 +164,6 @@ class ConnDialog(QDialog):
         self.test_conn.setDisabled(True)
         # 取消按钮：点击则关闭对话框
         self.cancel.clicked.connect(self.dialog.close)
-        self.conn_name_value.textEdited.connect(self.check_name_available)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self.dialog)
@@ -194,26 +196,28 @@ class ConnDialog(QDialog):
 
     def check_name_available(self, conn_name):
         """检查名称是否可用"""
+        label_height = self.conn_name.geometry().height()
+        self.name_check_pic.setFixedWidth(label_height * 0.8)
         if conn_name:
-            self.name_check_pic.clear()
-            self.movie = QMovie(":/gif/loading_simple.gif")
-            self.movie.setSpeed(200)
-            self.name_check_pic.setMovie(self.movie)
-            # 指定动画的尺寸
-            label_height = self.conn_name.geometry().height()
-            self.name_check_pic.setFixedWidth(label_height * 0.8)
-            self.movie.setScaledSize(QSize(label_height, label_height))
-            self.movie.start()
             name_available = check_name_available(conn_name, self.connection.id)
             if name_available:
-                self.name_check_pic.setPixmap(QPixmap(":/icon/right.jpg")
-                                              .scaled(label_height, label_height,
-                                                      Qt.IgnoreAspectRatio, Qt.SmoothTransformation))
-                prompt = "当前名称可用"
+                prompt = CONN_NAME_AVAILABLE.format(conn_name)
                 style = "color:green"
+                # 重载样式表
+                self.conn_name_value.setStyleSheet(read_qss())
+                # todo 当前图片不好看
+                pm = QPixmap(":/icon/right.png").scaled(label_height,
+                                                        label_height,
+                                                        Qt.IgnoreAspectRatio,
+                                                        Qt.SmoothTransformation)
             else:
-                prompt = "当前名称不可用"
+                prompt = CONN_NAME_EXISTS.format(conn_name)
                 style = "color:red"
+                self.conn_name_value.setStyleSheet("#conn_name_value{border-color:red;color:red}")
+                # todo 错误的图片
+                pm = QPixmap().scaled(label_height, label_height, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            self.name_available = name_available
+            self.name_check_pic.setPixmap(pm)
             self.name_check_prompt.setStyleSheet(style)
             self.name_check_prompt.setText(prompt)
 
@@ -221,7 +225,7 @@ class ConnDialog(QDialog):
         # 检查是否都有值
         conn = self.get_input()
         # 如果输入框都有值，那么就开放按钮，否则关闭
-        if all(conn):
+        if all(conn) and self.name_available:
             self.ok.setDisabled(False)
             self.test_conn.setDisabled(False)
         else:
@@ -241,8 +245,22 @@ class ConnDialog(QDialog):
 
     def test_connection(self):
         """测试连接"""
+        self.loading_mask = LoadingMask(self.dialog, ":/gif/loading_simple.gif")
+        self.loading_mask.show()
+        self.dialog.installEventFilter(self.loading_mask)
         new_conn = self.get_input_connection()
-        test_connection(new_conn)
+        # 创建并启用子线程
+        test_conn_thread = TestConnWorker(new_conn)
+        test_conn_thread.result.connect(self.get_test_result)
+        test_conn_thread.start()
+
+    def get_test_result(self, test_res):
+        """解析测试连接的结果"""
+        self.loading_mask.close()
+        if test_res[0]:
+            pop_ok(TEST_CONN_MENU, test_res[1])
+        else:
+            pop_fail(TEST_CONN_MENU, test_res[1])
 
     def handle_func(self):
         """添加新的连接记录到系统库中，或编辑连接信息"""
@@ -255,4 +273,21 @@ class ConnDialog(QDialog):
         pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
         self.dialog.close()
         self.conn_signal.emit(self.gui_parent, new_conn)
-        # pop_fail(self.dialog_title, CONN_NAME_EXISTS)
+
+
+class TestConnWorker(QThread):
+
+    # 定义信号，返回测试结果，第一个参数为是否成功，第二个为提示语
+    result = pyqtSignal(tuple)
+
+    def __init__(self, connection):
+        super().__init__()
+        self.conn = connection
+
+    def run(self):
+        self.test_conn()
+
+    def test_conn(self):
+        test_res = test_connection(self.conn)
+        self.result.emit(test_res)
+
