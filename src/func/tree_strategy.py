@@ -14,7 +14,7 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     DEL_CONN_MENU, CLOSE_CONN_PROMPT, EDIT_CONN_WITH_FIELD_PROMPT, EDIT_CONN_PROMPT, DEL_CONN_WITH_FIELD_PROMPT, \
     DEL_CONN_PROMPT, OPEN_DB_MENU, CLOSE_DB_MENU, SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, \
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
-from src.dialog.conn_dialog import test_connection, TestConnWorker
+from src.dialog.conn_dialog import TestConnWorker
 from src.func.connection_function import open_connection, close_connection
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
 from src.func.selected_data import SelectedData
