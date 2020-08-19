@@ -250,10 +250,11 @@ class ConnDialog(QDialog):
         self.loading_mask.show()
         self.dialog.installEventFilter(self.loading_mask)
         new_conn = self.get_input_connection()
-        # 创建并启用子线程
-        test_conn_thread = TestConnWorker(new_conn)
-        test_conn_thread.result.connect(self.get_test_result)
-        test_conn_thread.start()
+        # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
+        # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
+        self.test_conn_thread = TestConnWorker(new_conn)
+        self.test_conn_thread.result.connect(self.get_test_result)
+        self.test_conn_thread.start()
 
     def get_test_result(self, test_res):
         """解析测试连接的结果"""
