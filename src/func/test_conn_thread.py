@@ -39,10 +39,11 @@ class AsyncTestConn:
     def test_conn(self):
         self._movie.start()
         self._movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self._movie.currentPixmap())))
-        # 创建并启用子线程
-        test_conn_thread = TestConnWorker(self.conn)
-        test_conn_thread.result.connect(lambda res: self.get_test_result(res))
-        test_conn_thread.start()
+        # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
+        # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
+        self.test_conn_thread = TestConnWorker(self.conn)
+        self.test_conn_thread.result.connect(lambda res: self.get_test_result(res))
+        self.test_conn_thread.start()
 
     def get_test_result(self, test_res):
         """解析测试连接的结果"""

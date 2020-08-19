@@ -45,10 +45,11 @@ class AsyncOpenConn:
     def open_conn(self):
         self._movie.start()
         self._movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self._movie.currentPixmap())))
-        # 创建并启用子线程
-        open_conn_thread = OpenConnWorker(self.gui, self.conn_id, self.conn_name)
-        open_conn_thread.result.connect(lambda res: self.get_result(res))
-        open_conn_thread.start()
+        # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
+        # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
+        self.open_conn_thread = OpenConnWorker(self.gui, self.conn_id, self.conn_name)
+        self.open_conn_thread.result.connect(lambda res: self.get_result(res))
+        self.open_conn_thread.start()
 
     def get_result(self, data):
         """解析打开连接的结果"""
