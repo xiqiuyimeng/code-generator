@@ -10,13 +10,13 @@
 """
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QDialog
 
 from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
     SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE, TEST_CONN_MENU
-from src.func.connection_function import test_connection
+from src.func.test_conn_thread import TestConnWorker
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_ok, pop_fail
 from src.style.qss import read_qss
@@ -274,21 +274,3 @@ class ConnDialog(QDialog):
         pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
         self.dialog.close()
         self.conn_signal.emit(self.gui_parent, new_conn)
-
-
-class TestConnWorker(QThread):
-
-    # 定义信号，返回测试结果，第一个参数为是否成功，第二个为提示语
-    result = pyqtSignal(tuple)
-
-    def __init__(self, connection):
-        super().__init__()
-        self.conn = connection
-
-    def run(self):
-        self.test_conn()
-
-    def test_conn(self):
-        test_res = test_connection(self.conn)
-        self.result.emit(test_res)
-
