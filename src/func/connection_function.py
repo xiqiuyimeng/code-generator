@@ -19,15 +19,19 @@ def open_connection(gui, conn_id, conn_name):
         可取出当前点击的连接完整信息
     :param conn_name: 连接名称，作为已连接数据库的连接字典key。
     """
-    # 如果该连接已经打开，直接取，否则获取新的连接
-    if not gui.connected_dict.get(conn_name):
-        # id name host port user pwd
-        conn_info = gui.display_conn_dict.get(conn_id)
-        executor = DBExecutor(*conn_info[2:])
-        gui.connected_dict[conn_name] = executor
-    else:
-        executor = gui.connected_dict.get(conn_name)
-    return executor
+    try:
+        # 如果该连接已经打开，直接取，否则获取新的连接
+        if not gui.connected_dict.get(conn_name):
+            # id name host port user pwd
+            conn_info = gui.display_conn_dict.get(conn_id)
+            executor = DBExecutor(*conn_info[2:])
+            gui.connected_dict[conn_name] = executor
+        else:
+            executor = gui.connected_dict.get(conn_name)
+        return True, executor
+    except Exception as e:
+        return False, f'{TEST_CONN_FAIL_PROMPT}：[{conn_name}]' \
+                      f'\t\n {e.args[0]} - {e.args[1]}'
 
 
 def close_connection(gui, conn_name):

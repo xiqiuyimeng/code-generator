@@ -14,14 +14,15 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     DEL_CONN_MENU, CLOSE_CONN_PROMPT, EDIT_CONN_WITH_FIELD_PROMPT, EDIT_CONN_PROMPT, DEL_CONN_WITH_FIELD_PROMPT, \
     DEL_CONN_PROMPT, OPEN_DB_MENU, CLOSE_DB_MENU, SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, \
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
-from src.dialog.conn_dialog import TestConnWorker
 from src.func.connection_function import open_connection, close_connection
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
 from src.func.selected_data import SelectedData
 from src.func.table_func import fill_table, change_table_checkbox, close_table, add_table, check_table_opened
+from src.func.test_conn_thread import AsyncTestConn
+from src.func.open_conn_thread import AsyncOpenConn
 from src.func.tree_function import make_tree_item, show_conn_dialog
 from src.little_widget.menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
-from src.little_widget.message_box import pop_question, pop_ok, pop_fail
+from src.little_widget.message_box import pop_question
 from src.sys.sys_info_storage.sqlite import delete_conn
 
 _author_ = 'luwt'
@@ -100,9 +101,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 连接的id，连接名称
             conn_id, conn_name = TreeNodeConn.get_node_info(item)
-            dbs = open_connection(gui, conn_id, conn_name).get_dbs()
-            for db in dbs:
-                make_tree_item(gui, item, db)
+            open_conn = AsyncOpenConn(gui, conn_id, conn_name, item)
+            open_conn.open_conn()
 
     def close_item(self, item, gui):
         """
@@ -142,7 +142,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             self.close_item(item, gui)
         # 测试连接
         elif func == TEST_CONN_MENU:
-            self.test_conn(gui.display_conn_dict.get(conn_id))
+            self.test_conn(gui.display_conn_dict.get(conn_id), item)
         # 添加连接
         elif func == ADD_CONN_MENU:
             gui.add_conn()
@@ -153,18 +153,9 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         elif func == DEL_CONN_MENU:
             self.del_conn(func, gui, conn_name, conn_id, item)
 
-    def test_conn(self, conn):
-        test_conn_thread = TestConnWorker(conn)
-        test_conn_thread.result.connect(lambda res: self.get_test_result(res))
-        test_conn_thread.start()
-
-    def get_test_result(self, test_res):
-        # todo 打开连接处应该打开失败时弹窗，和这里类似
-        if test_res[0]:
-            print("ok")
-            pop_ok(TEST_CONN_MENU, test_res[1])
-        else:
-            pop_fail(TEST_CONN_MENU, test_res[1])
+    def test_conn(self, conn, item):
+        test_conn = AsyncTestConn(conn, TEST_CONN_MENU, item)
+        test_conn.test_conn()
 
     @staticmethod
     def close_conn(conn_name, func, gui):
@@ -280,7 +271,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 获取连接id和名称，从而获取该连接的数据库操作对象
             conn_id, conn_name, db_name = TreeNodeDB.get_node_info(item)
-            executor = open_connection(gui, conn_id, conn_name)
+            executor = open_connection(gui, conn_id, conn_name)[1]
             # 首先需要切换库
             executor.switch_db(db_name)
             tables = executor.get_tables()
@@ -488,7 +479,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
     @staticmethod
     def get_cols(gui, item):
         conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
-        executor = open_connection(gui, conn_id, conn_name)
+        executor = open_connection(gui, conn_id, conn_name)[1]
         # 获取当前表下所有的列信息，包含字段名、字段类型、注释
         return executor.get_cols(db_name, tb_name)
 
