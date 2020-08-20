@@ -14,13 +14,13 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     DEL_CONN_MENU, CLOSE_CONN_PROMPT, EDIT_CONN_WITH_FIELD_PROMPT, EDIT_CONN_PROMPT, DEL_CONN_WITH_FIELD_PROMPT, \
     DEL_CONN_PROMPT, OPEN_DB_MENU, CLOSE_DB_MENU, SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, \
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
-from src.func.connection_function import open_connection, close_connection
+from src.func.connection_function import close_connection
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
 from src.func.selected_data import SelectedData
-from src.func.table_func import fill_table, change_table_checkbox, close_table, add_table, check_table_opened
+from src.func.table_func import change_table_checkbox, close_table, add_table, check_table_opened
 from src.func.test_conn_thread import AsyncTestConn
 from src.func.open_conn_thread import AsyncOpenConn
-from src.func.tree_function import make_tree_item, show_conn_dialog
+from src.func.tree_function import show_conn_dialog
 from src.little_widget.menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.little_widget.message_box import pop_question
 from src.sys.sys_info_storage.sqlite import delete_conn
@@ -101,8 +101,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 连接的id，连接名称
             conn_id, conn_name = TreeNodeConn.get_node_info(item)
-            open_conn = AsyncOpenConn(gui, conn_id, conn_name, item)
-            open_conn.open_conn()
+            open_conn = AsyncOpenConn(gui, conn_id, item, self, conn_name)
+            open_conn.connect_db()
 
     def close_item(self, item, gui):
         """
@@ -271,12 +271,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 获取连接id和名称，从而获取该连接的数据库操作对象
             conn_id, conn_name, db_name = TreeNodeDB.get_node_info(item)
-            executor = open_connection(gui, conn_id, conn_name)[1]
-            # 首先需要切换库
-            executor.switch_db(db_name)
-            tables = executor.get_tables()
-            for table in tables:
-                make_tree_item(gui, item, table, checkbox=Qt.Unchecked)
+            open_conn = AsyncOpenConn(gui, conn_id, item, self, conn_name, db_name)
+            open_conn.connect_db()
 
     def close_item(self, item, gui):
         """
@@ -377,25 +373,9 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         # 如果当前打开表是欲打开之表，什么都不需要做
         elif check_table_opened(gui, item):
             return
-        # 添加表格控件
-        add_table(gui)
-        # 获取连接id，从而获取该连接的数据库操作对象
-        cols = TreeNodeTable.get_cols(gui, item)
         conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
-        # 获取选中的字段，如果为空，则未选中，如果选中列表长度等于字段列表长度，那么为全选
-        selected_cols = SelectedData().get_col_list(conn_name, db_name, tb_name, True)
-        # 当前表复选框的状态，赋予表格中复选框的状态
-        fill_table(gui, cols, selected_cols, tb_name)
-        # 如果表格复选框为选中且选中的字段数等于总字段数，那么将表头的复选框也选中，默认表头复选框未选中
-        if item.checkState(0) == Qt.Checked and len(cols) == len(selected_cols):
-            gui.table_header.set_header_checked(True)
-        # 表格复选框改变事件
-        gui.tableWidget.cellChanged.connect(gui.on_cell_changed_func)
-        gui.current_table = item
-        # 状态栏提示
-        gui.statusbar.showMessage(f"当前展示的表为：{item.text(0)}")
-        # 设置气泡提示
-        gui.tableWidget.setToolTip(f'当前表为{tb_name}')
+        open_conn = AsyncOpenConn(gui, conn_id, item, self, conn_name, db_name, tb_name)
+        open_conn.connect_db()
 
     def close_item(self, item, gui):
         """
@@ -475,11 +455,4 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         db_name = item.parent().text(0)
         tb_name = item.text(0)
         return conn_id, conn_name, db_name, tb_name
-
-    @staticmethod
-    def get_cols(gui, item):
-        conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
-        executor = open_connection(gui, conn_id, conn_name)[1]
-        # 获取当前表下所有的列信息，包含字段名、字段类型、注释
-        return executor.get_cols(db_name, tb_name)
 

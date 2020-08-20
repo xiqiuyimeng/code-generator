@@ -19,7 +19,7 @@ def get_params(gui, selected_data):
     params = list()
     for conn_name, db_dict in selected_data.items():
         conn_id = get_id_by_name(conn_name)
-        cursor = open_connection(gui, conn_id, conn_name)[1].cursor
+        cursor = open_connection(gui, conn_id, conn_name).cursor
         for db_name, tb_dict in db_dict.items():
             for tb_name, cols in tb_dict.items():
                 current_param_dict = {

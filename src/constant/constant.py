@@ -7,12 +7,6 @@ import os
 _author_ = 'luwt'
 _date_ = '2020/4/20 10:40'
 
-# 默认配置文件地址
-DEFAULT_CONFIG_PATH = 'config.xml'
-
-# 测试数据库连接，查询数据库版本信息
-TEST_CONN_SQL = 'select version();'
-
 # 查询数据库列表
 QUERY_DB_SQL = 'show databases;'
 

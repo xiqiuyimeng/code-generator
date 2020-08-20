@@ -17,10 +17,7 @@ class LoadingMask(QWidget):
 
         self.movie = QMovie(gif)
         self.label.setMovie(self.movie)
-        # self.label.setFixedSize(QSize(160, 160))
         self.label.setScaledContents(True)
-        self.setObjectName("loading_mask")
-        self.label.setStyleSheet("#loading_mask{border-style:solid;border-radius:25px}")
         self.movie.start()
 
         layout = QHBoxLayout(self)

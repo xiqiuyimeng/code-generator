@@ -4,7 +4,7 @@
 """
 from itertools import groupby
 
-from src.constant.constant import TEST_CONN_SQL, QUERY_DB_SQL, QUERY_TABLES_SQL, QUERY_SYS_TB, QUERY_SYS_TB_COL
+from src.constant.constant import QUERY_DB_SQL, QUERY_TABLES_SQL, QUERY_SYS_TB, QUERY_SYS_TB_COL
 from src.db.get_cursor import Cursor
 
 _author_ = 'luwt'
@@ -30,7 +30,7 @@ class DBExecutor:
         self.cursor_ = Cursor(self.host, self.user, self.pwd, None, self.port)
 
     def test_conn(self):
-        self.cursor.execute(TEST_CONN_SQL)
+        self.cursor_.conn.ping()
 
     def switch_db(self, db):
         """切换库"""
