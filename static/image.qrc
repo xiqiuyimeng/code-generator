@@ -1,7 +1,7 @@
 <RCC>
   <qresource prefix="/icon">
     <file alias="add.jpg">icon/add.jpg</file>
-    <file alias="exec.jpg">icon/exec.png</file>
+    <file alias="exec.jpg">icon/exec.jpg</file>
     <file alias="exit.jpg">icon/exit.jpg</file>
     <file alias="refresh.jpg">icon/refresh.jpg</file>
     <file alias="right.jpg">icon/right.jpg</file>

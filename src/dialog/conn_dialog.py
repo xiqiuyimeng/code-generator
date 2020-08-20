@@ -189,6 +189,7 @@ class ConnDialog(QDialog):
             self.passwd_value.setText(self._translate("Dialog", self.connection.pwd))
             self.ok.setDisabled(False)
             self.test_conn.setDisabled(False)
+            self.name_available = True
         else:
             self.host_value.setText(self._translate("Dialog", "localhost"))
             self.port_value.setText(self._translate("Dialog", "3306"))
@@ -256,13 +257,13 @@ class ConnDialog(QDialog):
         self.test_conn_thread.result.connect(self.get_test_result)
         self.test_conn_thread.start()
 
-    def get_test_result(self, test_res):
+    def get_test_result(self, flag, prompt):
         """解析测试连接的结果"""
         self.loading_mask.close()
-        if test_res[0]:
-            pop_ok(TEST_CONN_MENU, test_res[1])
+        if flag:
+            pop_ok(TEST_CONN_MENU, prompt)
         else:
-            pop_fail(TEST_CONN_MENU, test_res[1])
+            pop_fail(TEST_CONN_MENU, prompt)
 
     def handle_func(self):
         """添加新的连接记录到系统库中，或编辑连接信息"""
