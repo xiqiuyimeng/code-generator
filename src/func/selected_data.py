@@ -13,10 +13,8 @@
 第三层字典（表字典）：存放对应数据库下的表信息，key为表名，value为列表。称之为tb_dict
 第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list，如果全选字段，则为元祖类型，否则为列表
 """
-from src.constant.constant import TEST_CONN_FAIL_PROMPT, OPEN_CONN_MENU
 from src.db.cursor_proxy import get_cols_group_by_table
 from src.func.connection_function import open_connection
-from src.little_widget.message_box import pop_fail
 
 _author_ = 'luwt'
 _date_ = '2020/7/8 16:45'

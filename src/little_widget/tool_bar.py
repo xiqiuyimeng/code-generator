@@ -5,7 +5,6 @@
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
-from static import image_rc
 
 _author_ = 'luwt'
 _date_ = '2020/7/13 14:28'

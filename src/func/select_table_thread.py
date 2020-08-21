@@ -8,7 +8,6 @@ from src.func.gui_function import set_children_check_state
 from src.func.selected_data import SelectedData
 from src.func.table_func import change_table_checkbox
 from src.little_widget.message_box import pop_fail
-from static import image_rc
 
 _author_ = 'luwt'
 _date_ = '2020/8/21 10:04'

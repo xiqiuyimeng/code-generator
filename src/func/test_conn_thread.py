@@ -6,7 +6,6 @@ from PyQt5.QtGui import QIcon
 from src.constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
 from src.func.connection_function import test_connection
 from src.little_widget.message_box import pop_ok, pop_fail
-from static import image_rc
 
 _author_ = 'luwt'
 _date_ = '2020/8/19 11:35'

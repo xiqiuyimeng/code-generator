@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QMessageBox
 
 from src.constant.constant import OK_BUTTON, ACCEPT_BUTTON, \
     REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
-from static import image_rc
 
 
 _author_ = 'luwt'

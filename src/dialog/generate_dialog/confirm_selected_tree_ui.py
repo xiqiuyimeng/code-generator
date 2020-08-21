@@ -1,11 +1,9 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, \
     EXPAND_BUTTON, PATH_GENERATOR_BUTTON
-from src.sys.settings.font import set_font
 
 _author_ = 'luwt'
 _date_ = '2020/7/23 15:51'

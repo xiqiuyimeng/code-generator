@@ -22,7 +22,6 @@ from src.little_widget.message_box import pop_ok, pop_fail
 from src.style.qss import read_qss
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
-from static import image_rc
 
 
 class ConnDialog(QDialog):
