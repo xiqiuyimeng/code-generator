@@ -137,12 +137,7 @@ class SelectedData:
         :param tb_names: 表名称列表，作为key存在于表字典中，若不传则为查询所有
         """
         tb_dict = self.get_tb_dict(conn_name, db_name)
-        try:
-            executor = open_connection(gui, conn_id, conn_name)
-        except Exception as e:
-            pop_fail(OPEN_CONN_MENU, f'{TEST_CONN_FAIL_PROMPT}：[{conn_name}]'
-                     f'\t\n {e.args[0]} - {e.args[1]}')
-            return
+        executor = open_connection(gui, conn_id, conn_name)
         cols = executor.get_tb_cols(db_name, tb_names)
         tb_cols_dict = get_cols_group_by_table(cols)
         tb_dict.update(tb_cols_dict)
