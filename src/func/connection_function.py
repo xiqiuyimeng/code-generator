@@ -26,8 +26,13 @@ def open_connection(gui, conn_id, conn_name):
         gui.connected_dict[conn_name] = executor
     else:
         executor = gui.connected_dict.get(conn_name)
-        # 当前连接已经存在，测试下
-        executor.test_conn()
+        try:
+            # 当前连接已经存在，测试下
+            executor.test_conn()
+        except Exception as e:
+            # 若连接已失效，清除连接字典中对应项
+            del gui.connected_dict[conn_name]
+            raise e
     return executor
 
 

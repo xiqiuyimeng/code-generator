@@ -133,6 +133,8 @@ SAVE_CONN_SUCCESS_PROMPT = '保存成功！'
 TEST_CONN_SUCCESS_PROMPT = '连接成功！'
 # 测试连接失败提示语
 TEST_CONN_FAIL_PROMPT = '无法连接到数据库'
+# 选择数据库表数据时，无法连接到数据库
+SELECT_TABLE_FAIL_PROMPT = '选择数据库表失败'
 # 检查系统库中连接名字存在提示语
 CONN_NAME_EXISTS = '当前名称不可用，{}已存在！'
 CONN_NAME_AVAILABLE = '连接名称{}可用'

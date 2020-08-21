@@ -16,6 +16,7 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
 from src.func.connection_function import close_connection
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
+from src.func.select_table_thread import AsyncSelectTable
 from src.func.selected_data import SelectedData
 from src.func.table_func import change_table_checkbox, close_table, add_table, check_table_opened
 from src.func.test_conn_thread import AsyncTestConn
@@ -317,11 +318,8 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
                 self.close_item(item, gui)
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
-            set_children_check_state(item, Qt.Checked)
-            # 填充选中表列表，获取连接名，id，数据库名，表名
-            SelectedData().set_tbs(gui, conn_id, conn_name, db_name)
-            if hasattr(gui, 'current_table') and gui.current_table.parent() is item:
-                change_table_checkbox(gui, gui.current_table, True)
+            select_table = AsyncSelectTable(gui, item, conn_id, conn_name, db_name)
+            select_table.select_table()
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
             set_children_check_state(item, Qt.Unchecked)
@@ -401,9 +399,8 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
             conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
             # 如果表已经选中，那么右侧表格需全选字段
             if check_state == Qt.Checked:
-                change_table_checkbox(gui, item, True)
-                # 添加表名到容器
-                SelectedData().set_tbs(gui, conn_id, conn_name, db_name, (tb_name, ))
+                select_table = AsyncSelectTable(gui, item, conn_id, conn_name, db_name, (tb_name, ))
+                select_table.select_table()
             # 如果表未选中，那么右侧表格需清空选择
             elif check_state == Qt.Unchecked:
                 # 从容器删除表名

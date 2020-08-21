@@ -11,6 +11,8 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QDialog
 
 from src.func.do_generate import dispatch_generate
+from src.little_widget.loading_widget import LoadingMask
+from src.little_widget.message_box import pop_fail
 
 
 class GenerateResultDialog(QDialog):
@@ -30,7 +32,7 @@ class GenerateResultDialog(QDialog):
     def setup_ui(self):
         self.setObjectName("Dialog")
         # 当前窗口大小根据父窗口大小计算
-        self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.6)
+        self.resize(self.parent_screen_rect.width() * 0.8, self.parent_screen_rect.height() * 0.8)
         self.verticalLayout_frame = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_frame.setObjectName("verticalLayout_frame")
         self.result_frame = QtWidgets.QFrame(self)
@@ -72,10 +74,12 @@ class GenerateResultDialog(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-
+        # 启动遮罩层
+        self.set_loading_mask()
         # 创建并启用子线程
         self.generate_thread = GenerateWorker(self.gui, self.output_config_dict, self.selected_data)
         self.generate_thread.result.connect(self.progress)
+        self.generate_thread.error.connect(self.handle_error)
         self.generate_thread.start()
 
         # 按钮事件
@@ -85,10 +89,25 @@ class GenerateResultDialog(QDialog):
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
+    def set_loading_mask(self):
+        """设置遮罩层，以防在刚打开界面时因异常而导致界面没有响应"""
+        self.loading_mask = LoadingMask(self, ":/gif/loading.gif")
+        self.loading_mask.show()
+        self.installEventFilter(self.loading_mask)
+
     def progress(self, saved_count, file_count, progress_value, msg):
+        # 当生成第一个文件的时候，证明数据准备已经没问题，关闭遮罩层
+        if saved_count == 1:
+            self.loading_mask.close()
         self.progressBar.setValue(progress_value)
         self.log_label.setText(self._translate("Dialog", f"总文件数：{file_count}个，已生成：{saved_count}个"))
         self.textBrowser.append(msg)
+
+    def handle_error(self, e):
+        # 当进度条值为0时发生异常，即为数据准备异常
+        if self.progressBar.value() == 0:
+            self.loading_mask.close()
+        pop_fail("生成失败", f'{e.args[0]} - {e.args[1]}')
 
     def close_parent(self):
         self.close()
@@ -104,6 +123,7 @@ class GenerateWorker(QThread):
 
     # 定义信号，返回已生成文件数，总文件数，当前进度值及文件名
     result = pyqtSignal(int, int, int, str)
+    error = pyqtSignal(Exception)
 
     def __init__(self, gui, output_config_dict, selected_data):
         super().__init__()
@@ -112,7 +132,10 @@ class GenerateWorker(QThread):
         self.selected_data = selected_data
 
     def run(self):
-        self.produce(self.consume())
+        try:
+            self.produce(self.consume())
+        except Exception as e:
+            self.error.emit(e)
 
     def consume(self):
         count = 1
