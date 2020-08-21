@@ -9,7 +9,6 @@ from src.func.selected_data import SelectedData
 from src.func.table_func import add_table, fill_table
 from src.func.tree_function import make_tree_item
 from src.little_widget.message_box import pop_fail
-from static import image_rc
 
 
 _author_ = 'luwt'

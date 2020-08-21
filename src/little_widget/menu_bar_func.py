@@ -6,7 +6,6 @@
 from PyQt5 import QtGui, QtWidgets
 
 from src.constant.constant import ADD_CONN_MENU, GENERATE_MENU, FILE_MENU, HELP_MENU
-from static import image_rc
 
 _author_ = 'luwt'
 _date_ = '2020/6/27 8:26'
