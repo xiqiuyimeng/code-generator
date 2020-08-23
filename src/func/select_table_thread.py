@@ -54,14 +54,18 @@ class AsyncSelectTable:
         self._movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self._movie.currentPixmap())))
         # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
         # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
-        self.select_table_thread = SelectTableWorker(self.gui, self.conn_id, self.conn_name, self.db_name, self.tb_names)
+        self.select_table_thread = SelectTableWorker(self.gui,
+                                                     self.conn_id,
+                                                     self.conn_name,
+                                                     self.db_name,
+                                                     self.tb_names)
         self.select_table_thread.result.connect(lambda flag, prompt: self.handle_show(flag, prompt))
         self.select_table_thread.start()
 
     def handle_show(self, flag, prompt):
         """解析测试连接的结果"""
         self._movie.stop()
-        self.item.setIcon(0, QIcon())
+        self.item.setIcon(0, self.item.icon(0))
         if self.tb_names:
             self.select_one(flag, prompt)
         else:

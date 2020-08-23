@@ -7,7 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QIcon
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
@@ -62,6 +63,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setHidden(True)
+        # 统一设置图标大小
+        self.treeWidget.setIconSize(QSize(40, 30))
         self.tree_verticalLayout.addWidget(self.treeWidget)
         self.horizontalLayout.addWidget(self.tree_frame)
 
@@ -78,6 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         # 设置名称显示在图标下面（默认本来是只显示图标）
         fill_tool_bar(self)
+        self.toolBar.setIconSize(QSize(60, 40))
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # 状态栏
@@ -119,10 +123,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def get_saved_conns(self):
         """获取所有已存储的连接，生成页面树结构第一层"""
         conns = get_conns()
+        icon = QIcon(":/icon/mysql_conn_icon.png")
         for item in conns:
             # item属性：id name host port user pwd
             # 根节点，展示连接的列表
-            make_tree_item(self, self.treeWidget, item.name, item.id)
+            make_tree_item(self, self.treeWidget, item.name, icon, item.id)
             self.display_conn_dict[item.id] = item
 
     def get_tree_list(self):

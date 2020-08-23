@@ -2,6 +2,7 @@
 """
 处理树节点相关操作
 """
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from src.dialog.conn_dialog import ConnDialog
@@ -12,16 +13,18 @@ _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
 
 
-def make_tree_item(gui, parent, name, item_id=None, checkbox=None):
+def make_tree_item(gui, parent, name, icon, item_id=None, checkbox=None):
     """
     构造树的子项
     :param gui: 启动的主窗口界面对象
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
+    :param icon: 图标，该元素的展示图标对象
     :param item_id: 构造的子节点隐藏属性id，可无
     :param checkbox: 构造的子节点的复选框，可无。若存在，将当前状态写入第三列中
     """
     item = QTreeWidgetItem(parent)
+    item.setIcon(0, icon)
     gui.update_tree_item_name(item, name)
     if item_id:
         # id 作为隐藏属性，写于第二列
@@ -65,7 +68,8 @@ def add_conn_tree_item(gui, connection):
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
     """
     gui.display_conn_dict[connection.id] = connection
-    make_tree_item(gui, gui.treeWidget, connection.name, connection.id)
+    icon = QIcon(":/icon/mysql_conn_icon.png")
+    make_tree_item(gui, gui.treeWidget, connection.name, icon, connection.id)
 
 
 def update_conn_tree_item(gui, connection):

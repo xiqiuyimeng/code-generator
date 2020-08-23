@@ -30,7 +30,7 @@ def add_conn_menu(gui):
     添加连接菜单
     :param gui: 启动的主窗口界面对象
     """
-    add_action = QtWidgets.QAction(QtGui.QIcon(':/icon/add.jpg'), ADD_CONN_MENU, gui)
+    add_action = QtWidgets.QAction(QtGui.QIcon(':/icon/add.png'), ADD_CONN_MENU, gui)
     add_action.setShortcut('Ctrl+N')
     add_action.setStatusTip('在左侧列表中添加一条连接')
     add_action.triggered.connect(gui.add_conn)
@@ -43,7 +43,7 @@ def exit_app_menu(gui):
     退出菜单
     :param gui: 启动的主窗口界面对象
     """
-    exit_action = QtWidgets.QAction(QtGui.QIcon(':/icon/exit.jpg'), '退出', gui)
+    exit_action = QtWidgets.QAction(QtGui.QIcon(':/icon/exit.png'), '退出', gui)
     exit_action.setShortcut('Ctrl+Q')
     exit_action.setStatusTip('退出应用程序')
     exit_action.triggered.connect(gui.quit)
@@ -56,7 +56,7 @@ def generate_menu(gui):
     生成菜单
     :param gui: 启动的主窗口界面对象
     """
-    generate_action = QtWidgets.QAction(QtGui.QIcon(':/icon/exec.jpg'), GENERATE_MENU, gui)
+    generate_action = QtWidgets.QAction(QtGui.QIcon(':/icon/exec.png'), GENERATE_MENU, gui)
     generate_action.setShortcut('Ctrl+G')
     generate_action.setStatusTip('根据选择执行生成命令')
     generate_action.triggered.connect(gui.generate)
