@@ -52,7 +52,7 @@ class AsyncTestConn:
     def get_test_result(self, flag, prompt):
         """解析测试连接的结果"""
         self._movie.stop()
-        self.item.setIcon(0, QIcon())
+        self.item.setIcon(0, self.item.icon(0))
         if flag:
             pop_ok(self.title, prompt)
         else:

@@ -1,5 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, \
@@ -65,19 +67,25 @@ class TreeWidgetUI:
 
     def make_tree(self):
         """根据选中数据构建树"""
+        self.treeWidget.setIconSize(QSize(40, 30))
+        conn_icon = QIcon(":icon/mysql_conn_icon.png")
+        db_icon = QIcon(":icon/database_icon.png")
+        tb_icon = QIcon(":icon/table_icon.png")
+        col_icon = QIcon(":icon/column_icon.png")
         for conn_name, db_dict in self.parent.selected_data.items():
-            conn_item = self.make_item(self.treeWidget, conn_name)
+            conn_item = self.make_item(self.treeWidget, conn_name, conn_icon)
             for db_name, tb_dict in db_dict.items():
-                db_item = self.make_item(conn_item, db_name)
+                db_item = self.make_item(conn_item, db_name, db_icon)
                 for tb_name, cols in tb_dict.items():
-                    tb_item = self.make_item(db_item, tb_name)
+                    tb_item = self.make_item(db_item, tb_name, tb_icon)
                     for col in cols:
-                        self.make_item(tb_item, col)
+                        self.make_item(tb_item, col, col_icon)
         self.treeWidget.expandAll()
 
-    def make_item(self, parent, name):
+    def make_item(self, parent, name, icon):
         item = QTreeWidgetItem(parent)
         item.setText(0, self._translate("Dialog", name))
+        item.setIcon(0, QIcon(icon))
         return item
 
     def retranslateUi(self):

@@ -1,12 +1,17 @@
 <RCC>
   <qresource prefix="/icon">
-    <file alias="add.jpg">icon/add.jpg</file>
-    <file alias="exec.jpg">icon/exec.jpg</file>
-    <file alias="exit.jpg">icon/exit.jpg</file>
-    <file alias="refresh.jpg">icon/refresh.jpg</file>
+    <file alias="add.png">icon/add.png</file>
+    <file alias="exec.png">icon/exec.png</file>
+    <file alias="exit.png">icon/exit.png</file>
+    <file alias="refresh.png">icon/refresh.png</file>
     <file alias="right.jpg">icon/right.jpg</file>
     <file alias="right.png">icon/right.png</file>
     <file alias="wrong.png">icon/wrong.png</file>
+    <file alias="mysql_conn_icon.png">icon/mysql_conn_icon.png</file>
+    <file alias="database_icon.png">icon/database_icon.png</file>
+    <file alias="table_icon.png">icon/table_icon.png</file>
+    <file alias="column_icon.png">icon/column_icon.png</file>
+    <file alias="button_icon.png">icon/button_icon.png</file>
   </qresource>
   <qresource prefix="/bg_jpg">
     <file alias="window_bg.jpg">bg_jpg/window_bg.jpg</file>

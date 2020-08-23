@@ -79,14 +79,16 @@ class AsyncOpenConn:
         self._movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self._movie.currentPixmap())))
         # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
         # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
-        self.open_conn_thread = ConnectDBWorker(self.gui, self.caller_name, self.conn_id, self.conn_name, self.db_name, self.tb_name)
+        self.open_conn_thread = ConnectDBWorker(self.gui, self.caller_name,
+                                                self.conn_id, self.conn_name,
+                                                self.db_name, self.tb_name)
         self.open_conn_thread.result.connect(lambda flag, data: self.analyse_result(flag, data))
         self.open_conn_thread.start()
 
     def analyse_result(self, flag, data):
         """解析读取数据库的结果"""
         self._movie.stop()
-        self.item.setIcon(0, QIcon())
+        self.item.setIcon(0, self.item.icon(0))
         if flag:
             if self.caller_name == "TreeNodeConn":
                 self.analyse_conn_result(data)
@@ -99,13 +101,15 @@ class AsyncOpenConn:
 
     def analyse_conn_result(self, data):
         """解析打开连接的结果"""
+        icon = QIcon(":icon/database_icon.png")
         for db in data:
-            make_tree_item(self.gui, self.item, db)
+            make_tree_item(self.gui, self.item, db, icon)
         self.item.setExpanded(True)
 
     def analyse_db_result(self, data):
+        icon = QIcon(":icon/table_icon.png")
         for table in data:
-            make_tree_item(self.gui, self.item, table, checkbox=Qt.Unchecked)
+            make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
         self.item.setExpanded(True)
 
     def analyse_tb_result(self, data):
