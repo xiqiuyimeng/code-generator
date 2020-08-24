@@ -20,6 +20,7 @@ from src.func.tree_strategy import tree_node_factory, Context
 from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
 from src.little_widget.tool_bar import fill_tool_bar
+from src.scrollable_widget.scrollable_widget import MyTreeWidget
 from src.sys.sys_info_storage.sqlite import get_conns
 
 
@@ -59,7 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tree_header_label = QtWidgets.QLabel(self.tree_frame)
         self.tree_header_label.setObjectName("tree_header_label")
         self.tree_verticalLayout.addWidget(self.tree_header_label)
-        self.treeWidget = QtWidgets.QTreeWidget(self.tree_frame)
+        self.treeWidget = MyTreeWidget(self.tree_frame)
 
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setHidden(True)
@@ -81,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         # 设置名称显示在图标下面（默认本来是只显示图标）
         fill_tool_bar(self)
-        self.toolBar.setIconSize(QSize(60, 40))
+        self.toolBar.setIconSize(QSize(50, 40))
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # 状态栏

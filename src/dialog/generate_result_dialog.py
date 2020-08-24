@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QDialog
 from src.func.do_generate import dispatch_generate
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_fail
+from src.scrollable_widget.scrollable_widget import MyTextBrowser
 
 
 class GenerateResultDialog(QDialog):
@@ -54,7 +55,7 @@ class GenerateResultDialog(QDialog):
         self.log_label = QtWidgets.QLabel(self.result_frame)
         self.log_label.setObjectName("log_label")
         self.verticalLayout.addWidget(self.log_label)
-        self.textBrowser = QtWidgets.QTextBrowser(self.result_frame)
+        self.textBrowser = MyTextBrowser(self.result_frame)
         self.textBrowser.setObjectName("textBrowser")
         self.verticalLayout.addWidget(self.textBrowser)
         self.gridLayout = QtWidgets.QGridLayout()

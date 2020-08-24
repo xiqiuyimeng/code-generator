@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 from src.constant.constant import TABLE_HEADER_LABELS
 from src.func.selected_data import SelectedData
+from src.scrollable_widget.scrollable_widget import MyTableWidget
 from src.table.table_header import all_header_combobox, CheckBoxHeader
 
 _author_ = 'luwt'
@@ -27,7 +28,7 @@ def add_table(gui):
     gui.table_header_label.setObjectName("table_header_label")
     gui.table_verticalLayout.addWidget(gui.table_header_label)
 
-    gui.tableWidget = QtWidgets.QTableWidget(gui.table_frame)
+    gui.tableWidget = MyTableWidget(gui.table_frame)
     gui.tableWidget.setObjectName("tableWidget")
     gui.tableWidget.setAttribute(Qt.WA_TranslucentBackground, True)
     # 在布局中添加表格

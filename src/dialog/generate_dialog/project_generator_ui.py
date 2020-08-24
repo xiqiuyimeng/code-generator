@@ -16,6 +16,7 @@ from src.func.project_generator_input import JavaInputHandler, JavaSrcInputHandl
     MapperInputHandler, XmlInputHandler, ServiceInputHandler, ServiceImplInputHandler, ControllerInputHandler, \
     clear_current_param, check_params
 from src.little_widget.message_box import pop_warning
+from src.scrollable_widget.scrollable_widget import MyScrollArea
 
 _author_ = 'luwt'
 _date_ = '2020/7/18 11:47'
@@ -109,7 +110,7 @@ class ProjectGeneratorUI:
         self.mybatis_tab.setObjectName("mybatis_tab")
         self.verticalLayout_scroll_mybatis = QtWidgets.QVBoxLayout(self.mybatis_tab)
         self.verticalLayout_scroll_mybatis.setObjectName("verticalLayout_scroll_mybatis")
-        self.mybatis_scrollArea = QScrollArea(self.mybatis_tab)
+        self.mybatis_scrollArea = MyScrollArea(self.mybatis_tab)
         self.mybatis_scrollArea.setWidgetResizable(True)
         self.mybatis_scrollArea.setObjectName("mybatis_scrollArea")
         self.mybatis_scroll_widget = QtWidgets.QWidget()
