@@ -139,8 +139,8 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             item.setExpanded(True)
         # 关闭连接
         elif func == CLOSE_CONN_MENU:
-            self.close_conn(conn_name, func, gui)
-            self.close_item(item, gui)
+            if self.close_conn(conn_name, func, gui):
+                self.close_item(item, gui)
         # 测试连接
         elif func == TEST_CONN_MENU:
             self.test_conn(gui.display_conn_dict.get(conn_id), item)
@@ -173,8 +173,9 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             if reply:
                 SelectedData().unset_conn(conn_name)
             else:
-                return
+                return False
         close_connection(gui, conn_name)
+        return True
 
     def edit_conn(self, func, gui, conn_name, conn_id, item):
         """

@@ -72,6 +72,7 @@ class AsyncOpenConn:
         self.db_name = db_name
         self.tb_name = tb_name
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
+        self.icon = self.item.icon(0)
 
     def connect_db(self):
         self._movie.start()
@@ -88,7 +89,7 @@ class AsyncOpenConn:
     def analyse_result(self, flag, data):
         """解析读取数据库的结果"""
         self._movie.stop()
-        self.item.setIcon(0, self.item.icon(0))
+        self.item.setIcon(0, self.icon)
         if flag:
             if self.caller_name == "TreeNodeConn":
                 self.analyse_conn_result(data)

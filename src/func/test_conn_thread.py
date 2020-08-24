@@ -39,6 +39,7 @@ class AsyncTestConn:
         self.title = title
         self.item = item
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
+        self.icon = self.item.icon(0)
 
     def test_conn(self):
         self._movie.start()
@@ -52,7 +53,7 @@ class AsyncTestConn:
     def get_test_result(self, flag, prompt):
         """解析测试连接的结果"""
         self._movie.stop()
-        self.item.setIcon(0, self.item.icon(0))
+        self.item.setIcon(0, self.icon)
         if flag:
             pop_ok(self.title, prompt)
         else:
