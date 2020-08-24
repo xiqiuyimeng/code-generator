@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QTreeWidgetItem
 
 from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, \
     PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, EXPAND_BUTTON, PATH_GENERATOR_BUTTON
+from src.scrollable_widget.scrollable_widget import MyTreeWidget
 
 _author_ = 'luwt'
 _date_ = '2020/7/23 15:51'
@@ -28,7 +29,7 @@ class TreeWidgetUI:
         self.tree_header_label = QtWidgets.QLabel(self.widget)
         self.tree_header_label.setObjectName("tree_header_label")
         self.verticalLayout_2.addWidget(self.tree_header_label)
-        self.treeWidget = QtWidgets.QTreeWidget(self.widget)
+        self.treeWidget = MyTreeWidget(self.widget)
         self.parent.treeWidget = self.treeWidget
         self.treeWidget.setObjectName("treeWidget")
         # 树控件背景透明
