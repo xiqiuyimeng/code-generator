@@ -48,6 +48,7 @@ class AsyncSelectTable:
         self.db_name = db_name
         self.tb_names = tb_names
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
+        self.icon = self.item.icon(0)
 
     def select_table(self):
         self._movie.start()
@@ -65,7 +66,7 @@ class AsyncSelectTable:
     def handle_show(self, flag, prompt):
         """解析测试连接的结果"""
         self._movie.stop()
-        self.item.setIcon(0, self.item.icon(0))
+        self.item.setIcon(0, self.icon)
         if self.tb_names:
             self.select_one(flag, prompt)
         else:
