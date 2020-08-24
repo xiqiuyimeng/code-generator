@@ -18,7 +18,7 @@ from src.func.connection_function import close_connection
 from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
 from src.func.select_table_thread import AsyncSelectTable
 from src.func.selected_data import SelectedData
-from src.func.table_func import change_table_checkbox, close_table, add_table, check_table_opened
+from src.func.table_func import change_table_checkbox, close_table, check_table_opened
 from src.func.test_conn_thread import AsyncTestConn
 from src.func.open_conn_thread import AsyncOpenConn
 from src.func.tree_function import show_conn_dialog

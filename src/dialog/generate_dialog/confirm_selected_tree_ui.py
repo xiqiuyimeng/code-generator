@@ -4,8 +4,8 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, \
-    EXPAND_BUTTON, PATH_GENERATOR_BUTTON
+from src.constant.constant import CONFIRM_TREE_HEADER_LABELS, COLLAPSE_BUTTON, \
+    PROJECT_GENERATOR_BUTTON, CANCEL_BUTTON, EXPAND_BUTTON, PATH_GENERATOR_BUTTON
 
 _author_ = 'luwt'
 _date_ = '2020/7/23 15:51'
