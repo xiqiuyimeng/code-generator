@@ -56,6 +56,8 @@ PARAM_PATH_ERROR = "路径参数有误"
 """菜单栏"""
 FILE_MENU = '文件'
 HELP_MENU = '帮助'
+EXIT_MENU = '退出'
+ABOUT_MENU = '关于'
 
 """关于连接的右键菜单"""
 # 打开连接
@@ -207,4 +209,20 @@ SERVICE_IMPL_PACKAGE = 'service实现类包名'
 SERVICE_IMPL_PACKAGE_DESC = 'service实现类包名：您希望输出的service实现类的包名，例如：com.demo.service.impl'
 CONTROLLER_PACKAGE = 'controller类包名'
 CONTROLLER_PACKAGE_DESC = 'controller类包名：您希望输出的controller文件的包名，例如：com.demo.controller'
-
+"""关于信息"""
+ABOUT_TITLE = '关于生成器'
+GENERATOR_TITLE = '生成器分类'
+ABOUT_MYBATIS_TITLE = 'mybatis生成器'
+ABOUT_MYBATIS_INFO = '1.根据官方mybatis样例代码格式制作。可以生成Java实体类文件、mapper接口文件、xml配置文件。' \
+                     '\n2.在mapper接口文件和xml文件中默认增加了列表查询语句，即实现了增删改查列表功能。\n3.与官方生成器不同的是，' \
+                     '生成器可以提供部分字段的生成，例如在原有表结构上新增了一些字段，生成器将会生成这部分字段所对应的要改变的代码' \
+                     '（Java实体类文件、xml文件），将新增部分粘贴在原代码处即可。\n4.Java实体类文件默认使用lombok的@Data注解' \
+                     '替代冗余的属性get和set方法。\n'
+ABOUT_SPRING_TITLE = 'spring生成器'
+ABOUT_SPRING_INFO = '1.基于mybatis生成器进行扩展，生成spring框架所需的相应业务代码，可生成service、serviceImpl、controller类。' \
+                    '需要注意的是，如果选择的是表的部分字段，将不生成这三个文件，因为对业务表的新增字段通常不影响上层接口。\n'
+ABOUT_PATH_TITLE = '生成器路径分类'
+APPOINT_PATH = '指定路径'
+APPOINT_PATH_INFO = '生成到指定路径意味着所有的文件都将生成到同一个目录下，此时所填写的包名仅仅是作为代码中package关键字的值，生成到指定目录后，需要手动拷贝至自己的项目下。'
+APPOINT_PROJECT = '指定项目地址'
+APPOINT_PROJECT_INFO = '生成到指定项目意味着所有生成的文件都将按照规则被放置在相应的项目目录下。此时的项目路径需要填写正确，输入项都会做相应检查。如果输入路径包名都正确，那么生成的spring全套代码是可以直接运行的。'

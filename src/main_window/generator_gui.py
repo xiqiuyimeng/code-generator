@@ -17,6 +17,7 @@ from src.func.selected_data import SelectedData
 from src.func.table_func import on_cell_changed
 from src.func.tree_function import make_tree_item, add_conn_func
 from src.func.tree_strategy import tree_node_factory, Context
+from src.little_widget.about import AboutUI
 from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
 from src.little_widget.tool_bar import fill_tool_bar
@@ -217,6 +218,14 @@ class MainWindow(QtWidgets.QMainWindow):
             generate_dialog.exec()
         else:
             pop_fail(WRONG_TITLE, WRONG_UNSELECT_DATA)
+
+    def help(self):
+        print("help")
+
+    def about(self):
+        about_ui = AboutUI(self.screen_rect)
+        about_ui.show()
+        about_ui.exec_()
 
     def quit(self):
         self.close()
