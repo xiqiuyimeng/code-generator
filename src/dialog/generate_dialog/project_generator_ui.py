@@ -3,7 +3,6 @@
 点击生成按钮，弹窗的第二步页面，负责配置生成器的输出配置
 """
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QScrollArea
 
 from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE_BUTTON, \
     CANCEL_BUTTON, MYBATIS_TITLE, IS_LOMBOK, MYBATIS_GENERATOR_DESC, LOMBOK_DESC, \
@@ -77,7 +76,7 @@ class ProjectGeneratorUI:
         # 按钮点击事件
         self.clear_button.clicked.connect(lambda: clear_current_param(self))
         self.pre_step_button.clicked.connect(self.pre_step)
-        self.generate_button.clicked.connect(lambda: self.parent.generate(self.project_output_dict))
+        self.generate_button.clicked.connect(lambda: self.generate())
         self.cancel_button.clicked.connect(self.parent.close)
         # 选择文件夹按钮
         self.java_button.clicked.connect(lambda: JavaInputHandler().choose_dir(self))
@@ -246,7 +245,7 @@ class ProjectGeneratorUI:
         self.spring_tab.setObjectName("spring_tab")
         self.verticalLayout_scroll_spring = QtWidgets.QVBoxLayout(self.spring_tab)
         self.verticalLayout_scroll_spring.setObjectName("verticalLayout_scroll_spring")
-        self.spring_scrollArea = QScrollArea(self.spring_tab)
+        self.spring_scrollArea = MyScrollArea(self.spring_tab)
         self.spring_scrollArea.setWidgetResizable(True)
         self.spring_scrollArea.setObjectName("spring_scrollArea")
         self.spring_scroll_widget = QtWidgets.QWidget()

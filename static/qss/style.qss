@@ -76,6 +76,12 @@ QLineEdit:disabled{
     border-radius:25px;
     border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
 }
+/*关于界面对话框样式*/
+#about_frame{
+    border-style:solid;
+    border-radius:25px;
+    border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
+}
 /*标签页字体*/
 QTabWidget{
     font-size:18px;
@@ -92,14 +98,14 @@ QTabWidget:tab-bar{
     subcontrol-position:center;
     background:transparent;
 }
-/*mybatis、spring滚动条区域*/
-#mybatis_scrollArea,#spring_scrollArea{
+/*mybatis、spring、关于界面滚动条区域*/
+#mybatis_scrollArea,#spring_scrollArea,#about_scrollArea{
     border-style:solid;
     border-radius:25px;
     background:transparent;
 }
 /*滚动条中的控件*/
-#mybatis_scroll_widget,#spring_scroll_widget{
+#mybatis_scroll_widget,#spring_scroll_widget,#about_scroll_widget{
     background:transparent
 }
 /*滚动条背景色透明，需要同时设置add-page sub-page*/
@@ -230,3 +236,25 @@ QProgressBar::chunk {
     background: #16b816;
     border-radius: 10%;
 }
+#about_dialog QLabel{
+    font-size:16px;
+    font-family:楷体;
+    qproperty-wordWrap:true;
+    qproperty-alignment:AlignTop;
+}
+#about_dialog #about_title{
+    font-size:25px;
+    font-weight:500;
+    qproperty-alignment:AlignHCenter;
+}
+#about_dialog #generator_title, #about_dialog #path_title{
+    font-size:20px;
+    font-weight:500
+}
+#about_dialog #mybatis_generator_title,#about_dialog #spring_generator_title,
+#about_dialog #appoint_path, #about_dialog #appoint_project{
+    font-size:19px;
+    font-weight:300;
+    qproperty-alignment:AlignTop;
+}
+

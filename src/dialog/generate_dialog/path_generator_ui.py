@@ -7,7 +7,6 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QScrollArea
 
 from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE_BUTTON, \
     CANCEL_BUTTON, MYBATIS_TITLE, IS_LOMBOK, LOMBOK_DESC, MODEL_PACKAGE, \
@@ -17,6 +16,7 @@ from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE
     OUTPUT_PATH_DESC
 from src.func.path_generator_input import OutputPathInputHandler, clear_current_param, ModelPathInputHandler, \
     MapperPathInputHandler, ServicePathInputHandler, ServiceImplPathInputHandler, ControllerPathInputHandler
+from src.scrollable_widget.scrollable_widget import MyScrollArea
 
 
 class PathGeneratorUI:
@@ -73,7 +73,7 @@ class PathGeneratorUI:
         # 按钮点击事件
         self.clear_button.clicked.connect(lambda: clear_current_param(self))
         self.pre_step_button.clicked.connect(self.pre_step)
-        self.generate_button.clicked.connect(lambda: self.parent.generate(self.path_output_dict))
+        self.generate_button.clicked.connect(lambda: self.generate())
         self.cancel_button.clicked.connect(self.parent.close)
         # # 选择文件夹按钮
         self.output_button.clicked.connect(lambda: OutputPathInputHandler().choose_dir(self))
@@ -97,7 +97,7 @@ class PathGeneratorUI:
         self.mybatis_tab.setObjectName("mybatis_tab")
         self.verticalLayout_scroll_mybatis = QtWidgets.QVBoxLayout(self.mybatis_tab)
         self.verticalLayout_scroll_mybatis.setObjectName("verticalLayout_scroll_mybatis")
-        self.mybatis_scrollArea = QScrollArea(self.mybatis_tab)
+        self.mybatis_scrollArea = MyScrollArea(self.mybatis_tab)
         self.mybatis_scrollArea.setWidgetResizable(True)
         self.mybatis_scrollArea.setObjectName("mybatis_scrollArea")
         self.mybatis_scroll_widget = QtWidgets.QWidget()
@@ -194,7 +194,7 @@ class PathGeneratorUI:
         self.spring_tab.setObjectName("spring_tab")
         self.verticalLayout_scroll_spring = QtWidgets.QVBoxLayout(self.spring_tab)
         self.verticalLayout_scroll_spring.setObjectName("verticalLayout_scroll_spring")
-        self.spring_scrollArea = QScrollArea(self.spring_tab)
+        self.spring_scrollArea = MyScrollArea(self.spring_tab)
         self.spring_scrollArea.setWidgetResizable(True)
         self.spring_scrollArea.setObjectName("spring_scrollArea")
         self.spring_scroll_widget = QtWidgets.QWidget()
@@ -305,3 +305,8 @@ class PathGeneratorUI:
         self.widget.hide()
         # 展示树控件
         self.parent.tree_widget.show()
+
+    def generate(self):
+        # lombok选值
+        self.path_output_dict['lombok'] = eval(self.lombok_comboBox.currentText())
+        self.parent.generate(self.path_output_dict)
