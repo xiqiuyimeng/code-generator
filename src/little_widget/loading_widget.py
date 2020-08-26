@@ -31,8 +31,10 @@ class LoadingMask(QWidget):
         """过滤移动事件，让遮罩层跟随父窗口移动"""
         if widget == self.parent() and type(event) == QMoveEvent:
             self.move_with_parent()
+            # 返回true，说明事件已处理，其他控件不会再处理
             return True
-        return super(LoadingMask, self).eventFilter(widget, event)
+        # 交由其他控件处理
+        return super().eventFilter(widget, event)
 
     def move_with_parent(self):
         """跟随父窗口移动，大小跟随父窗口大小"""

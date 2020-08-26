@@ -165,7 +165,6 @@ class ConnDialog(QDialog):
         self.cancel.clicked.connect(self.dialog.close)
 
         self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self.dialog)
 
     def retranslateUi(self):
         self.title.setText(self.dialog_title)
@@ -248,6 +247,7 @@ class ConnDialog(QDialog):
         """测试连接"""
         self.loading_mask = LoadingMask(self.dialog, ":/gif/loading.gif")
         self.loading_mask.show()
+        # 将遮罩层作为过滤器安装到对话框上，也就实现了对于在对话框中的动作的监听
         self.dialog.installEventFilter(self.loading_mask)
         new_conn = self.get_input_connection()
         # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，

@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 
 from src.constant.constant import ABOUT_TITLE, GENERATOR_TITLE, ABOUT_MYBATIS_TITLE, ABOUT_MYBATIS_INFO, \
@@ -99,3 +99,6 @@ class AboutUI(QtWidgets.QDialog):
         self.appoint_project.setText(APPOINT_PROJECT)
         self.appoint_project_info.setText(APPOINT_PROJECT_INFO)
 
+    def changeEvent(self, event):
+        if event.type() == QtCore.QEvent.ActivationChange and not self.isHidden():
+            self.close()

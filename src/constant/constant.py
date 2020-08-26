@@ -209,6 +209,9 @@ SERVICE_IMPL_PACKAGE = 'service实现类包名'
 SERVICE_IMPL_PACKAGE_DESC = 'service实现类包名：您希望输出的service实现类的包名，例如：com.demo.service.impl'
 CONTROLLER_PACKAGE = 'controller类包名'
 CONTROLLER_PACKAGE_DESC = 'controller类包名：您希望输出的controller文件的包名，例如：com.demo.controller'
+"""生成配置spring页弹窗"""
+ASK_TITLE = '生成配置'
+ASK_PROMPT = 'mybatis配置页输入信息尚未填写，spring页输入项无法开放。是否返回mybatis页继续填写？'
 """关于信息"""
 ABOUT_TITLE = '关于生成器'
 GENERATOR_TITLE = '生成器分类'

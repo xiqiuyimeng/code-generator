@@ -88,7 +88,6 @@ class GenerateResultDialog(QDialog):
         self.ok_button.clicked.connect(self.close_parent)
 
         self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def set_loading_mask(self):
         """设置遮罩层，以防在刚打开界面时因异常而导致界面没有响应"""

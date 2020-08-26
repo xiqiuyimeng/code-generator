@@ -60,7 +60,6 @@ class DisplaySelectedDialog(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def select_project_generator(self):
         """选择项目生成器"""
