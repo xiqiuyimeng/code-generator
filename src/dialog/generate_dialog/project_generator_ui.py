@@ -10,11 +10,12 @@ from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE
     MODEL_PACKAGE_DESC, MAPPER_PACKAGE, MAPPER_PACKAGE_DESC, XML_PATH, XML_PATH_DESC, \
     MYBATIS_TAB_TITLE, SPRING_TAB_TITLE, SPRING_TITLE, SPRING_GENERATOR_DESC, \
     SERVICE_PACKAGE, SERVICE_PACKAGE_DESC, SERVICE_IMPL_PACKAGE, SERVICE_IMPL_PACKAGE_DESC, \
-    CONTROLLER_PACKAGE, CONTROLLER_PACKAGE_DESC, CHOOSE_DIRECTORY, WARNING_TITLE, PARAM_WARNING_MSG
+    CONTROLLER_PACKAGE, CONTROLLER_PACKAGE_DESC, CHOOSE_DIRECTORY, WARNING_TITLE, PARAM_WARNING_MSG, ASK_TITLE, \
+    ASK_PROMPT
 from src.func.project_generator_input import JavaInputHandler, JavaSrcInputHandler, ModelInputHandler, \
     MapperInputHandler, XmlInputHandler, ServiceInputHandler, ServiceImplInputHandler, ControllerInputHandler, \
-    clear_current_param, check_params
-from src.little_widget.message_box import pop_warning
+    clear_current_param, check_params, check_mybatis_lineEdit
+from src.little_widget.message_box import pop_warning, pop_question
 from src.scrollable_widget.scrollable_widget import MyScrollArea
 
 _author_ = 'luwt'
@@ -72,7 +73,8 @@ class ProjectGeneratorUI:
         self.cancel_button.setObjectName("cancel_button")
         self.gridLayout.addWidget(self.cancel_button, 0, 4, 1, 1)
         self.verticalLayout_2.addWidget(self.button_widget)
-
+        # 切换页面事件
+        self.tabWidget.currentChanged.connect(lambda idx: self.switch_tab(idx))
         # 按钮点击事件
         self.clear_button.clicked.connect(lambda: clear_current_param(self))
         self.pre_step_button.clicked.connect(self.pre_step)
@@ -370,6 +372,11 @@ class ProjectGeneratorUI:
         self.service_button.setText(CHOOSE_DIRECTORY)
         self.service_impl_button.setText(CHOOSE_DIRECTORY)
         self.controller_button.setText(CHOOSE_DIRECTORY)
+
+    def switch_tab(self, idx):
+        """切换页面事件，如果切换到spring页，检查mybatis页是否已经有值，若没有值，弹窗询问是否返回mybatis页"""
+        if idx == 1 and not check_mybatis_lineEdit(self) and pop_question(ASK_TITLE, ASK_PROMPT):
+            self.tabWidget.setCurrentIndex(0)
 
     def pre_step(self):
         # 隐藏选择生成器界面

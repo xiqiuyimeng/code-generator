@@ -13,9 +13,11 @@ from src.constant.constant import CLEAR_CONFIG_BUTTON, PRE_STEP_BUTTON, GENERATE
     MODEL_PACKAGE_DESC, MAPPER_PACKAGE, MAPPER_PACKAGE_DESC, MYBATIS_TAB_TITLE, SPRING_TAB_TITLE, SPRING_TITLE, \
     SPRING_GENERATOR_DESC, SERVICE_PACKAGE, SERVICE_PACKAGE_DESC, SERVICE_IMPL_PACKAGE, SERVICE_IMPL_PACKAGE_DESC, \
     CONTROLLER_PACKAGE, CONTROLLER_PACKAGE_DESC, CHOOSE_DIRECTORY, MYBATIS_PATH_GENERATOR_DESC, OUTPUT_PATH, \
-    OUTPUT_PATH_DESC
+    OUTPUT_PATH_DESC, ASK_TITLE, ASK_PROMPT
 from src.func.path_generator_input import OutputPathInputHandler, clear_current_param, ModelPathInputHandler, \
-    MapperPathInputHandler, ServicePathInputHandler, ServiceImplPathInputHandler, ControllerPathInputHandler
+    MapperPathInputHandler, ServicePathInputHandler, ServiceImplPathInputHandler, ControllerPathInputHandler, \
+    check_path_mybatis_lineEdit
+from src.little_widget.message_box import pop_question
 from src.scrollable_widget.scrollable_widget import MyScrollArea
 
 
@@ -69,7 +71,8 @@ class PathGeneratorUI:
         self.cancel_button.setObjectName("cancel_button")
         self.gridLayout.addWidget(self.cancel_button, 0, 4, 1, 1)
         self.verticalLayout_2.addWidget(self.button_widget)
-
+        # 切换页面事件
+        self.tabWidget.currentChanged.connect(lambda idx: self.switch_tab(idx))
         # 按钮点击事件
         self.clear_button.clicked.connect(lambda: clear_current_param(self))
         self.pre_step_button.clicked.connect(self.pre_step)
@@ -299,6 +302,11 @@ class PathGeneratorUI:
         self.cancel_button.setText(CANCEL_BUTTON)
         # 选择文件夹按钮
         self.output_button.setText(CHOOSE_DIRECTORY)
+
+    def switch_tab(self, idx):
+        """切换页面事件，如果切换到spring页，检查mybatis页是否已经有值，若没有值，弹窗询问是否返回mybatis页"""
+        if idx == 1 and not check_path_mybatis_lineEdit(self) and pop_question(ASK_TITLE, ASK_PROMPT):
+            self.tabWidget.setCurrentIndex(0)
 
     def pre_step(self):
         # 隐藏选择生成器界面

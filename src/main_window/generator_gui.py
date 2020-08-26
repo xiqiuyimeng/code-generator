@@ -17,7 +17,7 @@ from src.func.selected_data import SelectedData
 from src.func.table_func import on_cell_changed
 from src.func.tree_function import make_tree_item, add_conn_func
 from src.func.tree_strategy import tree_node_factory, Context
-from src.little_widget.about import AboutUI
+from src.little_widget.about_ui import AboutUI
 from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
 from src.little_widget.tool_bar import fill_tool_bar
@@ -107,7 +107,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowOpacity(0.95)
 
         self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         self.setWindowTitle(self._translate("MainWindow", "MainWindow"))
@@ -223,9 +222,8 @@ class MainWindow(QtWidgets.QMainWindow):
         print("help")
 
     def about(self):
-        about_ui = AboutUI(self.screen_rect)
-        about_ui.show()
-        about_ui.exec_()
+        self.about_ui = AboutUI(self.screen_rect)
+        self.about_ui.show()
 
     def quit(self):
         self.close()
