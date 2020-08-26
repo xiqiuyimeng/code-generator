@@ -100,5 +100,6 @@ class AboutUI(QtWidgets.QDialog):
         self.appoint_project_info.setText(APPOINT_PROJECT_INFO)
 
     def changeEvent(self, event):
-        if event.type() == QtCore.QEvent.ActivationChange and not self.isHidden():
+        # 如果窗口不是当前活跃，那么就关闭
+        if not self.isActiveWindow():
             self.close()
