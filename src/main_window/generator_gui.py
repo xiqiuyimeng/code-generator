@@ -60,10 +60,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         # 创建标题栏
-        self.title_bar = TitleBar()
+        self.title_bar = TitleBar(30, self)
         self.title_bar.setObjectName("title_bar")
         self.title_bar.setFixedWidth(self.width())
-        self.title_bar.setFixedHeight(30)
 
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
