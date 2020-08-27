@@ -12,10 +12,10 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QDialog
 
 from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
     SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE, TEST_CONN_MENU
+from src.dialog.draggable_dialog import DraggableDialog
 from src.func.test_conn_thread import TestConnWorker
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_ok, pop_fail
@@ -24,7 +24,7 @@ from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
 
 
-class ConnDialog(QDialog):
+class ConnDialog(DraggableDialog):
 
     conn_signal = QtCore.pyqtSignal(object, Connection)
 
