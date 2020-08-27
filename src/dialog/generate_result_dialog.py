@@ -8,15 +8,15 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtWidgets import QDialog
 
+from src.dialog.draggable_dialog import DraggableDialog
 from src.func.do_generate import dispatch_generate
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_fail
 from src.scrollable_widget.scrollable_widget import MyTextBrowser
 
 
-class GenerateResultDialog(QDialog):
+class GenerateResultDialog(DraggableDialog):
 
     # 定义信号，关闭父窗口
     close_parent_signal = pyqtSignal()

@@ -13,15 +13,15 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog
 
+from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.generate_dialog.confirm_selected_tree_ui import TreeWidgetUI
 from src.dialog.generate_dialog.path_generator_ui import PathGeneratorUI
 from src.dialog.generate_dialog.project_generator_ui import ProjectGeneratorUI
 from src.dialog.generate_result_dialog import GenerateResultDialog
 
 
-class DisplaySelectedDialog(QDialog):
+class DisplaySelectedDialog(DraggableDialog):
 
     def __init__(self, gui, selected_data, screen_rect):
         super().__init__()
