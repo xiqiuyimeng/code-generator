@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 from src.constant.constant import ABOUT_TITLE, GENERATOR_TITLE, ABOUT_MYBATIS_TITLE, ABOUT_MYBATIS_INFO, \
