@@ -9,6 +9,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QVBoxLayout
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
@@ -21,6 +22,7 @@ from src.little_widget.about_ui import AboutUI
 from src.little_widget.help_ui import HelpUI
 from src.little_widget.menu_bar_func import fill_menu_bar
 from src.little_widget.message_box import pop_fail
+from src.little_widget.title_bar import TitleBar
 from src.little_widget.tool_bar import fill_tool_bar
 from src.scrollable_widget.scrollable_widget import MyTreeWidget
 from src.sys.sys_info_storage.sqlite import get_conns
@@ -45,11 +47,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setup_ui(self):
         self.setObjectName("MainWindow")
+        self.setWindowFlags(Qt.FramelessWindowHint)
         # 按当前分辨率计算窗口大小
         self.resize(self.desktop_screen_rect.width() * 0.6, self.desktop_screen_rect.height() * 0.75)
         # 当前窗口的分辨率大小，其他窗口以此为参考
         self.screen_rect = self.geometry()
-        self.centralwidget = QtWidgets.QWidget(self)
+        # 创建主控件，用以包含所有内容
+        self.main_widget = QtWidgets.QWidget()
+        # 主控件中的布局
+        self.main_layout = QVBoxLayout()
+        # 设置所有间距为0
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        # 创建标题栏
+        self.title_bar = TitleBar()
+        self.title_bar.setObjectName("title_bar")
+        self.title_bar.setFixedWidth(self.width())
+        self.title_bar.setFixedHeight(30)
+
+        self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -71,12 +87,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tree_verticalLayout.addWidget(self.treeWidget)
         self.horizontalLayout.addWidget(self.tree_frame)
 
-        self.setCentralWidget(self.centralwidget)
         # 菜单栏
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setObjectName("menubar")
         fill_menu_bar(self)
-        self.setMenuBar(self.menubar)
 
         # 工具栏
         self.toolBar = QtWidgets.QToolBar(self)
@@ -86,6 +100,14 @@ class MainWindow(QtWidgets.QMainWindow):
         fill_tool_bar(self)
         self.toolBar.setIconSize(QSize(50, 40))
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        # 主布局添加所有部件，依次为标题栏、菜单栏、工具栏、承载了实际窗口内容的主控件，将窗口中央控件设置为包含所有的控件
+        self.main_layout.addWidget(self.title_bar)
+        self.main_layout.addWidget(self.menubar)
+        self.main_layout.addWidget(self.toolBar)
+        self.main_layout.addWidget(self.centralwidget)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
         # 状态栏
         self.statusbar = QtWidgets.QStatusBar(self)
