@@ -106,6 +106,7 @@ class AsyncOpenConn:
         for db in data:
             make_tree_item(self.gui, self.item, db, icon)
         self.item.setExpanded(True)
+        self.gui.open_conn_item['conn'] = self.item
 
     def analyse_db_result(self, data):
         icon = QIcon(":icon/table_icon.png")
