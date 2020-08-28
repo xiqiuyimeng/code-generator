@@ -15,7 +15,6 @@ class TitleBar(QWidget):
         self.parent = parent
         # 沉浸式标题栏，和菜单栏在同一水平线
         self.menu_bar = menu_bar
-        self.setStyleSheet("background:red")
         self.title_height = title_height
         self.button_height = title_height * 0.8
         self.icon = QLabel()
