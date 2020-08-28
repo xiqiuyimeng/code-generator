@@ -72,11 +72,11 @@ class PathGeneratorUI:
         self.gridLayout.addWidget(self.cancel_button, 0, 4, 1, 1)
         self.verticalLayout_2.addWidget(self.button_widget)
         # 切换页面事件
-        self.tabWidget.currentChanged.connect(lambda idx: self.switch_tab(idx))
+        self.tabWidget.currentChanged.connect(self.switch_tab)
         # 按钮点击事件
         self.clear_button.clicked.connect(lambda: clear_current_param(self))
         self.pre_step_button.clicked.connect(self.pre_step)
-        self.generate_button.clicked.connect(lambda: self.generate())
+        self.generate_button.clicked.connect(self.generate)
         self.cancel_button.clicked.connect(self.parent.close)
         # # 选择文件夹按钮
         self.output_button.clicked.connect(lambda: OutputPathInputHandler().choose_dir(self))

@@ -1,7 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt5 import QtCore
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QPushButton, QHBoxLayout, QLabel, QSizePolicy
 
 _author_ = 'luwt'
@@ -11,10 +10,14 @@ _date_ = '2020/8/27 17:15'
 class TitleBar(QWidget):
     """自定义标题栏"""
 
-    def __init__(self, title_height, parent):
+    def __init__(self, title_height, parent, menu_bar):
         super().__init__()
         self.parent = parent
+        # 沉浸式标题栏，和菜单栏在同一水平线
+        self.menu_bar = menu_bar
+        self.setStyleSheet("background:red")
         self.title_height = title_height
+        self.button_height = title_height * 0.8
         self.icon = QLabel()
         self.icon.setPixmap(QPixmap(":/icon/exec.png").scaled(self.title_height, self.title_height))
         # 标题栏文字
@@ -24,31 +27,27 @@ class TitleBar(QWidget):
         self.main_title.setObjectName("main_title")
         # 最小化按钮
         self.min_button = QPushButton()
-        self.min_button.resize(QSize(self.title_height, self.title_height))
+        self.min_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.min_button.setObjectName("min_button")
-        self.min_button.setText("最小化")
         # 最大化按钮
         self.max_button = QPushButton()
-        self.max_button.resize(QSize(self.title_height, self.title_height))
+        self.max_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.max_button.setObjectName("max_button")
-        self.max_button.setText("最大化")
         # 还原窗口按钮
         self.restore_button = QPushButton()
-        self.restore_button.resize(QSize(self.title_height, self.title_height))
+        self.restore_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.restore_button.setObjectName("restore_button")
-        self.restore_button.setText("还原")
         self.restore_button.setVisible(False)
         # 关闭按钮
         self.close_button = QPushButton()
-        self.close_button.resize(QSize(self.title_height, self.title_height))
-        self.close_button.setIcon(QIcon(":/icon/wrong.png"))
+        self.close_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.close_button.setObjectName("close_button")
         # 标题栏的布局
         self.title_layout = QHBoxLayout()
-        self.title_layout.setSpacing(0)
-        self.title_layout.setContentsMargins(0, 0, 0, 0)
         # 将各个控件依次添加到布局中
         self.title_layout.addWidget(self.icon)
+        # 实现沉浸式标题栏，将菜单栏融入到当前布局
+        self.title_layout.addWidget(self.menu_bar)
         self.title_layout.addWidget(self.main_title)
         self.title_layout.addWidget(self.min_button)
         self.title_layout.addWidget(self.max_button)
@@ -61,7 +60,6 @@ class TitleBar(QWidget):
         self.restore_button.clicked.connect(self.restore_window)
         self.close_button.clicked.connect(self.parent.close)
 
-    @QtCore.pyqtSlot()
     def max_window(self):
         """窗口最大化"""
         self.parent.setWindowState(Qt.WindowMaximized)
@@ -69,7 +67,6 @@ class TitleBar(QWidget):
         self.max_button.setVisible(False)
         self.parent.title_bar.setFixedWidth(self.parent.width())
 
-    @QtCore.pyqtSlot()
     def restore_window(self):
         """窗口还原"""
         self.parent.setWindowState(Qt.WindowNoState)
