@@ -29,7 +29,7 @@ def add_refresh_tool(gui):
     refresh_tool = QAction(QIcon(':/icon/refresh.png'), '刷新', gui)
     refresh_tool.setStatusTip('刷新')
     refresh_tool.setShortcut('F5')
-    refresh_tool.triggered.connect(refresh)
+    refresh_tool.triggered.connect(gui.refresh)
     gui.toolBar.addAction(refresh_tool)
 
 
@@ -47,6 +47,3 @@ def add_exit_tool(gui):
     gui.toolBar.addSeparator()
     gui.toolBar.addAction(exit_tool)
 
-
-def refresh():
-    print("刷新了")
