@@ -17,7 +17,7 @@ from src.func.connection_function import close_connection
 from src.func.selected_data import SelectedData
 from src.func.table_func import on_cell_changed, close_table
 from src.func.tree_function import make_tree_item, add_conn_func
-from src.func.tree_strategy import tree_node_factory, Context
+from src.func.tree_strategy import tree_node_factory, Context, TreeNodeConn
 from src.little_widget.about_ui import AboutUI
 from src.little_widget.help_ui import HelpUI
 from src.little_widget.menu_bar_func import fill_menu_bar
@@ -38,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象，
         # 因为在编辑连接后，连接名称可能会变化，无法作为唯一标识
         self.display_conn_dict = dict()
-        self.open_conn_dict = dict()
+        self.open_conn_item = dict()
         self.dbs = list()
         self.tables = list()
         # 当前屏幕的分辨率大小
@@ -254,9 +254,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def refresh(self):
         # 清空当前树
-        # todo 影响到了table
+        item = self.open_conn_item.get("conn")
+        TreeNodeConn().close_item(item, self)
+        close_connection(self, item.text(0))
         self.treeWidget.clear()
-        # if hasattr(self, 'table_frame') and self.current_table:
-        #     close_table(self)
         self.get_saved_conns()
 
