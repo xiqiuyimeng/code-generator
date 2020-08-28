@@ -57,10 +57,10 @@ class TreeWidgetUI:
         self.verticalLayout_2.addLayout(self.gridLayout_button)
 
         # 按钮响应事件
-        self.expand_collapse_button.clicked.connect(lambda: self.expand_collapse())
-        self.path_generator_button.clicked.connect(lambda: self.parent.select_path_generator())
-        self.project_generator_button.clicked.connect(lambda: self.parent.select_project_generator())
-        self.cancel_button.clicked.connect(lambda: self.parent.close())
+        self.expand_collapse_button.clicked.connect(self.expand_collapse)
+        self.path_generator_button.clicked.connect(self.parent.select_path_generator)
+        self.project_generator_button.clicked.connect(self.parent.select_project_generator)
+        self.cancel_button.clicked.connect(self.parent.close)
 
         self.make_tree()
 

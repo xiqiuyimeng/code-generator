@@ -207,6 +207,42 @@ QPushButton:disabled{
     background-color:Silver;
     border:none
 }
+/*窗口最小化按钮*/
+#min_button{
+    background: #6DDF6D;
+    border: none;
+    border-radius: 10px;
+}
+#min_button:hover{
+    background: green;
+}
+/*窗口最大化、还原按钮*/
+#max_button, #restore_button{
+    border: none;
+    background: #F7D674;
+    border-radius: 10px;
+}
+#max_button:hover, #restore_button:hover{
+    background: yellow;
+}
+/*关闭窗口按钮*/
+#close_button{
+    border: none;
+    background:#F76677;
+    border-radius: 10px;
+}
+#close_button:hover{
+    background: red;
+}
+#menubar{
+    font-size: 18px;
+}
+#main_title{
+    font-size:25px;
+    font-family:楷体;
+    font-weight:500;
+
+}
 /*特定label样式*/
 #lombok,#java,#java_src,#model,#mapper,#xml,#service,#service_impl,#controller,#output{
     font-size:18px;

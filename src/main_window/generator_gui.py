@@ -9,7 +9,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
@@ -59,10 +59,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置所有间距为0
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        # 创建标题栏
-        self.title_bar = TitleBar(30, self)
-        self.title_bar.setObjectName("title_bar")
-        self.title_bar.setFixedWidth(self.width())
 
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
@@ -91,6 +87,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menubar.setObjectName("menubar")
         fill_menu_bar(self)
 
+        # 创建标题栏
+        self.title_bar = TitleBar(30, self, self.menubar)
+        self.title_bar.setObjectName("title_bar")
+        self.title_bar.setFixedWidth(self.width())
+
         # 工具栏
         self.toolBar = QtWidgets.QToolBar(self)
         self.toolBar.setObjectName("toolBar")
@@ -102,7 +103,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # 主布局添加所有部件，依次为标题栏、菜单栏、工具栏、承载了实际窗口内容的主控件，将窗口中央控件设置为包含所有的控件
         self.main_layout.addWidget(self.title_bar)
-        self.main_layout.addWidget(self.menubar)
         self.main_layout.addWidget(self.toolBar)
         self.main_layout.addWidget(self.centralwidget)
         self.main_widget.setLayout(self.main_layout)

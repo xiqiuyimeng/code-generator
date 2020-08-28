@@ -22,7 +22,7 @@ from src.func.table_func import change_table_checkbox, close_table, check_table_
 from src.func.test_conn_thread import AsyncTestConn
 from src.func.open_conn_thread import AsyncOpenConn
 from src.func.tree_function import show_conn_dialog
-from src.little_widget.menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
+from src.little_widget.right_menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.little_widget.message_box import pop_question
 from src.sys.sys_info_storage.sqlite import delete_conn
 
