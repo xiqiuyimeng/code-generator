@@ -15,9 +15,8 @@ from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELEC
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
 from src.func.selected_data import SelectedData
-from src.func.table_func import on_cell_changed, close_table
-from src.func.tree_function import make_tree_item, add_conn_func
-from src.func.tree_strategy import tree_node_factory, Context, TreeNodeConn
+from src.func.tree_function import make_tree_item
+from src.func.tree_strategy import tree_node_factory, Context, TreeNodeTable, TreeNodeConn
 from src.little_widget.about_ui import AboutUI
 from src.little_widget.help_ui import HelpUI
 from src.little_widget.menu_bar_func import fill_menu_bar
@@ -38,7 +37,10 @@ class MainWindow(QtWidgets.QMainWindow):
         # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象，
         # 因为在编辑连接后，连接名称可能会变化，无法作为唯一标识
         self.display_conn_dict = dict()
-        self.open_conn_item = dict()
+        # 保存在页面已经打开的项
+        # {conn1:[db1s], conn2:[db2s],
+        # opened_table: (conn_name, db_name, tb_name)}
+        self.open_item_dict = dict()
         self.dbs = list()
         self.tables = list()
         # 当前屏幕的分辨率大小
@@ -186,14 +188,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         item.setText(self._translate("MainWindow", field))
 
-    def on_cell_changed_func(self, row, col):
-        """
-        第一列checkbox状态改变时触发
-        :param row: 表格中当前行
-        :param col: 表格中当前列
-        """
-        on_cell_changed(self, row, col)
-
     def close_conn(self, conn_name=None):
         """
         关闭连接
@@ -230,9 +224,6 @@ class MainWindow(QtWidgets.QMainWindow):
         node = tree_node_factory(item)
         Context(node).handle_menu_func(item, func, self)
 
-    def add_conn(self):
-        add_conn_func(self, self.screen_rect)
-
     def generate(self):
         selected_data = SelectedData().conn_dict
         if selected_data:
@@ -249,14 +240,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.about_ui = AboutUI(self.screen_rect)
         self.about_ui.show()
 
-    def quit(self):
-        self.close()
-
     def refresh(self):
+        # 关闭右侧表格
+        if hasattr(self, 'current_table'):
+            TreeNodeTable().close_item(self.current_table, self)
         # 清空当前树
-        item = self.open_conn_item.get("conn")
-        TreeNodeConn().close_item(item, self)
-        close_connection(self, item.text(0))
         self.treeWidget.clear()
+        # 重新获取页面连接
         self.get_saved_conns()
+        for conn_name, db_names in self.open_item_dict.items():
+            # TreeNodeConn().open_item()
+            print(conn_name, db_names)
+
 
