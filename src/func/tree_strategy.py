@@ -21,7 +21,7 @@ from src.func.selected_data import SelectedData
 from src.func.table_func import change_table_checkbox, close_table, check_table_opened
 from src.func.test_conn_thread import AsyncTestConn
 from src.func.open_conn_thread import AsyncOpenConn
-from src.func.tree_function import show_conn_dialog
+from src.func.tree_function import show_conn_dialog, add_conn_func
 from src.little_widget.right_menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.little_widget.message_box import pop_question
 from src.sys.sys_info_storage.sqlite import delete_conn
@@ -146,7 +146,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
             self.test_conn(gui.display_conn_dict.get(conn_id), item)
         # 添加连接
         elif func == ADD_CONN_MENU:
-            gui.add_conn()
+            add_conn_func(gui, gui.screen_rect)
         # 编辑连接
         elif func == EDIT_CONN_MENU:
             self.edit_conn(func, gui, conn_name, conn_id, item)

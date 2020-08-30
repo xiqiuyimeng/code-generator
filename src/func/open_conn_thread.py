@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 from src.constant.constant import OPEN_CONN_MENU, TEST_CONN_FAIL_PROMPT
 from src.func.connection_function import open_connection
 from src.func.selected_data import SelectedData
-from src.func.table_func import add_table, fill_table
+from src.func.table_func import add_table, fill_table, on_cell_changed
 from src.func.tree_function import make_tree_item
 from src.little_widget.message_box import pop_fail
 
@@ -106,13 +106,14 @@ class AsyncOpenConn:
         for db in data:
             make_tree_item(self.gui, self.item, db, icon)
         self.item.setExpanded(True)
-        self.gui.open_conn_item['conn'] = self.item
+        self.gui.open_item_dict[self.conn_name] = list()
 
     def analyse_db_result(self, data):
         icon = QIcon(":icon/table_icon.png")
         for table in data:
             make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
         self.item.setExpanded(True)
+        self.gui.open_item_dict[self.conn_name].append(self.db_name)
 
     def analyse_tb_result(self, data):
         # 添加表格控件
@@ -126,11 +127,13 @@ class AsyncOpenConn:
         if self.item.checkState(0) == Qt.Checked and len(cols) == len(selected_cols):
             self.gui.table_header.set_header_checked(True)
         # 表格复选框改变事件
-        self.gui.tableWidget.cellChanged.connect(self.gui.on_cell_changed_func)
+        self.gui.tableWidget.cellChanged.connect(lambda row, col: on_cell_changed(self.gui, row, col))
         self.gui.current_table = self.item
         # 状态栏提示
         self.gui.statusbar.showMessage(f"当前展示的表为：{self.item.text(0)}")
         # 设置气泡提示
         self.gui.tableWidget.setToolTip(f'当前表为{self.tb_name}')
+        # 已经打开的表，记录下连接名、库名和表名
+        self.gui.open_item_dict['opened_table'] = self.conn_name, self.db_name, self.tb_name
 
 

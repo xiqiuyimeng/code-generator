@@ -6,6 +6,7 @@
 from PyQt5 import QtGui, QtWidgets
 
 from src.constant.constant import ADD_CONN_MENU, GENERATE_MENU, FILE_MENU, HELP_MENU, EXIT_MENU, ABOUT_MENU
+from src.func.tree_function import add_conn_func
 
 _author_ = 'luwt'
 _date_ = '2020/6/27 8:26'
@@ -36,7 +37,7 @@ def add_conn_menu(gui):
     add_action = QtWidgets.QAction(QtGui.QIcon(':/icon/add.png'), ADD_CONN_MENU, gui)
     add_action.setShortcut('Ctrl+N')
     add_action.setStatusTip('在左侧列表中添加一条连接')
-    add_action.triggered.connect(gui.add_conn)
+    add_action.triggered.connect(lambda: add_conn_func(gui, gui.screen_rect))
 
     gui.file_menu.addAction(add_action)
 
@@ -49,7 +50,7 @@ def exit_app_menu(gui):
     exit_action = QtWidgets.QAction(QtGui.QIcon(':/icon/exit.png'), EXIT_MENU, gui)
     exit_action.setShortcut('Ctrl+Q')
     exit_action.setStatusTip('退出应用程序')
-    exit_action.triggered.connect(gui.quit)
+    exit_action.triggered.connect(gui.close)
 
     gui.file_menu.addAction(exit_action)
 

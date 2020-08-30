@@ -6,6 +6,8 @@
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
+from src.func.tree_function import add_conn_func
+
 _author_ = 'luwt'
 _date_ = '2020/7/13 14:28'
 
@@ -21,7 +23,7 @@ def add_insert_conn_tool(gui):
     # 指定图标
     insert_tool = QAction(QIcon(':/icon/add.png'), '添加连接', gui)
     insert_tool.setStatusTip('在左侧列表中添加一条连接')
-    insert_tool.triggered.connect(gui.add_conn)
+    insert_tool.triggered.connect(lambda: add_conn_func(gui, gui.screen_rect))
     gui.toolBar.addAction(insert_tool)
 
 
@@ -43,7 +45,7 @@ def add_generate_tool(gui):
 def add_exit_tool(gui):
     exit_tool = QAction(QIcon(':/icon/exit.png'), '退出程序', gui)
     exit_tool.setStatusTip('退出应用程序')
-    exit_tool.triggered.connect(gui.quit)
+    exit_tool.triggered.connect(gui.close)
     gui.toolBar.addSeparator()
     gui.toolBar.addAction(exit_tool)
 
