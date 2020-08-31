@@ -102,7 +102,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 连接的id，连接名称
             conn_id, conn_name = TreeNodeConn.get_node_info(item)
-            open_conn = AsyncOpenConn(gui, conn_id, item, self, conn_name)
+            open_conn = AsyncOpenConn(gui, item, conn_id, conn_name)
             open_conn.connect_db()
 
     def close_item(self, item, gui):
@@ -273,7 +273,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         if item.childCount() == 0:
             # 获取连接id和名称，从而获取该连接的数据库操作对象
             conn_id, conn_name, db_name = TreeNodeDB.get_node_info(item)
-            open_conn = AsyncOpenConn(gui, conn_id, item, self, conn_name, db_name)
+            open_conn = AsyncOpenConn(gui, item, conn_id, conn_name, db_name)
             open_conn.connect_db()
 
     def close_item(self, item, gui):
@@ -373,7 +373,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         elif check_table_opened(gui, item):
             return
         conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
-        open_conn = AsyncOpenConn(gui, conn_id, item, self, conn_name, db_name, tb_name)
+        open_conn = AsyncOpenConn(gui, item, conn_id, conn_name, db_name, tb_name)
         open_conn.connect_db()
 
     def close_item(self, item, gui):

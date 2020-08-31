@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtGui
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QObject
 from PyQt5.QtGui import QIcon
 
 from src.constant.constant import OPEN_CONN_MENU, TEST_CONN_FAIL_PROMPT
@@ -17,14 +17,12 @@ _date_ = '2020/8/19 14:20'
 
 class ConnectDBWorker(QThread):
 
-    # 定义信号，返回结果，第一个参数为是否成功，第二个：成功为返回的连接对象，失败为返回的异常信息
+    # 定义信号，返回结果，第一个参数为是否成功，第二个：成功为返回的查询结果，失败为返回的异常信息
     result = pyqtSignal(bool, object)
 
-    def __init__(self, gui, caller_name, conn_id, conn_name, db_name, tb_name):
+    def __init__(self, gui, conn_id, conn_name, db_name=None, tb_name=None):
         super().__init__()
         self.gui = gui
-        # 调用者名称
-        self.caller_name = caller_name
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.db_name = db_name
@@ -36,17 +34,19 @@ class ConnectDBWorker(QThread):
             data = self.open_sth()
             self.result.emit(True, data)
         except Exception as e:
-            print("异常")
             data = f'{TEST_CONN_FAIL_PROMPT}：[{self.conn_name}]' \
                    f'\t\n {e.args[0]} - {e.args[1]}'
             self.result.emit(False, data)
 
     def open_sth(self):
-        if self.caller_name == "TreeNodeConn":
+        # 库名和表名不存在，认为是操作连接
+        if self.db_name is None and self.tb_name is None:
             return self.open_conn()
-        elif self.caller_name == "TreeNodeDB":
+        # 库名存在，表名不存在，认为操作库
+        elif self.db_name and self.tb_name is None:
             return self.open_db()
-        elif self.caller_name == "TreeNodeTable":
+        # 两者都存在，认为操作表
+        elif self.db_name and self.tb_name:
             return self.open_tb()
 
     def open_conn(self):
@@ -60,17 +60,19 @@ class ConnectDBWorker(QThread):
         return self.executor.get_cols(self.db_name, self.tb_name)
 
 
-class AsyncOpenConn:
+class AsyncOpenConn(QObject):
 
-    def __init__(self, gui, conn_id, item, caller, conn_name, db_name=None, tb_name=None):
+    finished = pyqtSignal()
+
+    def __init__(self, gui, item, conn_id, conn_name, db_name=None, tb_name=None, expanded=True):
+        super().__init__()
         self.gui = gui
         self.conn_id = conn_id
         self.item = item
-        # 调用者名称，作为标识决定如何解析结果
-        self.caller_name = caller.__class__.__name__
         self.conn_name = conn_name
         self.db_name = db_name
         self.tb_name = tb_name
+        self.expanded = expanded
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
         self.icon = self.item.icon(0)
 
@@ -80,9 +82,11 @@ class AsyncOpenConn:
         self._movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self._movie.currentPixmap())))
         # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
         # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
-        self.open_conn_thread = ConnectDBWorker(self.gui, self.caller_name,
-                                                self.conn_id, self.conn_name,
-                                                self.db_name, self.tb_name)
+        self.open_conn_thread = ConnectDBWorker(self.gui,
+                                                self.conn_id,
+                                                self.conn_name,
+                                                self.db_name,
+                                                self.tb_name)
         self.open_conn_thread.result.connect(lambda flag, data: self.analyse_result(flag, data))
         self.open_conn_thread.start()
 
@@ -91,11 +95,14 @@ class AsyncOpenConn:
         self._movie.stop()
         self.item.setIcon(0, self.icon)
         if flag:
-            if self.caller_name == "TreeNodeConn":
+            # 库名和表名不存在，认为是操作连接
+            if self.db_name is None and self.tb_name is None:
                 self.analyse_conn_result(data)
-            elif self.caller_name == "TreeNodeDB":
+            # 库名存在，表名不存在，认为操作库
+            elif self.db_name and self.tb_name is None:
                 self.analyse_db_result(data)
-            elif self.caller_name == "TreeNodeTable":
+            # 两者都存在，认为操作表
+            elif self.db_name and self.tb_name:
                 self.analyse_tb_result(data)
         else:
             pop_fail(OPEN_CONN_MENU, data)
@@ -105,15 +112,17 @@ class AsyncOpenConn:
         icon = QIcon(":icon/database_icon.png")
         for db in data:
             make_tree_item(self.gui, self.item, db, icon)
-        self.item.setExpanded(True)
-        self.gui.open_item_dict[self.conn_name] = list()
+        self.item.setExpanded(self.expanded)
+        self.gui.open_item_dict[self.conn_name] = list(), self.expanded
+        self.finished.emit()
 
     def analyse_db_result(self, data):
         icon = QIcon(":icon/table_icon.png")
         for table in data:
             make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
-        self.item.setExpanded(True)
-        self.gui.open_item_dict[self.conn_name].append(self.db_name)
+        self.item.setExpanded(self.expanded)
+        self.gui.open_item_dict[self.conn_name][0].append((self.db_name, self.expanded))
+        self.finished.emit()
 
     def analyse_tb_result(self, data):
         # 添加表格控件
