@@ -14,9 +14,10 @@ from PyQt5.QtWidgets import QVBoxLayout
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
+from src.func.refresh_thread import Refresh
 from src.func.selected_data import SelectedData
 from src.func.tree_function import make_tree_item
-from src.func.tree_strategy import tree_node_factory, Context, TreeNodeTable, TreeNodeConn
+from src.func.tree_strategy import tree_node_factory, Context, TreeNodeTable
 from src.little_widget.about_ui import AboutUI
 from src.little_widget.help_ui import HelpUI
 from src.little_widget.menu_bar_func import fill_menu_bar
@@ -37,8 +38,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象，
         # 因为在编辑连接后，连接名称可能会变化，无法作为唯一标识
         self.display_conn_dict = dict()
-        # 保存在页面已经打开的项
-        # {conn1:[db1s], conn2:[db2s],
+        # 保存在页面已经打开的项，字典值为元祖，第一个为列表，存放打开的库名，
+        # 第二个为当前项的打开状态，库名列表元素同样为元祖，记录库名和状态
+        # {conn1:[(db1,True)...],True, conn2:[(db2,True)],True,
         # opened_table: (conn_name, db_name, tb_name)}
         self.open_item_dict = dict()
         self.dbs = list()
@@ -115,6 +117,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
+        # 任务栏图标
+        self.setWindowIcon(QIcon(":/icon/exec.png"))
 
         # 初始化树：初始化获取树结构的第一层元素，为数据库连接列表
         self.get_saved_conns()
@@ -240,6 +244,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.about_ui = AboutUI(self.screen_rect)
         self.about_ui.show()
 
+    def change_expanded(self):
+        pass
+
     def refresh(self):
         # 关闭右侧表格
         if hasattr(self, 'current_table'):
@@ -248,8 +255,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget.clear()
         # 重新获取页面连接
         self.get_saved_conns()
-        for conn_name, db_names in self.open_item_dict.items():
-            # TreeNodeConn().open_item()
-            print(conn_name, db_names)
+        # 开一个线程用来打开之前的打开项
+        refresh = Refresh(self)
+        refresh.refresh()
 
 

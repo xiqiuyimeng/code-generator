@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
-
+import ctypes
 from src.main_window.generator_gui import MainWindow
 from src.style.qss import read_qss
 from static import image_rc
@@ -27,6 +27,8 @@ if __name__ == "__main__":
     app.setStyleSheet(read_qss())
     screen_rect = desktop.screenGeometry()
     ui = MainWindow(screen_rect)
+    # 声明AppUserModelID，否则windows认为这是python子程序，无法使用自定义任务栏图标
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("generator")
     ui.show()
     splash.finish(ui)
     app.exec_()
