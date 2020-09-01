@@ -113,7 +113,7 @@ class AsyncOpenConn(QObject):
         for db in data:
             make_tree_item(self.gui, self.item, db, icon)
         self.item.setExpanded(self.expanded)
-        self.gui.open_item_dict[self.conn_name] = list(), self.expanded
+        self.gui.open_item_dict[self.conn_name] = {"expanded": self.expanded, "opened_db": dict()}
         self.finished.emit()
 
     def analyse_db_result(self, data):
@@ -121,7 +121,8 @@ class AsyncOpenConn(QObject):
         for table in data:
             make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
         self.item.setExpanded(self.expanded)
-        self.gui.open_item_dict[self.conn_name][0].append((self.db_name, self.expanded))
+        opened_db_dict = {self.db_name: {"expanded": self.expanded, "table": dict()}}
+        self.gui.open_item_dict[self.conn_name]["opened_db"].update(opened_db_dict)
         self.finished.emit()
 
     def analyse_tb_result(self, data):
@@ -143,6 +144,6 @@ class AsyncOpenConn(QObject):
         # 设置气泡提示
         self.gui.tableWidget.setToolTip(f'当前表为{self.tb_name}')
         # 已经打开的表，记录下连接名、库名和表名
-        self.gui.open_item_dict['opened_table'] = self.conn_name, self.db_name, self.tb_name
+        self.gui.opened_table = self.conn_name, self.db_name, self.tb_name
 
 
