@@ -38,11 +38,24 @@ class MainWindow(QtWidgets.QMainWindow):
         # 页面展示的连接（从系统库中获取的连接信息），key为id，value为connection对象，
         # 因为在编辑连接后，连接名称可能会变化，无法作为唯一标识
         self.display_conn_dict = dict()
-        # 保存在页面已经打开的项，字典值为元祖，第一个为列表，存放打开的库名，
-        # 第二个为当前项的打开状态，库名列表元素同样为元祖，记录库名和状态
-        # {conn1:[(db1,True)...],True, conn2:[(db2,True)],True,
-        # opened_table: (conn_name, db_name, tb_name)}
+        # 保存在页面已经打开的项，字典键为连接名，值为字典，字典包含两个键，一个为expanded记录展开状态，
+        # 一个为opened_db 记录打开的库信息。opened_db对应的值为字典，该字典包含多个打开的库名键，
+        # 值为字典，包含两个键值对，一个为expanded记录节点展开状态，一个为table，表名，table对应值为字典，
+        # 字典包含多个表名键，值为是否选中
+        # {
+        #      conn:{
+        #          opened_db:{
+        #              db:{
+        #                  table:{tb: Qt.Checked},
+        #                  expanded:True,
+        #              }
+        #          },
+        #          expanded:True
+        #      }
+        # }
         self.open_item_dict = dict()
+        # opened_table: [conn_name, db_name, tb_name]
+        self.opened_table = tuple()
         self.dbs = list()
         self.tables = list()
         # 当前屏幕的分辨率大小
@@ -244,10 +257,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.about_ui = AboutUI(self.screen_rect)
         self.about_ui.show()
 
-    def change_expanded(self):
-        pass
-
     def refresh(self):
+        refresh = Refresh(self)
+        refresh.update_expanded_before_refresh()
         # 关闭右侧表格
         if hasattr(self, 'current_table'):
             TreeNodeTable().close_item(self.current_table, self)
@@ -256,7 +268,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # 重新获取页面连接
         self.get_saved_conns()
         # 开一个线程用来打开之前的打开项
-        refresh = Refresh(self)
         refresh.refresh()
 
 
