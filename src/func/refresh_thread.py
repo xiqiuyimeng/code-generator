@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from src.func.open_conn_thread import AsyncOpenConn
 
@@ -7,9 +8,12 @@ _author_ = 'luwt'
 _date_ = '2020/8/31 11:38'
 
 
-class Refresh:
+class Refresh(QObject):
+
+    refresh_finished = pyqtSignal()
 
     def __init__(self, gui):
+        super().__init__()
         self.gui = gui
 
     def refresh(self):
@@ -38,7 +42,8 @@ class Refresh:
                                     conn_id,
                                     conn_name,
                                     db_name,
-                                    expanded=db_value.get("expanded"))
+                                    expanded=db_value.get("expanded"),
+                                    check_status=db_value.get("table"))
             open_db.connect_db()
             if self.gui.opened_table and self.gui.opened_table[0] == conn_name \
                     and self.gui.opened_table[1] == db_name:
@@ -59,7 +64,15 @@ class Refresh:
             if values.get("opened_db"):
                 for db, db_value in values.get("opened_db").items():
                     db_item = self.iterate_tree_item(conn_item, db)
-                    self.gui.open_item_dict[conn_name]["opened_db"]["expanded"] = db_item.isExpanded()
+                    db_value["expanded"] = db_item.isExpanded()
+                    db_value["table"] = self.collect_table_check_status(db_item)
+
+    def collect_table_check_status(self, db_item):
+        check_status = dict()
+        for index in range(db_item.childCount()):
+            tb_item = db_item.child(index)
+            check_status[tb_item.text(0)] = tb_item.checkState(0)
+        return check_status
 
     def iterate_tree_root(self, conn_name):
         """遍历树节点，返回匹配名字的节点"""

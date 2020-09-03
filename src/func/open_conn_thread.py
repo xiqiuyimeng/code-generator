@@ -20,7 +20,7 @@ class ConnectDBWorker(QThread):
     # 定义信号，返回结果，第一个参数为是否成功，第二个：成功为返回的查询结果，失败为返回的异常信息
     result = pyqtSignal(bool, object)
 
-    def __init__(self, gui, conn_id, conn_name, db_name=None, tb_name=None):
+    def __init__(self, gui, conn_id, conn_name, db_name=None, tb_name=None, open_dict=None):
         super().__init__()
         self.gui = gui
         self.conn_id = conn_id
@@ -64,7 +64,7 @@ class AsyncOpenConn(QObject):
 
     finished = pyqtSignal()
 
-    def __init__(self, gui, item, conn_id, conn_name, db_name=None, tb_name=None, expanded=True):
+    def __init__(self, gui, item, conn_id, conn_name, db_name=None, tb_name=None, expanded=True, check_status=None):
         super().__init__()
         self.gui = gui
         self.conn_id = conn_id
@@ -73,6 +73,7 @@ class AsyncOpenConn(QObject):
         self.db_name = db_name
         self.tb_name = tb_name
         self.expanded = expanded
+        self.check_status = check_status
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
         self.icon = self.item.icon(0)
 
@@ -119,7 +120,9 @@ class AsyncOpenConn(QObject):
     def analyse_db_result(self, data):
         icon = QIcon(":icon/table_icon.png")
         for table in data:
-            make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
+            # 表的选中状态
+            check_state = Qt.Unchecked if not self.check_status else self.check_status.get(table)
+            make_tree_item(self.gui, self.item, table, icon, checkbox=check_state)
         self.item.setExpanded(self.expanded)
         opened_db_dict = {self.db_name: {"expanded": self.expanded, "table": dict()}}
         self.gui.open_item_dict[self.conn_name]["opened_db"].update(opened_db_dict)
