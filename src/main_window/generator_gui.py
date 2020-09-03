@@ -60,6 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tables = list()
         # 当前屏幕的分辨率大小
         self.desktop_screen_rect = screen_rect
+        self.refresh_finished = True
 
         self.setup_ui()
 
@@ -258,16 +259,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.about_ui.show()
 
     def refresh(self):
-        refresh = Refresh(self)
-        refresh.update_expanded_before_refresh()
-        # 关闭右侧表格
-        if hasattr(self, 'current_table'):
-            TreeNodeTable().close_item(self.current_table, self)
-        # 清空当前树
-        self.treeWidget.clear()
-        # 重新获取页面连接
-        self.get_saved_conns()
-        # 开一个线程用来打开之前的打开项
-        refresh.refresh()
+        if self.refresh_finished:
+            # 先将标志位修改
+            self.refresh_finished = False
+            refresh = Refresh(self)
+            refresh.update_expanded_before_refresh()
+            # 关闭右侧表格
+            if hasattr(self, 'current_table'):
+                TreeNodeTable().close_item(self.current_table, self)
+            # 清空当前树
+            self.treeWidget.clear()
+            # 重新获取页面连接
+            self.get_saved_conns()
+            refresh.refresh_finished.connect(lambda: self.refresh_finish())
+            # 刷新数据
+            refresh.refresh()
+
+    def refresh_finish(self):
+        # 复原标志位为已刷新完毕
+        self.refresh_finished = True
 
 
