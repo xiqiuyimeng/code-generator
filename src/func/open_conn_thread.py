@@ -64,7 +64,7 @@ class AsyncOpenConn(QObject):
 
     finished = pyqtSignal()
 
-    def __init__(self, gui, item, conn_id, conn_name, db_name=None, tb_name=None, expanded=True, check_status=None):
+    def __init__(self, gui, item, conn_id, conn_name, db_name=None, tb_name=None):
         super().__init__()
         self.gui = gui
         self.conn_id = conn_id
@@ -72,8 +72,6 @@ class AsyncOpenConn(QObject):
         self.conn_name = conn_name
         self.db_name = db_name
         self.tb_name = tb_name
-        self.expanded = expanded
-        self.check_status = check_status
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
         self.icon = self.item.icon(0)
 
@@ -113,19 +111,21 @@ class AsyncOpenConn(QObject):
         icon = QIcon(":icon/database_icon.png")
         for db in data:
             make_tree_item(self.gui, self.item, db, icon)
-        self.item.setExpanded(self.expanded)
-        self.gui.open_item_dict[self.conn_name] = {"expanded": self.expanded, "opened_db": dict()}
+        self.item.setExpanded(True)
+        self.gui.open_item_dict[self.conn_name] = {"expanded": True, "opened_db": dict()}
         self.finished.emit()
 
     def analyse_db_result(self, data):
         icon = QIcon(":icon/table_icon.png")
-        for table in data:
-            # 表的选中状态
-            check_state = Qt.Unchecked if not self.check_status else self.check_status.get(table)
-            make_tree_item(self.gui, self.item, table, icon, checkbox=check_state)
-        self.item.setExpanded(self.expanded)
-        opened_db_dict = {self.db_name: {"expanded": self.expanded, "table": dict()}}
-        self.gui.open_item_dict[self.conn_name]["opened_db"].update(opened_db_dict)
+        if data:
+            for table in data:
+                # 表的选中状态
+                make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
+            self.item.setExpanded(True)
+            opened_db_dict = {self.db_name: {"expanded": True, "table": dict()}}
+            self.gui.open_item_dict[self.conn_name]["opened_db"].update(opened_db_dict)
+        else:
+            pop_fail("打开数据库", "该数据库下没有表")
         self.finished.emit()
 
     def analyse_tb_result(self, data):
