@@ -15,7 +15,7 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     DEL_CONN_PROMPT, OPEN_DB_MENU, CLOSE_DB_MENU, SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, \
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
 from src.func.connection_function import close_connection
-from src.func.gui_function import check_table_status, set_children_check_state, check_field_status
+from src.func.gui_function import check_table_status, set_children_check_state
 from src.func.select_table_thread import AsyncSelectTable
 from src.func.selected_data import SelectedData
 from src.func.table_func import change_table_checkbox, close_table, check_table_opened
@@ -416,13 +416,10 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         :param item: 当前点击树节点元素
         :param gui: 启动的主窗口界面对象
         """
-        check_state = tuple()
         table_opened = hasattr(gui, 'table_frame') \
             and gui.table_header.isVisible() \
             and gui.current_table is item
-        if check_table_opened(gui, item):
-            # 检查表格中字段复选框状态
-            check_state = check_field_status(gui, item)
+        check_state = item.text(2)
         return get_table_menu_names(table_opened, check_state)
 
     def handle_menu_func(self, item, func, gui):

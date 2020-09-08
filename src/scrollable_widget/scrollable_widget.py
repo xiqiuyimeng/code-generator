@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QAbstractScrollArea, QTreeWidget, QTableWidget, QScrollArea, QTextBrowser
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QAbstractScrollArea, QTreeWidget, QTableWidget, QScrollArea, QTextBrowser, QTreeWidgetItem
 
 _author_ = 'luwt'
 _date_ = '2020/8/24 15:41'
@@ -20,7 +21,9 @@ class MyScrollableWidget(QAbstractScrollArea):
 
 
 class MyTreeWidget(QTreeWidget, MyScrollableWidget):
-    ...
+
+    # 定义信号，发送点击复选框的树节点和是否选中
+    item_checkbox_clicked = pyqtSignal(QTreeWidgetItem, bool)
 
 
 class MyTableWidget(QTableWidget, MyScrollableWidget):

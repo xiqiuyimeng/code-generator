@@ -30,31 +30,6 @@ def check_table_status(parent):
     return all_checked, parted_checked
 
 
-def check_field_status(gui, item):
-    """
-    检查字段是否全选
-    :param gui: 启动的主窗口界面对象
-    :param item: 当前点击的树节点元素
-    :return all_checked: 是否被全选
-            parted_checked: 是否部分选中
-    """
-    parted_checked = False
-    # 根据表头复选框状态判断是否全选
-    all_checked = gui.table_header.isOn
-    # 如果表头没有全选，左侧表选中，证明是部分选中
-    if not all_checked and item.checkState(0) == Qt.Checked:
-        parted_checked = True
-    return all_checked, parted_checked
-
-
-def quit_app(gui):
-    """
-    退出主窗口
-    :param gui: 启动的主窗口界面对象
-    """
-    gui.close()
-
-
 def set_children_check_state(item, check_state):
     """
     将当前节点下所有项的复选框统一改为一个状态

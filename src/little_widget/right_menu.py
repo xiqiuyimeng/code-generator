@@ -2,6 +2,8 @@
 """
 处理右键菜单
 """
+from PyQt5.QtCore import Qt
+
 from src.constant.constant import CLOSE_CONN_MENU, OPEN_CONN_MENU, TEST_CONN_MENU, \
     ADD_CONN_MENU, EDIT_CONN_MENU, DEL_CONN_MENU, CLOSE_DB_MENU, UNSELECT_TB_MENU, \
     SELECT_ALL_TB_MENU, OPEN_DB_MENU, CLOSE_TABLE_MENU, UNSELECT_FIELD_MENU, \
@@ -57,13 +59,11 @@ def get_db_menu_names(item, checked):
     return menu_names
 
 
-def get_table_menu_names(table_opened, checked):
+def get_table_menu_names(table_opened, check_state):
     """
     生成第三层，数据表列表的右键菜单
     :param table_opened 表是否打开
-    :param checked 元祖：其中包含两个布尔值，
-        第一个代表是否全选，第二个代表是否部分选中
-    菜单：
+    :param check_state: 字符串，checkbox的选中状态：
         全选：添加取消选择菜单
         部分选中：添加全选菜单和取消选择菜单
         都未选中：添加全选菜单
@@ -72,14 +72,14 @@ def get_table_menu_names(table_opened, checked):
     if table_opened:
         menu_names.append(CLOSE_TABLE_MENU)
         # 全选时：添加取消选择菜单
-        if checked[0]:
+        if int(check_state) == Qt.Checked:
             menu_names.append(UNSELECT_FIELD_MENU)
         # 部分选中时：添加全选菜单和取消选择菜单
-        elif checked[1]:
+        elif int(check_state) == Qt.PartiallyChecked:
             menu_names.append(SELECT_ALL_FIELD_MENU)
             menu_names.append(UNSELECT_FIELD_MENU)
         # 都未选中时：添加全选菜单
-        else:
+        elif int(check_state) == Qt.Unchecked:
             menu_names.append(SELECT_ALL_FIELD_MENU)
     else:
         menu_names.append(OPEN_TABLE_MENU)
