@@ -32,6 +32,7 @@ def make_tree_item(gui, parent, name, icon, item_id=None, checkbox=None):
     if checkbox is not None:
         item.setCheckState(0, checkbox)
         gui.update_tree_item_name(item, str(checkbox), 2)
+    return item
 
 
 def add_conn_func(gui, screen_rect):
