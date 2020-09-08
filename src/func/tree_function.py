@@ -3,11 +3,11 @@
 处理树节点相关操作
 """
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QTreeWidgetItem
 
-from src.dialog.conn_dialog import ConnDialog
 from src.constant.constant import ADD_CONN_MENU, EDIT_CONN_MENU
+from src.dialog.conn_dialog import ConnDialog
 from src.sys.sys_info_storage.sqlite import Connection
+from src.tree.tree_item import MyTreeWidgetItem
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
@@ -23,7 +23,7 @@ def make_tree_item(gui, parent, name, icon, item_id=None, checkbox=None):
     :param item_id: 构造的子节点隐藏属性id，可无
     :param checkbox: 构造的子节点的复选框，可无。若存在，将当前状态写入第三列中
     """
-    item = QTreeWidgetItem(parent)
+    item = MyTreeWidgetItem(gui.treeWidget, parent)
     item.setIcon(0, icon)
     gui.update_tree_item_name(item, name)
     if item_id:

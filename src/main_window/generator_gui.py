@@ -138,7 +138,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 双击树节点事件
         self.treeWidget.doubleClicked.connect(self.get_tree_list)
         # 树结构中，第三层表格的复选框点击事件
-        self.treeWidget.itemClicked.connect(self.table_check_box)
+        self.treeWidget.item_checkbox_clicked.connect(self.table_check_box)
         # 右击事件
         self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeWidget.customContextMenuRequested.connect(self.right_click_menu)

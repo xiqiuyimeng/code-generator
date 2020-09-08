@@ -97,7 +97,7 @@ def fill_table(gui, cols, selected_cols, tb_name):
         # 插入新的一行
         gui.tableWidget.insertRow(i)
         # 设置checkbox在第一列
-        check = QTableWidgetItem()
+        table_check_item = QTableWidgetItem()
         if selected_cols is None:
             check_status = Qt.Unchecked
         else:
@@ -105,11 +105,11 @@ def fill_table(gui, cols, selected_cols, tb_name):
                 check_status = Qt.Checked
             else:
                 check_status = Qt.Unchecked
-        check.setCheckState(check_status)
+        table_check_item.setCheckState(check_status)
         # 加上行号
-        check.setText(str(i + 1))
-        gui.tableWidget.setItem(i, 0, check)
-        all_header_combobox.append(check)
+        table_check_item.setText(str(i + 1))
+        gui.tableWidget.setItem(i, 0, table_check_item)
+        all_header_combobox.append(table_check_item)
 
         for n, field in enumerate(col, start=1):
             # 建立一个新的对象，赋值，填充到表格中对应位置
@@ -159,22 +159,25 @@ def on_cell_changed(gui, row, col):
         conn_name, db_name, tb_name = get_node(gui.current_table)
         # 取出选中行的字段名称
         field = gui.tableWidget.item(row, 1).text()
+        check_state = item.checkState()
         # 如果有选中的checkbox
-        if item.checkState() == Qt.Checked:
+        if check_state == Qt.Checked:
             # 表格总行数
             count = gui.tableWidget.rowCount()
             # 已选字段保存
             SelectedData().set_cols(gui, conn_name, db_name, tb_name, (field, ))
             checked_list = SelectedData().get_col_list(conn_name, db_name, tb_name)
-            # 如果选中字段个数等于表格总行数，且表头复选框未选中
-            if count == len(checked_list) and not gui.table_header.isOn:
-                # 全选按钮应该选中，设置表头复选框按钮状态为选中
-                gui.table_header.set_header_checked(True)
-            # 设置左侧树部件中，对应表也应为选中状态
-            gui.current_table.setCheckState(0, Qt.Checked)
-            # 当前item为表格项，下面更新的是树控件中的项，需要将当前表对应的树节点更新即可
-            gui.update_tree_item_name(gui.current_table, str(Qt.Checked), 2)
-        elif item.checkState() == Qt.Unchecked:
+            # 如果选中字段个数等于表格总行数
+            if count == len(checked_list):
+                # 表头复选框未选中
+                if not gui.table_header.isOn:
+                    # 全选按钮应该选中，设置表头复选框按钮状态为选中
+                    gui.table_header.set_header_checked(True)
+                # 设置左侧树部件中，对应表也应为选中状态
+                check_state = Qt.Checked
+            else:
+                check_state = Qt.PartiallyChecked
+        elif check_state == Qt.Unchecked:
             # 设置表头复选框按钮状态为未选中
             gui.table_header.set_header_checked(False)
             # 删除字段
@@ -182,9 +185,12 @@ def on_cell_changed(gui, row, col):
             checked_list = SelectedData().get_col_list(conn_name, db_name, tb_name, True)
             # 设置左侧树部件中，对应表为未选中状态
             if checked_list is None:
-                gui.current_table.setCheckState(0, Qt.Unchecked)
-                # 当前item为表格项，下面更新的是树控件中的项，需要将当前表对应的树节点更新即可
-                gui.update_tree_item_name(gui.current_table, str(Qt.Unchecked), 2)
+                check_state = Qt.Unchecked
+            else:
+                check_state = Qt.PartiallyChecked
+        gui.current_table.setCheckState(0, check_state)
+        # 保存当前树节点的选中状态
+        gui.update_tree_item_name(gui.current_table, str(check_state), 2)
 
 
 def get_node(item):
