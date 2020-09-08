@@ -20,7 +20,7 @@ class ConnectDBWorker(QThread):
     # 定义信号，返回结果，第一个参数为是否成功，第二个：成功为返回的查询结果，失败为返回的异常信息
     result = pyqtSignal(bool, object)
 
-    def __init__(self, gui, conn_id, conn_name, db_name=None, tb_name=None, open_dict=None):
+    def __init__(self, gui, conn_id, conn_name, db_name=None, tb_name=None):
         super().__init__()
         self.gui = gui
         self.conn_id = conn_id
@@ -61,8 +61,6 @@ class ConnectDBWorker(QThread):
 
 
 class AsyncOpenConn(QObject):
-
-    finished = pyqtSignal()
 
     def __init__(self, gui, item, conn_id, conn_name, db_name=None, tb_name=None):
         super().__init__()
@@ -112,8 +110,6 @@ class AsyncOpenConn(QObject):
         for db in data:
             make_tree_item(self.gui, self.item, db, icon)
         self.item.setExpanded(True)
-        self.gui.open_item_dict[self.conn_name] = {"expanded": True, "opened_db": dict()}
-        self.finished.emit()
 
     def analyse_db_result(self, data):
         icon = QIcon(":icon/table_icon.png")
@@ -122,11 +118,8 @@ class AsyncOpenConn(QObject):
                 # 表的选中状态
                 make_tree_item(self.gui, self.item, table, icon, checkbox=Qt.Unchecked)
             self.item.setExpanded(True)
-            opened_db_dict = {self.db_name: {"expanded": True, "table": dict()}}
-            self.gui.open_item_dict[self.conn_name]["opened_db"].update(opened_db_dict)
         else:
             pop_fail("打开数据库", "该数据库下没有表")
-        self.finished.emit()
 
     def analyse_tb_result(self, data):
         # 添加表格控件
@@ -143,7 +136,7 @@ class AsyncOpenConn(QObject):
         self.gui.tableWidget.cellChanged.connect(lambda row, col: on_cell_changed(self.gui, row, col))
         self.gui.current_table = self.item
         # 状态栏提示
-        self.gui.statusbar.showMessage(f"当前展示的表为：{self.item.text(0)}")
+        self.gui.statusbar.showMessage(f"当前展示的表为：{self.tb_name}")
         # 设置气泡提示
         self.gui.tableWidget.setToolTip(f'当前表为{self.tb_name}')
         # 已经打开的表，记录下连接名、库名和表名

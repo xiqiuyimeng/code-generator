@@ -44,20 +44,18 @@ class MainWindow(QtWidgets.QMainWindow):
         # 字典包含多个表名键，值为是否选中
         # {
         #      conn:{
-        #          opened_db:{
+        #          'opened_db':{
         #              db:{
-        #                  table:{tb: Qt.Checked},
-        #                  expanded:True,
+        #                  'table':{tb: Qt.Checked},
+        #                  'expanded': True,
         #              }
         #          },
-        #          expanded:True
+        #          'expanded': True
         #      }
         # }
         self.open_item_dict = dict()
-        # opened_table: [conn_name, db_name, tb_name]
+        # opened_table: (conn_name, db_name, tb_name)
         self.opened_table = tuple()
-        self.dbs = list()
-        self.tables = list()
         # 当前屏幕的分辨率大小
         self.desktop_screen_rect = screen_rect
         self.refresh_finished = True
@@ -262,8 +260,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.refresh_finished:
             # 先将标志位修改
             self.refresh_finished = False
-            refresh = Refresh(self)
-            refresh.update_expanded_before_refresh()
+            refresh = Refresh(self, self.opened_table)
+            refresh.collect_data_before_refresh()
             # 关闭右侧表格
             if hasattr(self, 'current_table'):
                 TreeNodeTable().close_item(self.current_table, self)
@@ -273,10 +271,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.get_saved_conns()
             refresh.refresh_finished.connect(lambda: self.refresh_finish())
             # 刷新数据
-            refresh.refresh()
+            refresh.refresh_data()
 
     def refresh_finish(self):
         # 复原标志位为已刷新完毕
         self.refresh_finished = True
+        # 清空存储的打开项
+        self.open_item_dict.clear()
 
 
