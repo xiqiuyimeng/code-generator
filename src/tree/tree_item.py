@@ -16,8 +16,13 @@ class MyTreeWidgetItem(QTreeWidgetItem):
 
     def setData(self, column: int, role: int, value):
         # 当点击位置为复选框，且值已经改变，发送信号
-        check_change = column == 0 and role == Qt.CheckStateRole and self.checkState(0) != value
+        check_change = self.tree.checkbox_clicked \
+                       and column == 0 \
+                       and role == Qt.CheckStateRole \
+                       and self.checkState(0) != value
         super().setData(column, role, value)
         if check_change:
             self.tree.item_checkbox_clicked.emit(self, value)
+            # 复原树控件中标志项
+            self.tree.checkbox_clicked = False
 

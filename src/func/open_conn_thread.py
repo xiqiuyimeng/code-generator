@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 from src.constant.constant import OPEN_CONN_MENU, TEST_CONN_FAIL_PROMPT
 from src.func.connection_function import open_connection
 from src.func.selected_data import SelectedData
-from src.func.table_func import add_table, fill_table, on_cell_changed
+from src.func.table_func import add_table, fill_table, on_check_changed
 from src.func.tree_function import make_tree_item
 from src.little_widget.message_box import pop_fail
 
@@ -133,7 +133,7 @@ class AsyncOpenConn(QObject):
         if self.item.checkState(0) == Qt.Checked and len(cols) == len(selected_cols):
             self.gui.table_header.set_header_checked(True)
         # 表格复选框改变事件
-        self.gui.tableWidget.cellChanged.connect(lambda row, col: on_cell_changed(self.gui, row, col))
+        self.gui.tableWidget.item_checkbox_clicked.connect(lambda checked, field: on_check_changed(self.gui, checked, field))
         self.gui.current_table = self.item
         # 状态栏提示
         self.gui.statusbar.showMessage(f"当前展示的表为：{self.tb_name}")
