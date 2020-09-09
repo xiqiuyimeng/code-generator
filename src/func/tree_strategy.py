@@ -16,14 +16,14 @@ from src.constant.constant import OPEN_CONN_MENU, CLOSE_CONN_MENU, TEST_CONN_MEN
     OPEN_TABLE_MENU, CLOSE_TABLE_MENU, SELECT_ALL_FIELD_MENU, UNSELECT_FIELD_MENU
 from src.func.connection_function import close_connection
 from src.func.gui_function import check_table_status, set_children_check_state
+from src.func.open_conn_thread import AsyncOpenConn
 from src.func.select_table_thread import AsyncSelectTable
 from src.func.selected_data import SelectedData
 from src.func.table_func import change_table_checkbox, close_table, check_table_opened
 from src.func.test_conn_thread import AsyncTestConn
-from src.func.open_conn_thread import AsyncOpenConn
 from src.func.tree_function import show_conn_dialog, add_conn_func
-from src.little_widget.right_menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.little_widget.message_box import pop_question
+from src.little_widget.right_menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
 from src.sys.sys_info_storage.sqlite import delete_conn
 
 _author_ = 'luwt'
@@ -62,8 +62,8 @@ class Context:
     def close_item(self, item, gui):
         return self.tree_node.close_item(item, gui)
 
-    def change_check_box(self, item, gui):
-        return self.tree_node.change_check_box(item, gui)
+    def change_check_box(self, item, check_state, gui):
+        return self.tree_node.change_check_box(item, check_state, gui)
 
     def get_menu_names(self, item, gui):
         return self.tree_node.get_menu_names(item, gui)
@@ -81,7 +81,7 @@ class TreeNodeAbstract(ABC):
     def close_item(self, item, gui): ...
 
     @abstractmethod
-    def change_check_box(self, item, gui): ...
+    def change_check_box(self, item, check_state, gui): ...
 
     @abstractmethod
     def get_menu_names(self, item, gui): ...
@@ -114,7 +114,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         TreeNodeDB().close_item(item, gui)
         item.setExpanded(False)
 
-    def change_check_box(self, item, gui): ...
+    def change_check_box(self, item, check_state, gui): ...
 
     def get_menu_names(self, item, gui):
         """
@@ -289,7 +289,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         item.takeChildren()
         item.setExpanded(False)
 
-    def change_check_box(self, item, gui): ...
+    def change_check_box(self, item, check_state, gui): ...
 
     def get_menu_names(self, item, gui):
         """
@@ -386,29 +386,23 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
             # 关闭表格
             close_table(gui)
 
-    def change_check_box(self, item, gui):
+    def change_check_box(self, item, check_state, gui):
         """
         修改复选框状态，当前元素复选框状态应与表格控件中的复选框联动
         :param item: 当前点击树节点元素
+        :param check_state: 复选框选中状态：全选、部分选、未选择
         :param gui: 启动的主窗口界面对象
         """
-        # 取出已保存的复选框状态(存在于第三列中)，以此判断是否点击复选框
-        saved_check_state = int(item.text(2))
-        check_state = item.checkState(0)
-        # 如果当前复选框状态与保存的不同，说明点击了复选框
-        if check_state != saved_check_state:
-            conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
-            # 如果表已经选中，那么右侧表格需全选字段
-            if check_state == Qt.Checked:
-                select_table = AsyncSelectTable(gui, item, conn_id, conn_name, db_name, (tb_name, ))
-                select_table.select_table()
-            # 如果表未选中，那么右侧表格需清空选择
-            elif check_state == Qt.Unchecked:
-                # 从容器删除表名
-                SelectedData().unset_tbs(gui, conn_name, db_name, (tb_name, ))
-                change_table_checkbox(gui, item, False)
-            # 将复选框状态保存
-            gui.update_tree_item_name(item, str(check_state), 2)
+        conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
+        # 如果表已经选中，那么右侧表格需全选字段
+        if check_state == Qt.Checked:
+            select_table = AsyncSelectTable(gui, item, conn_id, conn_name, db_name, (tb_name,))
+            select_table.select_table()
+        # 如果表未选中，那么右侧表格需清空选择
+        elif check_state == Qt.Unchecked:
+            # 从容器删除表名
+            SelectedData().unset_tbs(gui, conn_name, db_name, (tb_name,))
+            change_table_checkbox(gui, item, False)
 
     def get_menu_names(self, item, gui):
         """
@@ -419,7 +413,7 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         table_opened = hasattr(gui, 'table_frame') \
             and gui.table_header.isVisible() \
             and gui.current_table is item
-        check_state = item.text(2)
+        check_state = item.checkState(0)
         return get_table_menu_names(table_opened, check_state)
 
     def handle_menu_func(self, item, func, gui):

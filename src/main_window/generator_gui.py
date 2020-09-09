@@ -178,14 +178,15 @@ class MainWindow(QtWidgets.QMainWindow):
         node = tree_node_factory(item)
         Context(node).open_item(item, self)
 
-    def table_check_box(self, item):
+    def table_check_box(self, item, check_state):
         """
         处理树结构中，表的复选框，实现表的复选框与表格控件中复选框联动效果
         :param item: 当前点击树节点元素
+        :param checked: 是否选中
         """
         node = tree_node_factory(item)
         # 只处理表
-        Context(node).change_check_box(item, self)
+        Context(node).change_check_box(item, check_state, self)
 
     def update_tree_item_name(self, item, name, col=0):
         """

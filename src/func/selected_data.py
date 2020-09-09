@@ -31,6 +31,15 @@ def sort_dict(src_dict):
     return dict(zip(sorted_tuple[0], sorted_tuple[1]))
 
 
+def log_class(cls):
+    def inner(*args, **kwargs):
+        if hasattr(SelectedData, 'instance'):
+            print(SelectedData.instance.conn_dict)
+        return cls(*args, **kwargs)
+    return inner
+
+
+@log_class
 class SelectedData:
 
     def __new__(cls, *args, **kwargs):
@@ -39,7 +48,6 @@ class SelectedData:
             SelectedData.instance = object.__new__(cls)
             # 存放连接信息的字典，key为连接名称，value为字典。为保证唯一，放在构造器中初始化
             SelectedData.instance.conn_dict = dict()
-            print('实例化容器')
         return SelectedData.instance
 
     def unset_conn(self, conn_name):

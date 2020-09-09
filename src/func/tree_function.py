@@ -31,7 +31,6 @@ def make_tree_item(gui, parent, name, icon, item_id=None, checkbox=None):
         gui.update_tree_item_name(item, str(item_id), 1)
     if checkbox is not None:
         item.setCheckState(0, checkbox)
-        gui.update_tree_item_name(item, str(checkbox), 2)
     return item
 
 
