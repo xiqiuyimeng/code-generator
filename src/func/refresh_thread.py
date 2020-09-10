@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 from src.constant.constant import TEST_CONN_FAIL_PROMPT, OPEN_CONN_MENU
 from src.func.connection_function import open_connection
 from src.func.selected_data import SelectedData
-from src.func.table_func import add_table, on_check_changed, fill_table
+from src.func.table_func import add_table, fill_table
 from src.func.tree_function import make_tree_item
 from src.little_widget.message_box import pop_fail
 
@@ -178,27 +178,19 @@ class RefreshConnection(QObject):
                     }
         """
         # 添加表格控件
-        add_table(self.gui)
         table_name = opened_table_dict.get('table')
         cols = opened_table_dict.get('cols')
         db_name = db_item.text(0)
+        table_item = Refresh.iterate_tree_item(db_item, table_name)
+        # 添加表格控件
+        add_table(self.gui, table_item)
         # 获取选中的字段，如果为空，则未选中，如果选中列表长度等于字段列表长度，那么为全选
         selected_cols = SelectedData().get_col_list(self.conn_name, db_name, table_name, True)
-        # 当前表复选框的状态，赋予表格中复选框的状态
-        fill_table(self.gui, cols, selected_cols, table_name)
-        table_item = Refresh.iterate_tree_item(db_item, table_name)
+        # 填充表格，当前表复选框的状态，赋予表格中复选框的状态
+        fill_table(self.gui, cols, selected_cols)
         # 如果表格复选框为选中且选中的字段数等于总字段数，那么将表头的复选框也选中，默认表头复选框未选中
         if table_item.checkState(0) == Qt.Checked and len(cols) == len(selected_cols):
             self.gui.table_header.set_header_checked(True)
-        # 表格复选框改变事件
-        self.gui.tableWidget.item_checkbox_clicked.connect(lambda checked, field: on_check_changed(self.gui, checked, field))
-        self.gui.current_table = table_item
-        # 状态栏提示
-        self.gui.statusbar.showMessage(f"当前展示的表为：{table_name}")
-        # 设置气泡提示
-        self.gui.tableWidget.setToolTip(f'当前表为{table_name}')
-        # 已经打开的表，记录下连接名、库名和表名
-        self.gui.opened_table = self.conn_name, db_name, table_name
 
 
 class Refresh(QObject):

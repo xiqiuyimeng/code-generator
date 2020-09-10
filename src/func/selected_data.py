@@ -133,19 +133,15 @@ class SelectedData:
                 tb_dict[tb_name] = list()
         return tb_dict.get(tb_name)
 
-    def set_tbs(self, gui, conn_id, conn_name, db_name, tb_names=None):
+    def set_tbs(self, gui, conn_name, db_name, tb_cols_dict):
         """
         批量添加表名称，添加至表字典，key为表名，value为字段列表
         :param gui: 启动的主窗口界面对象
-        :param conn_id: 连接id
         :param conn_name: 连接名称，作为key存在于连接字典中
         :param db_name: 数据库名称，作为key存在于数据库字典中
-        :param tb_names: 表名称列表，作为key存在于表字典中，若不传则为查询所有
+        :param tb_cols_dict: 表字段的字典：{tb: (cols),}
         """
         tb_dict = self.get_tb_dict(conn_name, db_name)
-        executor = open_connection(gui, conn_id, conn_name)
-        cols = executor.get_tb_cols(db_name, tb_names)
-        tb_cols_dict = get_cols_group_by_table(cols)
         tb_dict.update(tb_cols_dict)
         sorted_dict = sort_dict(tb_dict)
         # 将原来的字典替换为排序后的字典
@@ -153,21 +149,20 @@ class SelectedData:
         # 状态栏信息
         gui.statusbar.showMessage(f"已选择表：{list(sorted_dict.keys())}")
 
-    def unset_tbs(self, gui, conn_name, db_name, tb_names=None):
+    def unset_tbs(self, gui, conn_name, db_name, tb_name=None):
         """
         批量删除表名称，从表字典中删除元素，若无指定表名，则清空所有
         :param gui: 启动的主窗口界面对象
         :param conn_name: 连接名称，作为key存在于连接字典中
         :param db_name: 数据库名称，作为key存在于数据库字典中
-        :param tb_names: 表名称列表，其中元素作为key存在于表字典中
+        :param tb_name: 表名称，其中元素作为key存在于表字典中
         """
         tb_dict = self.get_tb_dict(conn_name, db_name)
         # 若指定表名，且非所有已选表名，删除表名称，否则应为清空所有
-        if tb_names and len(tb_names) != len(tb_dict):
-            for tb_name in tb_names:
-                del tb_dict[tb_name]
+        if tb_name and len(tb_dict) > 1:
+            del tb_dict[tb_name]
             # 状态栏信息
-            gui.statusbar.showMessage(f"取消选择表：{tb_names}")
+            gui.statusbar.showMessage(f"取消选择表：{tb_name}")
         else:
             self.unset_db(gui, conn_name, db_name)
 
@@ -182,32 +177,33 @@ class SelectedData:
         tb_dict = self.get_tb_dict(conn_name, db_name)
         tb_dict[tb_name] = cols
 
-    def set_cols(self, gui, conn_name, db_name, tb_name, cols):
+    def set_cols(self, gui, conn_name, db_name, tb_name, col):
         """
         批量添加字段名称，添加至字段列表中
         :param gui: 启动的主窗口界面对象
         :param conn_name: 连接名称，作为key存在于连接字典中
         :param db_name: 数据库名称，作为key存在于数据库字典中
         :param tb_name: 表名称，作为key存在于表字典中
-        :param cols: 添加的字段名称列表，作为value存在于表字典中
+        :param col: 添加的字段名称，作为value存在于表字典中
         """
+        # todo 保持数据库字段原有的顺序
         col_list = self.get_col_list(conn_name, db_name, tb_name)
         if isinstance(col_list, list):
-            col_list.extend(cols)
+            col_list.append(col)
             # 若选中字段个数等于表中总字段数，将列表转为元祖，以此标识全选
             if len(col_list) == len(gui.current_cols):
                 col_tuple = tuple(col_list)
                 self.replace_col_list(conn_name, db_name, tb_name, col_tuple)
             gui.statusbar.showMessage(f'{tb_name}表已选字段：{col_list}')
 
-    def unset_cols(self, gui, conn_name, db_name, tb_name, cols=None):
+    def unset_cols(self, gui, conn_name, db_name, tb_name, col=None):
         """
         批量删除字段名称，若无指定字典，清空所有
         :param gui: 启动的主窗口界面对象
         :param conn_name: 连接名称，作为key存在于连接字典中
         :param db_name: 数据库名称，作为key存在于数据库字典中
         :param tb_name: 表名称，作为key存在于表字典中
-        :param cols: 需要删除的字段名称列表，作为value存在于表字典中
+        :param col: 需要删除的字段名称，作为value存在于表字典中
         """
         col_list = self.get_col_list(conn_name, db_name, tb_name, True)
         if col_list:
@@ -216,10 +212,10 @@ class SelectedData:
                 col_list = list(col_list)
                 self.replace_col_list(conn_name, db_name, tb_name, col_list)
             # 若指定字段，且非所有已选字段，删除字段，否则应清空所有
-            if cols and len(cols) != len(col_list):
-                [col_list.remove(col) for col in cols]
+            if col and len(col_list) > 1:
+                col_list.remove(col)
                 # 状态栏信息
-                gui.statusbar.showMessage(f"取消选择字段：{cols}")
+                gui.statusbar.showMessage(f"取消选择字段：{col}")
             else:
-                self.unset_tbs(gui, conn_name, db_name, [tb_name, ])
+                self.unset_tbs(gui, conn_name, db_name, tb_name)
 

@@ -159,9 +159,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def set_tree_header_label(self):
         self.tree_header_label.setText(TREE_HEADER_LABELS)
 
-    def set_table_header_label(self, text):
-        self.table_header_label.setText(f"当前展示表为：{text}")
-
     def get_saved_conns(self):
         """获取所有已存储的连接，生成页面树结构第一层"""
         conns = get_conns()
@@ -182,7 +179,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         处理树结构中，表的复选框，实现表的复选框与表格控件中复选框联动效果
         :param item: 当前点击树节点元素
-        :param checked: 是否选中
+        :param check_state: 选中状态：全部选择、部分选、未选择
         """
         node = tree_node_factory(item)
         # 只处理表

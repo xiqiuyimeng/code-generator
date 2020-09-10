@@ -62,7 +62,7 @@ class DBExecutor:
         """从系统表中查询指定数据库下的所有字段，也可指定表名"""
         sql = f'{QUERY_SYS_TB_COL} where table_schema = "{db}"'
         if table:
-            sql += f' and table_name in ("{",".join(table)}")'
+            sql += f' and table_name = "{table}"'
         return self.get_data(sql)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -83,6 +83,5 @@ def get_cols_group_by_table(cols):
     cols.sort(key=lambda x: x[1])
     result = groupby(cols, lambda x: x[1])
     for key, group in result:
-        cols = tuple(map(lambda x: x[0], list(group)))
-        res[key] = cols
+        res[key] = tuple(map(lambda x: x[0], list(group)))
     return res

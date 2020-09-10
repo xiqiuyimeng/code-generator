@@ -10,7 +10,10 @@ _date_ = '2020/9/8 16:40'
 class MyTreeWidgetItem(QTreeWidgetItem):
 
     def __init__(self, tree, parent):
-        """自定义树节点类，重写setData方法，完成点击复选框事件"""
+        """
+        自定义树节点类，重写setData方法，完成点击复选框事件，
+        参考自https://stackoverflow.com/questions/9686648/is-it-possible-to-create-a-signal-for-when-a-qtreewidgetitem-checkbox-is-toggled
+        """
         super().__init__(parent)
         self.tree = tree
 

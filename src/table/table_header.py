@@ -64,6 +64,7 @@ class CheckBoxHeader(QtWidgets.QHeaderView):
         # 如果行表头复选框为勾选状态
         if isOn:
             # 将所有的复选框都设为勾选状态
+            # todo 现在的复选框只有在点击时才会触发动作，全选时需要另外加函数响应数据操作
             for i in all_header_combobox:
                 i.setCheckState(QtCore.Qt.Checked)
         else:

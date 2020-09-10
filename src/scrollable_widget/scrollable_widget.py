@@ -62,6 +62,33 @@ class MyTableWidget(QTableWidget, MyScrollableWidget):
 
     # 定义信号，点击第一列复选框时，发送当前选中状态和第二列的字段名称
     item_checkbox_clicked = pyqtSignal(bool, str)
+    # 作为是否点击复选框标志，方便节点项处理
+    checkbox_clicked = False
+
+    def mousePressEvent(self, event):
+        # 点击的索引项
+        clicked_index = self.indexAt(event.pos())
+        if not clicked_index.isValid():
+            return
+        # 当点击第一列的时候再处理
+        if clicked_index.column() == 0:
+            # 表头的x位置
+            table_x = self.horizontalHeader().sectionViewportPosition(0)
+            # 获取根项目的x坐标，计算其他项目需要这一项
+            root_x = self.visualRect(self.rootIndex()).x()
+            # 获取单元格的可视化矩形大小
+            view_rect = self.visualRect(clicked_index)
+            # 计算元素的x坐标
+            item_x = table_x + view_rect.x() - root_x
+            # 计算复选框的矩形大小
+            checkbox_rect = QRect(item_x,
+                                  view_rect.y(),
+                                  self.style().pixelMetric(QStyle.PM_IndicatorWidth),
+                                  view_rect.height())
+            if checkbox_rect.contains(event.pos()):
+                # 标志项置为True
+                self.checkbox_clicked = True
+        super().mousePressEvent(event)
 
 
 class MyScrollArea(QScrollArea, MyScrollableWidget):
