@@ -323,6 +323,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             select_table.select_table()
         # 取消全选表
         elif func == UNSELECT_TB_MENU:
+            # 将子节点都置为未选中状态
             set_children_check_state(item, Qt.Unchecked)
             # 清空容器中的值
             SelectedData().unset_tbs(gui, conn_name, db_name)
@@ -396,12 +397,12 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
         conn_id, conn_name, db_name, tb_name = TreeNodeTable.get_node_info(item)
         # 如果表已经选中，那么右侧表格需全选字段
         if check_state == Qt.Checked:
-            select_table = AsyncSelectTable(gui, item, conn_id, conn_name, db_name, (tb_name,))
+            select_table = AsyncSelectTable(gui, item, conn_id, conn_name, db_name, tb_name)
             select_table.select_table()
         # 如果表未选中，那么右侧表格需清空选择
         elif check_state == Qt.Unchecked:
             # 从容器删除表名
-            SelectedData().unset_tbs(gui, conn_name, db_name, (tb_name,))
+            SelectedData().unset_tbs(gui, conn_name, db_name, tb_name)
             change_table_checkbox(gui, item, False)
 
     def get_menu_names(self, item, gui):
@@ -431,10 +432,12 @@ class TreeNodeTable(TreeNodeAbstract, ABC):
             close_table(gui)
         # 全选字段
         elif func == SELECT_ALL_FIELD_MENU:
-            change_table_checkbox(gui, item, True)
+            item.setCheckState(0, Qt.Checked)
+            self.change_check_box(item, Qt.Checked, gui)
         # 取消选择字段
         elif func == UNSELECT_FIELD_MENU:
-            change_table_checkbox(gui, item, False)
+            item.setCheckState(0, Qt.Unchecked)
+            self.change_check_box(item, Qt.Unchecked, gui)
 
     @staticmethod
     def get_node_info(item):
