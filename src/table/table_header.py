@@ -59,12 +59,11 @@ class CheckBoxHeader(QtWidgets.QHeaderView):
                 self.updateSection(0)
         super(CheckBoxHeader, self).mousePressEvent(event)
 
-    # 自定义信号 select_all_clicked 的槽方法
+    # 仅仅作为修改所有单元格复选框状态的方法，不作为槽方法
     def change_state(self, isOn):
         # 如果行表头复选框为勾选状态
         if isOn:
             # 将所有的复选框都设为勾选状态
-            # todo 现在的复选框只有在点击时才会触发动作，全选时需要另外加函数响应数据操作
             for i in all_header_combobox:
                 i.setCheckState(QtCore.Qt.Checked)
         else:

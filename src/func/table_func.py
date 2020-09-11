@@ -39,10 +39,10 @@ def add_table(gui, tree_item):
     gui.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
     # 交替行颜色
     gui.tableWidget.setAlternatingRowColors(True)
-    # 创建表格列标题，共四列
-    make_table_header(gui)
     # 处理一些其他信息
     add_table_ext_info(gui, tree_item)
+    # 创建表格列标题，共四列
+    make_table_header(gui)
 
 
 def add_table_ext_info(gui, tree_item):
@@ -83,7 +83,7 @@ def make_table_header(gui):
     # 默认行号隐藏
     gui.tableWidget.verticalHeader().setHidden(True)
     # 表头复选框单击信号与槽
-    gui.table_header.select_all_clicked.connect(gui.table_header.change_state)
+    gui.table_header.select_all_clicked.connect(gui.all_selected_table_cols)
 
 
 def close_table(gui):

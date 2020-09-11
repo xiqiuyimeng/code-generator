@@ -11,7 +11,8 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout
 
-from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA
+from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA, UNSELECT_FIELD_MENU, \
+    SELECT_ALL_FIELD_MENU
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
 from src.func.refresh_thread import Refresh
@@ -276,5 +277,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.refresh_finished = True
         # 清空存储的打开项
         self.open_item_dict.clear()
+
+    def all_selected_table_cols(self, checked):
+        """作为表格表头复选框点击事件的槽函数，保持与右键树节点相同处理"""
+        func = SELECT_ALL_FIELD_MENU if checked else UNSELECT_FIELD_MENU
+        TreeNodeTable().handle_menu_func(self.current_table, func, self)
 
 
