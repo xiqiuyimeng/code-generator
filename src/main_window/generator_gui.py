@@ -261,7 +261,7 @@ class MainWindow(QtWidgets.QMainWindow):
             refresh = Refresh(self, self.opened_table)
             refresh.collect_data_before_refresh()
             # 关闭右侧表格
-            if hasattr(self, 'current_table'):
+            if hasattr(self, 'table_frame'):
                 TreeNodeTable().close_item(self.current_table, self)
             # 清空当前树
             self.treeWidget.clear()

@@ -80,7 +80,7 @@ class TreeWidgetUI:
                 for tb_name, cols in tb_dict.items():
                     tb_item = self.make_item(db_item, tb_name, tb_icon)
                     for col in cols:
-                        self.make_item(tb_item, col, col_icon)
+                        self.make_item(tb_item, col[1], col_icon)
         self.treeWidget.expandAll()
 
     def make_item(self, parent, name, icon):

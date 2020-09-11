@@ -4,14 +4,15 @@
 {
     conn_name: {
         db_name: {
-            tb_name: [col_A, col_B]
+            tb_name: [(index_A, col_A), (index_B, col_B)]
         }
     }
 }
 第一层字典（连接字典）：存放连接信息，key为连接名称，value为字典。称之为conn_dict
 第二层字典（数据库字典）：存放对应连接下的数据库信息，key为数据库名称，value为字典。称之为db_dict
 第三层字典（表字典）：存放对应数据库下的表信息，key为表名，value为列表。称之为tb_dict
-第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list，如果全选字段，则为元祖类型，否则为列表
+第四层列表（字段列表）：存放对应表下的字段信息，称之为col_list，如果全选字段，则为元祖类型，否则为列表。
+                其中存放的元素为元祖，元祖内容：索引和字段名，作为排序的依据
 """
 from src.db.cursor_proxy import get_cols_group_by_table
 from src.func.connection_function import open_connection
@@ -143,6 +144,7 @@ class SelectedData:
         """
         tb_dict = self.get_tb_dict(conn_name, db_name)
         tb_dict.update(tb_cols_dict)
+        # 表的排序，在mysql中是按字母排序，故可以直接进行排序操作
         sorted_dict = sort_dict(tb_dict)
         # 将原来的字典替换为排序后的字典
         self.replace_tb_dict(conn_name, db_name, sorted_dict)
@@ -177,7 +179,7 @@ class SelectedData:
         tb_dict = self.get_tb_dict(conn_name, db_name)
         tb_dict[tb_name] = cols
 
-    def set_cols(self, gui, conn_name, db_name, tb_name, col):
+    def set_cols(self, gui, conn_name, db_name, tb_name, col, index):
         """
         批量添加字段名称，添加至字段列表中
         :param gui: 启动的主窗口界面对象
@@ -185,11 +187,14 @@ class SelectedData:
         :param db_name: 数据库名称，作为key存在于数据库字典中
         :param tb_name: 表名称，作为key存在于表字典中
         :param col: 添加的字段名称，作为value存在于表字典中
+        :param index: 在原字段列表中的索引位置
         """
-        # todo 保持数据库字段原有的顺序
         col_list = self.get_col_list(conn_name, db_name, tb_name)
         if isinstance(col_list, list):
-            col_list.append(col)
+            # 以索引和字段名组成元祖作为元素添加到列表中
+            col_list.append((index, col))
+            # 按索引排序
+            col_list.sort(key=lambda x: x[0])
             # 若选中字段个数等于表中总字段数，将列表转为元祖，以此标识全选
             if len(col_list) == len(gui.current_cols):
                 col_tuple = tuple(col_list)
@@ -213,7 +218,8 @@ class SelectedData:
                 self.replace_col_list(conn_name, db_name, tb_name, col_list)
             # 若指定字段，且非所有已选字段，删除字段，否则应清空所有
             if col and len(col_list) > 1:
-                col_list.remove(col)
+                col_item = filter(lambda x: x[1] == col, col_list).__next__()
+                col_list.remove(col_item)
                 # 状态栏信息
                 gui.statusbar.showMessage(f"取消选择字段：{col}")
             else:

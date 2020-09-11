@@ -39,7 +39,11 @@ class SelectTableWorker(QThread):
             # 获取要选择的所有数据
             executor = open_connection(self.gui, self.conn_id, self.conn_name)
             cols = executor.get_tb_cols(self.db_name, self.tb_name)
-            # tb_cols_dict: {tb: (col_A, col_B),}
+            # 如果查不到数据，返回
+            if not cols:
+                self.result.emit(False, f"表{self.tb_name if self.tb_name else ''}不存在，请刷新数据")
+                return
+            # tb_cols_dict: {tb: ((index_A, col_A), (index_B, col_B)),}
             tb_cols_dict = get_cols_group_by_table(cols)
             SelectedData().set_tbs(self.gui, self.conn_name, self.db_name, tb_cols_dict)
             result = None
@@ -127,7 +131,7 @@ class AsyncSelectTable:
         # 关闭表格
         close_table(self.gui)
         # 刷新表格
-        selected_cols = list(map(lambda x: x[0], data))
+        selected_cols = list(map(lambda x: (data.index(x), x[0]), data))
         add_table(self.gui, self.gui.current_table)
         fill_table(self.gui, data, selected_cols)
         # 填充表格时会将单元格复选框勾选，只剩下表头需要单独处理
