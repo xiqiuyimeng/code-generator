@@ -4,6 +4,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, Qt, QObject
 from PyQt5.QtGui import QIcon
 
 from src.constant.constant import OPEN_CONN_MENU, TEST_CONN_FAIL_PROMPT
+from src.exception.exception_enum import DBNotExistsError, TableNotExistsError
 from src.func.connection_function import open_connection
 from src.func.selected_data import SelectedData
 from src.func.table_func import add_table, fill_table
@@ -32,6 +33,8 @@ class ConnectDBWorker(QThread):
             self.executor = open_connection(self.gui, self.conn_id, self.conn_name)
             data = self.open_sth()
             self.result.emit(True, data)
+        except (DBNotExistsError, TableNotExistsError) as e:
+            self.result.emit(False, e.args[0])
         except Exception as e:
             data = f'{TEST_CONN_FAIL_PROMPT}：[{self.conn_name}]' \
                    f'\t\n {e.args[0]} - {e.args[1]}'
@@ -52,10 +55,16 @@ class ConnectDBWorker(QThread):
         return self.executor.get_dbs()
 
     def open_db(self):
+        dbs = self.open_conn()
+        if self.db_name not in dbs:
+            raise DBNotExistsError(f"数据库{self.db_name}不存在，无法打开，请刷新数据")
         self.executor.switch_db(self.db_name)
         return self.executor.get_tables()
 
     def open_tb(self):
+        tables = self.open_db()
+        if self.tb_name not in tables:
+            raise TableNotExistsError(f"表{self.tb_name}不存在，无法打开，请刷新数据")
         return self.executor.get_cols(self.db_name, self.tb_name)
 
 

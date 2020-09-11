@@ -47,7 +47,8 @@ def add_table(gui, tree_item):
 
 def add_table_ext_info(gui, tree_item):
     # 表格复选框改变事件
-    gui.tableWidget.item_checkbox_clicked.connect(lambda checked, field: on_check_changed(gui, checked, field))
+    gui.tableWidget.item_checkbox_clicked.connect(lambda checked, field, index:
+                                                  on_check_changed(gui, checked, field, index))
     gui.current_table = tree_item
     tb_name = tree_item.text(0)
     db_name = tree_item.parent().text(0)
@@ -97,6 +98,8 @@ def close_table(gui):
     # 删除table_frame属性，方便后续判断
     del gui.table_frame
     all_header_combobox.clear()
+    # 重置打开表
+    gui.opened_table = tuple()
     gui.statusbar.showMessage(f"成功关闭表：{gui.current_table.text(0)}")
 
 
@@ -119,7 +122,8 @@ def fill_table(gui, cols, selected_cols):
         if selected_cols is None:
             check_status = Qt.Unchecked
         else:
-            if col[0] in selected_cols:
+            selected_col_list = list(map(lambda x: x[1], selected_cols))
+            if col[0] in selected_col_list:
                 check_status = Qt.Checked
             else:
                 check_status = Qt.Unchecked
@@ -163,12 +167,13 @@ def check_table_opened(gui, item):
         and gui.current_table is item
 
 
-def on_check_changed(gui, checked, field):
+def on_check_changed(gui, checked, field, index):
     """
     第一列checkbox状态改变时触发
     :param gui 启动的主窗口界面对象
     :param checked: 复选框是否选中
     :param field: 表格中当前行字段值
+    :param index: 字段在表中的索引位置
     """
     # 获取当前打开表对应的树控件中的信息
     conn_name, db_name, tb_name = get_node(gui.current_table)
@@ -177,7 +182,7 @@ def on_check_changed(gui, checked, field):
         # 表格总行数
         count = gui.tableWidget.rowCount()
         # 已选字段保存
-        SelectedData().set_cols(gui, conn_name, db_name, tb_name, field)
+        SelectedData().set_cols(gui, conn_name, db_name, tb_name, field, index)
         checked_list = SelectedData().get_col_list(conn_name, db_name, tb_name)
         # 如果选中字段个数等于表格总行数
         if count == len(checked_list):

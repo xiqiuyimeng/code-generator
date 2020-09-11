@@ -76,12 +76,13 @@ class DBExecutor:
 def get_cols_group_by_table(cols):
     """
     将 get_tb_cols 方法查询出的结果进行分组，按表名分组，得到字典
-        tb: (col_A, col_B)
+        tb: ((index_A, col_A), (index_B, col_B))
     :param cols: 数据库中查询出的数据
     """
     res = dict()
     cols.sort(key=lambda x: x[1])
     result = groupby(cols, lambda x: x[1])
     for key, group in result:
-        res[key] = tuple(map(lambda x: x[0], list(group)))
+        cols_list = list(group)
+        res[key] = tuple(map(lambda x: (cols_list.index(x), x[0]), cols_list))
     return res

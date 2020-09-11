@@ -60,8 +60,8 @@ class MyTreeWidget(QTreeWidget, MyScrollableWidget):
 
 class MyTableWidget(QTableWidget, MyScrollableWidget):
 
-    # 定义信号，点击第一列复选框时，发送当前选中状态和第二列的字段名称
-    item_checkbox_clicked = pyqtSignal(bool, str)
+    # 定义信号，点击第一列复选框时，发送当前选中状态、第二列的字段名称和该字段的索引位置
+    item_checkbox_clicked = pyqtSignal(bool, str, int)
     # 作为是否点击复选框标志，方便节点项处理
     checkbox_clicked = False
 
