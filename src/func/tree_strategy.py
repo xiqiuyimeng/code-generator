@@ -283,7 +283,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
         :param gui: 启动的主窗口界面对象
         """
         # 关闭表格，由于当前item不是表，所以应该使用当前表对象（如果有的话）
-        if hasattr(gui, 'current_table'):
+        if hasattr(gui, 'table_frame'):
             TreeNodeTable().close_item(gui.current_table, gui)
         # 移除所有子项目
         item.takeChildren()
@@ -327,7 +327,7 @@ class TreeNodeDB(TreeNodeAbstract, ABC):
             set_children_check_state(item, Qt.Unchecked)
             # 清空容器中的值
             SelectedData().unset_tbs(gui, conn_name, db_name)
-            if hasattr(gui, 'current_table') and gui.current_table.parent() is item:
+            if hasattr(gui, 'table_frame') and gui.current_table.parent() is item:
                 change_table_checkbox(gui, gui.current_table, False)
 
     @staticmethod
