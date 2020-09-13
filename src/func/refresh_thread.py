@@ -75,7 +75,7 @@ class RefreshWorker(QThread):
         table_dict = dict()
         tb_status_dict = opened_db_dict[db]["table"]
         for table in tables:
-            table_dict[table] = tb_status_dict.get(table)
+            table_dict[table] = tb_status_dict.get(table, Qt.Unchecked)
         result_data[db] = {
             "expanded": opened_db_dict[db]["expanded"],
             "table": table_dict
@@ -113,7 +113,11 @@ class RefreshConnection(QObject):
         self.movie.start()
         # 设置icon
         self.movie.frameChanged.connect(lambda: self.conn_item.setIcon(0, QIcon(self.movie.currentPixmap())))
-        self.refresh_worker = RefreshWorker(self.gui, self.conn_id, self.conn_name, self.opened_child, self.opened_table)
+        self.refresh_worker = RefreshWorker(self.gui,
+                                            self.conn_id,
+                                            self.conn_name,
+                                            self.opened_child,
+                                            self.opened_table)
         self.refresh_worker.result.connect(lambda flag, data: self.refresh_ui(flag, data))
         self.refresh_worker.start()
 

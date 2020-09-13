@@ -21,5 +21,5 @@ class MyTableWidgetItem(QTableWidgetItem):
         if check_change:
             # 字段在复选框右侧的一列
             field = self.table.item(self.row(), self.column() + 1).text()
-            self.table.item_checkbox_clicked.emit(value, field, self.row())
+            self.table.item_checkbox_clicked.emit(value, field)
             self.table.checkbox_clicked = False
