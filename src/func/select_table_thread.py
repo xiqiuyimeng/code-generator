@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 
-from src.constant.constant import SELECT_TABLE_FAIL_PROMPT
+from src.constant.constant import SELECT_TABLE_FAIL_PROMPT, SELECT_FIELD_FAIL_PROMPT
 from src.db.cursor_proxy import get_cols_group_by_table
 from src.func.connection_function import open_connection
 from src.func.gui_function import set_children_check_state
@@ -22,30 +22,25 @@ class SelectTableWorker(QThread):
     # 查询失败为错误提示语
     result = pyqtSignal(bool, object)
 
-    def __init__(self, gui, conn_id, conn_name, db_name, tb_name, opened_table):
+    def __init__(self, gui, conn_id, conn_name, db_name, tb_name, col, opened_table):
         super().__init__()
         self.gui = gui
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.db_name = db_name
         self.tb_name = tb_name
+        self.col = col
         self.opened_table = opened_table
 
     def run(self):
-        self.select_table()
-
-    def select_table(self):
         try:
             # 获取要选择的所有数据
             executor = open_connection(self.gui, self.conn_id, self.conn_name)
             cols = executor.get_tb_cols(self.db_name, self.tb_name)
-            # 如果查不到数据，返回
-            if not cols:
-                self.result.emit(False, f"表{self.tb_name if self.tb_name else ''}不存在，请刷新数据")
-                return
-            # tb_cols_dict: {tb: ((index_A, col_A), (index_B, col_B)),}
-            tb_cols_dict = get_cols_group_by_table(cols)
-            SelectedData().set_tbs(self.gui, self.conn_name, self.db_name, tb_cols_dict)
+            if self.col:
+                self.select_col(list(map(lambda x: x[0], cols)))
+            else:
+                self.select_table(cols)
             result = None
             if self.opened_table:
                 # 查询打开表的字段并发射信号
@@ -55,16 +50,46 @@ class SelectTableWorker(QThread):
             self.result.emit(False, f'{SELECT_TABLE_FAIL_PROMPT}：[{self.conn_name}]'
                                     f'\t\n {e.args[0]} - {e.args[1]}')
 
+    def select_table(self, cols):
+        """选择表"""
+        # 如果查不到数据，返回
+        if not cols:
+            self.result.emit(False, f"表{self.tb_name if self.tb_name else ''}不存在，请刷新数据")
+            return
+        # tb_cols_dict: {tb: ((index_A, col_A), (index_B, col_B)),}
+        tb_cols_dict = get_cols_group_by_table(cols)
+        SelectedData().set_tbs(self.gui, self.conn_name, self.db_name, tb_cols_dict)
+
+    def select_col(self, cols):
+        """选择字段"""
+        # 如果查不到数据，返回
+        if not cols:
+            self.result.emit(False, f"表{self.tb_name if self.tb_name else ''}不存在，请刷新数据")
+            # 取消表的选择
+            SelectedData().unset_tbs(self.gui, self.conn_name, self.db_name, self.tb_name)
+            return
+        # 如果要选择的字段不存在
+        elif self.col not in cols:
+            self.result.emit(False, f"字段{self.col}不存在，请刷新数据")
+        else:
+            SelectedData().set_cols(self.gui,
+                                    self.conn_name,
+                                    self.db_name,
+                                    self.tb_name,
+                                    self.col,
+                                    cols.index(self.col))
+
 
 class AsyncSelectTable:
 
-    def __init__(self, gui, item, conn_id, conn_name, db_name, tb_name=None):
+    def __init__(self, gui, item, conn_id, conn_name, db_name, tb_name=None, col=None):
         self.item = item
         self.gui = gui
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.db_name = db_name
         self.tb_name = tb_name
+        self.col = col
         self.opened_table = self.find_opened_table()
         self._movie = QtGui.QMovie(":/gif/loading_simple.gif")
         self.icon = self.item.icon(0)
@@ -90,6 +115,7 @@ class AsyncSelectTable:
                                                      self.conn_name,
                                                      self.db_name,
                                                      self.tb_name,
+                                                     self.col,
                                                      self.opened_table)
         self.select_table_thread.result.connect(lambda flag, data: self.handle_show(flag, data))
         self.select_table_thread.start()
@@ -98,7 +124,9 @@ class AsyncSelectTable:
         """解析测试连接的结果"""
         self._movie.stop()
         self.item.setIcon(0, self.icon)
-        if self.tb_name:
+        if self.col:
+            self.select_col(flag, data)
+        elif self.tb_name:
             self.select_one(flag, data)
         else:
             self.select_all(flag, data)
@@ -124,15 +152,35 @@ class AsyncSelectTable:
         else:
             # 将当前项改为未选择状态
             self.item.setCheckState(0, Qt.Unchecked)
+            if self.opened_table:
+                # 如果表打开了，那么将表头也置为未选择
+                self.gui.table_header.set_header_checked(False)
             pop_fail(SELECT_TABLE_FAIL_PROMPT, data)
 
-    def rebuild_table(self, data):
+    def select_col(self, flag, data):
+        """选择字段的页面效果，刷新表格，修改复选框状态"""
+        if flag:
+            selected_cols = SelectedData().get_col_list(self.conn_name, self.db_name, self.tb_name)
+            # 刷新表格
+            self.rebuild_table(data, selected_cols)
+            if self.gui.table_header.isOn:
+                # 设置左侧树部件中，对应表也应为选中状态
+                check_state = Qt.Checked
+            else:
+                check_state = Qt.PartiallyChecked
+            self.gui.current_table.setCheckState(0, check_state)
+        else:
+            pop_fail(SELECT_FIELD_FAIL_PROMPT, data)
+
+    def rebuild_table(self, data, selected_cols=None):
         """刷新下表格数据"""
         # 关闭表格
         close_table(self.gui)
         # 刷新表格
-        selected_cols = list(map(lambda x: (data.index(x), x[0]), data))
+        if not selected_cols:
+            selected_cols = list(map(lambda x: (data.index(x), x[0]), data))
         add_table(self.gui, self.gui.current_table)
         fill_table(self.gui, data, selected_cols)
         # 填充表格时会将单元格复选框勾选，只剩下表头需要单独处理
-        self.gui.table_header.set_header_checked(True)
+        if len(selected_cols) == len(data):
+            self.gui.table_header.set_header_checked(True)

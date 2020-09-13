@@ -8,7 +8,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHeaderView
 
 from src.constant.constant import TABLE_HEADER_LABELS
-from src.func.selected_data import SelectedData
 from src.scrollable_widget.scrollable_widget import MyTableWidget
 from src.table.table_header import all_header_combobox, CheckBoxHeader
 from src.table.table_item import MyTableWidgetItem
@@ -47,8 +46,7 @@ def add_table(gui, tree_item):
 
 def add_table_ext_info(gui, tree_item):
     # 表格复选框改变事件
-    gui.tableWidget.item_checkbox_clicked.connect(lambda checked, field, index:
-                                                  on_check_changed(gui, checked, field, index))
+    gui.tableWidget.item_checkbox_clicked.connect(gui.on_table_check_changed)
     gui.current_table = tree_item
     tb_name = tree_item.text(0)
     db_name = tree_item.parent().text(0)
@@ -167,50 +165,10 @@ def check_table_opened(gui, item):
         and gui.current_table is item
 
 
-def on_check_changed(gui, checked, field, index):
-    """
-    第一列checkbox状态改变时触发
-    :param gui 启动的主窗口界面对象
-    :param checked: 复选框是否选中
-    :param field: 表格中当前行字段值
-    :param index: 字段在表中的索引位置
-    """
-    # 获取当前打开表对应的树控件中的信息
-    conn_name, db_name, tb_name = get_node(gui.current_table)
-    # 如果有选中的checkbox
-    if checked:
-        # 表格总行数
-        count = gui.tableWidget.rowCount()
-        # 已选字段保存
-        SelectedData().set_cols(gui, conn_name, db_name, tb_name, field, index)
-        checked_list = SelectedData().get_col_list(conn_name, db_name, tb_name)
-        # 如果选中字段个数等于表格总行数
-        if count == len(checked_list):
-            # 表头复选框未选中
-            if not gui.table_header.isOn:
-                # 全选按钮应该选中，设置表头复选框按钮状态为选中
-                gui.table_header.set_header_checked(True)
-            # 设置左侧树部件中，对应表也应为选中状态
-            check_state = Qt.Checked
-        else:
-            check_state = Qt.PartiallyChecked
-    else:
-        # 设置表头复选框按钮状态为未选中
-        gui.table_header.set_header_checked(False)
-        # 删除字段
-        SelectedData().unset_cols(gui, conn_name, db_name, tb_name, field)
-        checked_list = SelectedData().get_col_list(conn_name, db_name, tb_name, True)
-        # 设置左侧树部件中，对应表为未选中状态
-        if checked_list is None:
-            check_state = Qt.Unchecked
-        else:
-            check_state = Qt.PartiallyChecked
-    gui.current_table.setCheckState(0, check_state)
-
-
 def get_node(item):
+    conn_id = item.parent().parent().text(1)
     conn_name = item.parent().parent().text(0)
     db_name = item.parent().text(0)
     tb_name = item.text(0)
-    return conn_name, db_name, tb_name
+    return conn_id, conn_name, db_name, tb_name
 

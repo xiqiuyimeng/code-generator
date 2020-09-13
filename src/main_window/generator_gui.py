@@ -16,7 +16,9 @@ from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELEC
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.func.connection_function import close_connection
 from src.func.refresh_thread import Refresh
+from src.func.select_table_thread import AsyncSelectTable
 from src.func.selected_data import SelectedData
+from src.func.table_func import get_node
 from src.func.tree_function import make_tree_item
 from src.func.tree_strategy import tree_node_factory, Context, TreeNodeTable
 from src.little_widget.about_ui import AboutUI
@@ -282,5 +284,37 @@ class MainWindow(QtWidgets.QMainWindow):
         """作为表格表头复选框点击事件的槽函数，保持与右键树节点相同处理"""
         func = SELECT_ALL_FIELD_MENU if checked else UNSELECT_FIELD_MENU
         TreeNodeTable().handle_menu_func(self.current_table, func, self)
+
+    def on_table_check_changed(self, checked, field):
+        """
+        表格第一列checkbox状态改变时触发
+        :param checked: 复选框是否选中
+        :param field: 表格中当前行字段值
+        """
+        # 获取当前打开表对应的树控件中的信息
+        conn_id, conn_name, db_name, tb_name = get_node(self.current_table)
+        # 如果是选择字段
+        if checked:
+            select_table = AsyncSelectTable(self,
+                                            self.current_table,
+                                            conn_id,
+                                            conn_name,
+                                            db_name,
+                                            tb_name,
+                                            field)
+            select_table.select_table()
+        else:
+            # 设置表头复选框按钮状态为未选中
+            self.table_header.set_header_checked(False)
+            # 删除字段
+            SelectedData().unset_cols(self, conn_name, db_name, tb_name, field)
+            checked_list = SelectedData().get_col_list(conn_name, db_name, tb_name, True)
+            # 设置左侧树部件中，对应表为未选中状态
+            if checked_list is None:
+                check_state = Qt.Unchecked
+            else:
+                check_state = Qt.PartiallyChecked
+            self.current_table.setCheckState(0, check_state)
+
 
 

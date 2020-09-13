@@ -20,12 +20,12 @@ def check_table_status(parent):
     if parent.childCount():
         check_set = set()
         for index in range(parent.childCount()):
-            # 将checkbox选中状态放入集合，状态只有选中与未选中，
+            # 将checkbox选中状态放入集合，状态有选中、部分选中与未选中，
             # 若集合元素为两个，则为部分选中，若为一个，取值判断。
             check_set.add(parent.child(index).checkState(0))
-        if len(check_set) == 2:
+        if Qt.PartiallyChecked in check_set or len(check_set) > 1:
             parted_checked = True
-        elif check_set.pop() == Qt.Checked:
+        elif len(check_set) == 1 and check_set.pop() == Qt.Checked:
             all_checked = True
     return all_checked, parted_checked
 
