@@ -18,7 +18,7 @@ from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
 from src.dialog.draggable_dialog import DraggableDialog
 from src.func.test_conn_thread import TestConnWorker
 from src.little_widget.loading_widget import LoadingMask
-from src.little_widget.message_box import pop_ok, pop_fail
+from src.little_widget.message_box import pop_ok, pop_fail, TimerMessageBox
 from src.style.qss import read_qss
 from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
     add_conn, get_new_conn, check_name_available
@@ -272,6 +272,7 @@ class ConnDialog(DraggableDialog):
         elif self.dialog_title == ADD_CONN_MENU:
             add_conn(new_conn)
             new_conn = get_new_conn()
-        pop_ok(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
+        message_box = TimerMessageBox(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
+        message_box.exec_()
         self.dialog.close()
         self.conn_signal.emit(self.gui_parent, new_conn)

@@ -316,5 +316,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 check_state = Qt.PartiallyChecked
             self.current_table.setCheckState(0, check_state)
 
+    def clear_selected(self):
+        SelectedData().clear_container()
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
+        # 将所有树节点复选框重置
+        while iterator.value():
+            item = iterator.value()
+            if item.checkState(0) != Qt.Unchecked:
+                item.setCheckState(0, Qt.Unchecked)
+            iterator = iterator.__iadd__(1)
+        # 处理表格复选框
+        if hasattr(self, 'table_frame'):
+            self.table_header.set_header_checked(False)
+            self.table_header.change_state(False)
 
 
