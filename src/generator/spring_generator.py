@@ -49,6 +49,9 @@ class SpringGenerator(MybatisGenerator):
             controller_package=None,
             java_path=None,
             xml_path=None,
+            consumer=None,
+            file_count=None,
+            count=None,
             java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
             **kwargs
     ):
@@ -67,6 +70,9 @@ class SpringGenerator(MybatisGenerator):
             mapper_package,
             java_path,
             xml_path,
+            consumer,
+            file_count,
+            count,
             java_src_relative,
             **kwargs
         )
@@ -92,34 +98,33 @@ class SpringGenerator(MybatisGenerator):
         # controller文件保存路径
         self.controller_path = self.get_path(self.controller_package) + '/' + f'{self.class_name}Controller.java'
 
-    def generate_service(self, count, file_count, consumer):
+    def generate_service(self):
         content = self.env.get_template(self.service_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_package=self.service_package, param=self.param, key=self.key
         )
-        return self.save(self.service_path, content, count, file_count, consumer)
+        self.save(self.service_path, content)
 
-    def generate_service_impl(self, count, file_count, consumer):
+    def generate_service_impl(self):
         content = self.env.get_template(self.service_impl_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             mapper_namespace=self.mapper_namespace, param=self.param, key=self.key,
             service_impl_package=self.service_impl_package, hump_cls_name=self.hump_cls_name,
             service_namespace=self.service_namespace
         )
-        return self.save(self.service_impl_path, content, count, file_count, consumer)
+        self.save(self.service_impl_path, content)
 
-    def generate_controller(self, count, file_count, consumer):
+    def generate_controller(self):
         content = self.env.get_template(self.controller_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_namespace=self.service_namespace, param=self.param, key=self.key,
             controller_package=self.controller_package, hump_cls_name=self.hump_cls_name
         )
-        return self.save(self.controller_path, content, count, file_count, consumer)
+        self.save(self.controller_path, content)
 
-    def main(self, count, file_count, consumer):
-        count = super().main(count, file_count, consumer)
-        count = self.generate_service(count, file_count, consumer)
-        count = self.generate_service_impl(count, file_count, consumer)
-        count = self.generate_controller(count, file_count, consumer)
-        return count
+    def main(self):
+        super().main()
+        self.generate_service()
+        self.generate_service_impl()
+        self.generate_controller()
 

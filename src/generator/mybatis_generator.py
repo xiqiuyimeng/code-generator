@@ -68,6 +68,12 @@ class MybatisGenerator:
                 绝对路径 D:\java_workspaces\demo
         `xml_path`
             xml文件输出路径，如果此参数有效，将忽视path参数
+        `consumer`
+            作为消费者生成器，负责发送每次生成文件的信息，发送需要生成的文件总数，当前已生成的百分比，文件输出路径
+        `file_count`
+            文件总数，生成器总共需要生成的文件总数，不是只当前对象需要生成的，为了配合页面进度条
+        `count`
+            当前已经生成的文件数，与上面文件总数可计算当前进度，也就是返回的百分比
         `java_src_relative`
             java项目默认的源码包相对路径结构，默认为 src/main/java，由此参数，可结合java_path生成项目源码包绝对路径，
             再与命名空间拼接，可推出文件的绝对路径
@@ -88,6 +94,9 @@ class MybatisGenerator:
             mapper_package=None,
             java_path=None,
             xml_path=None,
+            consumer=None,
+            file_count=None,
+            count=None,
             java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
             **kwargs
     ):
@@ -162,6 +171,9 @@ class MybatisGenerator:
             if self.model_package else DEFAULT_MODEL_NS
         self.mapper_namespace = f'{self.mapper_package}.{self.class_name}Mapper' \
             if self.mapper_package else DEFAULT_MAPPER_NS
+        self.consumer = consumer
+        self.file_count = file_count
+        self.count = count
 
     def get_path(self, package=None):
         """
@@ -265,7 +277,7 @@ class MybatisGenerator:
             self.param, self.key = self.deal_type(self.primary[0][1])[1], \
                                    self.deal_column_name(self.primary[0][0])
 
-    def generate_java(self, count, file_count, consumer):
+    def generate_java(self):
         java_list = []
         import_list = set()
         for line in self.data:
@@ -282,19 +294,18 @@ class MybatisGenerator:
             lombok=self.lombok, import_list=import_list,
             model_package=self.model_package
         )
-        return self.save(self.java_output_path, content, count, file_count, consumer)
+        self.save(self.java_output_path, content)
 
-    def generate_mapper(self, count, file_count, consumer):
+    def generate_mapper(self):
         if self.mapper:
             content = self.env.get_template(self.mapper_tp).render(
                 cls_name=self.class_name, param=self.param, key=self.key,
                 need_update=self.need_update, model_namespace=self.model_namespace,
                 mapper_package=self.mapper_package, hump_cls_name=self.hump_cls_name
             )
-            return self.save(self.mapper_output_path, content, count, file_count, consumer)
-        return count
+            self.save(self.mapper_output_path, content)
 
-    def generate_xml(self, count, file_count, consumer):
+    def generate_xml(self):
         # resultMap, base_column_list, 主键params, java类型（用于在）
         result_map, columns, params, java_type = [], [], [], ''
         # 生成base_column_list
@@ -322,7 +333,7 @@ class MybatisGenerator:
             mapper=self.mapper, any_column=self.exec_sql,
             model_namespace=self.model_namespace, mapper_namespace=self.mapper_namespace
         )
-        return self.save(self.xml_output_path, content, count, file_count, consumer)
+        self.save(self.xml_output_path, content)
 
     @staticmethod
     def rm_pri(update_columns, params):
@@ -355,21 +366,18 @@ class MybatisGenerator:
             data = Data(name, column_name, java_type=None, jdbc_type=jdbc_type)
             result_map.append(data)
 
-    @staticmethod
-    def save(path, content, count, file_count, consumer):
+    def save(self, path, content):
         parent_dir = os.path.split(path)[0]
         if not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
         with open(path, 'w+', encoding='utf-8')as f:
             f.write(content)
             print(f'{OUTPUT_PREFIX}{path}')
-            count += 1
-            consumer.send([file_count, round(count * 100 / file_count), f'{OUTPUT_PREFIX}{path}'])
-        return count
+            self.count += 1
+            self.consumer.send([self.file_count, round(self.count * 100 / self.file_count), f'{OUTPUT_PREFIX}{path}'])
 
-    def main(self, count, file_count, consumer):
-        count = self.generate_java(count, file_count, consumer)
-        count = self.generate_mapper(count, file_count, consumer)
-        count = self.generate_xml(count, file_count, consumer)
-        return count
+    def main(self):
+        self.generate_java()
+        self.generate_mapper()
+        self.generate_xml()
 
