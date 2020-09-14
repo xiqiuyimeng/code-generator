@@ -51,6 +51,10 @@ class SelectedData:
             SelectedData.instance.conn_dict = dict()
         return SelectedData.instance
 
+    def clear_container(self):
+        """清空选择"""
+        self.conn_dict.clear()
+
     def unset_conn(self, conn_name):
         """
         删除已选字典中的连接

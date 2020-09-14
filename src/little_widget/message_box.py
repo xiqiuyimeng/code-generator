@@ -3,13 +3,12 @@
 消息弹窗
 """
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
 from src.constant.constant import OK_BUTTON, ACCEPT_BUTTON, \
     REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
-
 
 _author_ = 'luwt'
 _date_ = '2020/6/21 16:08'
@@ -76,3 +75,31 @@ def pop_warning(title, msg):
     reply = msg_box.exec()
     return True if reply == QMessageBox.AcceptRole else False
 
+
+class TimerMessageBox(QMessageBox):
+
+    def __init__(self, title, msg, timeout=2, parent=None):
+        """自定义消息弹框，超时自动关闭"""
+        super().__init__(parent)
+        # 去除标题栏的关闭按钮
+        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+        self.setWindowTitle(title)
+        self.setText(msg)
+        pix = QPixmap(":/icon/right.jpg") \
+            .scaled(30, 30, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        self.setIconPixmap(pix)
+        self.setStandardButtons(QMessageBox.NoButton)
+        self.timeout = timeout
+        self.timer = QTimer(self)
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.close_event)
+        self.timer.start()
+
+    def close_event(self):
+        self.timeout -= 1
+        if self.timeout <= 0:
+            self.close()
+
+    def closeEvent(self, event):
+        self.timer.stop()
+        event.accept()

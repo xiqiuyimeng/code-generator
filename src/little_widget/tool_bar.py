@@ -16,6 +16,7 @@ def fill_tool_bar(gui):
     add_insert_conn_tool(gui)
     add_refresh_tool(gui)
     add_generate_tool(gui)
+    add_clear_tool(gui)
     add_exit_tool(gui)
 
 
@@ -40,6 +41,14 @@ def add_generate_tool(gui):
     generate_tool.setStatusTip('根据选择执行生成命令')
     generate_tool.triggered.connect(gui.generate)
     gui.toolBar.addAction(generate_tool)
+
+
+def add_clear_tool(gui):
+    clear_tool = QAction(QIcon(':/icon/refresh.png'), '清空已选字段', gui)
+    clear_tool.setStatusTip('清空所有已经选择的字段')
+    clear_tool.triggered.connect(gui.clear_selected)
+    gui.toolBar.addSeparator()
+    gui.toolBar.addAction(clear_tool)
 
 
 def add_exit_tool(gui):
