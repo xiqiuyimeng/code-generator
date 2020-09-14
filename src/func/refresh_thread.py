@@ -15,7 +15,6 @@ _date_ = '2020/8/31 11:38'
 
 
 class RefreshWorker(QThread):
-
     # 定义信号，返回结果，第一个参数为是否成功，第二个：成功为返回的查询结果，失败为返回的异常信息
     result = pyqtSignal(bool, object)
 
@@ -65,6 +64,12 @@ class RefreshWorker(QThread):
             opened_dbs = opened_db_dict.keys()
             # 为保证数据真实，以数据库查出的库名与保存的打开库名做交集
             real_opened_dbs = set(dbs) & set(opened_dbs)
+            # 已经不存在的库
+            non_exists_dbs = set(opened_dbs) - set(dbs)
+            # 删除选中字段中不存在的库
+            unset_db = lambda db: SelectedData().unset_db(self.gui, self.conn_name, db)
+            [unset_db(db) for db in non_exists_dbs if non_exists_dbs]
+            # 刷新库
             [self.refresh_db(opened_db, opened_db_dict, result_data) for opened_db in real_opened_dbs]
         return result_data
 
@@ -74,6 +79,12 @@ class RefreshWorker(QThread):
         tables = self.db_executor.get_tables()
         table_dict = dict()
         tb_status_dict = opened_db_dict[db]["table"]
+        # 找到不存在的表
+        non_exists_tables = set(tb_status_dict.keys()) - set(tables)
+        # 删除选中字段中不存在的表
+        unset_tb = lambda table: SelectedData().unset_tbs(self.gui, self.conn_name, db, table)
+        [unset_tb(table) for table in non_exists_tables if non_exists_tables]
+        # 刷新表
         for table in tables:
             table_dict[table] = tb_status_dict.get(table, Qt.Unchecked)
         result_data[db] = {
@@ -93,7 +104,6 @@ class RefreshWorker(QThread):
 
 
 class RefreshConnection(QObject):
-
     refresh_conn_finished = pyqtSignal()
 
     def __init__(self, gui, conn_item, movie, expanded, opened_child=None, opened_table=None):
@@ -198,7 +208,6 @@ class RefreshConnection(QObject):
 
 
 class Refresh(QObject):
-
     refresh_finished = pyqtSignal()
 
     def __init__(self, gui, opened_table=None):
@@ -283,4 +292,3 @@ class Refresh(QObject):
             item = tree_item.child(index)
             if item.text(0) == name:
                 return item
-

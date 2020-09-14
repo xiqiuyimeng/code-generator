@@ -57,16 +57,29 @@ def mybatis_generate(param_dict, params, file_count, consumer):
     count = 0
     for param in params:
         param.update(param_dict)
+        ext_dict = {
+            "consumer": consumer,
+            "file_count": file_count,
+            "count": count
+        }
+        param.update(ext_dict)
         generator = MybatisGenerator(**param)
-        count = generator.main(count, file_count, consumer)
+        generator.main()
+        count = generator.count
 
 
 def spring_generate(spring_param_dict, params, file_count, consumer):
     count = 0
     for param in params:
         param.update(spring_param_dict)
+        ext_dict = {
+            "consumer": consumer,
+            "file_count": file_count,
+            "count": count
+        }
+        param.update(ext_dict)
         generator = SpringGenerator(**param)
-        count = generator.main(count, file_count, consumer)
+        generator.main()
 
 
 def dispatch_generate(gui, param_dict, selected_data, consumer):

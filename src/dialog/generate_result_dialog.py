@@ -107,7 +107,8 @@ class GenerateResultDialog(DraggableDialog):
         # 当进度条值为0时发生异常，即为数据准备异常
         if self.progressBar.value() == 0:
             self.loading_mask.close()
-        pop_fail("生成失败", f'{e.args[0]} - {e.args[1]}')
+        msg = f'{e.args[0]} - {e.args[1]}' if len(e.args) > 1 else e.args[0]
+        pop_fail("生成失败", msg)
 
     def close_parent(self):
         self.close()
