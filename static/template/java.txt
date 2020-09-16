@@ -1,4 +1,4 @@
-{% if model_package %}
+﻿{% if model_package %}
 package {{model_package}};
 {% endif %}
 

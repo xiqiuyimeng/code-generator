@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Template
 
 from src.constant import mysql_type as mt
-from src.constant.constant import DEFAULT_JAVA_TP, DEFAULT_MAPPER_TP, DEFAULT_XML_TP, \
-    DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH, DEFAULT_MODEL_NS, DEFAULT_MAPPER_NS, \
-    PARAM_PATH_ERROR, QUERY_SYS_TB, QUERY_TEMP_TB, CREATE_TEMP_TB, OUTPUT_PREFIX, TEMPLATE_PATH
+from src.constant.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH, DEFAULT_MODEL_NS, DEFAULT_MAPPER_NS, \
+    PARAM_PATH_ERROR, QUERY_SYS_TB, QUERY_TEMP_TB, CREATE_TEMP_TB, OUTPUT_PREFIX
+from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 
 _author_ = 'luwt'
 _date_ = '2019/3/5 15:17'
@@ -42,11 +42,11 @@ class MybatisGenerator:
             其中xml不会生成select和delete，另外所有的where语句也会缺省
             传参形式为字符串，多个字段名用逗号分隔
         `java_tp`
-            java类文件的模板，默认为当前目录下的java.txt文件，目录可选为当前目录下的子目录
+            java类文件的模板，存在于系统模板库中
         `mapper_tp`
-            mapper.java接口文件的模板，默认为当前目录下的mapper.txt文件，目录可选为当前目录下的子目录
+            mapper.java接口文件的模板，存在于系统模板库中
         `xml_tp`
-            mapper.xml配置文件的模板，默认为当前目录下的xml.txt文件，目录可选为当前目录下的子目录
+            mapper.xml配置文件的模板，存在于系统模板库中
         `output_path`
             输出路径，默认为'./输出目录'，可修改
         `lombok`
@@ -84,9 +84,6 @@ class MybatisGenerator:
             table_schema,
             table_name,
             column_name=None,
-            java_tp=DEFAULT_JAVA_TP,
-            mapper_tp=DEFAULT_MAPPER_TP,
-            xml_tp=DEFAULT_XML_TP,
             output_path=DEFAULT_PATH,
             lombok=True,
             exec_sql=None,
@@ -115,12 +112,6 @@ class MybatisGenerator:
         self.data = self.get_data()
         # 主键信息
         self.primary = list(filter(lambda k: k[2] == 'PRI', self.data))
-        # java实体类的模板文件
-        self.java_tp = java_tp
-        # mapper的模板文件
-        self.mapper_tp = mapper_tp
-        # xml的模板文件
-        self.xml_tp = xml_tp
         # 是否开启lombok注解
         self.lombok = lombok
         # 是否需要更新语句，如果表中都是主键，就不需要更新语句了
@@ -139,12 +130,14 @@ class MybatisGenerator:
         )
         self.appointed_columns = True if self.column_name else False
         self.mapper = True if not self.exec_sql and not self.appointed_columns else False
-        # 获取模板文件
-        self.env = Environment(
-            loader=FileSystemLoader(TEMPLATE_PATH),
-            lstrip_blocks=True,
-            trim_blocks=True
-        )
+        # 从库中读取正在使用的模板信息
+        self.template = TemplateSqlite().get_using_template()
+        # java实体类的模板
+        self.java_tp = self.template.java_tp
+        # mapper的模板
+        self.mapper_tp = self.template.mapper_tp
+        # xml的模板
+        self.xml_tp = self.template.xml_tp
         self.separator = '/'
         # 默认输出目录"./输出目录"
         self.path = output_path
@@ -289,7 +282,7 @@ class MybatisGenerator:
                 import_list.add(mt.import_type.get(types[1]))
             data = Data(name, line[0], types[1], types[0], line[-1])
             java_list.append(data)
-        content = self.env.get_template(self.java_tp).render(
+        content = Template(self.java_tp).render(
             cls_name=self.class_name, java_list=java_list,
             lombok=self.lombok, import_list=import_list,
             model_package=self.model_package
@@ -298,7 +291,7 @@ class MybatisGenerator:
 
     def generate_mapper(self):
         if self.mapper:
-            content = self.env.get_template(self.mapper_tp).render(
+            content = Template(self.mapper_tp).render(
                 cls_name=self.class_name, param=self.param, key=self.key,
                 need_update=self.need_update, model_namespace=self.model_namespace,
                 mapper_package=self.mapper_package, hump_cls_name=self.hump_cls_name
@@ -326,7 +319,7 @@ class MybatisGenerator:
         update_columns = result_map[:]
         # 拷贝一份result_map，用以存放xml中的更新块字段数据，将其中的主键信息剔除
         self.rm_pri(update_columns, params)
-        content = self.env.get_template(self.xml_tp).render(
+        content = Template(self.xml_tp).render(
             cls_name=self.class_name, result_map=result_map, columns=columns,
             table_name=self.table_name, params=params, java_type=java_type,
             need_update=self.need_update, update_columns=update_columns,

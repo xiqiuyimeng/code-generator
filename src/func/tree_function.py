@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 
 from src.constant.constant import ADD_CONN_MENU, EDIT_CONN_MENU
 from src.dialog.conn_dialog import ConnDialog
-from src.sys.sys_info_storage.sqlite import Connection
+from src.sys.sys_info_storage.conn_sqlite import Connection
 from src.tree.tree_item import MyTreeWidgetItem
 
 _author_ = 'luwt'

@@ -24,7 +24,7 @@ from src.func.test_conn_thread import AsyncTestConn
 from src.func.tree_function import show_conn_dialog, add_conn_func
 from src.little_widget.message_box import pop_question
 from src.little_widget.right_menu import get_conn_menu_names, get_db_menu_names, get_table_menu_names
-from src.sys.sys_info_storage.sqlite import delete_conn
+from src.sys.sys_info_storage.conn_sqlite import ConnSqlite
 
 _author_ = 'luwt'
 _date_ = '2020/6/23 16:21'
@@ -243,7 +243,7 @@ class TreeNodeConn(TreeNodeAbstract, ABC):
         # 关闭连接
         close_connection(gui, conn_name)
         conn_info = gui.display_conn_dict[conn_id]
-        delete_conn(conn_info.id)
+        ConnSqlite().delete(conn_info.id)
         del gui.display_conn_dict[conn_id]
         # 删除树元素
         # 树型部件的takeTopLevelItem方法可以从树型部件中删除对应项的节点并返回该项，语法：takeTopLevelItem(index)

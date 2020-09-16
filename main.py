@@ -3,7 +3,8 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 import ctypes
 from src.main_window.generator_gui import MainWindow
-from src.style.qss import read_qss
+from src.read_qrc.read_file import read_qss, read_template
+from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 from static import image_rc
 
 import sys
@@ -22,6 +23,8 @@ if __name__ == "__main__":
     # 显示启动界面
     splash.show()
     QtWidgets.qApp.processEvents()
+    # 初始化模板文件
+    TemplateSqlite().init_template(read_template())
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())

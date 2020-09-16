@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from src.constant.constant import DEFAULT_JAVA_TP, DEFAULT_MAPPER_TP, DEFAULT_XML_TP, DEFAULT_SERVICE_TP, \
-    DEFAULT_SERVICE_IMPL_TP, DEFAULT_CONTROLLER_TP, DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH
+from jinja2 import Template
+
+from src.constant.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH
 from src.generator.mybatis_generator import MybatisGenerator
 
 _author_ = 'luwt'
@@ -13,11 +14,11 @@ class SpringGenerator(MybatisGenerator):
         参数（此处未说明之参数，参见 MybatisGenerator 类文档）
 
         `service_tp`
-            service文件的模板路径，默认为当前目录下的service.txt文件，目录可选为当前目录下的子目录
+            service文件的模板，存在于系统模板库中
         `service_impl_tp`
-            serviceImpl文件的模板路径，默认为当前目录下的service_impl.txt文件，目录可选为当前目录下的子目录
+            serviceImpl文件的模板，存在于系统模板库中
         `controller_tp`
-            controller文件的模板路径，默认为当前目录下的controller.txt文件，目录可选为当前目录下的子目录
+            controller文件的模板，存在于系统模板库中
         `service_package`
             service文件所在包命名空间，例如com.demo.service，该命名空间将被作为service文件头部的引包声明，若无则不声明包命名空间。
             由包命名空间，生成器可生成service文件的命名空间，此命名空间将用于controller中作为引包声明，若无，则不声明
@@ -33,12 +34,6 @@ class SpringGenerator(MybatisGenerator):
             table_schema,
             table_name,
             column_name=None,
-            java_tp=DEFAULT_JAVA_TP,
-            mapper_tp=DEFAULT_MAPPER_TP,
-            xml_tp=DEFAULT_XML_TP,
-            service_tp=DEFAULT_SERVICE_TP,
-            service_impl_tp=DEFAULT_SERVICE_IMPL_TP,
-            controller_tp=DEFAULT_CONTROLLER_TP,
             output_path=DEFAULT_PATH,
             lombok=True,
             exec_sql=None,
@@ -60,9 +55,6 @@ class SpringGenerator(MybatisGenerator):
             table_schema,
             table_name,
             column_name,
-            java_tp,
-            mapper_tp,
-            xml_tp,
             output_path,
             lombok,
             exec_sql,
@@ -76,9 +68,9 @@ class SpringGenerator(MybatisGenerator):
             java_src_relative,
             **kwargs
         )
-        self.service_tp = service_tp
-        self.service_impl_tp = service_impl_tp
-        self.controller_tp = controller_tp
+        self.service_tp = self.template.service_tp
+        self.service_impl_tp = self.template.service_impl_tp
+        self.controller_tp = self.template.controller_tp
         # service包命名空间
         self.service_package = service_package
         # serviceImpl包命名空间
@@ -99,14 +91,14 @@ class SpringGenerator(MybatisGenerator):
         self.controller_path = self.get_path(self.controller_package) + '/' + f'{self.class_name}Controller.java'
 
     def generate_service(self):
-        content = self.env.get_template(self.service_tp).render(
+        content = Template(self.service_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_package=self.service_package, param=self.param, key=self.key
         )
         self.save(self.service_path, content)
 
     def generate_service_impl(self):
-        content = self.env.get_template(self.service_impl_tp).render(
+        content = Template(self.service_impl_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             mapper_namespace=self.mapper_namespace, param=self.param, key=self.key,
             service_impl_package=self.service_impl_package, hump_cls_name=self.hump_cls_name,
@@ -115,7 +107,7 @@ class SpringGenerator(MybatisGenerator):
         self.save(self.service_impl_path, content)
 
     def generate_controller(self):
-        content = self.env.get_template(self.controller_tp).render(
+        content = Template(self.controller_tp).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_namespace=self.service_namespace, param=self.param, key=self.key,
             controller_package=self.controller_package, hump_cls_name=self.hump_cls_name
