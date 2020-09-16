@@ -19,9 +19,8 @@ from src.dialog.draggable_dialog import DraggableDialog
 from src.func.test_conn_thread import TestConnWorker
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_ok, pop_fail, TimerMessageBox
-from src.style.qss import read_qss
-from src.sys.sys_info_storage.sqlite import Connection, update_conn, \
-    add_conn, get_new_conn, check_name_available
+from src.read_qrc.read_file import read_qss
+from src.sys.sys_info_storage.conn_sqlite import Connection, ConnSqlite
 
 
 class ConnDialog(DraggableDialog):
@@ -198,7 +197,7 @@ class ConnDialog(DraggableDialog):
         label_height = self.conn_name.geometry().height()
         self.name_check_pic.setFixedWidth(label_height)
         if conn_name:
-            name_available = check_name_available(conn_name, self.connection.id)
+            name_available = ConnSqlite().check_name_available(self.connection.id, conn_name)
             if name_available:
                 prompt = CONN_NAME_AVAILABLE.format(conn_name)
                 style = "color:green"
@@ -266,13 +265,19 @@ class ConnDialog(DraggableDialog):
 
     def handle_func(self):
         """添加新的连接记录到系统库中，或编辑连接信息"""
+        box_flag = False
         new_conn = self.get_input_connection()
         if self.dialog_title == EDIT_CONN_MENU:
-            update_conn(new_conn)
+            # 比较下是否有改动，如果有修改再更新库
+            if set(new_conn[1:]) - set(self.connection[1:]):
+                ConnSqlite().update_selective(new_conn)
+                box_flag = True
         elif self.dialog_title == ADD_CONN_MENU:
-            add_conn(new_conn)
-            new_conn = get_new_conn()
-        message_box = TimerMessageBox(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
-        message_box.exec_()
+            ConnSqlite().insert(new_conn)
+            new_conn = ConnSqlite().select_latest_one()
+            box_flag = True
+        if box_flag:
+            message_box = TimerMessageBox(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
+            message_box.exec_()
         self.dialog.close()
         self.conn_signal.emit(self.gui_parent, new_conn)

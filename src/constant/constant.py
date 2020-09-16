@@ -2,7 +2,6 @@
 """
 所有用到的常量
 """
-import os
 
 _author_ = 'luwt'
 _date_ = '2020/4/20 10:40'
@@ -33,20 +32,6 @@ DEFAULT_MODEL_NS = "实体类"
 # 默认输出目录
 DEFAULT_PATH = "./输出目录"
 
-# 项目目录
-TEMPLATE_PATH = (os.path.split(os.path.dirname(__file__))[0]).replace("\\", "/") + "/../static/template"
-# 默认java模板文件路径
-DEFAULT_JAVA_TP = 'java.txt'
-# 默认mapper模板文件路径
-DEFAULT_MAPPER_TP = 'mapper.txt'
-# 默认xml模板文件路径
-DEFAULT_XML_TP = 'xml.txt'
-# 默认service模板文件路径
-DEFAULT_SERVICE_TP = 'service.txt'
-# 默认service_impl模板文件路径
-DEFAULT_SERVICE_IMPL_TP = 'service_impl.txt'
-# 默认controller模板文件路径
-DEFAULT_CONTROLLER_TP = 'controller.txt'
 # 默认java项目源码包的相对路径结构
 DEFAULT_JAVA_SRC_RELATIVE_PATH = 'src/main/java'
 

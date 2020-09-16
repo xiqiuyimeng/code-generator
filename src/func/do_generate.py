@@ -1,9 +1,9 @@
 ﻿# -*- coding: utf-8 -*-
-from src.func.connection_function import open_connection
 from src.constant.constant import SPRING_TAB_TITLE, MYBATIS_TAB_TITLE
+from src.func.connection_function import open_connection
 from src.generator.mybatis_generator import MybatisGenerator
 from src.generator.spring_generator import SpringGenerator
-from src.sys.sys_info_storage.sqlite import get_id_by_name
+from src.sys.sys_info_storage.conn_sqlite import ConnSqlite
 
 _author_ = 'luwt'
 _date_ = '2020/7/15 14:25'
@@ -18,7 +18,7 @@ def get_params(gui, selected_data):
     selected_parted_table = 0
     params = list()
     for conn_name, db_dict in selected_data.items():
-        conn_id = get_id_by_name(conn_name)
+        conn_id = ConnSqlite().get_id_by_name(conn_name)
         cursor = open_connection(gui, conn_id, conn_name).cursor
         for db_name, tb_dict in db_dict.items():
             for tb_name, cols in tb_dict.items():

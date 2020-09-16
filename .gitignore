@@ -1,4 +1,5 @@
 build/
 dist/
 **/__pycache__/
-src/sys/sys_info_storage/mysql_generator
+src/sys/sys_info_storage/conn_db
+src/sys/sys_info_storage/template_db

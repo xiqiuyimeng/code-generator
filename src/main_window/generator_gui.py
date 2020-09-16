@@ -28,7 +28,8 @@ from src.little_widget.message_box import pop_fail
 from src.little_widget.title_bar import TitleBar
 from src.little_widget.tool_bar import fill_tool_bar
 from src.scrollable_widget.scrollable_widget import MyTreeWidget
-from src.sys.sys_info_storage.sqlite import get_conns
+from src.sys.sys_info_storage.conn_sqlite import ConnSqlite
+from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -164,7 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def get_saved_conns(self):
         """获取所有已存储的连接，生成页面树结构第一层"""
-        conns = get_conns()
+        conns = ConnSqlite().select_all()
         icon = QIcon(":/icon/mysql_conn_icon.png")
         for item in conns:
             # item属性：id name host port user pwd
@@ -210,6 +211,9 @@ class MainWindow(QtWidgets.QMainWindow):
         关闭连接
         :param conn_name: 要关闭的连接名称，若无，则关闭所有
         """
+        # 关闭sqlite连接
+        TemplateSqlite().close()
+        ConnSqlite().close()
         close_connection(self, conn_name)
 
     def right_click_menu(self, pos):

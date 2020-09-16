@@ -1,0 +1,10 @@
+﻿<RCC>
+    <qresource prefix="/template">
+        <file alias="java.txt">template/java.txt</file>
+        <file alias="mapper.txt">template/mapper.txt</file>
+        <file alias="xml.txt">template/xml.txt</file>
+        <file alias="service.txt">template/service.txt</file>
+        <file alias="service_impl.txt">template/service_impl.txt</file>
+        <file alias="controller.txt">template/controller.txt</file>
+    </qresource>
+</RCC>
