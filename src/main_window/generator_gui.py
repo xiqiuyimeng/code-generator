@@ -334,4 +334,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.table_header.set_header_checked(False)
             self.table_header.change_state(False)
 
+    def template_setting(self):
+        print("模板设置")
+
 
