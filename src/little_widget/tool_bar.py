@@ -45,7 +45,7 @@ def add_generate_tool(gui):
 
 
 def add_clear_tool(gui):
-    clear_tool = QAction(QIcon(':/icon/refresh.png'), '清空选择', gui)
+    clear_tool = QAction(QIcon(':/icon/remove.png'), '清空选择', gui)
     clear_tool.setStatusTip('清空所有已经选择的字段')
     clear_tool.triggered.connect(gui.clear_selected)
     gui.toolBar.addSeparator()
@@ -53,7 +53,7 @@ def add_clear_tool(gui):
 
 
 def add_template_tool(gui):
-    template_tool = QAction(QIcon(':/icon/refresh.png'), '模板设置', gui)
+    template_tool = QAction(QIcon(':/icon/template.png'), '模板设置', gui)
     template_tool.setStatusTip('查看模板、修改模板、新建模板等操作')
     template_tool.triggered.connect(gui.template_setting)
     gui.toolBar.addSeparator()
