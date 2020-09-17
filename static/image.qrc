@@ -4,6 +4,8 @@
     <file alias="exec.png">icon/exec.png</file>
     <file alias="exit.png">icon/exit.png</file>
     <file alias="refresh.png">icon/refresh.png</file>
+    <file alias="remove.png">icon/remove.png</file>
+    <file alias="template.png">icon/template.png</file>
     <file alias="right.jpg">icon/right.jpg</file>
     <file alias="right.png">icon/right.png</file>
     <file alias="wrong.png">icon/wrong.png</file>
