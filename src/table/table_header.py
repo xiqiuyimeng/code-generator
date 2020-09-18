@@ -7,10 +7,6 @@ _author_ = 'luwt'
 _date_ = '2020/6/21 9:21'
 
 
-# 用来装行表头所有复选框 全局变量
-all_header_combobox = list()
-
-
 class CheckBoxHeader(QtWidgets.QHeaderView):
     """自定义表头类，参考自 https://www.pythonf.cn/read/108150"""
 
@@ -25,6 +21,8 @@ class CheckBoxHeader(QtWidgets.QHeaderView):
     def __init__(self, orientation=QtCore.Qt.Horizontal, parent=None):
         super(CheckBoxHeader, self).__init__(orientation, parent)
         self.isOn = False
+        # 用来放所有复选框
+        self.all_header_combobox = list()
 
     def paintSection(self, painter, rect, logicalIndex):
         painter.save()
@@ -64,10 +62,10 @@ class CheckBoxHeader(QtWidgets.QHeaderView):
         # 如果行表头复选框为勾选状态
         if isOn:
             # 将所有的复选框都设为勾选状态
-            for i in all_header_combobox:
+            for i in self.all_header_combobox:
                 i.setCheckState(QtCore.Qt.Checked)
         else:
-            for i in all_header_combobox:
+            for i in self.all_header_combobox:
                 i.setCheckState(QtCore.Qt.Unchecked)
 
     def set_header_checked(self, checked):

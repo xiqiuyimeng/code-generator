@@ -25,10 +25,10 @@ def make_tree_item(gui, parent, name, icon, item_id=None, checkbox=None):
     """
     item = MyTreeWidgetItem(gui.treeWidget, parent)
     item.setIcon(0, icon)
-    gui.update_tree_item_name(item, name)
+    item.setText(0, name)
     if item_id:
         # id 作为隐藏属性，写于第二列
-        gui.update_tree_item_name(item, str(item_id), 1)
+        item.setText(1, item_id)
     if checkbox is not None:
         item.setCheckState(0, checkbox)
     return item
@@ -40,7 +40,7 @@ def add_conn_func(gui, screen_rect):
     :param gui: 启动的主窗口界面对象
     :param screen_rect: 主窗口大小
     """
-    conn_info = Connection(None, None, None, None, None, None)
+    conn_info = Connection(*((None,) * len(Connection._fields)))
     show_conn_dialog(gui, conn_info, ADD_CONN_MENU, screen_rect)
 
 
@@ -80,4 +80,4 @@ def update_conn_tree_item(gui, connection):
     """
     gui.display_conn_dict[connection.id] = connection
     item = gui.treeWidget.currentItem()
-    gui.update_tree_item_name(item, connection.name)
+    item.setText(0, connection.name)
