@@ -31,7 +31,6 @@ class ConnDialog(DraggableDialog):
         super().__init__()
         # 只是为了维护一个主窗口对象，方便其他操作
         self.gui_parent = gui
-        self.dialog = self
         self.dialog_title = dialog_title
         self.connection = connection
         self._translate = QtCore.QCoreApplication.translate
@@ -39,19 +38,19 @@ class ConnDialog(DraggableDialog):
         self.setup_ui()
 
     def setup_ui(self):
-        self.dialog.setObjectName("Dialog")
+        self.setObjectName("Dialog")
         # 当前窗口大小根据主窗口大小计算
-        self.dialog.resize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
+        self.resize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
         # 不透明度
         self.setWindowOpacity(0.95)
         # 隐藏窗口边框
-        self.dialog.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
-        self.dialog.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 
-        self.verticalLayout_frame = QtWidgets.QVBoxLayout(self.dialog)
+        self.verticalLayout_frame = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_frame.setObjectName("verticalLayout_frame")
-        self.conn_frame = QtWidgets.QFrame(self.dialog)
+        self.conn_frame = QtWidgets.QFrame(self)
         self.conn_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.conn_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.conn_frame.setObjectName("conn_frame")
@@ -139,10 +138,10 @@ class ConnDialog(DraggableDialog):
         self.verticalLayout.addLayout(self.gridLayout_2)
         self.verticalLayout_frame.addWidget(self.conn_frame)
         # 设置tab键的顺序
-        self.dialog.setTabOrder(self.conn_name_value, self.host_value)
-        self.dialog.setTabOrder(self.host_value, self.port_value)
-        self.dialog.setTabOrder(self.port_value, self.user_value)
-        self.dialog.setTabOrder(self.user_value, self.passwd_value)
+        self.setTabOrder(self.conn_name_value, self.host_value)
+        self.setTabOrder(self.host_value, self.port_value)
+        self.setTabOrder(self.port_value, self.user_value)
+        self.setTabOrder(self.user_value, self.passwd_value)
         # 设置端口号只能输入数字
         self.port_value.setValidator(QtGui.QIntValidator())
 
@@ -161,7 +160,7 @@ class ConnDialog(DraggableDialog):
         self.ok.setDisabled(True)
         self.test_conn.setDisabled(True)
         # 取消按钮：点击则关闭对话框
-        self.cancel.clicked.connect(self.dialog.close)
+        self.cancel.clicked.connect(self.close)
 
         self.retranslateUi()
 
@@ -244,10 +243,10 @@ class ConnDialog(DraggableDialog):
 
     def test_connection(self):
         """测试连接"""
-        self.loading_mask = LoadingMask(self.dialog, ":/gif/loading.gif")
+        self.loading_mask = LoadingMask(self, ":/gif/loading.gif")
         self.loading_mask.show()
         # 将遮罩层作为过滤器安装到对话框上，也就实现了对于在对话框中的动作的监听
-        self.dialog.installEventFilter(self.loading_mask)
+        self.installEventFilter(self.loading_mask)
         new_conn = self.get_input_connection()
         # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
         # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁
@@ -279,5 +278,5 @@ class ConnDialog(DraggableDialog):
         if box_flag:
             message_box = TimerMessageBox(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
             message_box.exec_()
-        self.dialog.close()
+        self.close()
         self.conn_signal.emit(self.gui_parent, new_conn)

@@ -12,6 +12,7 @@ class MyTableWidgetItem(QTableWidgetItem):
         """自定义单元格项，重写setData方法，完成点击复选框事件"""
         self.table = table
         super().__init__()
+        self.setTextAlignment(Qt.AlignCenter)
 
     def setData(self, role, value):
         check_change = self.table.checkbox_clicked \
@@ -23,3 +24,8 @@ class MyTableWidgetItem(QTableWidgetItem):
             field = self.table.item(self.row(), self.column() + 1).text()
             self.table.item_checkbox_clicked.emit(value, field)
             self.table.checkbox_clicked = False
+
+    def setText(self, text):
+        if not isinstance(text, str):
+            text = str(text)
+        super().setText(text)

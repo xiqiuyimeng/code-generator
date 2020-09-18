@@ -27,6 +27,14 @@
     font-family:楷体;
     font-weight:500;
 }
+/*模板表格表头*/
+#template_table_header_label{
+    font-size:20px;
+    font-family:楷体;
+    font-weight:500;
+    /*文字居中*/
+    qproperty-alignment:AlignHCenter;
+}
 /*气泡提示字体样式*/
 QToolTip{
     font-size:18px;
@@ -84,6 +92,12 @@ QLineEdit:disabled{
 }
 /*关于界面对话框样式*/
 #help_frame{
+    border-style:solid;
+    border-radius:25px;
+    border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
+}
+/*模板列表表格页背景图样式*/
+#template_table_frame{
     border-style:solid;
     border-radius:25px;
     border-image:url(:/bg_jpg/conn_dialog_bg.jpg);

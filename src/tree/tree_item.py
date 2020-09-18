@@ -29,3 +29,8 @@ class MyTreeWidgetItem(QTreeWidgetItem):
             # 复原树控件中标志项
             self.tree.checkbox_clicked = False
 
+    def setText(self, column, text):
+        if not isinstance(text, str):
+            text = str(text)
+        super().setText(column, text)
+

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QHeaderView
 
 from src.constant.constant import TABLE_HEADER_LABELS
 from src.scrollable_widget.scrollable_widget import MyTableWidget
-from src.table.table_header import all_header_combobox, CheckBoxHeader
+from src.table.table_header import CheckBoxHeader
 from src.table.table_item import MyTableWidgetItem
 
 _author_ = 'luwt'
@@ -95,7 +95,7 @@ def close_table(gui):
     sip.delete(gui.table_frame)
     # 删除table_frame属性，方便后续判断
     del gui.table_frame
-    all_header_combobox.clear()
+    gui.table_header.all_header_combobox.clear()
     # 重置打开表
     gui.opened_table = tuple()
     gui.statusbar.showMessage(f"成功关闭表：{gui.current_table.text(0)}")
@@ -129,13 +129,13 @@ def fill_table(gui, cols, selected_cols):
         # 加上行号
         table_check_item.setText(str(i + 1))
         gui.tableWidget.setItem(i, 0, table_check_item)
-        all_header_combobox.append(table_check_item)
+        gui.table_header.all_header_combobox.append(table_check_item)
 
         for n, field in enumerate(col, start=1):
             # 建立一个新的对象，赋值，填充到表格中对应位置
             item = MyTableWidgetItem(gui.tableWidget)
+            item.setText(field)
             gui.tableWidget.setItem(i, n, item)
-            gui.update_table_item(item, field)
     # 设置表格根据内容调整行高
     gui.tableWidget.resizeRowsToContents()
 

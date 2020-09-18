@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QVBoxLayout
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA, UNSELECT_FIELD_MENU, \
     SELECT_ALL_FIELD_MENU
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
+from src.dialog.template.templates_ui import TemplatesDialog
 from src.func.connection_function import close_connection
 from src.func.refresh_thread import Refresh
 from src.func.select_table_thread import AsyncSelectTable
@@ -189,23 +190,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # 只处理表
         Context(node).change_check_box(item, check_state, self)
 
-    def update_tree_item_name(self, item, name, col=0):
-        """
-        更新树的节点项名称
-        :param item: 当前树节点元素
-        :param name: 要更新的名字
-        :param col: 写入在哪一列，默认名字写在第一列，第二列为隐藏列，可写id作为隐藏属性
-        """
-        item.setText(col, self._translate("MainWindow", name))
-
-    def update_table_item(self, item, field):
-        """
-        更新表格控件中表格的值
-        :param item: 当前表格元素
-        :param field: 要填写的值
-        """
-        item.setText(self._translate("MainWindow", field))
-
     def close_conn(self, conn_name=None):
         """
         关闭连接
@@ -335,6 +319,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.table_header.change_state(False)
 
     def template_setting(self):
-        print("模板设置")
+        templates = TemplateSqlite().get_templates()
+        self.templates_dialog = TemplatesDialog(templates, self.screen_rect)
+        self.templates_dialog.exec()
 
 
