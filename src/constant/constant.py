@@ -137,7 +137,7 @@ CLOSE_DB_PROMPT = '该数据库下有已选的字段，强行关闭将清空库�
 """表格列头"""
 TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "备注"]
 """模板列表表格表头"""
-TEMPLATE_TABLE_HEADER_LABELS = ['全选', '模板名称', '模板类型', '使用次数', '使用中', '创建时间', '修改时间', '模板说明']
+TEMPLATE_TABLE_HEADER_LABELS = ['全选', '模板名称', '模板类型', '使用次数', '使用中', '创建时间', '修改时间', '操作']
 
 """主页面树部件头标题"""
 TREE_HEADER_LABELS = 'mysql连接列表'

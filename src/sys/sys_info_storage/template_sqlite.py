@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 import os
+import re
 import sqlite3
 from collections import namedtuple
 from datetime import datetime
@@ -13,10 +14,10 @@ _date_ = '2020/9/15 11:03'
 # 模板对象：id，模板名称，java模板java_tp, mapper模板mapper_tp, xml模板xml_tp,
 # service模板service_tp, service_impl模板service_impl_tp, controller模板controller_tp
 # 类型：0 内置，1 自定义。使用次数，可根据次数排序, is_using：是否在使用中，0否 1是
-# 创建时间 更新时间，时间都以时间戳形式存储，取出后再转为格式化字符串。模板说明
+# 创建时间 更新时间，时间都以时间戳形式存储，取出后再转为格式化字符串
 Template = namedtuple('Template', 'id tp_name java_tp mapper_tp xml_tp service_tp '
                                   'service_impl_tp controller_tp type use_times is_using '
-                                  'create_time update_time comment')
+                                  'create_time update_time')
 
 
 template_sql = {
@@ -33,17 +34,18 @@ template_sql = {
     use_times integer not null,
     is_using integer not null,
     create_time integer not null,
-    update_time integer not null,
-    comment text not null
+    update_time integer not null
     );''',
     'insert': 'insert into template ',
     'delete': 'delete from template where id = ?',
+    'batch_delete': 'delete from template where tp_name in ',
     'update_selective': 'update template set ',
     'select': 'select * from template',
     'select_templates': 'select tp_name, case type when 0 then "系统内置" when 1 then "自定义" end as type , '
                         'use_times, case is_using when 0 then "否" when 1 then "是" end as is_using, '
-                        'create_time, update_time, comment from template',
-    'select_name_exist': 'select count(*) > 0 from template where tp_name = ?'
+                        'create_time, update_time from template',
+    'select_name_exist': 'select count(*) > 0 from template where tp_name = ?',
+    'select_max_name_end': 'select tp_name from template where tp_name like ? order by tp_name desc limit 1'
 }
 
 
@@ -105,17 +107,21 @@ class TemplateSqlite(SqliteBasic):
             # 时间以时间戳形式存储
             template_dict['create_time'] = now
             template_dict['update_time'] = now
-            template_dict['comment'] = '系统内置的默认模板，如果删除请另外指定默认模板，否则无法生成代码！'
             default_template = Template(**template_dict)
             self.insert(default_template)
 
-    def check_tp_name_available(self, tp_id, tp_name):
+    def check_tp_name_available(self, tp_name, tp_id=None):
         sql = template_sql.get('select_name_exists')
         if tp_id:
             sql += f' and id != {tp_id}'
         self.cursor.execute(sql, (tp_name, ))
         data = self.cursor.fetchone()
         return data[0] == 0
+
+    def select_tp_name_max_end(self, tp_name):
+        sql = template_sql.get('select_max_name_end')
+        self.cursor.execute(sql, (tp_name + '%', ))
+        return self.cursor.fetchone()
 
     def get_template(self, tp_id):
         sql = template_sql.get('select') + f' where id = {tp_id}'
@@ -127,3 +133,49 @@ class TemplateSqlite(SqliteBasic):
         self.cursor.execute(sql)
         # 理论上只有一个正在使用中
         return self.cursor.fetchone()
+
+    def get_available_name(self, template):
+        # 处理名称
+        max_tp_name = self.select_tp_name_max_end(template.tp_name).tp_name
+        search = re.search(r"(?<=-copy)\d+$", max_tp_name)
+        if search:
+            # temp = template.tp_name[:search.start()]
+            # # 数据库中已存在的最大的copy n，在n基础上再加1
+            # max_tp_name = self.select_tp_name_max_end(temp).tp_name
+            # max_search = re.search(r"(?<=-copy)\d+$", max_tp_name)
+            tp_name = re.sub(r"(?<=-copy)\d+$", str(int(search.group()) + 1), max_tp_name)
+        else:
+            tp_name = template.tp_name + "-copy1"
+        return tp_name
+
+    def batch_copy(self, tp_names):
+        sql = template_sql.get('select') + f" where tp_name in ({', '.join('?' * len(tp_names))})"
+        self.cursor.execute(sql, tp_names)
+        templates = self.cursor.fetchall()
+        new_templates = list()
+        for template in templates:
+            now = round(datetime.now().timestamp())
+            tp_name = self.get_available_name(template)
+            new_template_dict = {
+                'id': None,
+                'tp_name': tp_name,
+                'type': 1,
+                'use_times': 0,
+                'is_using': 0,
+                'create_time': now,
+                'update_time': now
+            }
+            template_dict = template._asdict()
+            template_dict.update(new_template_dict)
+            self.insert(Template(**template_dict))
+            select_sql = template_sql.get('select_templates') + f' where tp_name = ?'
+            self.cursor.execute(select_sql, (tp_name, ))
+            new_templates.append(self.cursor.fetchone())
+        return new_templates
+
+    def batch_delete(self, tp_names):
+        sql = template_sql.get('batch_delete') + f"({','.join('?' * len(tp_names))})"
+        self.cursor.execute(sql, tp_names)
+        self.conn.commit()
+
+
