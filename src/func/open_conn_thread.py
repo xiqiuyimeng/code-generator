@@ -33,11 +33,8 @@ class ConnectDBWorker(QThread):
             self.executor = open_connection(self.gui, self.conn_id, self.conn_name)
             data = self.open_sth()
             self.result.emit(True, data)
-        except (DBNotExistsError, TableNotExistsError) as e:
-            self.result.emit(False, e.args[0])
         except Exception as e:
-            data = f'{TEST_CONN_FAIL_PROMPT}：[{self.conn_name}]' \
-                   f'\t\n {e.args[0]} - {e.args[1]}'
+            data = f'{TEST_CONN_FAIL_PROMPT}：[{self.conn_name}]\t\n {e}'
             self.result.emit(False, data)
 
     def open_sth(self):

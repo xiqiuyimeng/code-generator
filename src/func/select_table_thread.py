@@ -47,8 +47,7 @@ class SelectTableWorker(QThread):
                 result = executor.get_cols(self.db_name, self.opened_table)
             self.result.emit(True, result)
         except Exception as e:
-            self.result.emit(False, f'{SELECT_TABLE_FAIL_PROMPT}：[{self.conn_name}]'
-                                    f'\t\n {e.args[0]} - {e.args[1]}')
+            self.result.emit(False, f'{SELECT_TABLE_FAIL_PROMPT}：[{self.conn_name}]\t\n {e}')
 
     def select_table(self, cols):
         """选择表"""

@@ -139,10 +139,6 @@ class TemplateSqlite(SqliteBasic):
         max_tp_name = self.select_tp_name_max_end(template.tp_name).tp_name
         search = re.search(r"(?<=-copy)\d+$", max_tp_name)
         if search:
-            # temp = template.tp_name[:search.start()]
-            # # 数据库中已存在的最大的copy n，在n基础上再加1
-            # max_tp_name = self.select_tp_name_max_end(temp).tp_name
-            # max_search = re.search(r"(?<=-copy)\d+$", max_tp_name)
             tp_name = re.sub(r"(?<=-copy)\d+$", str(int(search.group()) + 1), max_tp_name)
         else:
             tp_name = template.tp_name + "-copy1"

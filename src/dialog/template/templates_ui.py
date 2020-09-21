@@ -12,6 +12,7 @@ from PyQt5.QtCore import Qt
 
 from src.constant.constant import TEMPLATE_TABLE_HEADER_LABELS
 from src.dialog.draggable_dialog import DraggableDialog
+from src.func.operate_template_thread import OperateTemplate
 from src.scrollable_widget.scrollable_widget import MyTableWidget
 from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 from src.table.table_header import CheckBoxHeader
@@ -24,6 +25,7 @@ class TemplatesDialog(DraggableDialog):
         super().__init__()
         self.templates = templates
         self.main_screen_rect = screen_rect
+        # 二维，元素为元祖，（index、tp_name）
         self.selected_templates = list()
         self.setup_ui()
 
@@ -85,7 +87,7 @@ class TemplatesDialog(DraggableDialog):
         self.batch_delete.clicked.connect(self.batch_delete_templates)
         self.quit_button.clicked.connect(self.close)
 
-        self.tableWidget.item_checkbox_clicked.connect(self.on_checkbox_changed)
+        self.tableWidget.item_checkbox_clicked.connect(lambda checked, field, row: self.on_checkbox_changed(checked, field, row))
 
         self.retranslateUi()
 
@@ -121,10 +123,7 @@ class TemplatesDialog(DraggableDialog):
                 i += start_row
             self.tableWidget.insertRow(i)
             table_check_item = MyTableWidgetItem(self.tableWidget)
-            if table_check_item.text() in self.selected_templates:
-                table_check_item.setCheckState(Qt.Checked)
-            else:
-                table_check_item.setCheckState(Qt.Unchecked)
+            table_check_item.setCheckState(Qt.Unchecked)
             table_check_item.setText(str(i + 1))
             self.tableWidget.setItem(i, 0, table_check_item)
             self.table_header.all_header_combobox.append(table_check_item)
@@ -140,36 +139,30 @@ class TemplatesDialog(DraggableDialog):
 
     def all_clicked(self, clicked):
         self.selected_templates.clear()
-        [self.selected_templates.append(self.tableWidget.item(checkbox.row(), checkbox.column() + 1).text())
-         for checkbox in self.table_header.all_header_combobox]
+        [self.selected_templates.append(
+            (checkbox.row(), self.tableWidget.item(checkbox.row(), checkbox.column() + 1).text())
+        ) for checkbox in self.table_header.all_header_combobox]
         self.table_header.change_state(clicked)
 
-    def on_checkbox_changed(self, checked, tp_name):
+    def on_checkbox_changed(self, checked, tp_name, row):
+        """点击复选框"""
         header_checked = False
-        if checked and tp_name not in self.selected_templates:
-            self.selected_templates.append(tp_name)
+        if checked and (row, tp_name) not in self.selected_templates:
+            self.selected_templates.append((row, tp_name))
             # 与表头联动
             if len(self.selected_templates) == len(self.table_header.all_header_combobox):
                 header_checked = True
-        elif not checked and tp_name in self.selected_templates:
-            self.selected_templates.remove(tp_name)
+        elif not checked and (row, tp_name) in self.selected_templates:
+            self.selected_templates.remove((row, tp_name))
         self.table_header.set_header_checked(header_checked)
 
     def batch_copy_templates(self):
+        """批量复制"""
         if self.selected_templates:
-            templates = TemplateSqlite().batch_copy(self.selected_templates)
-            # 渲染表
-            self.fill_table(templates, self.tableWidget.rowCount())
-            self.table_header.set_header_checked(False)
+            OperateTemplate(self, 'copy', self.selected_templates)
 
     def batch_delete_templates(self):
+        """批量删除"""
         if self.selected_templates:
-            TemplateSqlite().batch_delete(self.selected_templates)
-            delete_rows = list()
-            for tp_name in self.selected_templates:
-                for i in range(self.tableWidget.rowCount()):
-                    if self.tableWidget.item(i, 1).text() == tp_name:
-                        delete_rows.append(i)
-            self.selected_templates.clear()
-            [self.tableWidget.removeRow(row) for row in sorted(delete_rows, reverse=True)]
+            OperateTemplate(self, 'delete', self.selected_templates)
 

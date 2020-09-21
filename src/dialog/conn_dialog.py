@@ -245,8 +245,6 @@ class ConnDialog(DraggableDialog):
         """测试连接"""
         self.loading_mask = LoadingMask(self, ":/gif/loading.gif")
         self.loading_mask.show()
-        # 将遮罩层作为过滤器安装到对话框上，也就实现了对于在对话框中的动作的监听
-        self.installEventFilter(self.loading_mask)
         new_conn = self.get_input_connection()
         # 创建并启用子线程，这里需要注意的是，线程需要处理为类成员变量，
         # 如果是方法内的局部变量，在方法自上而下执行完后将被销毁

@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, QRect
+from PyQt5.QtCore import pyqtSignal, QRect, QRectF
 from PyQt5.QtWidgets import QAbstractScrollArea, QTreeWidget, QTableWidget, QScrollArea, QTextBrowser, \
     QTreeWidgetItem, QStyle
 
@@ -60,8 +60,8 @@ class MyTreeWidget(QTreeWidget, MyScrollableWidget):
 
 class MyTableWidget(QTableWidget, MyScrollableWidget):
 
-    # 定义信号，点击第一列复选框时，发送当前选中状态、第二列的字段名称
-    item_checkbox_clicked = pyqtSignal(bool, str)
+    # 定义信号，点击第一列复选框时，发送当前选中状态、第二列的字段名称和当前行
+    item_checkbox_clicked = pyqtSignal(bool, str, int)
     # 作为是否点击复选框标志，方便节点项处理
     checkbox_clicked = False
 
@@ -85,6 +85,9 @@ class MyTableWidget(QTableWidget, MyScrollableWidget):
                                   view_rect.y(),
                                   self.style().pixelMetric(QStyle.PM_IndicatorWidth),
                                   view_rect.height())
+            print(checkbox_rect)
+            print(event.pos())
+            print(checkbox_rect.contains(event.pos()))
             if checkbox_rect.contains(event.pos()):
                 # 标志项置为True
                 self.checkbox_clicked = True

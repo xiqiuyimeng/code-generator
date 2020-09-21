@@ -28,8 +28,7 @@ class TestConnWorker(QThread):
             test_connection(self.conn)
             self.result.emit(True, TEST_CONN_SUCCESS_PROMPT)
         except Exception as e:
-            self.result.emit(False, f'{TEST_CONN_FAIL_PROMPT}：[{self.conn.name}]'
-                                    f'\t\n {e.args[0]} - {e.args[1]}')
+            self.result.emit(False, f'{TEST_CONN_FAIL_PROMPT}：[{self.conn.name}]\t\n {e}')
 
 
 class AsyncTestConn:
