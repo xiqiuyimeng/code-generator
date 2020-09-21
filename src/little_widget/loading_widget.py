@@ -11,6 +11,7 @@ class LoadingMask(QWidget):
 
     def __init__(self, parent, gif):
         super().__init__(parent)
+        # 将遮罩层作为过滤器安装到调用者身上，也就实现了对于调用者的动作的监听
         parent.installEventFilter(self)
         self.set_size()
         self.label = QLabel()
