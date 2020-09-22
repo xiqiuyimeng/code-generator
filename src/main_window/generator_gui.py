@@ -12,7 +12,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout
 
 from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA, UNSELECT_FIELD_MENU, \
-    SELECT_ALL_FIELD_MENU
+    SELECT_ALL_FIELD_MENU, WRONG_UNSET_USING_TEMPLATE
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.dialog.template.templates_ui import TemplatesDialog
 from src.func.connection_function import close_connection
@@ -118,9 +118,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolBar = QtWidgets.QToolBar(self)
         self.toolBar.setObjectName("toolBar")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
-        # 设置名称显示在图标下面（默认本来是只显示图标）
         fill_tool_bar(self)
         self.toolBar.setIconSize(QSize(50, 40))
+        # 设置名称显示在图标下面（默认本来是只显示图标）
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # 主布局添加所有部件，依次为标题栏、菜单栏、工具栏、承载了实际窗口内容的主控件，将窗口中央控件设置为包含所有的控件
@@ -231,10 +231,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def generate(self):
         selected_data = SelectedData().conn_dict
-        if selected_data:
+        using_template = TemplateSqlite().get_using_template()
+        if selected_data and using_template:
             generate_dialog = DisplaySelectedDialog(self, selected_data, self.screen_rect)
             generate_dialog.exec()
-        else:
+        elif selected_data:
+            pop_fail(WRONG_TITLE, WRONG_UNSET_USING_TEMPLATE)
+        elif using_template:
             pop_fail(WRONG_TITLE, WRONG_UNSELECT_DATA)
 
     def help(self):

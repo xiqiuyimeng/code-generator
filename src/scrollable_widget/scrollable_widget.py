@@ -46,7 +46,9 @@ class MyTreeWidget(QTreeWidget, MyScrollableWidget):
         view_rect = self.visualRect(clicked_index)
         # 计算元素的x坐标
         item_x = tree_x + view_rect.x() - root_x
-        # 计算复选框的矩形大小
+        # todo 这里计算复选框大小有问题，起始点坐标计算有问题，qrect里最后的高度应该用复选框的高度，
+        #  起始的xy应该用复选框的xy坐标，目前不是
+        # 计算复选框的矩形大小，PM_IndicatorWidth 复选框的宽度
         checkbox_rect = QRect(item_x,
                               view_rect.y(),
                               self.style().pixelMetric(QStyle.PM_IndicatorWidth),
