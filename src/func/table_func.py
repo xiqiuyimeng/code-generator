@@ -127,7 +127,7 @@ def fill_table(gui, cols, selected_cols):
                 check_status = Qt.Unchecked
         table_check_item.setCheckState(check_status)
         # 加上行号
-        table_check_item.setText(str(i + 1))
+        table_check_item.setText(i + 1)
         gui.tableWidget.setItem(i, 0, table_check_item)
         gui.table_header.all_header_combobox.append(table_check_item)
 

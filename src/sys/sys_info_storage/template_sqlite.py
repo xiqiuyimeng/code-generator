@@ -45,7 +45,9 @@ template_sql = {
                         'use_times, case is_using when 0 then "否" when 1 then "是" end as is_using, '
                         'create_time, update_time from template',
     'select_name_exist': 'select count(*) > 0 from template where tp_name = ?',
-    'select_max_name_end': 'select tp_name from template where tp_name like ? order by tp_name desc limit 1'
+    'select_max_name_end': 'select tp_name from template where tp_name like ? order by tp_name desc limit 1',
+    'reset_using': 'update template set is_using = 0 where is_using = 1',
+    'using_template': 'update template set is_using = 1 where tp_name = ?'
 }
 
 
@@ -96,13 +98,15 @@ class TemplateSqlite(SqliteBasic):
         return self.cursor.fetchall()
 
     def init_template(self, template_dict):
+        """初始化模板，如果默认模板不存在，则初始化"""
         template = self.get_templates(tp_type=0)
         if not template:
+            using_template = self.get_using_template()
             template_dict['id'] = None
             template_dict['tp_name'] = '默认模板'
             template_dict['type'] = 0
             template_dict['use_times'] = 0
-            template_dict['is_using'] = 1
+            template_dict['is_using'] = 1 if not using_template else 0
             now = round(datetime.now().timestamp())
             # 时间以时间戳形式存储
             template_dict['create_time'] = now
@@ -173,5 +177,16 @@ class TemplateSqlite(SqliteBasic):
         sql = template_sql.get('batch_delete') + f"({','.join('?' * len(tp_names))})"
         self.cursor.execute(sql, tp_names)
         self.conn.commit()
+
+    def change_using_template(self, tp_name):
+        """改变使用中的模板，先将之前使用中的模板置为未使用，再将新模板置为使用中"""
+        sql = template_sql.get('reset_using')
+        self.cursor.execute(sql)
+        self.conn.commit()
+        # 置为使用中
+        using_sql = template_sql.get('using_template')
+        self.cursor.execute(using_sql, (tp_name, ))
+        self.conn.commit()
+
 
 

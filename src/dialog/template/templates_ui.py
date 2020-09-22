@@ -9,10 +9,15 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QToolButton, QMenu, QAction
 
-from src.constant.constant import TEMPLATE_TABLE_HEADER_LABELS
+from src.constant.constant import TEMPLATE_TABLE_HEADER_LABELS, COPY_ACTION, DEL_ACTION, TEMPLATE_LIST_HEADER, \
+    ADD_TEMPLATE, BATCH_COPY_TEMPLATE, BATCH_DEL_TEMPLATE, TEMPLATE_QUIT, USE_TEMPLATE_CELL, CAT_TEMPLATE_CELL, \
+    EDIT_TEMPLATE_CELL, COPY_TEMPLATE_CELL, DEL_TEMPLATE_CELL, QUIT_QUESTION
 from src.dialog.draggable_dialog import DraggableDialog
 from src.func.operate_template_thread import OperateTemplate
+from src.little_widget.message_box import pop_question
 from src.scrollable_widget.scrollable_widget import MyTableWidget
 from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 from src.table.table_header import CheckBoxHeader
@@ -85,19 +90,20 @@ class TemplatesDialog(DraggableDialog):
         # 事件
         self.batch_copy.clicked.connect(self.batch_copy_templates)
         self.batch_delete.clicked.connect(self.batch_delete_templates)
-        self.quit_button.clicked.connect(self.close)
+        self.quit_button.clicked.connect(self.quit)
 
-        self.tableWidget.item_checkbox_clicked.connect(lambda checked, field, row: self.on_checkbox_changed(checked, field, row))
+        self.tableWidget.item_checkbox_clicked.connect(lambda checked, field, row:
+                                                       self.on_checkbox_changed(checked, field, row))
 
         self.retranslateUi()
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        self.table_header_label.setText("代码模板列表")
-        self.add_template.setText("添加模板")
-        self.batch_copy.setText("批量复制")
-        self.batch_delete.setText("批量删除")
-        self.quit_button.setText("退出")
+        self.table_header_label.setText(TEMPLATE_LIST_HEADER)
+        self.add_template.setText(ADD_TEMPLATE)
+        self.batch_copy.setText(BATCH_COPY_TEMPLATE)
+        self.batch_delete.setText(BATCH_DEL_TEMPLATE)
+        self.quit_button.setText(TEMPLATE_QUIT)
 
     def make_header(self):
         self.tableWidget.setColumnCount(8)
@@ -124,7 +130,7 @@ class TemplatesDialog(DraggableDialog):
             self.tableWidget.insertRow(i)
             table_check_item = MyTableWidgetItem(self.tableWidget)
             table_check_item.setCheckState(Qt.Unchecked)
-            table_check_item.setText(str(i + 1))
+            table_check_item.setText(i + 1)
             self.tableWidget.setItem(i, 0, table_check_item)
             self.table_header.all_header_combobox.append(table_check_item)
             n = 1
@@ -135,6 +141,8 @@ class TemplatesDialog(DraggableDialog):
                     tp_item.setText(field)
                     self.tableWidget.setItem(i, n, tp_item)
                     n += 1
+            # 最后添加按钮，在序号为7的列
+            self.tableWidget.setCellWidget(i, 7, self.make_tools(i, template.tp_name, template.is_using))
         self.tableWidget.resizeRowsToContents()
 
     def all_clicked(self, clicked):
@@ -159,10 +167,102 @@ class TemplatesDialog(DraggableDialog):
     def batch_copy_templates(self):
         """批量复制"""
         if self.selected_templates:
-            OperateTemplate(self, 'copy', self.selected_templates)
+            OperateTemplate(self, COPY_ACTION, self.selected_templates)
 
     def batch_delete_templates(self):
         """批量删除"""
         if self.selected_templates:
-            OperateTemplate(self, 'delete', self.selected_templates)
+            OperateTemplate(self, DEL_ACTION, self.selected_templates)
 
+    def make_tools(self, row, tp_name, is_used):
+        """
+        添加操作按钮
+        :param row: 当前行
+        :param tp_name: 模板名称
+        :param is_used: 是否在使用，如果不在使用，需要展示使用按钮
+        """
+        tool_button = QToolButton(self)
+        tool_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        tool_button.setStatusTip('对模板的操作')
+        tool_button.setPopupMode(QToolButton.InstantPopup)
+        tool_button.setText('操作')
+        tool_button.setIcon(QIcon(":/icon/exec.png"))
+        tool_button.setAutoRaise(True)
+        menu = QMenu(self)
+        # 没有使用的模板才需要这个按钮
+        if is_used == '否':
+            use_act = QAction(QIcon(":/icon/exec.png"), USE_TEMPLATE_CELL, self)
+            use_act.triggered.connect(lambda: self.use_action(row, tp_name))
+            menu.addAction(use_act)
+        cat_act = QAction(QIcon(":/icon/exec.png"), CAT_TEMPLATE_CELL, self)
+        cat_act.triggered.connect(lambda: self.cat_action(row, tp_name))
+        menu.addAction(cat_act)
+        edit_act = QAction(QIcon(":/icon/exec.png"), EDIT_TEMPLATE_CELL, self)
+        edit_act.triggered.connect(lambda: self.edit_action(row, tp_name))
+        menu.addAction(edit_act)
+        copy_act = QAction(QIcon(":/icon/exec.png"), COPY_TEMPLATE_CELL, self)
+        copy_act.triggered.connect(lambda: self.copy_action(row, tp_name))
+        menu.addAction(copy_act)
+        del_act = QAction(QIcon(":/icon/exec.png"), DEL_TEMPLATE_CELL, self)
+        del_act.triggered.connect(lambda: self.del_action(row, tp_name))
+        menu.addAction(del_act)
+        tool_button.setMenu(menu)
+        return tool_button
+
+    def use_action(self, row, tp_name):
+        """设为使用中"""
+        TemplateSqlite().change_using_template(tp_name)
+        # 当前使用中的模板所在行
+        old_row = -1
+        # 渲染表格
+        for i in range(self.tableWidget.rowCount()):
+            item = self.tableWidget.item(i, 4)
+            if item.text() == '是':
+                item.setText('否')
+                old_row = i
+        self.tableWidget.item(row, 4).setText('是')
+        # 处理操作菜单
+        self.tableWidget.setCellWidget(row, 7, self.make_tools(
+            row, self.tableWidget.item(row, 1).text(), '是'
+        ))
+        # 如果之前使用的存在，重新构建下操作菜单
+        if old_row >= 0:
+            self.tableWidget.setCellWidget(old_row, 7, self.make_tools(
+                old_row, self.tableWidget.item(old_row, 1).text(), '否'
+            ))
+
+    def cat_action(self, row, tp_name):
+        print(row, CAT_TEMPLATE_CELL)
+
+    def edit_action(self, row, tp_name):
+        print(row, EDIT_TEMPLATE_CELL)
+
+    def copy_action(self, row, tp_name):
+        """复制模板，具体实现为批量复制方法"""
+        if (row, tp_name) not in self.selected_templates:
+            self.selected_templates.append((row, tp_name))
+        self.batch_copy_templates()
+        # 如果复选框未选择，可以删除这一项，否则不删
+        if self.tableWidget.item(row, 0).checkState() == Qt.Unchecked:
+            self.selected_templates.remove((row, tp_name))
+
+    def del_action(self, row, tp_name):
+        """删除模板，具体实现为批量删除方法"""
+        if (row, tp_name) not in self.selected_templates:
+            self.selected_templates.append((row, tp_name))
+        self.batch_delete_templates()
+
+    def keyPressEvent(self, event):
+        """在按esc时，执行自定义的quit方法"""
+        if event.key() == Qt.Key_Escape:
+            self.quit()
+        else:
+            super().keyPressEvent(event)
+
+    def quit(self):
+        """关闭前判断下是否存在使用中的模板，若不存在，弹窗提示"""
+        if not TemplateSqlite().get_using_template():
+            if pop_question('警告', QUIT_QUESTION):
+                self.close()
+        else:
+            self.close()

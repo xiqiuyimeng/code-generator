@@ -87,6 +87,7 @@ WARNING_OK = '确认无误'
 WARNING_RESELECT = '重新选择'
 WRONG_TITLE = '错误'
 WRONG_UNSELECT_DATA = '当前未选中数据，请选择后再执行！'
+WRONG_UNSET_USING_TEMPLATE = '当前没有设置使用模板，请先设置模板！'
 
 """消息框按钮文字"""
 OK_BUTTON = '确定'
@@ -240,3 +241,24 @@ APPOINT_PATH_INFO = '生成到指定路径意味着所有的文件都将生成�
 APPOINT_PROJECT = '指定项目地址'
 APPOINT_PROJECT_INFO = '生成到指定项目意味着所有生成的文件都将按照规则被放置在相应的项目目录下。此时的项目路径需要填写正确，' \
                        '输入项都会做相应检查。如果输入路径包名都正确，那么生成的spring全套代码是可以直接运行的。'
+"""模板部分"""
+# 动作标志
+COPY_ACTION = 'copy'
+DEL_ACTION = 'delete'
+# 消息弹窗
+COPY_TEMPLATE = '复制模板'
+DEL_TEMPLATE = '删除模板'
+OPERATION_FAILED = '操作失败！'
+QUIT_QUESTION = '检测到当前没有在使用中的模板，这将导致无法生成代码，是否仍要退出？'
+# 按钮文字
+TEMPLATE_LIST_HEADER = '代码模板列表'
+ADD_TEMPLATE = '添加模板'
+BATCH_COPY_TEMPLATE = '批量复制'
+BATCH_DEL_TEMPLATE = '批量删除'
+TEMPLATE_QUIT = '退出'
+USE_TEMPLATE_CELL = '使用'
+CAT_TEMPLATE_CELL = '查看'
+EDIT_TEMPLATE_CELL = '编辑'
+COPY_TEMPLATE_CELL = '复制'
+DEL_TEMPLATE_CELL = '删除'
+

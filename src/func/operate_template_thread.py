@@ -1,6 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QThread, pyqtSignal
 
+from src.constant.constant import COPY_TEMPLATE, DEL_TEMPLATE, OPERATION_FAILED, DEL_ACTION, COPY_ACTION
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_fail
 from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
@@ -20,10 +21,12 @@ class OperateTemplateWorker(QThread):
 
     def run(self):
         try:
-            if self.action == 'copy':
+            if self.action == COPY_ACTION:
                 self.batch_copy_template()
+            elif self.action == DEL_ACTION:
+                self.batch_delete_template()
         except Exception as e:
-            self.result.emit(False, f'操作失败！\t\n {e}')
+            self.result.emit(False, f'{OPERATION_FAILED}\t\n {e}')
 
     def batch_copy_template(self):
         templates = TemplateSqlite().batch_copy(self.selected_templates)
@@ -51,9 +54,9 @@ class OperateTemplate:
         self.worker.start()
 
     def handle_ui(self, flag, result):
-        if self.action == 'copy':
+        if self.action == COPY_ACTION:
             self.handle_ui_copy(flag, result)
-        elif self.action == 'delete':
+        elif self.action == DEL_ACTION:
             self.handle_ui_delete(flag, result)
 
     def handle_ui_copy(self, flag, result):
@@ -63,7 +66,7 @@ class OperateTemplate:
             self.gui.fill_table(result, self.gui.tableWidget.rowCount())
             self.gui.table_header.set_header_checked(False)
         else:
-            pop_fail("复制模板", result)
+            pop_fail(COPY_TEMPLATE, result)
 
     def handle_ui_delete(self, flag, result):
         if flag:
@@ -72,10 +75,11 @@ class OperateTemplate:
             # 已经删除完毕，选中列表可以清除
             self.selected_templates.clear()
             # 删除全选框中的元素
-            [self.gui.table_header.all_header_combobox.remove(self.gui.tableWidget.item(row, 0)) for row in delete_rows]
+            [self.gui.table_header.all_header_combobox.remove(self.gui.tableWidget.item(row, 0))
+             for row in delete_rows]
             # 删除页面行
             [self.gui.tableWidget.removeRow(row) for row in delete_rows]
             self.gui.table_header.set_header_checked(False)
         else:
-            pop_fail("删除模板", result)
+            pop_fail(DEL_TEMPLATE, result)
 
