@@ -93,7 +93,6 @@ class GenerateResultDialog(DraggableDialog):
         """设置遮罩层，以防在刚打开界面时因异常而导致界面没有响应"""
         self.loading_mask = LoadingMask(self, ":/gif/loading.gif")
         self.loading_mask.show()
-        self.installEventFilter(self.loading_mask)
 
     def progress(self, saved_count, file_count, progress_value, msg):
         # 当生成第一个文件的时候，证明数据准备已经没问题，关闭遮罩层

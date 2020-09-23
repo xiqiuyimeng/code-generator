@@ -47,8 +47,8 @@ class ProjectGeneratorUI:
         # spring标签页
         self.setup_spring_tab_ui()
 
-        self.tabWidget.addTab(self.mybatis_tab, "")
-        self.tabWidget.addTab(self.spring_tab, "")
+        self.tabWidget.addTab(self.mybatis_tab, MYBATIS_TAB_TITLE)
+        self.tabWidget.addTab(self.spring_tab, SPRING_TAB_TITLE)
         self.verticalLayout_2.addWidget(self.tabWidget)
 
         self.tabWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
@@ -344,8 +344,6 @@ class ProjectGeneratorUI:
         self.mapper_desc.setText(MAPPER_PACKAGE_DESC)
         self.xml.setText(XML_PATH)
         self.xml_desc.setText(XML_PATH_DESC)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.mybatis_tab),
-                                          self._translate("Dialog", MYBATIS_TAB_TITLE))
         self.spring_title.setText(SPRING_TITLE)
         self.spring_desc.setText(SPRING_GENERATOR_DESC)
         self.service.setText(SERVICE_PACKAGE)
@@ -354,8 +352,6 @@ class ProjectGeneratorUI:
         self.service_impl_desc.setText(SERVICE_IMPL_PACKAGE_DESC)
         self.controller.setText(CONTROLLER_PACKAGE)
         self.controller_desc.setText(CONTROLLER_PACKAGE_DESC)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.spring_tab),
-                                          self._translate("Dialog", SPRING_TAB_TITLE))
         # 按钮
         self.clear_button.setText(CLEAR_CONFIG_BUTTON)
         self.pre_step_button.setText(PRE_STEP_BUTTON)

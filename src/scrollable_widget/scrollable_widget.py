@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, QRect, QRectF
+from PyQt5.QtCore import pyqtSignal, QRect
 from PyQt5.QtWidgets import QAbstractScrollArea, QTreeWidget, QTableWidget, QScrollArea, QTextBrowser, \
     QTreeWidgetItem, QStyle
 
