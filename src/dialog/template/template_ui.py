@@ -11,8 +11,8 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QRect
 
 from src.dialog.template.tab_bar_style import TabWidget
-from src.scrollable_widget.scrollable_widget import MyTextBrowser
-from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
+from src.scrollable_widget.scrollable_widget import MyTextBrowser, MyTextEdit
+from src.sys.sys_info_storage.template_sqlite import TemplateSqlite, Template
 
 
 class TemplateDialog(QtWidgets.QDialog):
@@ -45,7 +45,10 @@ class TemplateDialog(QtWidgets.QDialog):
         self.template_name_label = QtWidgets.QLabel(self.template_frame)
         self.template_name_label.setObjectName("template_name_label")
         self.gridLayout.addWidget(self.template_name_label, 0, 0, 1, 1)
-        self.template_name = QtWidgets.QLabel(self.template_frame)
+        if self.title == '查看':
+            self.template_name = QtWidgets.QLabel(self.template_frame)
+        else:
+            self.template_name = QtWidgets.QLineEdit(self.template_frame)
         self.template_name.setObjectName("template_name")
         self.gridLayout.addWidget(self.template_name, 0, 1, 1, 1)
         self.template_content_label = QtWidgets.QLabel(self.template_frame)
@@ -56,7 +59,10 @@ class TemplateDialog(QtWidgets.QDialog):
         for tab_name in self.tab_names:
             exec(f'self.{tab_name} = QtWidgets.QWidget()')
             exec(f'self.{tab_name}.setObjectName("{tab_name}")')
-            exec(f'self.set_up_tab(self.{tab_name}, "{tab_name}")')
+            if self.title == '查看':
+                exec(f'self.set_up_show_tab(self.{tab_name}, "{tab_name}")')
+            else:
+                exec(f'self.set_up_edit_tab(self.{tab_name}, "{tab_name}")')
             exec(f'self.template_tab_widget.addTab(self.{tab_name}, "{tab_name[:-3]}")')
         self.gridLayout.addWidget(self.template_tab_widget, 2, 0, 1, 2)
 
@@ -64,36 +70,46 @@ class TemplateDialog(QtWidgets.QDialog):
         self.verticalLayout.addWidget(self.template_frame)
         self.retranslateUi()
         self.template_tab_widget.setCurrentIndex(0)
-
         self.setStyleSheet("""#template_title{
-    font-size:20px;
-    font-family:楷体;
-    font-weight:500;
-    /*文字居中*/
-    qproperty-alignment:AlignHCenter;
-}""")
+            font-size:20px;
+            font-family:楷体;
+            font-weight:500;
+            /*文字居中*/
+            qproperty-alignment:AlignHCenter;
+        }""")
 
-    def set_up_tab(self, tab, tab_name):
-        self.verticalLayout_scroll = QtWidgets.QVBoxLayout(tab)
+    def set_up_show_tab(self, tab, tab_name):
+        self.verticalLayout_scroll = QtWidgets.QHBoxLayout(tab)
         self.verticalLayout_scroll.setObjectName("verticalLayout_scroll")
         self.text_browser = MyTextBrowser(tab)
         self.text_browser.setLineWrapMode(MyTextBrowser.NoWrap)
         self.text_browser.setObjectName("text_browser")
-        self.verticalLayout_scroll.addWidget(self.text_browser)
         # 以纯文本形式显示
         self.text_browser.setPlainText(eval(f'self.template.{tab_name}'))
-        num_cut = QtWidgets.QLabel(window)  # 限制标签的大小
-        num_cut.resize(30, 300)
-        num_cut.move(270, 100)
+        self.verticalLayout_scroll.addWidget(self.set_up_line_number(tab, self.text_browser.document().lineCount()))
+        self.verticalLayout_scroll.addWidget(self.text_browser)
+
+    def set_up_edit_tab(self, tab, tab_name):
+        self.verticalLayout_scroll = QtWidgets.QHBoxLayout(tab)
+        self.verticalLayout_scroll.setObjectName("verticalLayout_scroll")
+        self.text_edit = MyTextEdit(tab)
+        self.text_edit.setObjectName("text_edit")
+        # 以纯文本形式显示
+        self.text_edit.setPlainText(eval(f'self.template.{tab_name}'))
+        self.verticalLayout_scroll.addWidget(self.set_up_line_number(tab, self.text_edit.document().lineCount()))
+        self.verticalLayout_scroll.addWidget(self.text_edit)
+
+    def set_up_line_number(self, parent, line_count):
+        # 限制标签的大小
+        num_cut = QtWidgets.QLabel(parent)
+        num_cut.setFixedWidth(30)
         num_cut.setStyleSheet('background-color:royalblue')
         num = QtWidgets.QLabel(num_cut)
-        num.move(0, 7)  # 偏移一点保证label里的行号和文本框里的段落能对齐
-        # 总行数
-        line_count = self.text_browser.document().lineCount()
         # 生成行号序列
         line_nums = '\n'.join([str(i) for i in range(1, line_count + 1)])
         num.setText(line_nums)
         num.adjustSize()
+        return num_cut
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -109,6 +125,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     t = TemplateSqlite().get_using_template()
     r = QRect(0, 0, 1152, 810)
-    ui = TemplateDialog("查看", r, t)
+    new_t = Template()
+    ui = TemplateDialog("新建", r, t)
     ui.show()
     sys.exit(app.exec_())
