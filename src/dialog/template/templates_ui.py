@@ -248,7 +248,7 @@ class TemplatesDialog(DraggableDialog):
 
     def del_action(self, row, tp_name):
         """删除模板，具体实现为批量删除方法"""
-        self.batch_delete_templates(((row, tp_name),))
+        self.batch_delete_templates([(row, tp_name), ])
 
     def keyPressEvent(self, event):
         """在按esc时，执行自定义的quit方法"""

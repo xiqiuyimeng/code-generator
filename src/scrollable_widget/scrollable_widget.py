@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal, QRect
 from PyQt5.QtWidgets import QAbstractScrollArea, QTreeWidget, QTableWidget, QScrollArea, QTextBrowser, \
-    QTreeWidgetItem, QStyle
+    QTreeWidgetItem, QStyle, QPlainTextEdit
 
 _author_ = 'luwt'
 _date_ = '2020/8/24 15:41'
@@ -101,4 +101,8 @@ class MyScrollArea(QScrollArea, MyScrollableWidget):
 
 
 class MyTextBrowser(QTextBrowser, MyScrollableWidget):
+    ...
+
+
+class MyTextEdit(QPlainTextEdit, MyScrollableWidget):
     ...
