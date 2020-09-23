@@ -322,8 +322,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.table_header.change_state(False)
 
     def template_setting(self):
-        templates = TemplateSqlite().get_templates()
-        self.templates_dialog = TemplatesDialog(templates, self.screen_rect)
+        self.templates_dialog = TemplatesDialog(self.screen_rect)
         self.templates_dialog.exec()
 
 
