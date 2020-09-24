@@ -15,10 +15,12 @@ class MyScrollableWidget(QAbstractScrollArea):
     def enterEvent(self, a0):
         """设置滚动条在进入控件区域的时候显示"""
         self.verticalScrollBar().setHidden(False)
+        self.horizontalScrollBar().setHidden(False)
 
     def leaveEvent(self, a0):
         """设置滚动条在离开控件区域的时候隐藏"""
         self.verticalScrollBar().setHidden(True)
+        self.horizontalScrollBar().setHidden(True)
 
 
 class MyTreeWidget(QTreeWidget, MyScrollableWidget):
@@ -105,4 +107,7 @@ class MyTextBrowser(QTextBrowser, MyScrollableWidget):
 
 
 class MyTextEdit(QPlainTextEdit, MyScrollableWidget):
-    ...
+    
+    def __init__(self, parent):
+        super(MyTextEdit, self).__init__(parent)
+        self.setLineWrapMode(self.NoWrap)

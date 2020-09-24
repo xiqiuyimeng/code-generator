@@ -8,14 +8,13 @@
 
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QRect
 
+from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
 from src.scrollable_widget.scrollable_widget import MyTextBrowser, MyTextEdit
-from src.sys.sys_info_storage.template_sqlite import TemplateSqlite, Template
 
 
-class TemplateDialog(QtWidgets.QDialog):
+class TemplateDialog(DraggableDialog):
 
     def __init__(self, title, screen_rect, template=None):
         super().__init__()
@@ -27,6 +26,8 @@ class TemplateDialog(QtWidgets.QDialog):
 
     def setup_ui(self):
         self.setObjectName("Dialog")
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         self.resize(self.main_screen_rect.width() * 0.8, self.main_screen_rect.height() * 0.8)
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -67,16 +68,30 @@ class TemplateDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.template_tab_widget, 2, 0, 1, 2)
 
         self.verticalLayout_2.addLayout(self.gridLayout)
+        # 按钮区
+        self.button_gridLayout = QtWidgets.QGridLayout()
+        self.button_gridLayout.setObjectName("button_gridLayout")
+        self.support_button = QtWidgets.QPushButton(self.template_frame)
+        self.support_button.setObjectName("support_button")
+        self.button_gridLayout.addWidget(self.support_button, 0, 0, 1, 1)
+        self.button_blank = QtWidgets.QLabel(self.template_frame)
+        self.button_gridLayout.addWidget(self.button_blank, 0, 1, 1, 1)
+        if self.title == '查看':
+            self.button_blank2 = QtWidgets.QLabel(self.template_frame)
+            self.button_gridLayout.addWidget(self.button_blank2, 0, 2, 1, 1)
+        else:
+            self.save_button = QtWidgets.QPushButton(self.template_frame)
+            self.save_button.setObjectName("save_button")
+            self.button_gridLayout.addWidget(self.save_button, 0, 2, 1, 1)
+        self.quit_button = QtWidgets.QPushButton(self.template_frame)
+        self.quit_button.setObjectName("quit_button")
+        self.quit_button.clicked.connect(self.close)
+        self.button_gridLayout.addWidget(self.quit_button, 0, 3, 1, 1)
+
+        self.verticalLayout_2.addLayout(self.button_gridLayout)
         self.verticalLayout.addWidget(self.template_frame)
         self.retranslateUi()
         self.template_tab_widget.setCurrentIndex(0)
-        self.setStyleSheet("""#template_title{
-            font-size:20px;
-            font-family:楷体;
-            font-weight:500;
-            /*文字居中*/
-            qproperty-alignment:AlignHCenter;
-        }""")
 
     def set_up_show_tab(self, tab, tab_name):
         self.verticalLayout_scroll = QtWidgets.QHBoxLayout(tab)
@@ -86,7 +101,6 @@ class TemplateDialog(QtWidgets.QDialog):
         self.text_browser.setObjectName("text_browser")
         # 以纯文本形式显示
         self.text_browser.setPlainText(eval(f'self.template.{tab_name}'))
-        self.verticalLayout_scroll.addWidget(self.set_up_line_number(tab, self.text_browser.document().lineCount()))
         self.verticalLayout_scroll.addWidget(self.text_browser)
 
     def set_up_edit_tab(self, tab, tab_name):
@@ -96,20 +110,7 @@ class TemplateDialog(QtWidgets.QDialog):
         self.text_edit.setObjectName("text_edit")
         # 以纯文本形式显示
         self.text_edit.setPlainText(eval(f'self.template.{tab_name}'))
-        self.verticalLayout_scroll.addWidget(self.set_up_line_number(tab, self.text_edit.document().lineCount()))
         self.verticalLayout_scroll.addWidget(self.text_edit)
-
-    def set_up_line_number(self, parent, line_count):
-        # 限制标签的大小
-        num_cut = QtWidgets.QLabel(parent)
-        num_cut.setFixedWidth(30)
-        num_cut.setStyleSheet('background-color:royalblue')
-        num = QtWidgets.QLabel(num_cut)
-        # 生成行号序列
-        line_nums = '\n'.join([str(i) for i in range(1, line_count + 1)])
-        num.setText(line_nums)
-        num.adjustSize()
-        return num_cut
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -118,14 +119,9 @@ class TemplateDialog(QtWidgets.QDialog):
         self.template_name_label.setText(_translate("Dialog", "模板名称"))
         self.template_name.setText(_translate("Dialog", self.template.tp_name))
         self.template_content_label.setText(_translate("Dialog", "模板内容"))
+        self.support_button.setText("帮助信息")
+        if self.title != '查看':
+            self.save_button.setText("保存")
+        self.quit_button.setText("退出")
 
 
-if __name__ == '__main__':
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    t = TemplateSqlite().get_using_template()
-    r = QRect(0, 0, 1152, 810)
-    new_t = Template()
-    ui = TemplateDialog("新建", r, t)
-    ui.show()
-    sys.exit(app.exec_())

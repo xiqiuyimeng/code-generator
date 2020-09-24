@@ -323,6 +323,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def template_setting(self):
         self.templates_dialog = TemplatesDialog(self.screen_rect)
-        self.templates_dialog.exec()
+        self.templates_dialog.show()
 
 

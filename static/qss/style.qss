@@ -48,6 +48,14 @@ QToolTip{
     /*文字居中*/
     qproperty-alignment:AlignHCenter;
 }
+/*模板标题*/
+#template_title{
+    font-size:20px;
+    font-family:楷体;
+    font-weight:500;
+    /*文字居中*/
+    qproperty-alignment:AlignHCenter;
+}
 /*标签字体样式*/
 QLabel{
     font-size:18px;
@@ -102,6 +110,12 @@ QLineEdit:disabled{
     border-radius:25px;
     border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
 }
+/*模板页背景*/
+#template_frame{
+    border-style:solid;
+    border-radius:25px;
+    border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
+}
 /*标签页字体*/
 QTabWidget{
     font-size:18px;
@@ -116,6 +130,11 @@ QTabWidget:pane{
 /*标签页的页签样式*/
 QTabWidget:tab-bar{
     subcontrol-position:center;
+    background:transparent;
+}
+/*模板页的tab标签在左侧，需要调整位置*/
+#template_tab_widget:tab-bar{
+    subcontrol-position:left;
     background:transparent;
 }
 /*mybatis、spring、关于界面滚动条区域*/
@@ -149,6 +168,30 @@ QScrollBar::handle:vertical:hover {
 }
 /*滚动条末端箭头按钮隐藏*/
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical{
+    border: none;
+    background: none;
+}
+/*滚动条背景色透明，需要同时设置add-page sub-page*/
+QScrollBar:horizontal {
+    /*设置滑块宽度*/
+    height: 14px;
+    background: transparent;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: transparent;
+}
+/*滚动条上的滑块设置*/
+QScrollBar::handle:horizontal {
+    border-radius: 7px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 60),stop:1 rgba(65, 105, 225, 60));
+}
+/*滚动条鼠标悬浮，颜色加深*/
+QScrollBar::handle:horizontal:hover {
+    border-radius: 7px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(100, 100, 100, 100),stop:1 rgba(0, 0, 128, 100));
+}
+/*滚动条末端箭头按钮隐藏*/
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
     border: none;
     background: none;
 }
@@ -277,6 +320,14 @@ QPushButton:disabled{
 }
 QTextBrowser{
     border-style: groove;
+    background: transparent;
+    font-size:18px;
+    font-family:楷体;
+}
+QPlainTextEdit{
+    border-style: solid;
+    border-width: 1px;
+    border-left-width: 0;
     background: transparent;
     font-size:18px;
     font-family:楷体;
