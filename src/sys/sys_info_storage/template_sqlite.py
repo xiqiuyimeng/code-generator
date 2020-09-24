@@ -127,9 +127,9 @@ class TemplateSqlite(SqliteBasic):
         self.cursor.execute(sql, (tp_name + '%', ))
         return self.cursor.fetchone()
 
-    def get_template(self, tp_id):
-        sql = template_sql.get('select') + f' where id = {tp_id}'
-        self.cursor.execute(sql)
+    def get_template(self, tp_name):
+        sql = template_sql.get('select') + f' where tp_name = ?'
+        self.cursor.execute(sql, (tp_name, ))
         return self.cursor.fetchone()
 
     def get_using_template(self):

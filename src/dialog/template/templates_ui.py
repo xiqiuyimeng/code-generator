@@ -16,10 +16,11 @@ from src.constant.constant import TEMPLATE_TABLE_HEADER_LABELS, COPY_ACTION, DEL
     ADD_TEMPLATE, BATCH_COPY_TEMPLATE, BATCH_DEL_TEMPLATE, TEMPLATE_QUIT, USE_TEMPLATE_CELL, CAT_TEMPLATE_CELL, \
     EDIT_TEMPLATE_CELL, COPY_TEMPLATE_CELL, DEL_TEMPLATE_CELL, QUIT_QUESTION
 from src.dialog.draggable_dialog import DraggableDialog
+from src.dialog.template.template_ui import TemplateDialog
 from src.func.operate_template_thread import OperateTemplate
 from src.little_widget.message_box import pop_question
 from src.scrollable_widget.scrollable_widget import MyTableWidget
-from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
+from src.sys.sys_info_storage.template_sqlite import TemplateSqlite, Template
 from src.table.table_header import CheckBoxHeader
 from src.table.table_item import MyTableWidgetItem
 
@@ -91,6 +92,7 @@ class TemplatesDialog(DraggableDialog):
         self.main_layout.addWidget(self.table_frame)
 
         # 事件
+        self.add_template.clicked.connect(self.add_template_func)
         self.batch_copy.clicked.connect(self.batch_copy_templates)
         self.batch_delete.clicked.connect(self.batch_delete_templates)
         self.quit_button.clicked.connect(self.quit)
@@ -237,10 +239,14 @@ class TemplatesDialog(DraggableDialog):
             ))
 
     def cat_action(self, row, tp_name):
-        print(row, CAT_TEMPLATE_CELL)
+        template = TemplateSqlite().get_template(tp_name)
+        exec(f'self.cat_ui_{row} = TemplateDialog("查看", self.main_screen_rect, template)')
+        exec(f'self.cat_ui_{row}.show()')
 
     def edit_action(self, row, tp_name):
-        print(row, EDIT_TEMPLATE_CELL)
+        template = TemplateSqlite().get_template(tp_name)
+        exec(f'self.edit_ui_{row} = TemplateDialog("编辑", self.main_screen_rect, template)')
+        exec(f'self.edit_ui_{row}.show()')
 
     def copy_action(self, row, tp_name):
         """复制模板，具体实现为批量复制方法"""
@@ -264,3 +270,8 @@ class TemplatesDialog(DraggableDialog):
                 self.close()
         else:
             self.close()
+
+    def add_template_func(self):
+        new_template = Template(*((None, ) * len(Template._fields)))
+        self.add_ui = TemplateDialog("新建", self.main_screen_rect, new_template)
+        self.add_ui.show()

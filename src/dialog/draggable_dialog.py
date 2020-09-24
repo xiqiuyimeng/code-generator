@@ -19,12 +19,13 @@ class DraggableDialog(QDialog):
             self.window_start_pos = self.frameGeometry().topLeft()
 
     def mouseMoveEvent(self, event):
-        if self.is_moving:
+        if hasattr(self, "is_moving") and self.is_moving:
             # 移动距离 = 移动后的鼠标位置坐标 - 初始（类型都是QPoint，是可以直接做运算，窗口处同理）
             move_distance = event.globalPos() - self.mouse_start_pos
             # 将窗口也移动
             self.move(self.window_start_pos + move_distance)
 
     def mouseReleaseEvent(self, event):
-        # 鼠标按键松开，恢复标志位
-        self.is_moving = False
+        if hasattr(self, "is_moving"):
+            # 鼠标按键松开，恢复标志位
+            self.is_moving = False
