@@ -15,6 +15,9 @@ _date_ = '2020/6/15 17:20'
 
 
 if __name__ == "__main__":
+    with open("static/template/java.txt", "r", encoding="utf-8")as f:
+        data = f.read()
+        print()
     app = QtWidgets.QApplication(sys.argv)
     splash = QtWidgets.QSplashScreen(
         QtGui.QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -23,8 +26,11 @@ if __name__ == "__main__":
     # 显示启动界面
     splash.show()
     QtWidgets.qApp.processEvents()
-    # 初始化模板文件
-    TemplateSqlite().init_template(read_template())
+    template = TemplateSqlite().get_templates(tp_type=0)
+    # 如果默认模板不存在，则初始化
+    if not template:
+        # 初始化模板文件
+        TemplateSqlite().init_template(read_template())
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())

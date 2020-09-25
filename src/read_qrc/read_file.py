@@ -15,7 +15,8 @@ templates = [':/template/java.txt', ':/template/mapper.txt', ':/template/xml.txt
 
 def read_file(file_path):
     file = QFile(file_path)
-    file.open(QIODevice.ReadOnly)
+    # 确定是读取文本文件，并且自动把换行符修改为 '\n'
+    file.open(QIODevice.ReadOnly | QIODevice.Text)
     content = QTextStream(file).readAll()
     file.close()
     return content

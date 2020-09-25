@@ -8,13 +8,18 @@
 
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
+from src.little_widget.message_box import pop_fail
 from src.scrollable_widget.scrollable_widget import MyTextBrowser, MyTextEdit
+from src.sys.sys_info_storage.template_sqlite import Template, TemplateSqlite
 
 
 class TemplateDialog(DraggableDialog):
+
+    result = pyqtSignal(str)
 
     def __init__(self, title, screen_rect, template=None):
         super().__init__()
@@ -82,9 +87,12 @@ class TemplateDialog(DraggableDialog):
         else:
             self.save_button = QtWidgets.QPushButton(self.template_frame)
             self.save_button.setObjectName("save_button")
+            # 保存
+            self.save_button.clicked.connect(self.save_func)
             self.button_gridLayout.addWidget(self.save_button, 0, 2, 1, 1)
         self.quit_button = QtWidgets.QPushButton(self.template_frame)
         self.quit_button.setObjectName("quit_button")
+        # 关闭
         self.quit_button.clicked.connect(self.close)
         self.button_gridLayout.addWidget(self.quit_button, 0, 3, 1, 1)
 
@@ -104,13 +112,13 @@ class TemplateDialog(DraggableDialog):
         self.verticalLayout_scroll.addWidget(self.text_browser)
 
     def set_up_edit_tab(self, tab, tab_name):
-        self.verticalLayout_scroll = QtWidgets.QHBoxLayout(tab)
-        self.verticalLayout_scroll.setObjectName("verticalLayout_scroll")
-        self.text_edit = MyTextEdit(tab)
-        self.text_edit.setObjectName("text_edit")
+        verticalLayout_scroll = QtWidgets.QHBoxLayout(tab)
+        verticalLayout_scroll.setObjectName("verticalLayout_scroll")
+        tab.text_edit = MyTextEdit(tab)
+        tab.text_edit.setObjectName("text_edit")
         # 以纯文本形式显示
-        self.text_edit.setPlainText(eval(f'self.template.{tab_name}'))
-        self.verticalLayout_scroll.addWidget(self.text_edit)
+        tab.text_edit.setPlainText(eval(f'self.template.{tab_name}'))
+        verticalLayout_scroll.addWidget(tab.text_edit)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -123,5 +131,39 @@ class TemplateDialog(DraggableDialog):
         if self.title != '查看':
             self.save_button.setText("保存")
         self.quit_button.setText("退出")
+
+    def save_func(self):
+        if not self.template_name.text():
+            pop_fail(self.title, "请填写模板名称")
+        else:
+            if self.title == "新建":
+                pass
+            elif self.title == "编辑":
+                changed_text = dict()
+                if self.template.tp_name != self.template_name.text():
+                    changed_text['tp_name'] = self.template_name.text()
+                for i in range(self.template_tab_widget.count()):
+                    text = self.template_tab_widget.widget(i).text_edit.toPlainText()
+                    original_text = eval(f'self.template.{self.tab_names[i]}')
+                    if text != original_text:
+                        changed_text[self.tab_names[i]] = text
+                if changed_text:
+                    try:
+                        self.edit_template(self.template_name.text(), changed_text)
+                    except Exception as e:
+                        pop_fail(self.title, e.args)
+
+    def add_new_template(self):
+        """新建模板"""
+        pass
+
+    def edit_template(self, tp_name, changed_text):
+        """编辑模板"""
+        new_template_dict = dict(zip(Template._fields, (None,) * (len(Template._fields))))
+        new_template_dict['id'] = self.template.id
+        new_template_dict.update(changed_text)
+        TemplateSqlite().update_selective(new_template_dict)
+        self.result.emit(tp_name)
+        self.close()
 
 
