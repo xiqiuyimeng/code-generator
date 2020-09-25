@@ -147,7 +147,7 @@ class TemplatesDialog(DraggableDialog):
                     self.tableWidget.setItem(i, n, tp_item)
                     n += 1
             # 最后添加按钮，在序号为7的列
-            self.tableWidget.setCellWidget(i, 7, self.make_tools(i, template.tp_name, template.is_using))
+            self.tableWidget.setCellWidget(i, 7, self.make_tools(i))
         self.tableWidget.resizeRowsToContents()
 
     def all_clicked(self, clicked):
@@ -171,6 +171,7 @@ class TemplatesDialog(DraggableDialog):
 
     def batch_copy_templates(self, selected_templates=None):
         """批量复制"""
+        # todo 有问题，会存在重名的情况，名字验证需要重新做
         already_selected = selected_templates if selected_templates else self.selected_templates
         if already_selected:
             OperateTemplate(self, COPY_ACTION, already_selected)
@@ -181,12 +182,10 @@ class TemplatesDialog(DraggableDialog):
         if already_selected:
             OperateTemplate(self, DEL_ACTION, already_selected)
 
-    def make_tools(self, row, tp_name, is_used):
+    def make_tools(self, row):
         """
         添加操作按钮
         :param row: 当前行
-        :param tp_name: 模板名称
-        :param is_used: 是否在使用，如果不在使用，需要展示使用按钮
         """
         tool_button = QToolButton(self)
         tool_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
@@ -195,9 +194,14 @@ class TemplatesDialog(DraggableDialog):
         tool_button.setText('操作')
         tool_button.setIcon(self.icon)
         tool_button.setAutoRaise(True)
+        self.pop_menu(tool_button, row)
+        return tool_button
+
+    def pop_menu(self, tool_button, row):
         menu = QMenu(self)
+        tp_name = self.tableWidget.item(row, 1).text()
         # 没有使用的模板才需要这个按钮
-        if is_used == '否':
+        if self.tableWidget.item(row, 4).text() == '否':
             use_act = QAction(self.icon, USE_TEMPLATE_CELL, self)
             use_act.triggered.connect(lambda: self.use_action(row, tp_name))
             menu.addAction(use_act)
@@ -214,7 +218,6 @@ class TemplatesDialog(DraggableDialog):
         del_act.triggered.connect(lambda: self.del_action(row, tp_name))
         menu.addAction(del_act)
         tool_button.setMenu(menu)
-        return tool_button
 
     def use_action(self, row, tp_name):
         """设为使用中"""
@@ -229,24 +232,23 @@ class TemplatesDialog(DraggableDialog):
                 old_row = i
         self.tableWidget.item(row, 4).setText('是')
         # 处理操作菜单
-        self.tableWidget.setCellWidget(row, 7, self.make_tools(
-            row, self.tableWidget.item(row, 1).text(), '是'
-        ))
+        self.rebuild_pop_menu((row, ))
         # 如果之前使用的存在，重新构建下操作菜单
         if old_row >= 0:
-            self.tableWidget.setCellWidget(old_row, 7, self.make_tools(
-                old_row, self.tableWidget.item(old_row, 1).text(), '否'
-            ))
+            self.rebuild_pop_menu((old_row, ))
 
     def cat_action(self, row, tp_name):
         template = TemplateSqlite().get_template(tp_name)
-        exec(f'self.cat_ui_{row} = TemplateDialog("查看", self.main_screen_rect, template)')
-        exec(f'self.cat_ui_{row}.show()')
+        cat_ui = TemplateDialog("查看", self.main_screen_rect, template)
+        cat_ui.show()
+        setattr(self, f'cat_ui_{row}', cat_ui)
 
     def edit_action(self, row, tp_name):
         template = TemplateSqlite().get_template(tp_name)
-        exec(f'self.edit_ui_{row} = TemplateDialog("编辑", self.main_screen_rect, template)')
-        exec(f'self.edit_ui_{row}.show()')
+        edit_ui = TemplateDialog("编辑", self.main_screen_rect, template)
+        edit_ui.result.connect(lambda new_tp_name: self.after_edit(row, new_tp_name))
+        edit_ui.show()
+        setattr(self, f'edit_ui_{row}', edit_ui)
 
     def copy_action(self, row, tp_name):
         """复制模板，具体实现为批量复制方法"""
@@ -274,4 +276,22 @@ class TemplatesDialog(DraggableDialog):
     def add_template_func(self):
         new_template = Template(*((None, ) * len(Template._fields)))
         self.add_ui = TemplateDialog("新建", self.main_screen_rect, new_template)
+        self.add_ui.result.connect(self.after_add)
         self.add_ui.show()
+
+    def after_add(self, tp_name):
+        template = TemplateSqlite().get_template(tp_name)
+        self.fill_table((template, ), self.tableWidget.rowCount())
+
+    def after_edit(self, row, tp_name):
+        template = TemplateSqlite().get_template_refresh_table(tp_name)
+        template_ = tuple(filter(lambda x: x is not None, template))
+        # 刷新表格，第一列和最后一列不需要填充
+        for col in range(self.tableWidget.columnCount() - 2):
+            self.tableWidget.item(row, col + 1).setText(template_[col])
+        # 菜单事件
+        self.rebuild_pop_menu((row, ))
+
+    def rebuild_pop_menu(self, rows):
+        [self.tableWidget.setCellWidget(row, 7, self.make_tools(row)) for row in rows]
+

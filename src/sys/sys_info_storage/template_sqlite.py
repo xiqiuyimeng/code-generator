@@ -90,6 +90,10 @@ class TemplateSqlite(SqliteBasic):
     def __init__(self):
         super().__init__(template_sql, self.conn, self.cursor)
 
+    def update_selective(self, mapping_dict):
+        mapping_dict['update_time'] = round(datetime.now().timestamp())
+        super().update_selective(Template(**mapping_dict))
+
     def get_templates(self, tp_type=None):
         sql = template_sql.get('select_templates')
         if tp_type is not None:
@@ -98,21 +102,19 @@ class TemplateSqlite(SqliteBasic):
         return self.cursor.fetchall()
 
     def init_template(self, template_dict):
-        """初始化模板，如果默认模板不存在，则初始化"""
-        template = self.get_templates(tp_type=0)
-        if not template:
-            using_template = self.get_using_template()
-            template_dict['id'] = None
-            template_dict['tp_name'] = '默认模板'
-            template_dict['type'] = 0
-            template_dict['use_times'] = 0
-            template_dict['is_using'] = 1 if not using_template else 0
-            now = round(datetime.now().timestamp())
-            # 时间以时间戳形式存储
-            template_dict['create_time'] = now
-            template_dict['update_time'] = now
-            default_template = Template(**template_dict)
-            self.insert(default_template)
+        """初始化模板"""
+        using_template = self.get_using_template()
+        template_dict['id'] = None
+        template_dict['tp_name'] = '默认模板'
+        template_dict['type'] = 0
+        template_dict['use_times'] = 0
+        template_dict['is_using'] = 1 if not using_template else 0
+        now = round(datetime.now().timestamp())
+        # 时间以时间戳形式存储
+        template_dict['create_time'] = now
+        template_dict['update_time'] = now
+        default_template = Template(**template_dict)
+        self.insert(default_template)
 
     def check_tp_name_available(self, tp_name, tp_id=None):
         sql = template_sql.get('select_name_exists')
@@ -129,6 +131,11 @@ class TemplateSqlite(SqliteBasic):
 
     def get_template(self, tp_name):
         sql = template_sql.get('select') + f' where tp_name = ?'
+        self.cursor.execute(sql, (tp_name, ))
+        return self.cursor.fetchone()
+
+    def get_template_refresh_table(self, tp_name):
+        sql = template_sql.get("select_templates") + f' where tp_name = ?'
         self.cursor.execute(sql, (tp_name, ))
         return self.cursor.fetchone()
 

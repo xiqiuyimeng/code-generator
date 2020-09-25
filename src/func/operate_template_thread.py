@@ -80,6 +80,12 @@ class OperateTemplate:
             # 删除页面行
             [self.gui.tableWidget.removeRow(row) for row in delete_rows]
             self.gui.table_header.set_header_checked(False)
+            # 最后一个是最小的行号，在这个行号以后都需要调整
+            min_row = delete_rows[-1]
+            need_update = (list(range(self.gui.tableWidget.rowCount())))[min_row:]
+            if need_update:
+                # 重新构建事件
+                self.gui.rebuild_pop_menu(need_update)
         else:
             pop_fail(DEL_TEMPLATE, result)
 
