@@ -63,12 +63,14 @@ def template_factory(cursor, row):
         else:
             data = row[i]
         result[col[0]] = data
-    # 初始化一个空的template字典
-    template_dict = Template(*((None,) * len(Template._fields)))._asdict()
-    # 将有值的部分进行更新
-    template_dict.update(result)
-    # 转化为template类型返回
-    return Template(**template_dict)
+    if set(result.keys()) <= set(Template._fields):
+        # 初始化一个空的template字典
+        template_dict = Template(*((None,) * len(Template._fields)))._asdict()
+        # 将有值的部分进行更新
+        template_dict.update(result)
+        # 转化为template类型返回
+        return Template(**template_dict)
+    return tuple(zip(result.values()))
 
 
 class TemplateSqlite(SqliteBasic):
@@ -89,6 +91,15 @@ class TemplateSqlite(SqliteBasic):
 
     def __init__(self):
         super().__init__(template_sql, self.conn, self.cursor)
+
+    def insert(self, mapping_dict):
+        now = round(datetime.now().timestamp())
+        mapping_dict['create_time'] = now
+        mapping_dict['update_time'] = now
+        mapping_dict['is_using'] = 0
+        mapping_dict['type'] = 1
+        mapping_dict['use_times'] = 0
+        super().insert(Template(**mapping_dict))
 
     def update_selective(self, mapping_dict):
         mapping_dict['update_time'] = round(datetime.now().timestamp())
@@ -113,16 +124,15 @@ class TemplateSqlite(SqliteBasic):
         # 时间以时间戳形式存储
         template_dict['create_time'] = now
         template_dict['update_time'] = now
-        default_template = Template(**template_dict)
-        self.insert(default_template)
+        self.insert(template_dict)
 
     def check_tp_name_available(self, tp_name, tp_id=None):
-        sql = template_sql.get('select_name_exists')
+        sql = template_sql.get('select_name_exist')
         if tp_id:
             sql += f' and id != {tp_id}'
         self.cursor.execute(sql, (tp_name, ))
         data = self.cursor.fetchone()
-        return data[0] == 0
+        return data[0][0] == 0
 
     def select_tp_name_max_end(self, tp_name):
         sql = template_sql.get('select_max_name_end')
@@ -156,6 +166,7 @@ class TemplateSqlite(SqliteBasic):
         return tp_name
 
     def batch_copy(self, tp_names):
+        # todo 复制有问题
         sql = template_sql.get('select') + f" where tp_name in ({', '.join('?' * len(tp_names))})"
         self.cursor.execute(sql, tp_names)
         templates = self.cursor.fetchall()
@@ -174,7 +185,7 @@ class TemplateSqlite(SqliteBasic):
             }
             template_dict = template._asdict()
             template_dict.update(new_template_dict)
-            self.insert(Template(**template_dict))
+            self.insert(template_dict)
             select_sql = template_sql.get('select_templates') + f' where tp_name = ?'
             self.cursor.execute(select_sql, (tp_name, ))
             new_templates.append(self.cursor.fetchone())

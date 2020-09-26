@@ -261,4 +261,11 @@ CAT_TEMPLATE_CELL = '查看'
 EDIT_TEMPLATE_CELL = '编辑'
 COPY_TEMPLATE_CELL = '复制'
 DEL_TEMPLATE_CELL = '删除'
+# 模板名称检查
+TP_NAME_AVAILABLE = '模板名称{}可用'
+TP_NAME_EXISTS = '当前模板名称不可用，{}已存在'
+# 模板页标题
+CAT_TEMPLATE_TITLE = '查看模板'
+EDIT_TEMPLATE_TITLE = '编辑模板'
+ADD_TEMPLATE_TITLE = '添加模板'
 

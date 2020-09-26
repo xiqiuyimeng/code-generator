@@ -9,10 +9,14 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QPixmap
 
+from src.constant.constant import TP_NAME_AVAILABLE, TP_NAME_EXISTS, CAT_TEMPLATE_TITLE, ADD_TEMPLATE_TITLE, \
+    EDIT_TEMPLATE_TITLE
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
 from src.little_widget.message_box import pop_fail
+from src.read_qrc.read_file import read_qss
 from src.scrollable_widget.scrollable_widget import MyTextBrowser, MyTextEdit
 from src.sys.sys_info_storage.template_sqlite import Template, TemplateSqlite
 
@@ -45,16 +49,26 @@ class TemplateDialog(DraggableDialog):
         self.template_title = QtWidgets.QLabel(self.template_frame)
         self.template_title.setObjectName("template_title")
         self.verticalLayout_2.addWidget(self.template_title)
+        self.name_check_splitter = QtWidgets.QSplitter(self.template_frame)
+        self.name_check_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.name_check_splitter.setObjectName("name_check_splitter")
+        self.name_check_splitter.setHandleWidth(0)
+        self.verticalLayout_2.addWidget(self.name_check_splitter)
+        self.name_check_pic = QtWidgets.QLabel(self.name_check_splitter)
+        self.name_check_pic.setObjectName("name_check_pic")
+        self.name_check_prompt = QtWidgets.QLabel(self.name_check_splitter)
+        self.name_check_prompt.setObjectName("name_check_prompt")
 
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
         self.template_name_label = QtWidgets.QLabel(self.template_frame)
         self.template_name_label.setObjectName("template_name_label")
         self.gridLayout.addWidget(self.template_name_label, 0, 0, 1, 1)
-        if self.title == '查看':
+        if self.title == CAT_TEMPLATE_TITLE:
             self.template_name = QtWidgets.QLabel(self.template_frame)
         else:
             self.template_name = QtWidgets.QLineEdit(self.template_frame)
+            self.template_name.textEdited.connect(self.check_name_available)
         self.template_name.setObjectName("template_name")
         self.gridLayout.addWidget(self.template_name, 0, 1, 1, 1)
         self.template_content_label = QtWidgets.QLabel(self.template_frame)
@@ -63,13 +77,14 @@ class TemplateDialog(DraggableDialog):
         self.template_tab_widget = TabWidget(self.template_frame)
         self.template_tab_widget.setObjectName("template_tab_widget")
         for tab_name in self.tab_names:
-            exec(f'self.{tab_name} = QtWidgets.QWidget()')
-            exec(f'self.{tab_name}.setObjectName("{tab_name}")')
-            if self.title == '查看':
-                exec(f'self.set_up_show_tab(self.{tab_name}, "{tab_name}")')
+            tab = QtWidgets.QWidget()
+            tab.setObjectName(f"{tab_name}")
+            setattr(self, f"self.{tab_name}", tab)
+            if self.title == CAT_TEMPLATE_TITLE:
+                self.set_up_show_tab(tab, tab_name)
             else:
-                exec(f'self.set_up_edit_tab(self.{tab_name}, "{tab_name}")')
-            exec(f'self.template_tab_widget.addTab(self.{tab_name}, "{tab_name[:-3]}")')
+                self.set_up_edit_tab(tab, tab_name)
+            self.template_tab_widget.addTab(tab, tab_name[:-3])
         self.gridLayout.addWidget(self.template_tab_widget, 2, 0, 1, 2)
 
         self.verticalLayout_2.addLayout(self.gridLayout)
@@ -81,7 +96,7 @@ class TemplateDialog(DraggableDialog):
         self.button_gridLayout.addWidget(self.support_button, 0, 0, 1, 1)
         self.button_blank = QtWidgets.QLabel(self.template_frame)
         self.button_gridLayout.addWidget(self.button_blank, 0, 1, 1, 1)
-        if self.title == '查看':
+        if self.title == CAT_TEMPLATE_TITLE:
             self.button_blank2 = QtWidgets.QLabel(self.template_frame)
             self.button_gridLayout.addWidget(self.button_blank2, 0, 2, 1, 1)
         else:
@@ -128,7 +143,7 @@ class TemplateDialog(DraggableDialog):
         self.template_name.setText(_translate("Dialog", self.template.tp_name))
         self.template_content_label.setText(_translate("Dialog", "模板内容"))
         self.support_button.setText("帮助信息")
-        if self.title != '查看':
+        if self.title != CAT_TEMPLATE_TITLE:
             self.save_button.setText("保存")
         self.quit_button.setText("退出")
 
@@ -136,9 +151,12 @@ class TemplateDialog(DraggableDialog):
         if not self.template_name.text():
             pop_fail(self.title, "请填写模板名称")
         else:
-            if self.title == "新建":
-                pass
-            elif self.title == "编辑":
+            if self.title == ADD_TEMPLATE_TITLE:
+                try:
+                    self.add_new_template()
+                except Exception as e:
+                    pop_fail(self.title, e.args)
+            elif self.title == EDIT_TEMPLATE_TITLE:
                 changed_text = dict()
                 if self.template.tp_name != self.template_name.text():
                     changed_text['tp_name'] = self.template_name.text()
@@ -152,10 +170,18 @@ class TemplateDialog(DraggableDialog):
                         self.edit_template(self.template_name.text(), changed_text)
                     except Exception as e:
                         pop_fail(self.title, e.args)
+                else:
+                    self.close()
 
     def add_new_template(self):
         """新建模板"""
-        pass
+        template_dict = self.template._asdict()
+        template_dict['tp_name'] = self.template_name.text()
+        for i in range(self.template_tab_widget.count()):
+            template_dict[self.tab_names[i]] = self.template_tab_widget.widget(i).text_edit.toPlainText()
+        TemplateSqlite().insert(template_dict)
+        self.result.emit(template_dict.get('tp_name'))
+        self.close()
 
     def edit_template(self, tp_name, changed_text):
         """编辑模板"""
@@ -165,5 +191,32 @@ class TemplateDialog(DraggableDialog):
         TemplateSqlite().update_selective(new_template_dict)
         self.result.emit(tp_name)
         self.close()
+
+    def check_name_available(self, tp_name):
+        """检查名称是否可用"""
+        label_height = self.template_name.geometry().height()
+        self.name_check_pic.setFixedWidth(label_height)
+        if tp_name:
+            name_available = TemplateSqlite().check_tp_name_available(tp_name, self.template.id)
+            if name_available:
+                prompt = TP_NAME_AVAILABLE.format(tp_name)
+                style = "color:green"
+                # 重载样式表
+                self.template_name.setStyleSheet(read_qss())
+                pm = QPixmap(":/icon/right.png").scaled(label_height * 0.6,
+                                                        label_height * 0.6,
+                                                        QtCore.Qt.IgnoreAspectRatio,
+                                                        QtCore.Qt.SmoothTransformation)
+            else:
+                prompt = TP_NAME_EXISTS.format(tp_name)
+                style = "color:red"
+                self.template_name.setStyleSheet("#template_name{border-color:red;color:red}")
+                pm = QPixmap(":/icon/wrong.png").scaled(label_height * 0.6,
+                                                        label_height * 0.6,
+                                                        QtCore.Qt.IgnoreAspectRatio,
+                                                        QtCore.Qt.SmoothTransformation)
+            self.name_check_pic.setPixmap(pm)
+            self.name_check_prompt.setStyleSheet(style)
+            self.name_check_prompt.setText(prompt)
 
 

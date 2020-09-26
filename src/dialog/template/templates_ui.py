@@ -14,7 +14,8 @@ from PyQt5.QtWidgets import QToolButton, QMenu, QAction
 
 from src.constant.constant import TEMPLATE_TABLE_HEADER_LABELS, COPY_ACTION, DEL_ACTION, TEMPLATE_LIST_HEADER, \
     ADD_TEMPLATE, BATCH_COPY_TEMPLATE, BATCH_DEL_TEMPLATE, TEMPLATE_QUIT, USE_TEMPLATE_CELL, CAT_TEMPLATE_CELL, \
-    EDIT_TEMPLATE_CELL, COPY_TEMPLATE_CELL, DEL_TEMPLATE_CELL, QUIT_QUESTION
+    EDIT_TEMPLATE_CELL, COPY_TEMPLATE_CELL, DEL_TEMPLATE_CELL, QUIT_QUESTION, CAT_TEMPLATE_TITLE, EDIT_TEMPLATE_TITLE, \
+    ADD_TEMPLATE_TITLE
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.template_ui import TemplateDialog
 from src.func.operate_template_thread import OperateTemplate
@@ -239,13 +240,13 @@ class TemplatesDialog(DraggableDialog):
 
     def cat_action(self, row, tp_name):
         template = TemplateSqlite().get_template(tp_name)
-        cat_ui = TemplateDialog("查看", self.main_screen_rect, template)
+        cat_ui = TemplateDialog(CAT_TEMPLATE_TITLE, self.main_screen_rect, template)
         cat_ui.show()
         setattr(self, f'cat_ui_{row}', cat_ui)
 
     def edit_action(self, row, tp_name):
         template = TemplateSqlite().get_template(tp_name)
-        edit_ui = TemplateDialog("编辑", self.main_screen_rect, template)
+        edit_ui = TemplateDialog(EDIT_TEMPLATE_TITLE, self.main_screen_rect, template)
         edit_ui.result.connect(lambda new_tp_name: self.after_edit(row, new_tp_name))
         edit_ui.show()
         setattr(self, f'edit_ui_{row}', edit_ui)
@@ -275,12 +276,12 @@ class TemplatesDialog(DraggableDialog):
 
     def add_template_func(self):
         new_template = Template(*((None, ) * len(Template._fields)))
-        self.add_ui = TemplateDialog("新建", self.main_screen_rect, new_template)
+        self.add_ui = TemplateDialog(ADD_TEMPLATE_TITLE, self.main_screen_rect, new_template)
         self.add_ui.result.connect(self.after_add)
         self.add_ui.show()
 
     def after_add(self, tp_name):
-        template = TemplateSqlite().get_template(tp_name)
+        template = TemplateSqlite().get_template_refresh_table(tp_name)
         self.fill_table((template, ), self.tableWidget.rowCount())
 
     def after_edit(self, row, tp_name):
