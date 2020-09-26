@@ -84,6 +84,7 @@ class OperateTemplate:
             min_row = delete_rows[-1]
             need_update = (list(range(self.gui.tableWidget.rowCount())))[min_row:]
             if need_update:
+                [self.gui.tableWidget.item(row, 0).setText(row + 1) for row in need_update]
                 # 重新构建事件
                 self.gui.rebuild_pop_menu(need_update)
         else:
