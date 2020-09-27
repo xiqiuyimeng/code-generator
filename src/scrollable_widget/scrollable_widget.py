@@ -56,7 +56,9 @@ class MyTreeWidget(QTreeWidget, MyScrollableWidget):
                               self.style().pixelMetric(QStyle.PM_IndicatorWidth),
                               view_rect.height())
         # 如果点击位置在复选框范围内
-        if checkbox_rect.contains(event.pos()):
+        # todo 暂时以第一列和当前行组成的矩形为限，判断是否点击，因为后面判断值改变时，只要确定点击即可，
+        #  当前范围内只有复选框会存在点击值改变，故可以暂时这样用，实际应计算出复选框大小矩形，但是复选框的左上角xy无法计算
+        if view_rect.contains(event.pos()):
             # 标志项置为True
             self.checkbox_clicked = True
         super().mousePressEvent(event)
@@ -89,10 +91,9 @@ class MyTableWidget(QTableWidget, MyScrollableWidget):
                                   view_rect.y(),
                                   self.style().pixelMetric(QStyle.PM_IndicatorWidth),
                                   view_rect.height())
-            print(checkbox_rect)
-            print(event.pos())
-            print(checkbox_rect.contains(event.pos()))
-            if checkbox_rect.contains(event.pos()):
+            # todo 暂时以第一列和当前行组成的矩形为限，判断是否点击，因为后面判断值改变时，只要确定点击即可，
+            #  当前范围内只有复选框会存在点击值改变，故可以暂时这样用，实际应计算出复选框大小矩形，但是复选框的左上角xy无法计算
+            if view_rect.contains(event.pos()):
                 # 标志项置为True
                 self.checkbox_clicked = True
         super().mousePressEvent(event)

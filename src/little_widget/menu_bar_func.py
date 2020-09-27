@@ -50,7 +50,7 @@ def exit_app_menu(gui):
     exit_action = QtWidgets.QAction(QtGui.QIcon(':/icon/exit.png'), EXIT_MENU, gui)
     exit_action.setShortcut('Ctrl+Q')
     exit_action.setStatusTip('退出应用程序')
-    exit_action.triggered.connect(gui.close)
+    exit_action.triggered.connect(gui.quit)
 
     gui.file_menu.addAction(exit_action)
 

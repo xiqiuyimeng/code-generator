@@ -63,7 +63,7 @@ def add_template_tool(gui):
 def add_exit_tool(gui):
     exit_tool = QAction(QIcon(':/icon/exit.png'), '退出程序', gui)
     exit_tool.setStatusTip('退出应用程序')
-    exit_tool.triggered.connect(gui.close)
+    exit_tool.triggered.connect(gui.quit)
     gui.toolBar.addSeparator()
     gui.toolBar.addAction(exit_tool)
 
