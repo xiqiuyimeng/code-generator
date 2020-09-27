@@ -155,7 +155,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.retranslateUi()
 
     def retranslateUi(self):
-        self.setWindowTitle(self._translate("MainWindow", "MainWindow"))
+        # 设置任务栏缩略图名称
+        self.setWindowTitle(self._translate("MainWindow", "代码生成器"))
         __sortingEnabled = self.treeWidget.isSortingEnabled()
         self.treeWidget.setSortingEnabled(False)
         self.treeWidget.setSortingEnabled(__sortingEnabled)
@@ -324,5 +325,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def template_setting(self):
         self.templates_dialog = TemplatesDialog(self.screen_rect)
         self.templates_dialog.show()
+
+    def quit(self):
+        if hasattr(self, 'templates_dialog'):
+            self.templates_dialog.close()
+        self.close()
 
 

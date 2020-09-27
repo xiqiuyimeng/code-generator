@@ -268,4 +268,57 @@ TP_NAME_EXISTS = '当前模板名称不可用，{}已存在'
 CAT_TEMPLATE_TITLE = '查看模板'
 EDIT_TEMPLATE_TITLE = '编辑模板'
 ADD_TEMPLATE_TITLE = '添加模板'
-
+"""模板帮助信息页"""
+# java
+JAVA_TP_DESC = "model_package: java实体类所在包的命名空间，例如: com.demo.model\n" \
+               "import_list: 需要声明引入的语句，当前仅有: import java.util.Date;\n" \
+               "lombok: 是否开启lombok注解，若开启实体类不会存在getter和setter方法，而是@Data注解\n" \
+               "cls_name: 类名，例如: User\n" \
+               "java_list: 顾名思义，数据结构为列表，列元素属性: \n" \
+               "\tname: java字段名，驼峰形式\n" \
+               "\tjava_type: 数据库字段在java中对应的字段类型，例如 varchar -> String\n" \
+               "\tcomment: 字段注释内容\n"
+MAPPER_TP_DESC = "mapper_package: mapper接口文件所在包的命名空间，例如: com.demo.dao\n" \
+                 "model_namespace: java实体类文件在项目中的命名空间，例如: com.demo.model.User\n" \
+                 "cls_name: 类名，例如: User\n" \
+                 "param: 删除、查询时传入的数据类型，若是多个主键，类型应为实体类型，否则为主键类型\n" \
+                 "key: 和上述param对应，多个主键，key为实体类驼峰形式名字，否则为主键名称\n" \
+                 "hump_cls_name: 驼峰形式的类名，例如: user\n" \
+                 "need_update: 布尔类型，是否需要生成更新语句（update）\n"
+XML_TP_DESC = "mapper_namespace: mapper接口文件在项目中的命名空间，例如: com.demo.dao.UserMapper\n" \
+              "model_namespace: java实体类文件在项目中的命名空间，例如: com.demo.model.User\n" \
+              "result_map: 列表类型，列表元素属性:\n" \
+              "\tcolumn_name: 字段名\n" \
+              "\tname: 字段名的驼峰形式\n" \
+              "\tjdbc_type: xml文件中的jdbc_type，例如 integer -> INTEGER\n" \
+              "any_column: 可执行sql\n" \
+              "columns: 字段名列表\n" \
+              "mapper: 布尔类型，是否生成mapper接口文件，如果指定列或者使用可执行sql将不生成mapper接口，继而会取消xml中的一部分代码生成\n" \
+              "java_type: 若是多个主键，类型应为实体类型，否则为主键类型，与mapper接口中的param对应\n" \
+              "table_name: 数据库表名\n" \
+              "params: 列表类型，元素为主键信息: \n" \
+              "\tname: java字段名，驼峰形式\n" \
+              "\tcolumn_name: 数据库字段名\n" \
+              "\tjdbc_type: xml文件中的jdbc_type，例如 integer -> INTEGER\n" \
+              "update_columns: 更新时需要set值的列名（即从所有列中删除主键的部分）\n" \
+              "cls_name: 类名，例如: User\n"
+SERVICE_TP_DESC = "service_package: service接口文件所在包的命名空间，例如: com.demo.service\n" \
+                  "model_namespace: java实体类文件在项目中的命名空间，例如: com.demo.model.User\n" \
+                  "cls_name: 类名，例如: User\n" \
+                  "param: 删除、查询时传入的数据类型，若是多个主键，类型应为实体类型，否则为主键类型\n" \
+                  "key: 和上述param对应，多个主键，key为实体类驼峰形式名字，否则为主键名称\n"
+SERVICE_IMPL_TP_DESC = "service_impl_package: service实现类文件所在包的命名空间，例如: com.demo.service.impl\n" \
+                       "mapper_namespace: mapper接口文件在项目中的命名空间，例如: com.demo.dao.UserMapper\n" \
+                       "model_namespace: java实体类文件在项目中的命名空间，例如: com.demo.model.User\n" \
+                       "service_namespace: service接口文件在项目中的命名空间，例如: com.demo.service.UserService\n" \
+                       "cls_name: 类名，例如: User\n" \
+                       "hump_cls_name: 驼峰形式的类名，例如: user\n" \
+                       "param: 删除、查询时传入的数据类型，若是多个主键，类型应为实体类型，否则为主键类型\n" \
+                       "key: 和上述param对应，多个主键，key为实体类驼峰形式名字，否则为主键名称\n"
+CONTROLLER_TP_DESC = "controller_package: controller文件所在包的命名空间，例如: com.demo.controller\n" \
+                     "model_namespace: java实体类文件在项目中的命名空间，例如: com.demo.model.User\n" \
+                     "service_namespace: service接口文件在项目中的命名空间，例如: com.demo.service.UserService\n" \
+                     "hump_cls_name: 驼峰形式的类名，例如: user\n" \
+                     "cls_name: 类名，例如: User\n" \
+                     "param: 删除、查询时传入的数据类型，若是多个主键，类型应为实体类型，否则为主键类型\n" \
+                     "key: 和上述param对应，多个主键，key为实体类驼峰形式名字，否则为主键名称\n"

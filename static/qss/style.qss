@@ -48,8 +48,8 @@ QToolTip{
     /*文字居中*/
     qproperty-alignment:AlignHCenter;
 }
-/*模板标题*/
-#template_title{
+/*模板标题，模板帮助标题*/
+#template_title, #template_help_title{
     font-size:20px;
     font-family:楷体;
     font-weight:500;
@@ -116,6 +116,12 @@ QLineEdit:disabled{
     border-radius:25px;
     border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
 }
+/*模板帮助页背景*/
+#template_help_frame{
+    border-style:solid;
+    border-radius:25px;
+    border-image:url(:/bg_jpg/conn_dialog_bg.jpg);
+}
 /*标签页字体*/
 QTabWidget{
     font-size:18px;
@@ -134,6 +140,11 @@ QTabWidget:tab-bar{
 }
 /*模板页的tab标签在左侧，需要调整位置*/
 #template_tab_widget:tab-bar{
+    subcontrol-position:left;
+    background:transparent;
+}
+/*模板帮助页的tab标签在左侧，需要调整位置*/
+#template_help_tab_widget:tab-bar{
     subcontrol-position:left;
     background:transparent;
 }

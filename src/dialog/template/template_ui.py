@@ -15,6 +15,7 @@ from src.constant.constant import TP_NAME_AVAILABLE, TP_NAME_EXISTS, CAT_TEMPLAT
     EDIT_TEMPLATE_TITLE
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
+from src.dialog.template.template_help_ui import TemplateHelpDialog
 from src.little_widget.message_box import pop_fail
 from src.read_qrc.read_file import read_qss
 from src.scrollable_widget.scrollable_widget import MyTextBrowser, MyTextEdit
@@ -24,9 +25,13 @@ from src.sys.sys_info_storage.template_sqlite import Template, TemplateSqlite
 class TemplateDialog(DraggableDialog):
 
     result = pyqtSignal(str)
+    # 关闭信号，关闭时发送当前窗口dialog_id
+    close_signal = pyqtSignal(str)
 
-    def __init__(self, title, screen_rect, template=None):
+    def __init__(self, gui, dialog_id, title, screen_rect, template=None):
         super().__init__()
+        self.gui = gui
+        self.dialog_id = dialog_id
         self.title = title
         self.main_screen_rect = screen_rect
         self.template = template
@@ -49,15 +54,6 @@ class TemplateDialog(DraggableDialog):
         self.template_title = QtWidgets.QLabel(self.template_frame)
         self.template_title.setObjectName("template_title")
         self.verticalLayout_2.addWidget(self.template_title)
-        self.name_check_splitter = QtWidgets.QSplitter(self.template_frame)
-        self.name_check_splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.name_check_splitter.setObjectName("name_check_splitter")
-        self.name_check_splitter.setHandleWidth(0)
-        self.verticalLayout_2.addWidget(self.name_check_splitter)
-        self.name_check_pic = QtWidgets.QLabel(self.name_check_splitter)
-        self.name_check_pic.setObjectName("name_check_pic")
-        self.name_check_prompt = QtWidgets.QLabel(self.name_check_splitter)
-        self.name_check_prompt.setObjectName("name_check_prompt")
 
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
@@ -71,9 +67,21 @@ class TemplateDialog(DraggableDialog):
             self.template_name.textEdited.connect(self.check_name_available)
         self.template_name.setObjectName("template_name")
         self.gridLayout.addWidget(self.template_name, 0, 1, 1, 1)
+        self.name_check_blank = QtWidgets.QLabel(self.template_frame)
+        self.gridLayout.addWidget(self.name_check_blank, 1, 0, 1, 1)
+        self.name_check_splitter = QtWidgets.QSplitter(self.template_frame)
+        self.name_check_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.name_check_splitter.setObjectName("name_check_splitter")
+        self.name_check_splitter.setHandleWidth(0)
+        self.gridLayout.addWidget(self.name_check_splitter, 1, 1, 1, 1)
+        self.name_check_pic = QtWidgets.QLabel(self.name_check_splitter)
+        self.name_check_pic.setObjectName("name_check_pic")
+        self.name_check_prompt = QtWidgets.QLabel(self.name_check_splitter)
+        self.name_check_prompt.setObjectName("name_check_prompt")
+
         self.template_content_label = QtWidgets.QLabel(self.template_frame)
         self.template_content_label.setObjectName("template_content_label")
-        self.gridLayout.addWidget(self.template_content_label, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.template_content_label, 2, 0, 1, 1)
         self.template_tab_widget = TabWidget(self.template_frame)
         self.template_tab_widget.setObjectName("template_tab_widget")
         for tab_name in self.tab_names:
@@ -85,7 +93,7 @@ class TemplateDialog(DraggableDialog):
             else:
                 self.set_up_edit_tab(tab, tab_name)
             self.template_tab_widget.addTab(tab, tab_name[:-3])
-        self.gridLayout.addWidget(self.template_tab_widget, 2, 0, 1, 2)
+        self.gridLayout.addWidget(self.template_tab_widget, 3, 0, 1, 2)
 
         self.verticalLayout_2.addLayout(self.gridLayout)
         # 按钮区
@@ -108,8 +116,9 @@ class TemplateDialog(DraggableDialog):
         self.quit_button = QtWidgets.QPushButton(self.template_frame)
         self.quit_button.setObjectName("quit_button")
         # 关闭
-        self.quit_button.clicked.connect(self.close)
         self.button_gridLayout.addWidget(self.quit_button, 0, 3, 1, 1)
+        self.quit_button.clicked.connect(self.dialog_close)
+        self.support_button.clicked.connect(self.open_help)
 
         self.verticalLayout_2.addLayout(self.button_gridLayout)
         self.verticalLayout.addWidget(self.template_frame)
@@ -137,7 +146,7 @@ class TemplateDialog(DraggableDialog):
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.setWindowTitle(_translate("Dialog", self.title))
         self.template_title.setText(self.title)
         self.template_name_label.setText(_translate("Dialog", "模板名称"))
         self.template_name.setText(_translate("Dialog", self.template.tp_name))
@@ -171,7 +180,7 @@ class TemplateDialog(DraggableDialog):
                     except Exception as e:
                         pop_fail(self.title, e.args)
                 else:
-                    self.close()
+                    self.dialog_close()
 
     def add_new_template(self):
         """新建模板"""
@@ -181,7 +190,7 @@ class TemplateDialog(DraggableDialog):
             template_dict[self.tab_names[i]] = self.template_tab_widget.widget(i).text_edit.toPlainText()
         TemplateSqlite().insert(template_dict)
         self.result.emit(template_dict.get('tp_name'))
-        self.close()
+        self.dialog_close()
 
     def edit_template(self, tp_name, changed_text):
         """编辑模板"""
@@ -190,7 +199,7 @@ class TemplateDialog(DraggableDialog):
         new_template_dict.update(changed_text)
         TemplateSqlite().update_selective(new_template_dict)
         self.result.emit(tp_name)
-        self.close()
+        self.dialog_close()
 
     def check_name_available(self, tp_name):
         """检查名称是否可用"""
@@ -218,5 +227,27 @@ class TemplateDialog(DraggableDialog):
             self.name_check_pic.setPixmap(pm)
             self.name_check_prompt.setStyleSheet(style)
             self.name_check_prompt.setText(prompt)
+
+    def open_help(self):
+        if hasattr(self.gui, 'help'):
+            self.gui.help.switch_tab(self.template_tab_widget.currentIndex())
+        else:
+            self.gui.help = TemplateHelpDialog(self.main_screen_rect,
+                                               self.template_tab_widget.currentIndex(),
+                                               self.tab_names)
+            self.gui.help.show()
+            self.gui.opened_window.append(self.gui.help)
+            self.gui.help.close_signal.connect(lambda: self.gui.opened_window.remove(self.gui.help))
+
+    def keyPressEvent(self, event):
+        """在按esc时，执行自定义的关闭方法"""
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.dialog_close()
+        else:
+            super().keyPressEvent(event)
+
+    def dialog_close(self):
+        self.close_signal.emit(self.dialog_id)
+        self.close()
 
 

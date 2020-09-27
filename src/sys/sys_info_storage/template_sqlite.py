@@ -45,7 +45,7 @@ template_sql = {
                         'use_times, case is_using when 0 then "否" when 1 then "是" end as is_using, '
                         'create_time, update_time from template',
     'select_name_exist': 'select count(*) > 0 from template where tp_name = ?',
-    'select_max_name_end': 'select tp_name from template where tp_name like ? order by tp_name desc limit 1',
+    'select_max_name_end': 'select tp_name from template where tp_name like ? order by id desc limit 1',
     'reset_using': 'update template set is_using = 0 where is_using = 1',
     'using_template': 'update template set is_using = 1 where tp_name = ?'
 }
@@ -124,7 +124,7 @@ class TemplateSqlite(SqliteBasic):
         # 时间以时间戳形式存储
         template_dict['create_time'] = now
         template_dict['update_time'] = now
-        self.insert(template_dict)
+        super().insert(Template(**template_dict))
 
     def check_tp_name_available(self, tp_name, tp_id=None):
         sql = template_sql.get('select_name_exist')
@@ -156,32 +156,35 @@ class TemplateSqlite(SqliteBasic):
         return self.cursor.fetchone()
 
     def get_available_name(self, template):
-        # 处理名称
-        max_tp_name = self.select_tp_name_max_end(template.tp_name).tp_name
-        search = re.search(r"(?<=-copy)\d+$", max_tp_name)
+        # 首先判断当前名字是否是copy后的，如果是，去查询相似名字时需要去掉-copy后缀，
+        # 否则直接以当前名字查询相似名字
+        search = re.search(r"(?<=-copy)\d+$", template.tp_name)
+        # 假定当前模板名称为无后缀名称
+        none_suffix_name = template.tp_name
         if search:
-            tp_name = re.sub(r"(?<=-copy)\d+$", str(int(search.group()) + 1), max_tp_name)
+            # 如果能匹配到，截取出无后缀名称（去掉-copy数字）
+            none_suffix_name = template.tp_name[: search.span()[0] - 5]
+        # 在数据库中查询后缀最大的名称
+        max_suffix_name = self.select_tp_name_max_end(none_suffix_name).tp_name
+        # 再次匹配查出的名称，若能匹配到，将后缀数字加1，否则直接加后缀
+        max_suffix_search = re.search(r"(?<=-copy)\d+$", max_suffix_name)
+        if max_suffix_search:
+            tp_name = re.sub(r"(?<=-copy)\d+$", str(int(max_suffix_search.group()) + 1), max_suffix_name)
         else:
-            tp_name = template.tp_name + "-copy1"
+            tp_name = max_suffix_name + "-copy1"
         return tp_name
 
     def batch_copy(self, tp_names):
-        # todo 复制有问题
+        # 根据名称找到需要复制的模板
         sql = template_sql.get('select') + f" where tp_name in ({', '.join('?' * len(tp_names))})"
         self.cursor.execute(sql, tp_names)
         templates = self.cursor.fetchall()
         new_templates = list()
         for template in templates:
-            now = round(datetime.now().timestamp())
             tp_name = self.get_available_name(template)
             new_template_dict = {
                 'id': None,
                 'tp_name': tp_name,
-                'type': 1,
-                'use_times': 0,
-                'is_using': 0,
-                'create_time': now,
-                'update_time': now
             }
             template_dict = template._asdict()
             template_dict.update(new_template_dict)

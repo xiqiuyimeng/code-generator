@@ -36,6 +36,8 @@ class TemplatesDialog(DraggableDialog):
         # 初始化需要使用的icon
         self.icon = QIcon(":/icon/exec.png")
         self.setup_ui()
+        # 将从属于当前窗口的子窗口记录下
+        self.opened_window = list()
 
     def setup_ui(self):
         self.setObjectName("Dialog")
@@ -105,6 +107,7 @@ class TemplatesDialog(DraggableDialog):
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("Dialog", "代码模板列表"))
         self.table_header_label.setText(TEMPLATE_LIST_HEADER)
         self.add_template.setText(ADD_TEMPLATE)
         self.batch_copy.setText(BATCH_COPY_TEMPLATE)
@@ -172,7 +175,6 @@ class TemplatesDialog(DraggableDialog):
 
     def batch_copy_templates(self, selected_templates=None):
         """批量复制"""
-        # todo 有问题，会存在重名的情况，名字验证需要重新做
         already_selected = selected_templates if selected_templates else self.selected_templates
         if already_selected:
             OperateTemplate(self, COPY_ACTION, already_selected)
@@ -239,17 +241,29 @@ class TemplatesDialog(DraggableDialog):
             self.rebuild_pop_menu((old_row, ))
 
     def cat_action(self, row, tp_name):
-        template = TemplateSqlite().get_template(tp_name)
-        cat_ui = TemplateDialog(CAT_TEMPLATE_TITLE, self.main_screen_rect, template)
-        cat_ui.show()
-        setattr(self, f'cat_ui_{row}', cat_ui)
+        # 如果窗口存在，就激活，否则新建
+        if hasattr(self, f'cat_ui_{row}'):
+            exec(f'self.cat_ui_{row}.activateWindow()')
+        else:
+            template = TemplateSqlite().get_template(tp_name)
+            cat_ui = TemplateDialog(self, f'cat_ui_{row}', CAT_TEMPLATE_TITLE, self.main_screen_rect, template)
+            self.opened_window.append(cat_ui)
+            cat_ui.close_signal.connect(lambda dialog_id: self.opened_window.remove(eval(f'self.cat_ui_{row}')))
+            cat_ui.show()
+            setattr(self, f'cat_ui_{row}', cat_ui)
 
     def edit_action(self, row, tp_name):
-        template = TemplateSqlite().get_template(tp_name)
-        edit_ui = TemplateDialog(EDIT_TEMPLATE_TITLE, self.main_screen_rect, template)
-        edit_ui.result.connect(lambda new_tp_name: self.after_edit(row, new_tp_name))
-        edit_ui.show()
-        setattr(self, f'edit_ui_{row}', edit_ui)
+        # 如果窗口存在，就激活，否则新建
+        if hasattr(self, f'edit_ui_{row}'):
+            exec(f'self.edit_ui_{row}.activateWindow()')
+        else:
+            template = TemplateSqlite().get_template(tp_name)
+            edit_ui = TemplateDialog(self, f'edit_ui_{row}', EDIT_TEMPLATE_TITLE, self.main_screen_rect, template)
+            self.opened_window.append(edit_ui)
+            edit_ui.result.connect(lambda new_tp_name: self.after_edit(row, new_tp_name))
+            edit_ui.close_signal.connect(lambda dialog_id: self.opened_window.remove(eval(f'self.edit_ui_{row}')))
+            edit_ui.show()
+            setattr(self, f'edit_ui_{row}', edit_ui)
 
     def copy_action(self, row, tp_name):
         """复制模板，具体实现为批量复制方法"""
@@ -270,15 +284,24 @@ class TemplatesDialog(DraggableDialog):
         """关闭前判断下是否存在使用中的模板，若不存在，弹窗提示"""
         if not TemplateSqlite().get_using_template():
             if pop_question('警告', QUIT_QUESTION):
-                self.close()
+                self.dialog_close()
         else:
-            self.close()
+            self.dialog_close()
+
+    def dialog_close(self):
+        [dialog.close() for dialog in self.opened_window]
+        self.close()
 
     def add_template_func(self):
-        new_template = Template(*((None, ) * len(Template._fields)))
-        self.add_ui = TemplateDialog(ADD_TEMPLATE_TITLE, self.main_screen_rect, new_template)
-        self.add_ui.result.connect(self.after_add)
-        self.add_ui.show()
+        if hasattr(self, 'add_ui'):
+            self.add_ui.activateWindow()
+        else:
+            new_template = Template(*((None, ) * len(Template._fields)))
+            self.add_ui = TemplateDialog(self, 'add_ui', ADD_TEMPLATE_TITLE, self.main_screen_rect, new_template)
+            self.opened_window.append(self.add_ui)
+            self.add_ui.result.connect(self.after_add)
+            self.add_ui.close_signal.connect(lambda dialog_id: self.opened_window.remove(self.add_ui))
+            self.add_ui.show()
 
     def after_add(self, tp_name):
         template = TemplateSqlite().get_template_refresh_table(tp_name)

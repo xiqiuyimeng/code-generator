@@ -23,7 +23,7 @@ class SpringGenerator(MybatisGenerator):
             service文件所在包命名空间，例如com.demo.service，该命名空间将被作为service文件头部的引包声明，若无则不声明包命名空间。
             由包命名空间，生成器可生成service文件的命名空间，此命名空间将用于controller中作为引包声明，若无，则不声明
         `service_impl_package`
-            service文件所在包命名空间，例如com.demo.serviceImpl，该命名空间将被作为serviceImpl文件头部的引包声明，若无则不声明。
+            service文件所在包命名空间，例如com.demo.service.impl，该命名空间将被作为serviceImpl文件头部的引包声明，若无则不声明。
         `controller_package`
             service文件所在包命名空间，例如com.demo.controller，该命名空间将被作为controller文件头部的引包声明，若无则不声明。
     """
