@@ -12,7 +12,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from src.constant.constant import TP_NAME_AVAILABLE, TP_NAME_EXISTS, CAT_TEMPLATE_TITLE, ADD_TEMPLATE_TITLE, \
-    EDIT_TEMPLATE_TITLE
+    EDIT_TEMPLATE_TITLE, NO_TP_NAME, HELP_BUTTON, SAVE, QUIT, TP_NAME, TP_CONTENT
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
 from src.dialog.template.template_help_ui import TemplateHelpDialog
@@ -148,17 +148,17 @@ class TemplateDialog(DraggableDialog):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Dialog", self.title))
         self.template_title.setText(self.title)
-        self.template_name_label.setText(_translate("Dialog", "模板名称"))
+        self.template_name_label.setText(_translate("Dialog", TP_NAME))
         self.template_name.setText(_translate("Dialog", self.template.tp_name))
-        self.template_content_label.setText(_translate("Dialog", "模板内容"))
-        self.support_button.setText("帮助信息")
+        self.template_content_label.setText(_translate("Dialog", TP_CONTENT))
+        self.support_button.setText(HELP_BUTTON)
         if self.title != CAT_TEMPLATE_TITLE:
-            self.save_button.setText("保存")
-        self.quit_button.setText("退出")
+            self.save_button.setText(SAVE)
+        self.quit_button.setText(QUIT)
 
     def save_func(self):
         if not self.template_name.text():
-            pop_fail(self.title, "请填写模板名称")
+            pop_fail(self.title, NO_TP_NAME)
         else:
             if self.title == ADD_TEMPLATE_TITLE:
                 try:

@@ -136,17 +136,55 @@ QTabWidget:pane{
 /*标签页的页签样式*/
 QTabWidget:tab-bar{
     subcontrol-position:center;
-    background:transparent;
+}
+/*标签页，用.类的形式不会影响子类*/
+.QTabBar::tab{
+    width: 150px;
+    height: 40px;
+    background: transparent;
+    font-size: 16px;
+    border-top: 1px solid #29459c;
+    border-left: 1px solid #29459c;
+    border-bottom: 1px solid #29459c;
+}
+.QTabBar::tab:last{
+    border-right: 1px solid #29459c;
+}
+.QTabBar::tab:selected{
+    border-top: 6px solid green;
+    border-bottom: none;
+    color: green;
+    font-size: 18px;
+    font-weight: 500;
+    /*自动调整高度*/
+    height: auto;
 }
 /*模板页的tab标签在左侧，需要调整位置*/
 #template_tab_widget:tab-bar{
     subcontrol-position:left;
-    background:transparent;
+}
+/*模板标签页*/
+TabBar::tab {
+	background: transparent;
+    font-size: 16px;
+    font-weight: 500;
+    border-top: 1px solid #29459c;
+    border-left: 1px solid #29459c;
+    border-right: 1px solid #29459c;
+}
+TabBar::tab:last{
+    border-bottom: 1px solid #29459c;;
+}
+/*标签选中*/
+TabBar::tab:selected{
+    border-left: 6px solid green;
+    border-right: none;
+    color: green;
+    font-size: 18px;
 }
 /*模板帮助页的tab标签在左侧，需要调整位置*/
 #template_help_tab_widget:tab-bar{
     subcontrol-position:left;
-    background:transparent;
 }
 /*mybatis、spring、关于界面滚动条区域*/
 #mybatis_scrollArea, #spring_scrollArea, #about_scrollArea, #help_scrollArea{
@@ -312,7 +350,9 @@ QPushButton:disabled{
 
 }
 /*特定label样式*/
-#lombok,#java,#java_src,#model,#mapper,#xml,#service,#service_impl,#controller,#output{
+#lombok,#java,#java_src,#model,#mapper,#xml,#service,
+#service_impl,#controller,#output,#template_help_label,
+#template_engine_label,#template_desc,#template_name_label,#template_content_label{
     font-size:18px;
     font-family:楷体;
     font-weight:500
@@ -344,9 +384,7 @@ QTextBrowser{
 }
 /*对于模板的文本编辑区域，采用和pycharm、idea代码一致的Consolas字体*/
 QPlainTextEdit{
-    border-style: solid;
-    border-width: 1px;
-    border-left-width: 0;
+    border-style: groove;
     background: transparent;
     font-size:16px;
     font-family:Consolas;

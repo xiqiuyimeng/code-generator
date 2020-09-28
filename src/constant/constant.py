@@ -264,10 +264,18 @@ DEL_TEMPLATE_CELL = '删除'
 # 模板名称检查
 TP_NAME_AVAILABLE = '模板名称{}可用'
 TP_NAME_EXISTS = '当前模板名称不可用，{}已存在'
+NO_TP_NAME = '请填写模板名称'
 # 模板页标题
 CAT_TEMPLATE_TITLE = '查看模板'
 EDIT_TEMPLATE_TITLE = '编辑模板'
 ADD_TEMPLATE_TITLE = '添加模板'
+# 模板页按钮
+HELP_BUTTON = '帮助信息'
+SAVE = '保存'
+QUIT = '退出'
+# 模板页label
+TP_NAME = '模板名称：'
+TP_CONTENT = '模板内容'
 """模板帮助信息页"""
 # java
 JAVA_TP_DESC = "model_package: java实体类所在包的命名空间，例如: com.demo.model\n" \
@@ -322,3 +330,11 @@ CONTROLLER_TP_DESC = "controller_package: controller文件所在包的命名空�
                      "cls_name: 类名，例如: User\n" \
                      "param: 删除、查询时传入的数据类型，若是多个主键，类型应为实体类型，否则为主键类型\n" \
                      "key: 和上述param对应，多个主键，key为实体类驼峰形式名字，否则为主键名称\n"
+# 模板帮助页label
+TP_HELP = '模板帮助信息'
+TP_INTRODUCE = '模板介绍：'
+TP_INFO = '\n模板共提供六个代码文件模板，分别为生成java实体类的模板文件、生成mapper接口的模板文件、生成xml的模板文件、生成service接口的模板文件、' \
+          '生成service_impl的模板文件和生成controller的模板文件。其中包括了一些生成器可提供的字段，详细请看下面标签页中关键词介绍。\n'
+TP_ENGINE = '使用的模板引擎：'
+TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引擎：http://docs.jinkan.org/docs/jinja2/'
+TP_KEY_DESC = '模板中的关键词介绍'

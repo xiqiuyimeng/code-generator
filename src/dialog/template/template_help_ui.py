@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 
 from src.constant.constant import JAVA_TP_DESC, MAPPER_TP_DESC, XML_TP_DESC, SERVICE_TP_DESC, SERVICE_IMPL_TP_DESC, \
-    CONTROLLER_TP_DESC
+    CONTROLLER_TP_DESC, QUIT, TP_HELP, TP_INTRODUCE, TP_INFO, TP_ENGINE, TP_ENGINE_INFO, TP_KEY_DESC
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
 from src.scrollable_widget.scrollable_widget import MyTextBrowser
@@ -51,6 +51,7 @@ class TemplateHelpDialog(DraggableDialog):
         self.gridLayout.addWidget(self.template_help_label, 0, 0, 1, 1)
         self.template_help_info = QtWidgets.QLabel(self.template_help_frame)
         self.template_help_info.setObjectName("template_help_info")
+        self.template_help_info.setWordWrap(True)
         self.gridLayout.addWidget(self.template_help_info, 0, 1, 1, 1)
         self.template_engine_label = QtWidgets.QLabel(self.template_help_frame)
         self.template_engine_label.setObjectName("template_engine_label")
@@ -90,13 +91,13 @@ class TemplateHelpDialog(DraggableDialog):
         self.retranslate_ui()
 
     def retranslate_ui(self):
-        self.template_help_title.setText("帮助信息")
-        self.template_help_label.setText("代码模板：")
-        self.template_help_info.setText("模板的详细信息")
-        self.template_engine_label.setText("使用的模板引擎")
-        self.template_engine.setText("jinja2引擎")
-        self.template_desc.setText("模板中字段解释")
-        self.quit_button.setText("退出")
+        self.template_help_title.setText(TP_HELP)
+        self.template_help_label.setText(TP_INTRODUCE)
+        self.template_help_info.setText(TP_INFO)
+        self.template_engine_label.setText(TP_ENGINE)
+        self.template_engine.setText(TP_ENGINE_INFO)
+        self.template_desc.setText(TP_KEY_DESC)
+        self.quit_button.setText(QUIT)
 
     def set_up_tab(self, tab, content):
         self.verticalLayout_scroll = QtWidgets.QHBoxLayout(tab)
