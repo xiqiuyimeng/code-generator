@@ -6,9 +6,7 @@ block_cipher = None
 a = Analysis(['main.py'],
              pathex=['D:\\python_workspaces\\python_tools\\mysql_generator'],
              binaries=[],
-             datas=[
-             ('D:\\python_workspaces\\python_tools\\mysql_generator\\static\\template\\*.txt', './static/template')
-             ],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],

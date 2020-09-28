@@ -15,9 +15,6 @@ _date_ = '2020/6/15 17:20'
 
 
 if __name__ == "__main__":
-    with open("static/template/java.txt", "r", encoding="utf-8")as f:
-        data = f.read()
-        print()
     app = QtWidgets.QApplication(sys.argv)
     splash = QtWidgets.QSplashScreen(
         QtGui.QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
