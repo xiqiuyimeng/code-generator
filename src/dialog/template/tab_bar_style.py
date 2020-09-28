@@ -14,6 +14,9 @@ class TabBar(QTabBar):
     def tabSizeHint(self, index):
         s = QTabBar.tabSizeHint(self, index)
         s.transpose()
+        # 设置每个tabBar中item的大小
+        s.setWidth(150)
+        s.setHeight(50)
         return s
 
     def paintEvent(self, event):
