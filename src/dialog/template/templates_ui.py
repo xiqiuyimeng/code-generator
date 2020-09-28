@@ -248,7 +248,7 @@ class TemplatesDialog(DraggableDialog):
             template = TemplateSqlite().get_template(tp_name)
             cat_ui = TemplateDialog(self, f'cat_ui_{row}', CAT_TEMPLATE_TITLE, self.main_screen_rect, template)
             self.opened_window.append(cat_ui)
-            cat_ui.close_signal.connect(lambda dialog_id: self.opened_window.remove(eval(f'self.cat_ui_{row}')))
+            cat_ui.close_signal.connect(lambda dialog_id: self.remove_opened_dialog_attr(f'cat_ui_{row}'))
             cat_ui.show()
             setattr(self, f'cat_ui_{row}', cat_ui)
 
@@ -261,7 +261,7 @@ class TemplatesDialog(DraggableDialog):
             edit_ui = TemplateDialog(self, f'edit_ui_{row}', EDIT_TEMPLATE_TITLE, self.main_screen_rect, template)
             self.opened_window.append(edit_ui)
             edit_ui.result.connect(lambda new_tp_name: self.after_edit(row, new_tp_name))
-            edit_ui.close_signal.connect(lambda dialog_id: self.opened_window.remove(eval(f'self.edit_ui_{row}')))
+            edit_ui.close_signal.connect(lambda dialog_id: self.remove_opened_dialog_attr(f'edit_ui_{row}'))
             edit_ui.show()
             setattr(self, f'edit_ui_{row}', edit_ui)
 
@@ -300,8 +300,12 @@ class TemplatesDialog(DraggableDialog):
             self.add_ui = TemplateDialog(self, 'add_ui', ADD_TEMPLATE_TITLE, self.main_screen_rect, new_template)
             self.opened_window.append(self.add_ui)
             self.add_ui.result.connect(self.after_add)
-            self.add_ui.close_signal.connect(lambda dialog_id: self.opened_window.remove(self.add_ui))
+            self.add_ui.close_signal.connect(lambda: self.remove_opened_dialog_attr('add_ui'))
             self.add_ui.show()
+
+    def remove_opened_dialog_attr(self, attr):
+        self.opened_window.remove(eval(f'self.{attr}'))
+        delattr(self, attr)
 
     def after_add(self, tp_name):
         template = TemplateSqlite().get_template_refresh_table(tp_name)
