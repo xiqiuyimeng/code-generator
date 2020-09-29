@@ -91,6 +91,7 @@ class TemplateHelpDialog(DraggableDialog):
         self.retranslate_ui()
 
     def retranslate_ui(self):
+        self.setWindowTitle(QtCore.QCoreApplication.translate("Dialog", self.title))
         self.template_help_title.setText(TP_HELP)
         self.template_help_label.setText(TP_INTRODUCE)
         self.template_help_info.setText(TP_INFO)

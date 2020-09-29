@@ -24,7 +24,7 @@ template_sql = {
     'create': '''create table if not exists template (
     id integer primary key autoincrement,
     tp_name char(50) not null,
-    java_tp blob not null,
+    java_tp text not null,
     mapper_tp text not null,
     xml_tp text not null,
     service_tp text not null,
@@ -47,7 +47,10 @@ template_sql = {
     'select_name_exist': 'select count(*) > 0 from template where tp_name = ?',
     'select_max_name_end': 'select tp_name from template where tp_name like ? order by id desc limit 1',
     'reset_using': 'update template set is_using = 0 where is_using = 1',
-    'using_template': 'update template set is_using = 1 where tp_name = ?'
+    'using_template': 'update template set is_using = 1 where tp_name = ?',
+    'add_use_times': 'update template set use_times = (SELECT use_times + 1 FROM template where is_using = 1) '
+                    'where is_using = 1',
+    'select_use_times': 'select use_times from template where is_using = 1'
 }
 
 
@@ -208,6 +211,16 @@ class TemplateSqlite(SqliteBasic):
         using_sql = template_sql.get('using_template')
         self.cursor.execute(using_sql, (tp_name, ))
         self.conn.commit()
+
+    def add_use_times(self):
+        sql = template_sql.get('add_use_times')
+        self.cursor.execute(sql)
+        self.conn.commit()
+
+    def get_use_times(self):
+        sql = template_sql.get('select_use_times')
+        self.cursor.execute(sql)
+        return self.cursor.fetchone()
 
 
 

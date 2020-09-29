@@ -157,30 +157,27 @@ class TemplateDialog(DraggableDialog):
         self.quit_button.setText(QUIT)
 
     def save_func(self):
-        if not self.template_name.text():
-            pop_fail(self.title, NO_TP_NAME)
-        else:
-            if self.title == ADD_TEMPLATE_TITLE:
-                try:
+        try:
+            if not self.template_name.text():
+                pop_fail(self.title, NO_TP_NAME)
+            else:
+                if self.title == ADD_TEMPLATE_TITLE:
                     self.add_new_template()
-                except Exception as e:
-                    pop_fail(self.title, e.args)
-            elif self.title == EDIT_TEMPLATE_TITLE:
-                changed_text = dict()
-                if self.template.tp_name != self.template_name.text():
-                    changed_text['tp_name'] = self.template_name.text()
-                for i in range(self.template_tab_widget.count()):
-                    text = self.template_tab_widget.widget(i).text_edit.toPlainText()
-                    original_text = eval(f'self.template.{self.tab_names[i]}')
-                    if text != original_text:
-                        changed_text[self.tab_names[i]] = text
-                if changed_text:
-                    try:
+                elif self.title == EDIT_TEMPLATE_TITLE:
+                    changed_text = dict()
+                    if self.template.tp_name != self.template_name.text():
+                        changed_text['tp_name'] = self.template_name.text()
+                    for i in range(self.template_tab_widget.count()):
+                        text = self.template_tab_widget.widget(i).text_edit.toPlainText()
+                        original_text = eval(f'self.template.{self.tab_names[i]}')
+                        if text != original_text:
+                            changed_text[self.tab_names[i]] = text
+                    if changed_text:
                         self.edit_template(self.template_name.text(), changed_text)
-                    except Exception as e:
-                        pop_fail(self.title, e.args)
-                else:
-                    self.dialog_close()
+                    else:
+                        self.dialog_close()
+        except Exception as e:
+            pop_fail(self.title, f'{e}')
 
     def add_new_template(self):
         """新建模板"""
@@ -237,7 +234,11 @@ class TemplateDialog(DraggableDialog):
                                                self.tab_names)
             self.gui.help.show()
             self.gui.opened_window.append(self.gui.help)
-            self.gui.help.close_signal.connect(lambda: self.gui.opened_window.remove(self.gui.help))
+            self.gui.help.close_signal.connect(self.remove_help_ui)
+
+    def remove_help_ui(self):
+        self.gui.opened_window.remove(self.gui.help)
+        delattr(self.gui, 'help')
 
     def keyPressEvent(self, event):
         """在按esc时，执行自定义的关闭方法"""

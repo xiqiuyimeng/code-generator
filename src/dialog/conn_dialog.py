@@ -165,6 +165,7 @@ class ConnDialog(DraggableDialog):
         self.retranslateUi()
 
     def retranslateUi(self):
+        self.setWindowTitle(self._translate("Dialog", self.dialog_title))
         self.title.setText(self.dialog_title)
         self.conn_name.setText("连接名：")
         self.host.setText("主机：")

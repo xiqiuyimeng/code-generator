@@ -324,11 +324,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def template_setting(self):
         self.templates_dialog = TemplatesDialog(self.screen_rect)
+        self.templates_dialog.close_signal.connect(lambda: delattr(self, 'templates_dialog'))
         self.templates_dialog.show()
 
     def quit(self):
         if hasattr(self, 'templates_dialog'):
             self.templates_dialog.close()
         self.close()
+
+    def add_template_use_times(self):
+        # 增加模板使用次数
+        TemplateSqlite().add_use_times()
+        # 如果模板列表打开，需要重新渲染表格中的使用次数
+        if hasattr(self, 'templates_dialog'):
+            self.templates_dialog.update_use_times()
 
 
