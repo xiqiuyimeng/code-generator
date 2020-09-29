@@ -80,7 +80,7 @@ def clear_spring_input(ui):
 
 def clear_current_param(ui):
     # spring tab页，清空spring页
-    if ui.template_tab_widget.currentIndex() == 1:
+    if ui.tabWidget.currentIndex() == 1:
         clear_spring_input(ui)
     else:
         # lombok置为默认的True

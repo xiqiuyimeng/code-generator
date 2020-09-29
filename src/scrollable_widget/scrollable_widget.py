@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, QRect
+from PyQt5.QtCore import pyqtSignal, QRect, Qt
 from PyQt5.QtWidgets import QAbstractScrollArea, QTreeWidget, QTableWidget, QScrollArea, QTextBrowser, \
     QTreeWidgetItem, QStyle, QPlainTextEdit
 
@@ -110,5 +110,13 @@ class MyTextBrowser(QTextBrowser, MyScrollableWidget):
 class MyTextEdit(QPlainTextEdit, MyScrollableWidget):
     
     def __init__(self, parent):
-        super(MyTextEdit, self).__init__(parent)
+        super().__init__(parent)
         self.setLineWrapMode(self.NoWrap)
+
+    def keyPressEvent(self, e):
+        # 按下tab键，设置四个空格位
+        if e.key() == Qt.Key_Tab:
+            tc = self.textCursor()
+            tc.insertText("    ")
+            return
+        return super().keyPressEvent(e)

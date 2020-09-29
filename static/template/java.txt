@@ -1,29 +1,26 @@
-﻿{% if model_package %}
+﻿{%- if model_package -%}
 package {{model_package}};
-{% endif %}
-
+{%- endif -%}
 {% if import_list %}
 {% for import in import_list %}
 {{import}}
 {% endfor %}
-{% endif %}
+{%- endif %}
 {% if lombok %}
 import lombok.Data;
 
 @Data
 {% else %}
-
-{% endif %}
+{% endif -%}
 public class {{cls_name}}{
-
-    {% for data in java_list %}
+    {% for data in java_list -%}
     {% if data.comment %}
     private {{data.java_type}} {{data.name}};  //{{data.comment}}
     {% else %}
     private {{data.java_type}} {{data.name}};
     {% endif %}
 
-    {% endfor %}
+    {%- endfor -%}
     {%- if lombok -%}
     {% else %}
     {# ---getter和setter---- #}

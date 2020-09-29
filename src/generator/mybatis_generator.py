@@ -102,7 +102,7 @@ class MybatisGenerator:
         self.table_schema = table_schema
         # 表名
         self.table_name = table_name
-        # 可选：字段名，字符串形式，逗号分隔
+        # 可选：字段名，列表形式
         self.column_name = column_name
         # 可执行的sql语句
         self.exec_sql = exec_sql
@@ -128,8 +128,7 @@ class MybatisGenerator:
             self.class_name[:1].lower(),
             1
         )
-        self.appointed_columns = True if self.column_name else False
-        self.mapper = True if not self.exec_sql and not self.appointed_columns else False
+        self.mapper = True if not self.exec_sql and not self.column_name else False
         # 从库中读取正在使用的模板信息
         self.template = TemplateSqlite().get_using_template()
         # java实体类的模板

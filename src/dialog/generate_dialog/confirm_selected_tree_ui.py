@@ -90,7 +90,7 @@ class TreeWidgetUI:
         return item
 
     def retranslateUi(self):
-        self.parent.setWindowTitle(self._translate("Dialog", "Dialog"))
+        self.parent.setWindowTitle(self._translate("Dialog", CONFIRM_TREE_HEADER_LABELS))
         self.treeWidget.headerItem().setHidden(True)
         self.tree_header_label.setText(CONFIRM_TREE_HEADER_LABELS)
         self.expand_collapse_button.setText(COLLAPSE_BUTTON)

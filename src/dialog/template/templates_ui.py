@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolButton, QMenu, QAction
 
@@ -27,6 +27,8 @@ from src.table.table_item import MyTableWidgetItem
 
 
 class TemplatesDialog(DraggableDialog):
+
+    close_signal = pyqtSignal()
 
     def __init__(self, screen_rect):
         super().__init__()
@@ -291,6 +293,7 @@ class TemplatesDialog(DraggableDialog):
     def dialog_close(self):
         [dialog.close() for dialog in self.opened_window]
         self.close()
+        self.close_signal.emit()
 
     def add_template_func(self):
         if hasattr(self, 'add_ui'):
@@ -323,3 +326,11 @@ class TemplatesDialog(DraggableDialog):
     def rebuild_pop_menu(self, rows):
         [self.tableWidget.setCellWidget(row, 7, self.make_tools(row)) for row in rows]
 
+    def update_use_times(self):
+        for row in range(self.tableWidget.rowCount()):
+            if self.tableWidget.item(row, 4).text() == '是':
+                template = TemplateSqlite().get_use_times()
+                self.tableWidget.item(row, 3).setText(template.use_times)
+                break
+        # 按使用次数，降序排列
+        self.tableWidget.sortItems(3, Qt.DescendingOrder)

@@ -99,7 +99,10 @@ class GenerateResultDialog(DraggableDialog):
         if saved_count == 1:
             self.loading_mask.close()
         self.progressBar.setValue(progress_value)
-        self.log_label.setText(self._translate("Dialog", f"总文件数：{file_count}个，已生成：{saved_count}个"))
+        # 当进度条值为100时，证明已经生成已经结束，将模板使用次数加1
+        if progress_value == 100:
+            self.gui.add_template_use_times()
+        self.log_label.setText(f"总文件数：{file_count}个，已生成：{saved_count}个")
         self.textBrowser.append(msg)
 
     def handle_error(self, e):
@@ -113,6 +116,7 @@ class GenerateResultDialog(DraggableDialog):
         self.close_parent_signal.emit()
 
     def retranslateUi(self):
+        self.setWindowTitle(self._translate("Dialog", "生成结果"))
         self.label.setText("完成进度")
         self.cancel_button.setText("返回配置页")
         self.ok_button.setText("确定")

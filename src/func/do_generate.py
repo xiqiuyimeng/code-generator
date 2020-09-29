@@ -28,7 +28,7 @@ def get_params(gui, selected_data):
                     'table_name': tb_name
                 }
                 if isinstance(cols, list):
-                    current_param_dict['column_name'] = cols
+                    current_param_dict['column_name'] = list(map(lambda x: x[1], cols))
                     selected_parted_table += 1
                 params.append(current_param_dict)
     return params, selected_parted_table
@@ -53,7 +53,7 @@ def get_file_counts(params, generator_type):
     return all_file
 
 
-def mybatis_generate(param_dict, params, file_count, consumer):
+def generate(param_dict, params, file_count, consumer, generator_type):
     count = 0
     for param in params:
         param.update(param_dict)
@@ -63,23 +63,12 @@ def mybatis_generate(param_dict, params, file_count, consumer):
             "count": count
         }
         param.update(ext_dict)
-        generator = MybatisGenerator(**param)
+        if generator_type == MYBATIS_TAB_TITLE:
+            generator = MybatisGenerator(**param)
+        else:
+            generator = SpringGenerator(**param)
         generator.main()
         count = generator.count
-
-
-def spring_generate(spring_param_dict, params, file_count, consumer):
-    count = 0
-    for param in params:
-        param.update(spring_param_dict)
-        ext_dict = {
-            "consumer": consumer,
-            "file_count": file_count,
-            "count": count
-        }
-        param.update(ext_dict)
-        generator = SpringGenerator(**param)
-        generator.main()
 
 
 def dispatch_generate(gui, param_dict, selected_data, consumer):
@@ -89,7 +78,8 @@ def dispatch_generate(gui, param_dict, selected_data, consumer):
             and 'service_impl_package' in param_dict \
             and 'controller_package' in param_dict:
         file_count = get_file_counts(params, SPRING_TAB_TITLE)
-        spring_generate(param_dict, params[0], file_count, consumer)
+        generator_type = SPRING_TAB_TITLE
     else:
         file_count = get_file_counts(params, MYBATIS_TAB_TITLE)
-        mybatis_generate(param_dict, params[0], file_count, consumer)
+        generator_type = MYBATIS_TAB_TITLE
+    generate(param_dict, params[0], file_count, consumer, generator_type)

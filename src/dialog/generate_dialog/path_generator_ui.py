@@ -269,6 +269,7 @@ class PathGeneratorUI:
         """
         对界面上的文字样式控制
         """
+        self.parent.setWindowTitle(self._translate("Dialog", "指定路径生成配置"))
         self.mybatis_title.setText(MYBATIS_TITLE)
         self.mybatis_desc.setText(MYBATIS_PATH_GENERATOR_DESC)
         self.lombok.setText(IS_LOMBOK)
