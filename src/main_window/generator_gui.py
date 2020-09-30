@@ -323,9 +323,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.table_header.change_state(False)
 
     def template_setting(self):
-        self.templates_dialog = TemplatesDialog(self.screen_rect)
-        self.templates_dialog.close_signal.connect(lambda: delattr(self, 'templates_dialog'))
-        self.templates_dialog.show()
+        if hasattr(self, 'templates_dialog'):
+            self.templates_dialog.activateWindow()
+        else:
+            self.templates_dialog = TemplatesDialog(self.screen_rect)
+            self.templates_dialog.close_signal.connect(lambda: delattr(self, 'templates_dialog'))
+            self.templates_dialog.show()
 
     def quit(self):
         if hasattr(self, 'templates_dialog'):

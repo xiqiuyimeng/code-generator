@@ -332,5 +332,3 @@ class TemplatesDialog(DraggableDialog):
                 template = TemplateSqlite().get_use_times()
                 self.tableWidget.item(row, 3).setText(template.use_times)
                 break
-        # 按使用次数，降序排列
-        self.tableWidget.sortItems(3, Qt.DescendingOrder)
