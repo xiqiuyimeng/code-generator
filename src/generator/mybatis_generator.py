@@ -337,17 +337,10 @@ class MybatisGenerator:
          for param in params if param.column_name == result.column_name]
 
     def generate_base_col(self, columns):
-        col, i = 0, 1
         for line in self.data:
             column_name, base_column = line[0], line[0] + ', '
             if line == self.data[-1]:
                 base_column = column_name
-            else:
-                # 对baseColumnList进行换行处理，控制每行字符数
-                col += len(base_column)
-                if col > i * 80:
-                    i += 1
-                    base_column = column_name + ', \n\t'
             columns.append(base_column)
 
     def generate_result_map(self, result_map):
