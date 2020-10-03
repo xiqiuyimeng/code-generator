@@ -120,8 +120,8 @@ class MybatisGenerator:
         self.param = ''
         # 确认在查询语句时，传参的值，一般为主键
         self.key = ''
-        self.get_param_key()
         self.class_name = self.deal_class_name()
+        self.get_param_key()
         # 驼峰形式的类名
         self.hump_cls_name = self.class_name.replace(
             self.class_name[:1],
@@ -281,7 +281,7 @@ class MybatisGenerator:
                 import_list.add(mt.import_type.get(types[1]))
             data = Data(name, line[0], types[1], types[0], line[-1])
             java_list.append(data)
-        content = Template(self.java_tp).render(
+        content = Template(self.java_tp, trim_blocks=True, lstrip_blocks=True).render(
             cls_name=self.class_name, java_list=java_list,
             lombok=self.lombok, import_list=import_list,
             model_package=self.model_package
@@ -290,7 +290,7 @@ class MybatisGenerator:
 
     def generate_mapper(self):
         if self.mapper:
-            content = Template(self.mapper_tp).render(
+            content = Template(self.mapper_tp, trim_blocks=True, lstrip_blocks=True).render(
                 cls_name=self.class_name, param=self.param, key=self.key,
                 need_update=self.need_update, model_namespace=self.model_namespace,
                 mapper_package=self.mapper_package, hump_cls_name=self.hump_cls_name
@@ -315,10 +315,9 @@ class MybatisGenerator:
                 self.deal_column_name(primary[0]), primary[0],
                 None, self.deal_type(primary[1])[0]
             ))
-        update_columns = result_map[:]
         # 拷贝一份result_map，用以存放xml中的更新块字段数据，将其中的主键信息剔除
-        self.rm_pri(update_columns, params)
-        content = Template(self.xml_tp).render(
+        update_columns = self.rm_pri(result_map[:], params)
+        content = Template(self.xml_tp, trim_blocks=True, lstrip_blocks=True).render(
             cls_name=self.class_name, result_map=result_map, columns=columns,
             table_name=self.table_name, params=params, java_type=java_type,
             need_update=self.need_update, update_columns=update_columns,
@@ -333,8 +332,8 @@ class MybatisGenerator:
         在update的时候，set语句中不需要主键的信息，
         主键是作为唯一标识，所以需要从update的语句中删除主键的信息
         """
-        [update_columns.remove(result) for result in update_columns
-         for param in params if param.column_name == result.column_name]
+        primary_cols = set(map(lambda x: x.column_name, params))
+        return list(filter(lambda x: x.column_name not in primary_cols, update_columns))
 
     def generate_base_col(self, columns):
         for line in self.data:

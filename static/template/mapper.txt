@@ -1,6 +1,7 @@
-{%- if mapper_package -%}
+{% if mapper_package %}
 package {{mapper_package}};
 {% endif %}
+
 import {{model_namespace}};
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,11 +18,11 @@ public interface {{cls_name}}Mapper {
 
     {{cls_name}} selectByPrimaryKey({{param}} {{key}});
 
-    {% if need_update -%}
+    {% if need_update %}
     int updateByPrimaryKeySelective({{cls_name}} {{hump_cls_name}});
 
     int updateByPrimaryKey({{cls_name}} {{hump_cls_name}});
-    {%- endif %}
 
+    {% endif %}
     List<{{cls_name}}> get{{cls_name}}List();
 }
