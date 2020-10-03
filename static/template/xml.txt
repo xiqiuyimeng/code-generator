@@ -2,128 +2,123 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="{{mapper_namespace}}">
     <resultMap id="BaseResultMap" type="{{model_namespace}}">
-         {%- for result in result_map %}
+        {% for result in result_map %}
     	<result column="{{result.column_name}}" property="{{result.name}}" jdbcType="{{result.jdbc_type}}"/>
-    	{%- endfor %}
+    	{% endfor %}
     </resultMap>
-    {% if not any_column -%}
+    {% if not any_column %}
     <sql id="Base_Column_List">
-        {%- for column in columns %}
+        {% for column in columns %}
         {{column}}
-        {%- endfor %}
+        {% endfor %}
     </sql>
-  {% if mapper %}
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="{{java_type}}">
-    select
-    <include refid="Base_Column_List"/>
-    from {{table_name}}
-    where
-    {%- for param in params -%}
-    {% if params[0] == param -%}
-    {{" "~param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else %}
-    and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% endif -%}
-    {%- endfor %}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="{{java_type}}" >
-    delete from {{table_name}}
-    where {% for param in params -%}
-    {%- if params[0] == param -%}
-    {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else %}
-    and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% endif -%}
-    {%- endfor %}
-  </delete>
-  {% endif %}
-  <insert id="insert" parameterType="{{model_namespace}}" >
-    insert into {{table_name}} (
-    {%- for result in result_map -%}
-    {%- if loop.last -%}
-    {{result.column_name}}
-    {% elif loop.index % 3 == 0 -%}
-    {{result.column_name~', \n\t  '}}
-    {%- else -%}
-    {{result.column_name~', '}}
-    {%- endif %}
-    {%- endfor %}
-    )
-    values (
-    {%- for result in result_map -%}
-    {%- if loop.last -%}
-    #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}'}}
-    {% elif loop.index % 3 == 0 -%}
-    #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, \n\t  '}}
-    {%- else -%}
-    #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
-    {%- endif %}
-    {%- endfor %}
-    )
-  </insert>
-  <insert id="insertSelective" parameterType="{{model_namespace}}" >
-    insert into {{table_name}}
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-    {% for result in result_map %}
-      <if test="{{result.name}} != null" >
-        {{result.column_name}},
-      </if>
-    {% endfor %}
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-     {% for result in result_map %}
-      <if test="{{result.name}} != null" >
-        #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
-      </if>
-    {% endfor %}
-    </trim>
-  </insert>
-  {% if need_update %}
-  <update id="updateByPrimaryKey" parameterType="{{model_namespace}}" >
-    update {{table_name}}
-    set {% for update_column in update_columns %}
-    {% if loop.first -%}
-      {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
-    {% elif loop.last %}
-      {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}}
-    {% else %}
-      {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
-    {% endif %}
-    {% endfor %}
-    {%- if mapper %}
-    where {% for param in params -%}
-    {%- if params[0] == param -%}
-    {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else %}
-    and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% endif %}
-    {%- endfor %}
-    {% endif %}
-  </update>
-  <update id="updateByPrimaryKeySelective" parameterType="{{model_namespace}}" >
-    update {{table_name}}
-    <set >
-    {% for update_column in update_columns %}
-      <if test="{{update_column.name}} != null" >
-        {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}},
-      </if>
-    {% endfor %}
-    </set>
     {% if mapper %}
-    where {% for param in params -%}
-    {%- if params[0] == param -%}
-    {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-    {% else %}
-    and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="{{java_type}}">
+        select
+        <include refid="Base_Column_List"/>
+        from {{table_name}}
+        {% for param in params %}
+        {% if loop.first %}
+        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% else %}
+        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% endif %}
+        {% endfor %}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="{{java_type}}" >
+        delete from {{table_name}}
+        {% for param in params %}
+        {% if loop.first %}
+        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% else %}
+        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% endif %}
+        {% endfor %}
+    </delete>
     {% endif %}
-    {%- endfor %}
+    <insert id="insert" parameterType="{{model_namespace}}" >
+        insert into {{table_name}} (
+        {% for result in result_map %}
+        {% if loop.last %}
+        {{result.column_name}}
+        {% else %}
+        {{result.column_name~', '}}
+        {% endif %}
+        {% endfor %}
+        )
+        values (
+        {% for result in result_map %}
+        {% if loop.last %}
+        #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}'}}
+        {% else %}
+        #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
+        {% endif %}
+        {% endfor %}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="{{model_namespace}}" >
+        insert into {{table_name}}
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            {% for result in result_map %}
+            <if test="{{result.name}} != null" >
+                {{result.column_name}},
+            </if>
+            {% endfor %}
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            {% for result in result_map %}
+            <if test="{{result.name}} != null" >
+                #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
+            </if>
+            {% endfor %}
+        </trim>
+    </insert>
+    {% if need_update %}
+    <update id="updateByPrimaryKey" parameterType="{{model_namespace}}" >
+        update {{table_name}}
+        {% for update_column in update_columns %}
+        {% if loop.first %}
+        set {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
+        {% elif loop.last %}
+          {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}}
+        {% else %}
+          {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
+        {% endif %}
+        {% endfor %}
+        {% if mapper %}
+        {% for param in params %}
+        {% if loop.first %}
+        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% else %}
+        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="{{model_namespace}}" >
+        update {{table_name}}
+        <set>
+        {% for update_column in update_columns %}
+            <if test="{{update_column.name}} != null" >
+                {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}},
+            </if>
+        {% endfor %}
+        </set>
+        {% if mapper %}
+        {% for param in params %}
+        {% if loop.first %}
+        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% else %}
+        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </update>
     {% endif %}
-  </update>
-  {% endif %}
-  <select id="get{{cls_name}}List" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List"/>
-    from {{table_name}}
-  </select>
-  {% endif -%}
+    <select id="get{{cls_name}}List" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from {{table_name}}
+    </select>
+    {% endif %}
 </mapper>

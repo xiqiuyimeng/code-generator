@@ -1,6 +1,7 @@
-{%- if controller_package -%}
+{% if controller_package %}
 package {{controller_package}};
 {% endif %}
+
 import {{model_namespace}};
 import {{service_namespace}};
 import org.springframework.beans.factory.annotation.Autowired;

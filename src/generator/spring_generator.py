@@ -91,14 +91,14 @@ class SpringGenerator(MybatisGenerator):
         self.controller_path = self.get_path(self.controller_package) + '/' + f'{self.class_name}Controller.java'
 
     def generate_service(self):
-        content = Template(self.service_tp).render(
+        content = Template(self.service_tp, trim_blocks=True, lstrip_blocks=True).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_package=self.service_package, param=self.param, key=self.key
         )
         self.save(self.service_path, content)
 
     def generate_service_impl(self):
-        content = Template(self.service_impl_tp).render(
+        content = Template(self.service_impl_tp, trim_blocks=True, lstrip_blocks=True).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             mapper_namespace=self.mapper_namespace, param=self.param, key=self.key,
             service_impl_package=self.service_impl_package, hump_cls_name=self.hump_cls_name,
@@ -107,7 +107,7 @@ class SpringGenerator(MybatisGenerator):
         self.save(self.service_impl_path, content)
 
     def generate_controller(self):
-        content = Template(self.controller_tp).render(
+        content = Template(self.controller_tp, trim_blocks=True, lstrip_blocks=True).render(
             cls_name=self.class_name, model_namespace=self.model_namespace,
             service_namespace=self.service_namespace, param=self.param, key=self.key,
             controller_package=self.controller_package, hump_cls_name=self.hump_cls_name

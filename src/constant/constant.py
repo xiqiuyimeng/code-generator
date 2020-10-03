@@ -292,7 +292,8 @@ MAPPER_TP_DESC = "mapper_package: mapper接口文件所在包的命名空间，�
                  "param: 删除、查询时传入的数据类型，若是多个主键，类型应为实体类型，否则为主键类型\n" \
                  "key: 和上述param对应，多个主键，key为实体类驼峰形式名字，否则为主键名称\n" \
                  "hump_cls_name: 驼峰形式的类名，例如: user\n" \
-                 "need_update: 布尔类型，是否需要生成更新语句（update）\n"
+                 "need_update: 布尔类型，是否需要生成更新语句（update），\n" \
+                 "当表中字段皆为主键时，need_update = False"
 XML_TP_DESC = "mapper_namespace: mapper接口文件在项目中的命名空间，例如: com.demo.dao.UserMapper\n" \
               "model_namespace: java实体类文件在项目中的命名空间，例如: com.demo.model.User\n" \
               "result_map: 列表类型，列表元素属性:\n" \
@@ -336,5 +337,6 @@ TP_INTRODUCE = '模板介绍：'
 TP_INFO = '\n模板共提供六个代码文件模板，分别为生成java实体类的模板文件、生成mapper接口的模板文件、生成xml的模板文件、生成service接口的模板文件、' \
           '生成service_impl的模板文件和生成controller的模板文件。其中包括了一些生成器可提供的字段，详细请看下面标签页中关键词介绍。\n'
 TP_ENGINE = '使用的模板引擎：'
-TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引擎：http://docs.jinkan.org/docs/jinja2/'
+TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引擎：http://docs.jinkan.org/docs/jinja2/，\n' \
+                 '默认已经添加trim_blocks=True, lstrip_blocks=True，去除模板本身所生成的空行。'
 TP_KEY_DESC = '模板中的关键词介绍'
