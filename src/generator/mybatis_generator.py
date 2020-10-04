@@ -5,7 +5,7 @@ from jinja2 import Template
 
 from src.constant import mysql_type as mt
 from src.constant.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH, DEFAULT_MODEL_NS, DEFAULT_MAPPER_NS, \
-    PARAM_PATH_ERROR, QUERY_SYS_TB, QUERY_TEMP_TB, CREATE_TEMP_TB, OUTPUT_PREFIX
+    PARAM_PATH_ERROR, QUERY_SYS_TB, OUTPUT_PREFIX
 from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 
 _author_ = 'luwt'
@@ -51,10 +51,6 @@ class MybatisGenerator:
             输出路径，默认为'./输出目录'，可修改
         `lombok`
             在生成java类时是否生成lombok的@Data注释，默认true，若配置为false则生成getter和setter方法
-        `exec_sql`
-            可执行的sql查询语句，用于多表联合查询情况，默认None，开启后将会生成相应的java类和xml，不会生成mapper.java，
-            xml中只会生成resultMap
-        优先级：exec_sql 最高，有可执行语句即按exec_sql执行，其次，必须指定表名，列名可不指定，列名指定后，按列名来执行
         `model_package`
             实体类文件所在的包命名空间，例如 com.demo.model，它将被作为实体类文件的文件头部的引包声明，若无则不声明包命名空间。
             由包命名空间，生成器可生成实体类文件的命名空间，它将被用于xml文件及mapper文件中。
@@ -86,7 +82,6 @@ class MybatisGenerator:
             column_name=None,
             output_path=DEFAULT_PATH,
             lombok=True,
-            exec_sql=None,
             model_package=None,
             mapper_package=None,
             java_path=None,
@@ -104,8 +99,6 @@ class MybatisGenerator:
         self.table_name = table_name
         # 可选：字段名，列表形式
         self.column_name = column_name
-        # 可执行的sql语句
-        self.exec_sql = exec_sql
         # 查询结果为字段名，类型，约束（判断是否为主键PRI即可，应用在按主键查询更新删除等操作），自定义sql提供完整查询字段即可
         self.sql = self.get_sql()
         # 获取查询的数据
@@ -128,7 +121,7 @@ class MybatisGenerator:
             self.class_name[:1].lower(),
             1
         )
-        self.mapper = True if not self.exec_sql and not self.column_name else False
+        self.mapper = True if not self.column_name else False
         # 从库中读取正在使用的模板信息
         self.template = TemplateSqlite().get_using_template()
         # java实体类的模板
@@ -196,9 +189,7 @@ class MybatisGenerator:
         """
         sql = f'{QUERY_SYS_TB} where table_schema = "{self.table_schema}" ' \
               f'and table_name = "{self.table_name}"'
-        if self.exec_sql:
-            sql = QUERY_TEMP_TB
-        elif self.column_name:
+        if self.column_name:
             # 如果只有一个值，就不需要循环了
             if len(self.column_name) == 1:
                 sql += f' and column_name in ("{self.column_name[0]}")'
@@ -214,21 +205,8 @@ class MybatisGenerator:
 
     def get_data(self):
         """连接数据库获取数据"""
-        # 如果存在自定义sql，那么先生成临时表
-        if self.exec_sql:
-            self.cursor.execute(f'use {self.table_schema};')
-            self.cursor.execute(f'{CREATE_TEMP_TB} {self.exec_sql};')
         self.cursor.execute(self.sql)
-        data = list(self.cursor.fetchall())
-        if self.exec_sql:
-            for ix, line in enumerate(data):
-                line = list(line)
-                # 类型标准化，临时表中查得的类型是类型加字段长度，去除长度信息
-                if line[1].find('(') > 0:
-                    type_ = line[1][0: line[1].find('(')]
-                    line[1] = type_
-                data[ix] = line
-        return data
+        return list(self.cursor.fetchall())
 
     def deal_class_name(self):
         class_name = ''
@@ -321,8 +299,8 @@ class MybatisGenerator:
             cls_name=self.class_name, result_map=result_map, columns=columns,
             table_name=self.table_name, params=params, java_type=java_type,
             need_update=self.need_update, update_columns=update_columns,
-            mapper=self.mapper, any_column=self.exec_sql,
-            model_namespace=self.model_namespace, mapper_namespace=self.mapper_namespace
+            mapper=self.mapper, model_namespace=self.model_namespace,
+            mapper_namespace=self.mapper_namespace
         )
         self.save(self.xml_output_path, content)
 
@@ -336,11 +314,7 @@ class MybatisGenerator:
         return list(filter(lambda x: x.column_name not in primary_cols, update_columns))
 
     def generate_base_col(self, columns):
-        for line in self.data:
-            column_name, base_column = line[0], line[0] + ', '
-            if line == self.data[-1]:
-                base_column = column_name
-            columns.append(base_column)
+        [columns.append(col[0]) for col in self.data]
 
     def generate_result_map(self, result_map):
         for line in self.data:
