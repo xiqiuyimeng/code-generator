@@ -3,10 +3,9 @@
 <mapper namespace="{{mapper_namespace}}">
     <resultMap id="BaseResultMap" type="{{model_namespace}}">
         {% for result in result_map %}
-    	<result column="{{result.column_name}}" property="{{result.name}}" jdbcType="{{result.jdbc_type}}"/>
-    	{% endfor %}
+        <result column="{{result.column_name}}" property="{{result.name}}" jdbcType="{{result.jdbc_type}}"/>
+        {% endfor %}
     </resultMap>
-    {% if not any_column %}
     <sql id="Base_Column_List">
         {% for column in columns %}
         {{column}}
@@ -120,5 +119,4 @@
         <include refid="Base_Column_List"/>
         from {{table_name}}
     </select>
-    {% endif %}
 </mapper>

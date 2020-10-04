@@ -12,10 +12,6 @@ QUERY_DB_SQL = 'show databases;'
 # 查询数据库中的表名sql
 QUERY_TABLES_SQL = 'show tables;'
 
-# 创建临时表sql
-CREATE_TEMP_TB = 'create temporary table tmp_table'
-# 查询临时表sql
-QUERY_TEMP_TB = 'show full fields from tmp_table'
 # 查询系统表sql
 QUERY_SYS_TB = 'select column_name, data_type, column_key, column_comment from information_schema.columns'
 # 查询系统表和列sql
@@ -300,7 +296,6 @@ XML_TP_DESC = "mapper_namespace: mapper接口文件在项目中的命名空间�
               "\tcolumn_name: 字段名\n" \
               "\tname: 字段名的驼峰形式\n" \
               "\tjdbc_type: xml文件中的jdbc_type，例如 integer -> INTEGER\n" \
-              "any_column: 可执行sql\n" \
               "columns: 字段名列表\n" \
               "mapper: 布尔类型，是否生成mapper接口文件，如果指定列或者使用可执行sql将不生成mapper接口，继而会取消xml中的一部分代码生成\n" \
               "java_type: 若是多个主键，类型应为实体类型，否则为主键类型，与mapper接口中的param对应\n" \
