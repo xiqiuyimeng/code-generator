@@ -215,11 +215,11 @@ class MainWindow(QtWidgets.QMainWindow):
             menu_names = Context(node).get_menu_names(item, self)
             [menu.addAction(QtWidgets.QAction(option, menu)) for option in menu_names]
             # 右键菜单点击事件
-            menu.triggered.connect(self.menu_slot)
+            menu.triggered.connect(self.right_menu_func)
             # 右键菜单弹出位置跟随焦点位置
             menu.exec_(QtGui.QCursor.pos())
 
-    def menu_slot(self, act):
+    def right_menu_func(self, act):
         """
         点击右键菜单选项后触发事件
         :param act: 右键菜单中的动作
