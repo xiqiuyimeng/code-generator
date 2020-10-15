@@ -65,6 +65,7 @@ class TemplateDialog(DraggableDialog):
         else:
             self.template_name = QtWidgets.QLineEdit(self.template_frame)
             self.template_name.textEdited.connect(self.check_name_available)
+            self.template_name.setMaxLength(50)
         self.template_name.setObjectName("template_name")
         self.gridLayout.addWidget(self.template_name, 0, 1, 1, 1)
         self.name_check_blank = QtWidgets.QLabel(self.template_frame)

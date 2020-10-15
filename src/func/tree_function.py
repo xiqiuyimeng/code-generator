@@ -53,11 +53,11 @@ def show_conn_dialog(gui, conn_info, title, screen_rect):
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
     :param screen_rect: 主窗口大小
     """
-    dialog = ConnDialog(conn_info, title, gui, screen_rect)
+    dialog = ConnDialog(conn_info, title, screen_rect)
     if title == ADD_CONN_MENU:
-        dialog.conn_signal.connect(add_conn_tree_item)
+        dialog.conn_signal.connect(lambda conn: add_conn_tree_item(gui, conn))
     elif title == EDIT_CONN_MENU:
-        dialog.conn_signal.connect(update_conn_tree_item)
+        dialog.conn_signal.connect(lambda conn: update_conn_tree_item(gui, conn))
     dialog.exec()
 
 

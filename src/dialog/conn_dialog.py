@@ -25,12 +25,10 @@ from src.sys.sys_info_storage.conn_sqlite import Connection, ConnSqlite
 
 class ConnDialog(DraggableDialog):
 
-    conn_signal = QtCore.pyqtSignal(object, Connection)
+    conn_signal = QtCore.pyqtSignal(Connection)
 
-    def __init__(self, connection, dialog_title, gui, screen_rect):
+    def __init__(self, connection, dialog_title, screen_rect):
         super().__init__()
-        # 只是为了维护一个主窗口对象，方便其他操作
-        self.gui_parent = gui
         self.dialog_title = dialog_title
         self.connection = connection
         self._translate = QtCore.QCoreApplication.translate
@@ -144,6 +142,11 @@ class ConnDialog(DraggableDialog):
         self.setTabOrder(self.user_value, self.passwd_value)
         # 设置端口号只能输入数字
         self.port_value.setValidator(QtGui.QIntValidator())
+        # 设置最多可输入字符数
+        self.conn_name_value.setMaxLength(50)
+        self.host_value.setMaxLength(20)
+        self.user_value.setMaxLength(20)
+        self.passwd_value.setMaxLength(30)
 
         self.conn_name_value.textEdited.connect(self.check_name_available)
         self.conn_name_value.textEdited.connect(self.check_input)
@@ -278,4 +281,4 @@ class ConnDialog(DraggableDialog):
             message_box = TimerMessageBox(self.dialog_title, SAVE_CONN_SUCCESS_PROMPT)
             message_box.exec_()
         self.close()
-        self.conn_signal.emit(self.gui_parent, new_conn)
+        self.conn_signal.emit(new_conn)
