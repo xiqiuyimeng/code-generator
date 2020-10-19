@@ -347,7 +347,8 @@ QPushButton:disabled{
     font-size:25px;
     font-family:楷体;
     font-weight:500;
-
+    /*文字居中*/
+    qproperty-alignment:AlignCenter;
 }
 /*特定label样式*/
 #lombok,#java,#java_src,#model,#mapper,#xml,#service,

@@ -55,6 +55,8 @@ class TitleBar(DragWindowWidget):
         self.title_layout.addWidget(self.restore_button)
         self.title_layout.addWidget(self.close_button)
         self.setLayout(self.title_layout)
+        # 菜单栏宽度根据实际内容来定，不占用过多空白空间
+        self.menu_bar.setFixedWidth(self.menu_bar.sizeHint().width())
 
         self.min_button.clicked.connect(self.parent.showMinimized)
         self.max_button.clicked.connect(self.max_window)
