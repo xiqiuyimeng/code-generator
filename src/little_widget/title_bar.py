@@ -54,14 +54,14 @@ class TitleBar(QWidget):
         self.title_layout.addWidget(self.close_button)
         self.setLayout(self.title_layout)
 
-        self.min_button.clicked.connect(lambda: self.parent.setWindowState(Qt.WindowMinimized))
+        self.min_button.clicked.connect(self.parent.showMinimized)
         self.max_button.clicked.connect(self.max_window)
         self.restore_button.clicked.connect(self.restore_window)
         self.close_button.clicked.connect(self.parent.close)
 
     def max_window(self):
         """窗口最大化"""
-        self.parent.setWindowState(Qt.WindowMaximized)
+        self.parent.showFullScreen()
         self.restore_button.setVisible(True)
         self.max_button.setVisible(False)
         self.parent.title_bar.setFixedWidth(self.parent.width())
