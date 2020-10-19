@@ -15,6 +15,7 @@ from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELEC
     SELECT_ALL_FIELD_MENU, WRONG_UNSET_USING_TEMPLATE
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.dialog.template.templates_ui import TemplatesDialog
+from src.draggable_widget.draggable_ancestors_widget import DragWindowToolBar
 from src.func.connection_function import close_connection
 from src.func.refresh_thread import Refresh
 from src.func.select_table_thread import AsyncSelectTable
@@ -115,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.title_bar.setFixedWidth(self.width())
 
         # 工具栏
-        self.toolBar = QtWidgets.QToolBar(self)
+        self.toolBar = DragWindowToolBar(self)
         self.toolBar.setObjectName("toolBar")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         fill_tool_bar(self)

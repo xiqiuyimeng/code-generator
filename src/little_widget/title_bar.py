@@ -1,17 +1,19 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QPushButton, QHBoxLayout, QLabel, QSizePolicy
+from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QSizePolicy
+
+from src.draggable_widget.draggable_ancestors_widget import DragWindowWidget
 
 _author_ = 'luwt'
 _date_ = '2020/8/27 17:15'
 
 
-class TitleBar(QWidget):
+class TitleBar(DragWindowWidget):
     """自定义标题栏"""
 
     def __init__(self, title_height, parent, menu_bar):
-        super().__init__()
+        super().__init__(parent)
         self.parent = parent
         # 沉浸式标题栏，和菜单栏在同一水平线
         self.menu_bar = menu_bar
@@ -72,23 +74,3 @@ class TitleBar(QWidget):
         self.restore_button.setVisible(False)
         self.max_button.setVisible(True)
         self.parent.title_bar.setFixedWidth(self.parent.width())
-
-    def mousePressEvent(self, event):
-        # 如果按下了鼠标左键，将标志位设置为true
-        if event.button() == Qt.LeftButton:
-            self.is_moving = True
-            # 记录当前鼠标位置坐标
-            self.mouse_start_pos = event.globalPos()
-            # 记录当前窗口位置坐标
-            self.window_start_pos = self.parent.frameGeometry().topLeft()
-
-    def mouseMoveEvent(self, event):
-        if self.is_moving:
-            # 移动距离 = 移动后的鼠标位置坐标 - 初始（类型都是QPoint，是可以直接做运算，窗口处同理）
-            move_distance = event.globalPos() - self.mouse_start_pos
-            # 将主窗口也移动
-            self.parent.move(self.window_start_pos + move_distance)
-
-    def mouseReleaseEvent(self, event):
-        # 鼠标按键松开，恢复标志位
-        self.is_moving = False
