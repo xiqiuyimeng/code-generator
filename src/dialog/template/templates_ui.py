@@ -43,7 +43,7 @@ class TemplatesDialog(DraggableDialog):
 
     def setup_ui(self):
         self.setObjectName("Dialog")
-        self.resize(self.main_screen_rect.width() * 0.6, self.main_screen_rect.height() * 0.6)
+        self.resize(self.main_screen_rect.width() * 0.65, self.main_screen_rect.height() * 0.6)
         # 不透明度
         self.setWindowOpacity(0.95)
         # 隐藏窗口边框
@@ -63,8 +63,6 @@ class TemplatesDialog(DraggableDialog):
         self.verticalLayout.addWidget(self.table_header_label)
         # 添加表格
         self.tableWidget = MyTableWidget(self.table_frame)
-        # 取消水平滑块
-        self.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tableWidget.setObjectName("tableWidget")
         # 表头
         self.make_header()
