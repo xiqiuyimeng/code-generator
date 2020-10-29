@@ -19,11 +19,11 @@ def get_params(gui, selected_data):
     params = list()
     for conn_name, db_dict in selected_data.items():
         conn_id = ConnSqlite().get_id_by_name(conn_name)
-        cursor = open_connection(gui, conn_id, conn_name).cursor
+        db_executor = open_connection(gui, conn_id, conn_name)
         for db_name, tb_dict in db_dict.items():
             for tb_name, cols in tb_dict.items():
                 current_param_dict = {
-                    'cursor': cursor,
+                    'db_executor': db_executor,
                     'table_schema': db_name,
                     'table_name': tb_name
                 }

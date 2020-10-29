@@ -31,8 +31,8 @@ class MybatisGenerator:
     可以配置生成多表字段联合的java类和resultMap，也可以指定某表的某些字段
         参数：
 
-        `cursor`
-            数据库连接游标，可操作数据库
+        `db_executor`
+            操作数据库的代理对象
         `table_schema`
             数据库名称，需要传
         `table_name`
@@ -72,7 +72,7 @@ class MybatisGenerator:
     """
     def __init__(
             self,
-            cursor,
+            db_executor,
             table_schema,
             table_name,
             column_name=None,
@@ -86,7 +86,7 @@ class MybatisGenerator:
             java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
             **kwargs
     ):
-        self.cursor = cursor
+        self.db_executor = db_executor
         # 库名
         self.table_schema = table_schema
         # 表名
@@ -96,7 +96,7 @@ class MybatisGenerator:
         # 查询结果为字段名，类型，约束（判断是否为主键PRI即可，应用在按主键查询更新删除等操作），自定义sql提供完整查询字段即可
         self.sql = self.get_sql()
         # 获取查询的数据
-        self.data = self.get_data()
+        self.data = self.db_executor.get_data(self.sql)
         # 主键信息
         self.primary = list(filter(lambda k: k[2] == 'PRI', self.data))
         # 是否开启lombok注解
@@ -194,11 +194,6 @@ class MybatisGenerator:
                     else:
                         sql += f'"{col_name}", '
         return sql
-
-    def get_data(self):
-        """连接数据库获取数据"""
-        self.cursor.execute(self.sql)
-        return list(self.cursor.fetchall())
 
     def deal_class_name(self):
         class_name = ''

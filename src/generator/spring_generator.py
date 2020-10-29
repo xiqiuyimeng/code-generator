@@ -30,13 +30,12 @@ class SpringGenerator(MybatisGenerator):
 
     def __init__(
             self,
-            cursor,
+            db_executor,
             table_schema,
             table_name,
             column_name=None,
             output_path=DEFAULT_PATH,
             lombok=True,
-            exec_sql=None,
             model_package=None,
             mapper_package=None,
             service_package=None,
@@ -45,26 +44,21 @@ class SpringGenerator(MybatisGenerator):
             java_path=None,
             xml_path=None,
             consumer=None,
-            file_count=None,
-            count=None,
             java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
             **kwargs
     ):
         super().__init__(
-            cursor,
+            db_executor,
             table_schema,
             table_name,
             column_name,
             output_path,
             lombok,
-            exec_sql,
             model_package,
             mapper_package,
             java_path,
             xml_path,
             consumer,
-            file_count,
-            count,
             java_src_relative,
             **kwargs
         )
