@@ -53,14 +53,11 @@ def get_file_counts(params, generator_type):
     return all_file
 
 
-def generate(param_dict, params, file_count, consumer, generator_type):
-    count = 0
+def generate(param_dict, params, consumer, generator_type):
     for param in params:
         param.update(param_dict)
         ext_dict = {
             "consumer": consumer,
-            "file_count": file_count,
-            "count": count
         }
         param.update(ext_dict)
         if generator_type == MYBATIS_TAB_TITLE:
@@ -68,7 +65,6 @@ def generate(param_dict, params, file_count, consumer, generator_type):
         else:
             generator = SpringGenerator(**param)
         generator.main()
-        count = generator.count
 
 
 def dispatch_generate(gui, param_dict, selected_data, consumer):
@@ -82,4 +78,5 @@ def dispatch_generate(gui, param_dict, selected_data, consumer):
     else:
         file_count = get_file_counts(params, MYBATIS_TAB_TITLE)
         generator_type = MYBATIS_TAB_TITLE
-    generate(param_dict, params[0], file_count, consumer, generator_type)
+    gui.file_count = file_count
+    generate(param_dict, params[0], consumer, generator_type)

@@ -65,11 +65,7 @@ class MybatisGenerator:
         `xml_path`
             xml文件输出路径，如果此参数有效，将忽视path参数
         `consumer`
-            作为消费者生成器，负责发送每次生成文件的信息，发送需要生成的文件总数，当前已生成的百分比，文件输出路径
-        `file_count`
-            文件总数，生成器总共需要生成的文件总数，不是只当前对象需要生成的，为了配合页面进度条
-        `count`
-            当前已经生成的文件数，与上面文件总数可计算当前进度，也就是返回的百分比
+            作为消费者生成器，负责发送每次生成文件的信息，发送生成的文件输出路径
         `java_src_relative`
             java项目默认的源码包相对路径结构，默认为 src/main/java，由此参数，可结合java_path生成项目源码包绝对路径，
             再与命名空间拼接，可推出文件的绝对路径
@@ -87,8 +83,6 @@ class MybatisGenerator:
             java_path=None,
             xml_path=None,
             consumer=None,
-            file_count=None,
-            count=None,
             java_src_relative=DEFAULT_JAVA_SRC_RELATIVE_PATH,
             **kwargs
     ):
@@ -157,8 +151,6 @@ class MybatisGenerator:
         self.mapper_namespace = f'{self.mapper_package}.{self.class_name}Mapper' \
             if self.mapper_package else DEFAULT_MAPPER_NS
         self.consumer = consumer
-        self.file_count = file_count
-        self.count = count
 
     def get_path(self, package=None):
         """
@@ -331,8 +323,7 @@ class MybatisGenerator:
         with open(path, 'w+', encoding='utf-8')as f:
             f.write(content)
             print(f'{OUTPUT_PREFIX}{path}')
-            self.count += 1
-            self.consumer.send([self.file_count, round(self.count * 100 / self.file_count), f'{OUTPUT_PREFIX}{path}'])
+            self.consumer.send(f'{OUTPUT_PREFIX}{path}')
 
     def main(self):
         self.generate_java()

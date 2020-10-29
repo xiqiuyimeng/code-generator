@@ -94,10 +94,11 @@ class GenerateResultDialog(DraggableDialog):
         self.loading_mask = LoadingMask(self, ":/gif/loading.gif")
         self.loading_mask.show()
 
-    def progress(self, saved_count, file_count, progress_value, msg):
+    def progress(self, saved_count, file_count, msg):
         # 当生成第一个文件的时候，证明数据准备已经没问题，关闭遮罩层
         if saved_count == 1:
             self.loading_mask.close()
+        progress_value = round(saved_count * 100 / file_count)
         self.progressBar.setValue(progress_value)
         # 当进度条值为100时，证明已经生成已经结束，将模板使用次数加1
         if progress_value == 100:
@@ -124,8 +125,8 @@ class GenerateResultDialog(DraggableDialog):
 
 class GenerateWorker(QThread):
 
-    # 定义信号，返回已生成文件数，总文件数，当前进度值及文件名
-    result = pyqtSignal(int, int, int, str)
+    # 定义信号，返回已生成文件数，总文件数，文件名
+    result = pyqtSignal(int, int, str)
     error = pyqtSignal(Exception)
 
     def __init__(self, gui, output_config_dict, selected_data):
@@ -143,10 +144,10 @@ class GenerateWorker(QThread):
     def consume(self):
         count = 1
         while True:
-            n = yield
+            file_name = yield
             # 发送信号，第一个参数为已经生成的文件数，第二个参数为文件总数，
-            # 第三个为进度条值，第四个为文件名
-            self.result.emit(count, n[0], n[1], n[2])
+            # 第三个为文件名
+            self.result.emit(count, self.gui.file_count, file_name)
             count += 1
 
     def produce(self, consumer):
