@@ -34,7 +34,7 @@ class DBExecutor:
 
     def switch_db(self, db):
         """切换库"""
-        self.cursor.execute(f'use {db};')
+        self.cursor.execute(f'use `{db}`;')
 
     def get_data(self, sql):
         """执行sql，获取数据，返回列表格式"""
