@@ -38,7 +38,7 @@ class ConnDialog(DraggableDialog):
     def setup_ui(self):
         self.setObjectName("Dialog")
         # 当前窗口大小根据主窗口大小计算
-        self.resize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
+        self.setFixedSize(self.main_screen_rect.width() * 0.4, self.main_screen_rect.height() * 0.5)
         # 不透明度
         self.setWindowOpacity(0.95)
         # 隐藏窗口边框
@@ -195,7 +195,10 @@ class ConnDialog(DraggableDialog):
         label_height = self.conn_name.geometry().height()
         self.name_check_pic.setFixedWidth(label_height)
         if conn_name:
+            self.name_check_pic.show()
             name_available = ConnSqlite().check_name_available(self.connection.id, conn_name)
+            if len(conn_name) > 20:
+                conn_name = f'{conn_name[:10]}...{conn_name[-10:]}'
             if name_available:
                 prompt = CONN_NAME_AVAILABLE.format(conn_name)
                 style = "color:green"
@@ -217,6 +220,10 @@ class ConnDialog(DraggableDialog):
             self.name_check_pic.setPixmap(pm)
             self.name_check_prompt.setStyleSheet(style)
             self.name_check_prompt.setText(prompt)
+        else:
+            # 如果删除了值
+            self.name_check_pic.hide()
+            self.name_check_prompt.setText("")
 
     def check_input(self):
         # 检查是否都有值

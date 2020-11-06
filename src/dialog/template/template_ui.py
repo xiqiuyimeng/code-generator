@@ -42,7 +42,7 @@ class TemplateDialog(DraggableDialog):
         self.setObjectName("Dialog")
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-        self.resize(self.main_screen_rect.width() * 0.8, self.main_screen_rect.height() * 0.8)
+        self.setFixedSize(self.main_screen_rect.width() * 0.8, self.main_screen_rect.height() * 0.8)
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.verticalLayout.setObjectName("verticalLayout")
         self.template_frame = QtWidgets.QFrame(self)
@@ -203,7 +203,10 @@ class TemplateDialog(DraggableDialog):
         label_height = self.template_name.geometry().height()
         self.name_check_pic.setFixedWidth(label_height)
         if tp_name:
+            self.name_check_pic.show()
             name_available = TemplateSqlite().check_tp_name_available(tp_name, self.template.id)
+            if len(tp_name) > 20:
+                tp_name = f'{tp_name[:10]}...{tp_name[-10:]}'
             if name_available:
                 prompt = TP_NAME_AVAILABLE.format(tp_name)
                 style = "color:green"
@@ -224,6 +227,10 @@ class TemplateDialog(DraggableDialog):
             self.name_check_pic.setPixmap(pm)
             self.name_check_prompt.setStyleSheet(style)
             self.name_check_prompt.setText(prompt)
+        else:
+            # 如果删除了值
+            self.name_check_pic.hide()
+            self.name_check_prompt.setText("")
 
     def open_help(self):
         if hasattr(self.gui, 'help'):
