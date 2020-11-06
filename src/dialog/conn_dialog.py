@@ -142,11 +142,6 @@ class ConnDialog(DraggableDialog):
         self.setTabOrder(self.user_value, self.passwd_value)
         # 设置端口号只能输入数字
         self.port_value.setValidator(QtGui.QIntValidator())
-        # 设置最多可输入字符数
-        self.conn_name_value.setMaxLength(50)
-        self.host_value.setMaxLength(20)
-        self.user_value.setMaxLength(20)
-        self.passwd_value.setMaxLength(30)
 
         self.conn_name_value.textEdited.connect(self.check_name_available)
         self.conn_name_value.textEdited.connect(self.check_input)

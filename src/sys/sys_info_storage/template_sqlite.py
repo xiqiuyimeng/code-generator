@@ -23,7 +23,7 @@ Template = namedtuple('Template', 'id tp_name java_tp mapper_tp xml_tp service_t
 template_sql = {
     'create': '''create table if not exists template (
     id integer primary key autoincrement,
-    tp_name char(50) not null,
+    tp_name text not null,
     java_tp text not null,
     mapper_tp text not null,
     xml_tp text not null,

@@ -21,12 +21,13 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='generator',
+          name='mybatis代码生成器',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=False )
+          console=False,
+          icon='D:\\python_workspaces\\python_tools\\mysql_generator\\static\\icon\\data_dictionary.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -34,4 +35,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='generator')
+               name='mybatis代码生成器')
