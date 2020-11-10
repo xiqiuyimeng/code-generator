@@ -18,7 +18,7 @@ class MysqlType(Enum):
     char = ('CHAR', 'String')
     varchar = ('VARCHAR', 'String')
     longtext = ('VARCHAR', 'String')
-    bigint = ('LONG', 'Long')
+    bigint = ('BIGINT', 'Long')
 
 
 # 需要import的类型和对应语句
