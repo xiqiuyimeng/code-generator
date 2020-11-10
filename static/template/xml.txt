@@ -8,7 +8,11 @@
     </resultMap>
     <sql id="Base_Column_List">
         {% for column in columns %}
+        {% if loop.last %}
         {{column}}
+        {% else %}
+        {{column~', '}}
+        {% endif %}
         {% endfor %}
     </sql>
     {% if mapper %}
