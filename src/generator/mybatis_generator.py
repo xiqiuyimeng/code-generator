@@ -21,8 +21,9 @@ class Data:
         self.column_name = column_name
         self.java_type = java_type
         self.jdbc_type = jdbc_type
+        # 替换换行符主要是为了在java类文件生成时，考虑到转换为文档注释的格式
         self.comment = comment if comment is None \
-            else comment.replace("\r\n", " ")
+            else comment.replace("\r\n", "\n\t * ")
 
 
 class MybatisGenerator:
@@ -151,6 +152,9 @@ class MybatisGenerator:
         self.mapper_namespace = f'{self.mapper_package}.{self.class_name}Mapper' \
             if self.mapper_package else DEFAULT_MAPPER_NS
         self.consumer = consumer
+        # 记录无主键和多主键表
+        self.none_primary_tb = self.table_name if not self.primary else ''
+        self.multi_primary_tb = self.table_name if len(self.primary) > 1 else ''
 
     def get_path(self, package=None):
         """

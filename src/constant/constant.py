@@ -198,6 +198,9 @@ CONTROLLER_PACKAGE_DESC = 'controller类包名：您希望输出的controller文
 """生成配置spring页弹窗"""
 ASK_TITLE = '生成配置'
 ASK_PROMPT = 'mybatis配置页输入信息尚未填写，spring页输入项无法开放。是否返回mybatis页继续填写？'
+"""生成结果页弹窗信息"""
+SPECIAL_PRIMARY_TITLE = '主键问题'
+SPECIAL_PRIMARY_MSG = '所使用的数据表中，包含一些非单一主键情况：\n'
 """帮助信息页面"""
 HELP_TITLE = '生成器帮助信息'
 HELP_MYSQL_CONN_TITLE = 'mysql连接管理'

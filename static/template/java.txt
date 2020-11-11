@@ -18,10 +18,11 @@ public class {{cls_name}}{
 
     {% for data in java_list %}
     {% if data.comment %}
-    private {{data.java_type}} {{data.name}};  //{{data.comment}}
-    {% else %}
-    private {{data.java_type}} {{data.name}};
+    /**
+     * {{data.comment}}
+     */
     {% endif %}
+    private {{data.java_type}} {{data.name}};
 
     {% endfor %}
     {% if lombok %}

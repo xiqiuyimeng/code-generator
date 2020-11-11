@@ -54,6 +54,8 @@ def get_file_counts(params, generator_type):
 
 
 def generate(param_dict, params, consumer, generator_type):
+    # 记录下无主键表和多主键表，生成代码可能有问题
+    none_primary_tbs, multi_primary_tbs = list(), list()
     for param in params:
         param.update(param_dict)
         ext_dict = {
@@ -65,6 +67,11 @@ def generate(param_dict, params, consumer, generator_type):
         else:
             generator = SpringGenerator(**param)
         generator.main()
+        if generator.none_primary_tb:
+            none_primary_tbs.append(generator.none_primary_tb)
+        if generator.multi_primary_tb:
+            multi_primary_tbs.append(generator.multi_primary_tb)
+    return none_primary_tbs, multi_primary_tbs
 
 
 def dispatch_generate(gui, param_dict, selected_data, consumer):
@@ -79,4 +86,4 @@ def dispatch_generate(gui, param_dict, selected_data, consumer):
         file_count = get_file_counts(params, MYBATIS_TAB_TITLE)
         generator_type = MYBATIS_TAB_TITLE
     gui.file_count = file_count
-    generate(param_dict, params[0], consumer, generator_type)
+    return generate(param_dict, params[0], consumer, generator_type)

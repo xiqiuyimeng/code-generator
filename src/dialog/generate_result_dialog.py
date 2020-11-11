@@ -9,10 +9,11 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
+from src.constant.constant import SPECIAL_PRIMARY_TITLE, SPECIAL_PRIMARY_MSG
 from src.dialog.draggable_dialog import DraggableDialog
 from src.func.do_generate import dispatch_generate
 from src.little_widget.loading_widget import LoadingMask
-from src.little_widget.message_box import pop_fail
+from src.little_widget.message_box import pop_fail, pop_msg
 from src.scrollable_widget.scrollable_widget import MyTextBrowser
 
 
@@ -81,6 +82,7 @@ class GenerateResultDialog(DraggableDialog):
         self.generate_thread = GenerateWorker(self.gui, self.output_config_dict, self.selected_data)
         self.generate_thread.result.connect(self.progress)
         self.generate_thread.error.connect(self.handle_error)
+        self.generate_thread.special_primary_tbs_signal.connect(self.pop_special_primary_tbs_tips)
         self.generate_thread.start()
 
         # 按钮事件
@@ -112,6 +114,15 @@ class GenerateResultDialog(DraggableDialog):
             self.loading_mask.close()
         pop_fail("生成失败", f'{e}')
 
+    def pop_special_primary_tbs_tips(self, special_primary_tbs):
+        """弹出提示窗口，声明无主键表和多主键表情况"""
+        msg = SPECIAL_PRIMARY_MSG
+        if special_primary_tbs[0]:
+            msg += f'检测到无主键表{special_primary_tbs[0]}，生成代码不完整，需手动完善！\n'
+        if special_primary_tbs[1]:
+            msg += f'检测到多主键表{special_primary_tbs[1]}，生成代码请检查是否有误。\n'
+        pop_msg(SPECIAL_PRIMARY_TITLE, msg)
+
     def close_parent(self):
         self.close()
         self.close_parent_signal.emit()
@@ -129,6 +140,8 @@ class GenerateWorker(QThread):
     result = pyqtSignal(int, int, str)
     error = pyqtSignal(Exception)
 
+    special_primary_tbs_signal = pyqtSignal(tuple)
+
     def __init__(self, gui, output_config_dict, selected_data):
         super().__init__()
         self.gui = gui
@@ -137,7 +150,9 @@ class GenerateWorker(QThread):
 
     def run(self):
         try:
-            self.produce(self.consume())
+            special_primary_tbs = self.produce(self.consume())
+            if any(special_primary_tbs):
+                self.special_primary_tbs_signal.emit(special_primary_tbs)
         except Exception as e:
             self.error.emit(e)
 
@@ -152,6 +167,7 @@ class GenerateWorker(QThread):
 
     def produce(self, consumer):
         consumer.__next__()
-        dispatch_generate(self.gui, self.output_config_dict, self.selected_data, consumer)
+        special_primary_tbs = dispatch_generate(self.gui, self.output_config_dict, self.selected_data, consumer)
         consumer.close()
+        return special_primary_tbs
 
