@@ -8,3 +8,10 @@ mybatis_generator是借助jinja2实现的生成器。
 
 已完善数据库连接代码
 增加对service层和controller层模板代码的生成
+
+- 分支：
+  - master分支，主要是功能的实现，使用需要通过命令行的形式启动程序。
+  - gui分支，使用pyqt5实现了软件界面，更方便使用。
+
+
+
