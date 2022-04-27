@@ -1,0 +1,6 @@
+Jinja2==3.0.3
+MarkupSafe==2.0.1
+PyMySQL==1.0.2
+PyQt5==5.15.6
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.9.1
