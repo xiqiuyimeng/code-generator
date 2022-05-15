@@ -162,7 +162,7 @@ class AsyncSelectTable:
             selected_cols = SelectedData().get_col_list(self.conn_name, self.db_name, self.tb_name)
             # 刷新表格
             self.rebuild_table(data, selected_cols)
-            if self.gui.table_header.isOn:
+            if self.gui.table_header.is_on:
                 # 设置左侧树部件中，对应表也应为选中状态
                 check_state = Qt.Checked
             else:
