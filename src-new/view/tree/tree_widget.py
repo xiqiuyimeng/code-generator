@@ -16,7 +16,7 @@ from service.async_func.async_conn_task import ListConnExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
 from view.tree.tree_function import make_conn_tree_items
-from view.tree.tree_item_strategy import Context
+from view.tree.tree_item_strategy.context import Context
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:21'
