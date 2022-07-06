@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QToolBar, QAction
 
+from view.bar.bar_function import open_conn_dialog
 from view.custom_widget.draggable_widget import DraggableWidget
 
 _author_ = 'luwt'
@@ -31,7 +32,7 @@ class ToolBar(QToolBar, DraggableWidget):
     def add_insert_conn_tool(self):
         insert_tool = QAction(QIcon(':/icon/add.png'), '添加连接', self.main_window)
         insert_tool.setStatusTip('在左侧列表中添加一条连接')
-        # insert_tool.triggered.connect(lambda: add_conn_func(gui, gui.screen_rect))
+        insert_tool.triggered.connect(lambda: open_conn_dialog(self.main_window.tree_widget, self.main_window.geometry()))
 
         self.addAction(insert_tool)
 

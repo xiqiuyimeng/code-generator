@@ -2,6 +2,7 @@
 from PyQt5.QtCore import QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QMovie, QIcon
 
+from view.box.message_box import pop_fail
 from view.custom_widget.loading_widget import LoadingMaskWidget
 
 _author_ = 'luwt'
@@ -24,11 +25,13 @@ class ThreadWorkerABC(QThread):
         try:
             self.do_run()
         except Exception as e:
-            self.error_signal.emit(str(e))
+            self.do_exception(e)
         finally:
             self.do_finally()
 
     def do_run(self): ...
+
+    def do_exception(self, e: Exception): ...
 
     def do_finally(self): ...
 
@@ -36,7 +39,7 @@ class ThreadWorkerABC(QThread):
 # ----------------------- thread worker manager ABC -----------------------
 
 
-class ThreadWorkManagerABC(QObject):
+class ThreadExecutorABC(QObject):
     """对应 ThreadWorkerABC 设定，负责管理调度异步任务，与view交互工作"""
 
     def __init__(self, window, error_box_title):
@@ -64,10 +67,12 @@ class ThreadWorkManagerABC(QObject):
         self.fail_post_process()
         pop_fail(error_msg, self.error_box_title, self.window)
 
-    def worker_terminate(self):
+    def worker_terminate(self, terminate_callback):
         if self.worker.isRunning():
             self.worker.terminate()
         self.worker_quit()
+        # 停止后，首先调用回调函数
+        terminate_callback()
         self.post_process()
 
     def worker_quit(self):
@@ -91,7 +96,7 @@ class ThreadWorkManagerABC(QObject):
 # ----------------------- loading mask thread worker manager ABC -----------------------
 
 
-class LoadingMaskThreadWorkManagerABC(ThreadWorkManagerABC):
+class LoadingMaskThreadExecutor(ThreadExecutorABC):
     """使用遮罩层作为任务开始时前置动作的调度器"""
 
     def __init__(self, masked_widget, *args):
@@ -110,7 +115,7 @@ class LoadingMaskThreadWorkManagerABC(ThreadWorkManagerABC):
 # ----------------------- icon movie thread worker manager ABC -----------------------
 
 
-class IconMovieThreadWorkManager(ThreadWorkManagerABC):
+class IconMovieThreadExecutor(ThreadExecutorABC):
     """使用图标动画作为任务开始时前置动作的调度器"""
 
     def __init__(self, item, *args):

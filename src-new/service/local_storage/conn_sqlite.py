@@ -16,11 +16,11 @@ Connection = namedtuple('Connection', 'id name host port user pwd')
 conn_sql = {
     'create': '''create table if not exists connection
     (id integer PRIMARY KEY autoincrement,
-    name char(50) not null,
-    host char(20) not null,
+    name char(10) not null,
+    host char(100) not null,
     port int not null,
-    user char(20) not null,
-    pwd char(30) not null
+    user char(30) not null,
+    pwd char(50) not null
     );''',
     'insert': 'insert into connection ',
     'update_selective': 'update connection set ',

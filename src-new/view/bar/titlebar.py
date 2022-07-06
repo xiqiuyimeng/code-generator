@@ -14,14 +14,14 @@ _date_ = '2022/5/7 16:37'
 
 class TitleBar(DraggableWidget):
 
-    def __init__(self, title_height, parent, menu_bar):
+    def __init__(self, parent, menu_bar):
         super().__init__(parent)
         self.parent = parent
         # 沉浸式标题栏，和菜单栏在同一水平线
         self.menu_bar = menu_bar
-        self.title_height = title_height
-        self.button_height = title_height * 0.8
-        self.setFixedHeight(title_height << 1)
+        self.title_height = menu_bar.sizeHint().height()
+        self.button_height = menu_bar.sizeHint().height()
+        self.setFixedHeight(self.title_height << 1)
         self.icon = QLabel()
         self.icon.setPixmap(QPixmap(":/icon/exec.png").scaled(self.title_height, self.title_height))
         # 标题栏文字

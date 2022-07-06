@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMenuBar, QAction
 
 from src.constant.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, GENERATE_MENU, EXIT_MENU, ABOUT_MENU
+from view.bar.bar_function import open_conn_dialog
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 12:18'
@@ -36,7 +37,7 @@ class Menubar(QMenuBar):
         add_action = QAction(QIcon(':/icon/add.png'), ADD_CONN_MENU, self.main_window)
         add_action.setShortcut('Ctrl+N')
         add_action.setStatusTip('在左侧列表中添加一条连接')
-        # add_action.triggered.connect(lambda: add_conn_func(gui, gui.screen_rect))
+        add_action.triggered.connect(lambda: open_conn_dialog(self.main_window.tree_widget, self.main_window.geometry()))
 
         self.file_menu.addAction(add_action)
 

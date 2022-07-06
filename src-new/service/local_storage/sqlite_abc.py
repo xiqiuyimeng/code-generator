@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from sqlite3 import Cursor
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
@@ -6,7 +7,7 @@ _date_ = '2022/5/11 10:25'
 
 class SqliteBasic:
 
-    def __init__(self, sql_dict, conn, cursor):
+    def __init__(self, sql_dict, conn, cursor: Cursor):
         """操作sqlite数据库的基类"""
         self.sql_dict = sql_dict
         self.conn = conn
@@ -18,6 +19,8 @@ class SqliteBasic:
         sql = self.sql_dict.get('insert') + f'({field_str}) values ({value_placeholder})'
         self.cursor.execute(sql, mapping_obj[1:])
         self.conn.commit()
+        # 返回id
+        return self.cursor.lastrowid
 
     def delete(self, obj_id):
         sql = self.sql_dict.get('delete')

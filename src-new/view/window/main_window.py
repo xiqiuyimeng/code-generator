@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar, QFrame, QLabel, \
-    QAbstractItemView, QHeaderView, QSplitter
+    QSplitter
 
-from src.constant.constant import TABLE_HEADER_LABELS
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
 from view.bar.toolbar import ToolBar
@@ -24,40 +23,38 @@ class MainWindow(QMainWindow):
         self.desktop_screen_rect = screen_rect
 
         # 主控件，用以包含所有内容
-        self.main_widget = ...
-        self.main_layout = ...
+        self.main_widget: QWidget = ...
+        self.main_layout: QVBoxLayout = ...
 
         # 定义中心控件，用以包含主体内容
-        self.central_widget = ...
-        self.central_layout = ...
+        self.central_widget: QWidget = ...
+        self.central_layout: QHBoxLayout = ...
 
         # 定义水平方向分割器
-        self.horizontal_splitter = ...
+        self.horizontal_splitter: QSplitter = ...
 
         # 菜单栏、标题栏、工具栏、状态栏
-        self.menubar = ...
-        self.titlebar = ...
-        self.toolbar = ...
-        self.statusbar = ...
+        self.menubar: Menubar = ...
+        self.titlebar: TitleBar = ...
+        self.toolbar: ToolBar = ...
+        self.statusbar: QStatusBar = ...
 
         # 左侧树结构
-        self.tree_frame = ...
-        self.tree_layout = ...
-        self.tree_header_label = ...
-        self.tree_widget = ...
+        self.tree_frame: QFrame = ...
+        self.tree_layout: QVBoxLayout = ...
+        self.tree_header_label: QLabel = ...
+        self.tree_widget: TreeWidget = ...
 
         # 右侧表结构
-        self.table_frame = ...
-        self.table_layout = ...
-        self.table_header = ...
-        self.table_header_label = ...
-        self.table_widget = ...
+        self.table_frame: QFrame = ...
+        self.table_layout: QVBoxLayout = ...
+        self.table_header: CheckBoxHeader = ...
+        self.table_header_label: QLabel = ...
+        self.table_widget: TableWidget = ...
 
         self.setup_ui()
-        self.connect_signal()
 
     def setup_ui(self):
-        self.setObjectName("MainWindow")
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 按当前分辨率计算窗口大小
         self.resize(self.desktop_screen_rect.width() * 0.6, self.desktop_screen_rect.height() * 0.75)
@@ -68,7 +65,7 @@ class MainWindow(QMainWindow):
         self.main_layout = QVBoxLayout(self.main_widget)
         # 设置所有间距为0
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setContentsMargins(10, 0, 0, 0)
 
         self.central_widget = QWidget()
         self.central_widget.setObjectName('central_widget')
@@ -94,7 +91,7 @@ class MainWindow(QMainWindow):
         self.menubar.fill_menu_bar()
 
         # 创建标题栏
-        self.titlebar = TitleBar(30, self, self.menubar)
+        self.titlebar = TitleBar(self, self.menubar)
         self.titlebar.setObjectName("titlebar")
         self.titlebar.setFixedWidth(self.width())
 
@@ -120,13 +117,10 @@ class MainWindow(QMainWindow):
         self.tree_header_label.setObjectName('tree_header_label')
         self.tree_layout.addWidget(self.tree_header_label)
 
-        self.tree_widget = TreeWidget(self.tree_frame)
+        self.tree_widget = TreeWidget(self.tree_frame, self)
         self.tree_widget.setObjectName('tree_widget')
         self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self.tree_layout.addWidget(self.tree_widget)
-        self.tree_widget.headerItem().setHidden(True)
-        # 统一设置图标大小
-        self.tree_widget.setIconSize(QSize(40, 30))
 
     def setup_table(self):
         self.table_frame = QFrame(self.horizontal_splitter)
@@ -144,34 +138,5 @@ class MainWindow(QMainWindow):
         self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self.table_layout.addWidget(self.table_widget)
 
-        # 设置只读表格
-        self.table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # 交替行颜色
-        self.table_widget.setAlternatingRowColors(True)
-
-        # 表格设置为4列
-        self.table_widget.setColumnCount(4)
-        # 实例化自定义表头
-        self.table_header = CheckBoxHeader()
-        self.table_header.setObjectName("table_header")
-        # 设置表头
-        self.table_widget.setHorizontalHeader(self.table_header)
-        # 设置表头字段
-        self.table_widget.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
-        # 设置表头列宽度，第一列全选列
-        self.table_widget.horizontalHeader().resizeSection(0, 60)
-        # 第二列字段列，根据大小自动调整宽度
-        self.table_widget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        # 最后备注列拉伸到最大
-        self.table_widget.horizontalHeader().setStretchLastSection(True)
-        # 默认行号隐藏
-        self.table_widget.verticalHeader().setHidden(True)
-
-    def connect_signal(self):
-        # 双击树节点事件
-        # self.tree_widget.doubleClicked.connect()
-        # 第三层树节点，复选框点击事件
-        # self.tree_widget.item_checkbox_clicked.connect()
-        # 右击事件
-        self.tree_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.tree_widget.customContextMenuRequested.connect()
+        # 默认隐藏
+        self.table_frame.setHidden(True)
