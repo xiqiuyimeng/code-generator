@@ -11,6 +11,8 @@ from view.table.table_header import CheckBoxHeader
 from view.table.table_widget import TableWidget
 from view.tree.tree_widget import TreeWidget
 
+from service.util.tree_node import Tree
+
 _author_ = 'luwt'
 _date_ = '2022/5/7 10:04'
 
@@ -53,6 +55,9 @@ class MainWindow(QMainWindow):
         self.table_widget: TableWidget = ...
 
         self.setup_ui()
+
+        # 保存选中对象
+        self.tree_data = Tree()
 
     def setup_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint)

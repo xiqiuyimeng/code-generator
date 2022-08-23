@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from service.local_storage.conn_sqlite import Connection
 
 _author_ = 'luwt'
 _date_ = '2022/6/3 15:56'
@@ -132,6 +131,8 @@ class Tree:
         elif isinstance(node_name, str):
             # 单个名称，递归操作，找出node
             child_node = self.get_node(parent_node, node_name)
+            if not child_node:
+                return
             # 如果是删除元素的最后一项，直接进行删除
             if cur_key == tuple(del_data.keys())[-1]:
                 self._remove_node(parent_node, node_name)

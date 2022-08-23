@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU
+from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
+    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU
 from service.async_func.async_mysql_task import OpenDBExecutor
 from view.box.message_box import pop_fail
-from view.tree.tree_function import make_table_items
+from view.tree.tree_function import make_table_items, check_table_status, set_children_check_state
 from view.tree.tree_item_strategy.tree_node_abstract import TreeNodeAbstract
 
 _author_ = 'luwt'
@@ -44,12 +45,26 @@ class TreeNodeDB(TreeNodeAbstract):
         ...
 
     def get_menu_names(self):
-        return [
-            # 根据是否在打开中标识
-            CANCEL_OPEN_DB_MENU.format(self.db_name)
-            if self.item.data(1, Qt.UserRole) else OPEN_DB_MENU.format(self.db_name)
-            if not self.item.childCount() else CLOSE_DB_MENU.format(self.db_name),
-        ]
+        menu_names = list()
+        if self.item.childCount():
+            check_state = check_table_status(self.item)
+            menu_names.append(CLOSE_DB_MENU.format(self.db_name))
+            # 全选时：添加取消选择菜单
+            if check_state[0]:
+                menu_names.append(UNSELECT_TB_MENU)
+            # 部分选中时：添加全选菜单和取消选择菜单
+            elif check_state[1]:
+                menu_names.append(SELECT_ALL_TB_MENU)
+                menu_names.append(UNSELECT_TB_MENU)
+            else:
+                # 都未选中时：添加全选菜单
+                menu_names.append(SELECT_ALL_TB_MENU)
+        # 根据打开标识判断是否正在打开中
+        elif self.item.data(1, Qt.UserRole):
+            menu_names.append(CANCEL_OPEN_DB_MENU.format(self.db_name))
+        else:
+            menu_names.append(OPEN_DB_MENU.format(self.db_name))
+        return menu_names
 
     def handle_menu_func(self, func):
         # 打开数据库
@@ -61,3 +76,28 @@ class TreeNodeDB(TreeNodeAbstract):
         # 关闭数据库
         elif func == CLOSE_DB_MENU.format(self.db_name):
             pass
+        # 全选所有表
+        elif func == SELECT_ALL_TB_MENU:
+            tbs = set_children_check_state(self.item, Qt.Checked)
+            # 首先删除已存储的信息
+            del_data = {
+                'conn': self.item.parent().text(0),
+                'db': self.db_name
+            }
+            self.window.tree_data.del_node(del_data)
+            # 再添加
+            conn_info = self.item.parent().data(0, Qt.UserRole)
+            add_data = {
+                'conn': self.item.parent().text(0),
+                'db': self.db_name,
+                'tb': tbs
+            }
+            self.window.tree_data.add_node(add_data, conn_info)
+        # 取消全选所有表
+        elif func == UNSELECT_TB_MENU:
+            set_children_check_state(self.item, Qt.Unchecked)
+            del_data = {
+                'conn': self.item.parent().text(0),
+                'db': self.db_name
+            }
+            self.window.tree_data.del_node(del_data)
