@@ -12,6 +12,7 @@ from view.table.table_header import CheckBoxHeader
 from view.table.table_widget import TableWidget
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
+from view.window.central_widget import CentralWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 10:04'
@@ -72,16 +73,9 @@ class MainWindow(QMainWindow):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(10, 0, 0, 0)
 
-        self.central_widget = QWidget()
-        self.central_widget.setObjectName('central_widget')
-        self.central_layout = QHBoxLayout(self.central_widget)
-        self.horizontal_splitter = QSplitter(self.central_widget)
-        self.horizontal_splitter.setOrientation(Qt.Horizontal)
-        self.central_layout.addWidget(self.horizontal_splitter)
-
         self.setup_bars()
-        self.setup_tree()
-        self.setup_table()
+
+        self.central_widget = CentralWidget()
 
         # 主布局添加所有部件，依次为标题栏、菜单栏、工具栏、承载了实际窗口内容的主控件，将窗口中央控件设置为包含所有的控件
         self.main_layout.addWidget(self.titlebar)

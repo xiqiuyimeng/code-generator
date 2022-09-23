@@ -24,6 +24,8 @@ class CentralWidget(QWidget):
         # 标识当前展示的数据源列表类型
         self.datasource_show_type = ''
 
+        # 获取当前应该展示的 tree frame 和 table frame
+
 
 
 
