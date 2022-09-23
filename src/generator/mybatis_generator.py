@@ -3,8 +3,8 @@ import os
 
 from jinja2 import Template
 
-from src.constant import mysql_type as mt
-from src.constant.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH, DEFAULT_MODEL_NS, DEFAULT_MAPPER_NS, \
+from src.constant_ import mysql_type as mt
+from src.constant_.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH, DEFAULT_MODEL_NS, DEFAULT_MAPPER_NS, \
     PARAM_PATH_ERROR, QUERY_SYS_TB, OUTPUT_PREFIX
 from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from view.tree.tree_item_strategy.tree_node_conn import TreeNodeConn
-from view.tree.tree_item_strategy.tree_node_db import TreeNodeDB
-from view.tree.tree_item_strategy.tree_node_table import TreeNodeTable
+from view.tree.tree_item.tree_node_conn import ConnTreeNode
+from view.tree.tree_item.tree_node_db import DBTreeNode
+from view.tree.tree_item.tree_node_table import TableTreeNode
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:03'
@@ -21,11 +21,11 @@ def get_tree_node(item, tree_widget, window):
     """
     # 如果父级为空，那么则为连接
     if item.parent() is None:
-        return TreeNodeConn(item, tree_widget, window)
+        return ConnTreeNode(item, tree_widget, window)
     elif item.parent().parent() is None:
-        return TreeNodeDB(item, tree_widget, window)
+        return DBTreeNode(item, tree_widget, window)
     elif item.parent().parent().parent() is None:
-        return TreeNodeTable(item, tree_widget, window)
+        return TableTreeNode(item, tree_widget, window)
 
 
 class Context:

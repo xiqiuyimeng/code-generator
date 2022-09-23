@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
-from src.constant.constant import OK_BUTTON, ACCEPT_BUTTON, \
+from src.constant_.constant import OK_BUTTON, ACCEPT_BUTTON, \
     REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
 
 _author_ = 'luwt'

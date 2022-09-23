@@ -10,7 +10,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
-from src.constant.constant import ABOUT_TITLE, GENERATOR_TITLE, ABOUT_MYBATIS_TITLE, ABOUT_MYBATIS_INFO, \
+from src.constant_.constant import ABOUT_TITLE, GENERATOR_TITLE, ABOUT_MYBATIS_TITLE, ABOUT_MYBATIS_INFO, \
     ABOUT_SPRING_TITLE, ABOUT_SPRING_INFO, ABOUT_PATH_TITLE, APPOINT_PATH, APPOINT_PATH_INFO, APPOINT_PROJECT, \
     APPOINT_PROJECT_INFO
 from src.scrollable_widget.scrollable_widget import MyScrollArea

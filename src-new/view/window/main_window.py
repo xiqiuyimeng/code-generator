@@ -4,14 +4,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar, QFrame, QLabel, \
     QSplitter
 
+from service.util.tree_node import Tree
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
 from view.bar.toolbar import ToolBar
 from view.table.table_header import CheckBoxHeader
 from view.table.table_widget import TableWidget
-from view.tree.tree_widget import TreeWidget
-
-from service.util.tree_node import Tree
+from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 10:04'
@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         self.tree_frame: QFrame = ...
         self.tree_layout: QVBoxLayout = ...
         self.tree_header_label: QLabel = ...
-        self.tree_widget: TreeWidget = ...
+        self.tree_widget: AbstractTreeWidget = ...
 
         # 右侧表结构
         self.table_frame: QFrame = ...
@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         self.tree_header_label.setObjectName('tree_header_label')
         self.tree_layout.addWidget(self.tree_header_label)
 
-        self.tree_widget = TreeWidget(self.tree_frame, self)
+        self.tree_widget = SqlTreeWidget(self.tree_frame, self)
         self.tree_widget.setObjectName('tree_widget')
         self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self.tree_layout.addWidget(self.tree_widget)

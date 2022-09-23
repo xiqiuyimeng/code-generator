@@ -7,7 +7,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHeaderView
 
-from src.constant.constant import TABLE_HEADER_LABELS
+from src.constant_.constant import TABLE_HEADER_LABELS
 from src.scrollable_widget.scrollable_widget import MyTableWidget
 from src.table.table_header import CheckBoxHeader
 from src.table.table_item import MyTableWidgetItem

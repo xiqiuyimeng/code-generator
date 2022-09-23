@@ -10,7 +10,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
-from src.constant.constant import HELP_TITLE, HELP_MYSQL_CONN_TITLE, HELP_MYSQL_CONN_INFO, HELP_SELECT_COL_TITLE, \
+from src.constant_.constant import HELP_TITLE, HELP_MYSQL_CONN_TITLE, HELP_MYSQL_CONN_INFO, HELP_SELECT_COL_TITLE, \
     HELP_SELECT_COL_INFO, HELP_PATH_GENERATOR_TITLE, HELP_PATH_GENERATOR_INFO, HELP_PROJECT_GENERATOR_TITLE, \
     HELP_PROJECT_GENERATOR_INFO
 from src.scrollable_widget.scrollable_widget import MyScrollArea

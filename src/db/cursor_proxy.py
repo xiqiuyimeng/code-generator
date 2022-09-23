@@ -4,7 +4,7 @@
 """
 from itertools import groupby
 
-from src.constant.constant import QUERY_DB_SQL, QUERY_TABLES_SQL, QUERY_SYS_TB, QUERY_SYS_TB_COL
+from src.constant_.constant import QUERY_DB_SQL, QUERY_TABLES_SQL, QUERY_SYS_TB, QUERY_SYS_TB_COL
 from src.db.get_cursor import Cursor
 
 _author_ = 'luwt'

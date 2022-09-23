@@ -3,7 +3,7 @@ import os
 import sqlite3
 from collections import namedtuple
 
-from service.local_storage.sqlite_abc import SqliteBasic
+from service.system_storage.sqlite_abc import SqliteBasic
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:26'

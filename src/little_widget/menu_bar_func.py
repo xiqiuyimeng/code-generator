@@ -5,7 +5,7 @@
 
 from PyQt5 import QtGui, QtWidgets
 
-from src.constant.constant import ADD_CONN_MENU, GENERATE_MENU, FILE_MENU, HELP_MENU, EXIT_MENU, ABOUT_MENU
+from src.constant_.constant import ADD_CONN_MENU, GENERATE_MENU, FILE_MENU, HELP_MENU, EXIT_MENU, ABOUT_MENU
 from src.func.tree_function import add_conn_func
 
 _author_ = 'luwt'

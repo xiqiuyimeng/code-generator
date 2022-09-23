@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from src.constant.constant import TP_NAME_AVAILABLE, TP_NAME_EXISTS, CAT_TEMPLATE_TITLE, ADD_TEMPLATE_TITLE, \
+from src.constant_.constant import TP_NAME_AVAILABLE, TP_NAME_EXISTS, CAT_TEMPLATE_TITLE, ADD_TEMPLATE_TITLE, \
     EDIT_TEMPLATE_TITLE, NO_TP_NAME, HELP_BUTTON, SAVE, QUIT, TP_NAME, TP_CONTENT
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget

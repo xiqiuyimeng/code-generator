@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from service.db_operator.get_cursor import Cursor
-from constant.constant import QUERY_DB_SQL, QUERY_TABLES_SQL, QUERY_COLUMNS_SQL
+from constant_.constant import QUERY_DB_SQL, QUERY_TABLES_SQL, QUERY_COLUMNS_SQL
 
 _author_ = 'luwt'
 _date_ = '2022/5/30 21:59'

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView, QTreeWidget
 
 from view.searcher.search_func.tree_searcher import TreeSearcher
 
@@ -30,7 +30,7 @@ class SmartSearcherItemView(QAbstractItemView):
         self.scrollToItem(item, QAbstractItemView.EnsureVisible)
 
 
-class SmartSearcherTreeWidget(SmartSearcherItemView):
+class SmartSearcherTreeWidget(QTreeWidget, SmartSearcherItemView):
 
     def __init__(self, parent):
         super().__init__(parent)

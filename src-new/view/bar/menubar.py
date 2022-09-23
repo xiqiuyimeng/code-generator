@@ -5,7 +5,7 @@
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMenuBar, QAction
 
-from src.constant.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, GENERATE_MENU, EXIT_MENU, ABOUT_MENU
+from src.constant_.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, GENERATE_MENU, EXIT_MENU, ABOUT_MENU
 from view.bar.bar_function import open_conn_dialog
 
 _author_ = 'luwt'

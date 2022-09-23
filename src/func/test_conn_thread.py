@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QIcon
 
-from src.constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
+from src.constant_.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
 from src.func.connection_function import test_connection
 from src.little_widget.message_box import pop_ok, pop_fail
 

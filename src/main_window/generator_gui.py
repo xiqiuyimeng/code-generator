@@ -11,7 +11,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout
 
-from src.constant.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA, UNSELECT_FIELD_MENU, \
+from src.constant_.constant import TREE_HEADER_LABELS, WRONG_TITLE, WRONG_UNSELECT_DATA, UNSELECT_FIELD_MENU, \
     SELECT_ALL_FIELD_MENU, WRONG_UNSET_USING_TEMPLATE
 from src.dialog.generate_dialog.generate_dialog import DisplaySelectedDialog
 from src.dialog.template.templates_ui import TemplatesDialog

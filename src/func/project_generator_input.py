@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from PyQt5.QtWidgets import QFileDialog
 
-from src.constant.constant import CHOOSE_DIRECTORY, DEFAULT_JAVA_SRC_RELATIVE_PATH, \
+from src.constant_.constant import CHOOSE_DIRECTORY, DEFAULT_JAVA_SRC_RELATIVE_PATH, \
     JAVA_SRC_PATH, MODEL_PACKAGE, MAPPER_PACKAGE, XML_PATH, SERVICE_PACKAGE,\
     SERVICE_IMPL_PACKAGE, CONTROLLER_PACKAGE
 

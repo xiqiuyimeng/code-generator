@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from src.constant.constant import COPY_TEMPLATE, DEL_TEMPLATE, OPERATION_FAILED, DEL_ACTION, COPY_ACTION
+from src.constant_.constant import COPY_TEMPLATE, DEL_TEMPLATE, OPERATION_FAILED, DEL_ACTION, COPY_ACTION
 from src.little_widget.loading_widget import LoadingMask
 from src.little_widget.message_box import pop_fail
 from src.sys.sys_info_storage.template_sqlite import TemplateSqlite

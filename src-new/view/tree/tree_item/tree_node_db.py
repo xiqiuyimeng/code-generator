@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
+from constant_.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
     SELECT_ALL_TB_MENU, UNSELECT_TB_MENU
 from service.async_func.async_mysql_task import OpenDBExecutor
 from view.box.message_box import pop_fail
-from view.tree.tree_function import make_table_items, check_table_status, set_children_check_state
-from view.tree.tree_item_strategy.tree_node_abstract import TreeNodeAbstract
+from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
+from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
 
 
-class TreeNodeDB(TreeNodeAbstract):
+class DBTreeNode(AbstractTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)

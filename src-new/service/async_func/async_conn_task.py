@@ -4,9 +4,9 @@ from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
-from service.local_storage.conn_sqlite import Connection, ConnSqlite
+from service.system_storage.conn_sqlite import Connection, ConnSqlite
 from view.box.message_box import pop_ok
-from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
+from constant_.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
     LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT, LIST_ALL_CONN_TITLE
 

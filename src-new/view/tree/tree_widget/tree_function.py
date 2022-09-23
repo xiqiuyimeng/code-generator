@@ -5,7 +5,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from service.local_storage.conn_sqlite import Connection
+from service.system_storage.conn_sqlite import Connection
 from constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE
 from view.dialog.conn.conn_dialog import ConnDialog
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from view.tree.tree_function import add_conn_func
+from view.tree.tree_widget.tree_function import add_conn_func
 
 _author_ = 'luwt'
 _date_ = '2022/5/29 16:51'

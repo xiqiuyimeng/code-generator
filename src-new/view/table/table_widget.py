@@ -5,7 +5,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView
 
-from constant.constant import TABLE_HEADER_LABELS
+from constant_.constant import TABLE_HEADER_LABELS
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
 

@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QObject
 from PyQt5.QtGui import QIcon
 
-from src.constant.constant import OPEN_CONN_MENU, TEST_CONN_FAIL_PROMPT
+from src.constant_.constant import OPEN_CONN_MENU, TEST_CONN_FAIL_PROMPT
 from src.exception.exception_enum import DBNotExistsError, TableNotExistsError
 from src.func.connection_function import open_connection
 from src.func.selected_data import SelectedData

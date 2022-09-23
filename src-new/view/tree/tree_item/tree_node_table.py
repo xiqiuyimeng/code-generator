@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
+from constant_.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
 from service.async_func.async_mysql_task import OpenTBExecutor
 from view.table.table_function import fill_table, resize_table_rows
-from view.tree.tree_item_strategy.tree_node_abstract import TreeNodeAbstract
+from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
 
 
-class TreeNodeTable(TreeNodeAbstract):
+class TableTreeNode(AbstractTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)

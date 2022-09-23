@@ -5,7 +5,7 @@ _author_ = 'luwt'
 _date_ = '2022/7/6 22:08'
 
 
-class TreeNodeAbstract:
+class AbstractTreeNode:
 
     def __init__(self, item: QTreeWidgetItem, tree_widget, window):
         self.item = item

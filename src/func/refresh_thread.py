@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import QObject, pyqtSignal, QThread, Qt
 from PyQt5.QtGui import QIcon
 
-from src.constant.constant import TEST_CONN_FAIL_PROMPT, OPEN_CONN_MENU
+from src.constant_.constant import TEST_CONN_FAIL_PROMPT, OPEN_CONN_MENU
 from src.func.connection_function import open_connection
 from src.func.selected_data import SelectedData
 from src.func.table_func import add_table, fill_table

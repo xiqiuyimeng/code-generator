@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from constant.constant import CANCEL_OPEN_CONN_MENU, OPEN_CONN_MENU, CLOSE_CONN_MENU, CANCEL_TEST_CONN_MENU, \
+from constant_.constant import CANCEL_OPEN_CONN_MENU, OPEN_CONN_MENU, CLOSE_CONN_MENU, CANCEL_TEST_CONN_MENU, \
     TEST_CONN_MENU, ADD_CONN_MENU, EDIT_CONN_MENU, DEL_CONN_MENU, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE
 from service.async_func.async_mysql_task import OpenConnExecutor, TestConnIconMovieExecutor
 from view.box.message_box import pop_ok
-from view.tree.tree_function import make_db_items, add_conn_func, edit_conn_func
-from view.tree.tree_item_strategy.tree_node_abstract import TreeNodeAbstract
+from view.tree.tree_widget.tree_function import make_db_items, add_conn_func, edit_conn_func
+from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
 
 
-class TreeNodeConn(TreeNodeAbstract):
+class ConnTreeNode(AbstractTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)

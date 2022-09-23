@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-from src.constant.constant import SPRING_TAB_TITLE, MYBATIS_TAB_TITLE
+from src.constant_.constant import SPRING_TAB_TITLE, MYBATIS_TAB_TITLE
 from src.func.connection_function import open_connection
 from src.generator.mybatis_generator import MybatisGenerator
 from src.generator.spring_generator import SpringGenerator

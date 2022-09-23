@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
-from src.constant.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
+from src.constant_.constant import EDIT_CONN_MENU, ADD_CONN_MENU, \
     SAVE_CONN_SUCCESS_PROMPT, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE, TEST_CONN_MENU
 from src.dialog.draggable_dialog import DraggableDialog
 from src.func.test_conn_thread import TestConnWorker

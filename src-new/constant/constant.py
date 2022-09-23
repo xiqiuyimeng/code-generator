@@ -398,3 +398,8 @@ TP_ENGINE = '使用的模板引擎：'
 TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引擎：http://docs.jinkan.org/docs/jinja2/，\n' \
                  '默认已经添加trim_blocks=True, lstrip_blocks=True，去除模板本身所生成的空行。'
 TP_KEY_DESC = '模板中的关键词介绍'
+
+SQL_DATASOURCE_TYPE = 'sql数据源'
+STRUCTURE_DATASOURCE_TYPE = '结构体数据源'
+
+SYS_DB_PATH = 'c:\\Users\\luwt-a\\Documents\\generator_db'

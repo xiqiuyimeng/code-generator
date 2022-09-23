@@ -9,7 +9,6 @@ import sys
 from service.read_qrc.read_config import read_qss
 from view.window.main_window import MainWindow
 from static import image_rc
-import load
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:33'

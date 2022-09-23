@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from jinja2 import Template
 
-from src.constant.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH
+from src.constant_.constant import DEFAULT_PATH, DEFAULT_JAVA_SRC_RELATIVE_PATH
 from src.generator.mybatis_generator import MybatisGenerator
 
 _author_ = 'luwt'

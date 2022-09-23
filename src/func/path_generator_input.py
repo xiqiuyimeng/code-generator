@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
 from PyQt5.QtWidgets import QFileDialog
-from src.constant.constant import CHOOSE_DIRECTORY
+from src.constant_.constant import CHOOSE_DIRECTORY
 import os
 
 _author_ = 'luwt'

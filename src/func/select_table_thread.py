@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QIcon
 
-from src.constant.constant import SELECT_TABLE_FAIL_PROMPT, SELECT_FIELD_FAIL_PROMPT
+from src.constant_.constant import SELECT_TABLE_FAIL_PROMPT, SELECT_FIELD_FAIL_PROMPT
 from src.db.cursor_proxy import get_cols_group_by_table
 from src.func.connection_function import open_connection
 from src.func.gui_function import set_children_check_state

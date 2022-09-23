@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout, QLineEdit,
 
 from service.async_func.async_conn_task import AddConnExecutor, EditConnExecutor
 from service.async_func.async_mysql_task import TestConnLoadingMaskExecutor
-from service.local_storage.conn_sqlite import Connection
+from service.system_storage.conn_sqlite import Connection
 from service.read_qrc.read_config import read_qss
-from constant.constant import CONN_NAME_TEXT, HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, TEST_CONN_BTN_TEXT, \
+from constant_.constant import CONN_NAME_TEXT, HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, TEST_CONN_BTN_TEXT, \
     OK_BTN_TEXT, CANCEL_BTN_TEXT, DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE
 from view.custom_widget.draggable_widget import DraggableDialog
 

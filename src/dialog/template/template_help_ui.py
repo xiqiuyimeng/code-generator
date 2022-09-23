@@ -2,7 +2,7 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.constant import JAVA_TP_DESC, MAPPER_TP_DESC, XML_TP_DESC, SERVICE_TP_DESC, SERVICE_IMPL_TP_DESC, \
+from src.constant_.constant import JAVA_TP_DESC, MAPPER_TP_DESC, XML_TP_DESC, SERVICE_TP_DESC, SERVICE_IMPL_TP_DESC, \
     CONTROLLER_TP_DESC, QUIT, TP_HELP, TP_INTRODUCE, TP_INFO, TP_ENGINE, TP_ENGINE_INFO, TP_KEY_DESC
 from src.dialog.draggable_dialog import DraggableDialog
 from src.dialog.template.tab_bar_style import TabWidget
