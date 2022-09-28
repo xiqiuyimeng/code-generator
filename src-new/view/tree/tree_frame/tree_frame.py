@@ -11,11 +11,11 @@ _author_ = 'luwt'
 _date_ = '2022/9/14 18:01'
 
 
-def get_tree_frame(current_frame_type, frame_parent, window):
-    """根据类型获取对应的树结构frame"""
-    if current_frame_type == SQL_DATASOURCE_TYPE:
+def get_tree_frame(current_frame_name, frame_parent, window):
+    """根据当前的frame名称获取对应的树结构frame"""
+    if current_frame_name == SQL_DATASOURCE_TYPE:
         return SqlTreeFrame(frame_parent, window)
-    elif current_frame_type == STRUCTURE_DATASOURCE_TYPE:
+    elif current_frame_name == STRUCTURE_DATASOURCE_TYPE:
         return StructureTreeFrame(frame_parent, window)
 
 
@@ -39,6 +39,9 @@ class AbstractTreeFrame(QFrame):
         self.tree_widget.setObjectName('tree_widget')
         self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.tree_widget)
+
+        # 为了方便访问，树部件引用也挂到window上
+        window.tree_widget = self.tree_widget
 
     def get_header_text(self) -> str: ...
 

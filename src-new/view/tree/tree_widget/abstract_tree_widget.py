@@ -19,7 +19,7 @@ _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
 
 
-class AbstractTreeWidget(ScrollableWidget, SmartSearcherTreeWidget):
+class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
 
     def __init__(self, parent, window):
         super().__init__(parent)

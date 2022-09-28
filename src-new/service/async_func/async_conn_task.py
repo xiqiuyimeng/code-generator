@@ -4,9 +4,9 @@ from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
-from service.system_storage.conn_sqlite import Connection, ConnSqlite
+from service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
 from view.box.message_box import pop_ok
-from constant_.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
+from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
     LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT, LIST_ALL_CONN_TITLE
 
@@ -20,23 +20,23 @@ class AddConnWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal(int)
 
-    def __init__(self, connection: Connection):
+    def __init__(self, connection: SqlConnection):
         super().__init__()
         self.connection = connection
 
     def do_run(self):
-        conn_id = ConnSqlite().insert(self.connection)
-        log.info(f'[{self.connection.name}]{SAVE_CONN_SUCCESS_PROMPT}')
-        self.success_signal.emit(conn_id)
+        ConnSqlite().insert(self.connection)
+        log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
+        self.success_signal.emit(self.connection.id)
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.name}]{SAVE_CONN_FAIL_PROMPT} --> {e}')
-        self.error_signal.emit(f'[{self.connection.name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
+        log.error(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT} --> {e}')
+        self.error_signal.emit(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
 
 
 class AddConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, connection: Connection, masked_widget, window, callback):
+    def __init__(self, connection: SqlConnection, masked_widget, window, callback):
         self.connection = connection
         # 回调函数
         self.callback = callback
@@ -46,7 +46,7 @@ class AddConnExecutor(LoadingMaskThreadExecutor):
         return AddConnWorker(self.connection)
 
     def success_post_process(self, *args):
-        pop_ok(f'[{self.connection.name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
+        pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
                SAVE_CONN_TITLE, self.window)
         self.callback(*args)
 
@@ -59,23 +59,23 @@ class EditConnWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal()
 
-    def __init__(self, connection: Connection):
+    def __init__(self, connection: SqlConnection):
         super().__init__()
         self.connection = connection
 
     def do_run(self):
-        ConnSqlite().update_selective(self.connection)
-        log.info(f'[{self.connection.name}]{SAVE_CONN_SUCCESS_PROMPT}')
+        ConnSqlite().update(self.connection)
+        log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.name}]{SAVE_CONN_FAIL_PROMPT} --> {e}')
-        self.error_signal.emit(f'[{self.connection.name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
+        log.error(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT} --> {e}')
+        self.error_signal.emit(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
 
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
     
-    def __init__(self, connection: Connection, masked_widget, window, callback):
+    def __init__(self, connection: SqlConnection, masked_widget, window, callback):
         self.connection = connection
         self.callback = callback
         super().__init__(masked_widget, window, SAVE_CONN_TITLE)
@@ -84,7 +84,7 @@ class EditConnExecutor(LoadingMaskThreadExecutor):
         return EditConnWorker(self.connection)
     
     def success_post_process(self, *args):
-        pop_ok(f'[{self.connection.name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
+        pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
                SAVE_CONN_TITLE, self.window)
         self.callback()
 
@@ -139,7 +139,7 @@ class ListConnWorker(ThreadWorkerABC):
         super().__init__()
 
     def do_run(self):
-        connections = ConnSqlite().select_all()
+        connections = ConnSqlite().select(SqlConnection())
         log.info(LIST_ALL_CONN_SUCCESS_PROMPT)
         self.success_signal.emit(connections)
 

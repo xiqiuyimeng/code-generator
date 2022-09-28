@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from constant_.constant import CANCEL_OPEN_CONN_MENU, OPEN_CONN_MENU, CLOSE_CONN_MENU, CANCEL_TEST_CONN_MENU, \
+from constant.constant import CANCEL_OPEN_CONN_MENU, OPEN_CONN_MENU, CLOSE_CONN_MENU, CANCEL_TEST_CONN_MENU, \
     TEST_CONN_MENU, ADD_CONN_MENU, EDIT_CONN_MENU, DEL_CONN_MENU, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE
 from service.async_func.async_mysql_task import OpenConnExecutor, TestConnIconMovieExecutor
 from view.box.message_box import pop_ok

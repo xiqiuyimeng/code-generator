@@ -5,10 +5,10 @@ from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout, QLineEdit,
 
 from service.async_func.async_conn_task import AddConnExecutor, EditConnExecutor
 from service.async_func.async_mysql_task import TestConnLoadingMaskExecutor
-from service.system_storage.conn_sqlite import Connection
 from service.read_qrc.read_config import read_qss
-from constant_.constant import CONN_NAME_TEXT, HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, TEST_CONN_BTN_TEXT, \
+from constant.constant import CONN_NAME_TEXT, HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, TEST_CONN_BTN_TEXT, \
     OK_BTN_TEXT, CANCEL_BTN_TEXT, DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE
+from service.system_storage.conn_sqlite import SqlConnection
 from view.custom_widget.draggable_widget import DraggableDialog
 
 _author_ = 'luwt'
@@ -17,12 +17,12 @@ _date_ = '2022/5/29 17:55'
 
 class ConnDialog(DraggableDialog):
 
-    conn_changed = pyqtSignal(Connection)
+    conn_changed = pyqtSignal(SqlConnection)
 
     def __init__(self, connection, dialog_title, screen_rect, conn_name_dict):
         super().__init__()
         self.dialog_title = dialog_title
-        self.connection: Connection = connection
+        self.connection: SqlConnection = connection
         self.parent_screen_rect = screen_rect
         # 当前连接名称列表字典，key: id, value: name
         self.conn_name_dict = conn_name_dict

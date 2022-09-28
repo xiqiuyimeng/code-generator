@@ -3,10 +3,10 @@
 菜单栏展示
 """
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMenuBar, QAction
+from PyQt5.QtWidgets import QMenuBar, QAction, QMenu
 
-from src.constant_.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, GENERATE_MENU, EXIT_MENU, ABOUT_MENU
-from view.bar.bar_function import open_conn_dialog
+from constant.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, GENERATE_MENU, EXIT_MENU, ABOUT_MENU
+from view.bar.bar_function import add_sql_datasource_actions
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 12:18'
@@ -18,7 +18,7 @@ class Menubar(QMenuBar):
         super().__init__(window)
         self.main_window = window
 
-        self.file_menu = ...
+        self.file_menu: QMenu = ...
         self.help_menu = ...
 
     def fill_menu_bar(self):
@@ -34,12 +34,8 @@ class Menubar(QMenuBar):
         self.add_about_menu()
 
     def add_conn_menu(self):
-        add_action = QAction(QIcon(':/icon/add.png'), ADD_CONN_MENU, self.main_window)
-        add_action.setShortcut('Ctrl+N')
-        add_action.setStatusTip('在左侧列表中添加一条连接')
-        add_action.triggered.connect(lambda: open_conn_dialog(self.main_window.tree_widget, self.main_window.geometry()))
-
-        self.file_menu.addAction(add_action)
+        add_menu: QMenu = self.file_menu.addMenu(ADD_CONN_MENU)
+        add_sql_datasource_actions(self.main_window, add_menu)
 
     def add_generate_menu(self):
         generate_action = QAction(QIcon(':/icon/exec.png'), GENERATE_MENU, self.main_window)

@@ -4,6 +4,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar, QFrame, QLabel, \
     QSplitter
 
+from service.async_func.async_system_task.async_system_db_task import SystemThreadWorker
+from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
 from service.util.tree_node import Tree
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
@@ -11,7 +13,6 @@ from view.bar.toolbar import ToolBar
 from view.table.table_header import CheckBoxHeader
 from view.table.table_widget import TableWidget
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
-from view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from view.window.central_widget import CentralWidget
 
 _author_ = 'luwt'
@@ -55,10 +56,15 @@ class MainWindow(QMainWindow):
         self.table_header_label: QLabel = ...
         self.table_widget: TableWidget = ...
 
-        self.setup_ui()
-
         # 保存选中对象
         self.tree_data = Tree()
+
+        # 保存操作记录的队列
+        self.operation_queue = SystemOperationQueue()
+        # 异步操作本地数据库的线程
+        self.local_db_thread = SystemThreadWorker()
+
+        self.setup_ui()
 
     def setup_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -75,7 +81,7 @@ class MainWindow(QMainWindow):
 
         self.setup_bars()
 
-        self.central_widget = CentralWidget()
+        self.central_widget = CentralWidget(self)
 
         # 主布局添加所有部件，依次为标题栏、菜单栏、工具栏、承载了实际窗口内容的主控件，将窗口中央控件设置为包含所有的控件
         self.main_layout.addWidget(self.titlebar)
@@ -104,38 +110,3 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.statusbar)
         # 任务栏图标
         self.setWindowIcon(QIcon(":/icon/exec.png"))
-
-    def setup_tree(self):
-        self.tree_frame = QFrame(self.horizontal_splitter)
-        self.tree_frame.setFrameShape(QFrame.StyledPanel)
-        self.tree_frame.setFrameShadow(QFrame.Raised)
-        self.tree_frame.setObjectName('tree_frame')
-
-        self.tree_layout = QVBoxLayout(self.tree_frame)
-        self.tree_header_label = QLabel(self.tree_frame)
-        self.tree_header_label.setObjectName('tree_header_label')
-        self.tree_layout.addWidget(self.tree_header_label)
-
-        self.tree_widget = SqlTreeWidget(self.tree_frame, self)
-        self.tree_widget.setObjectName('tree_widget')
-        self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.tree_layout.addWidget(self.tree_widget)
-
-    def setup_table(self):
-        self.table_frame = QFrame(self.horizontal_splitter)
-        self.table_frame.setFrameShape(QFrame.StyledPanel)
-        self.table_frame.setFrameShadow(QFrame.Raised)
-        self.table_frame.setObjectName('table_frame')
-
-        self.table_layout = QVBoxLayout(self.table_frame)
-        self.table_header_label = QLabel(self.table_frame)
-        self.table_header_label.setObjectName('table_header_label')
-        self.table_layout.addWidget(self.table_header_label)
-
-        self.table_widget = TableWidget(self.table_frame)
-        self.table_widget.setObjectName('table_widget')
-        self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.table_layout.addWidget(self.table_widget)
-
-        # 默认隐藏
-        self.table_frame.setHidden(True)

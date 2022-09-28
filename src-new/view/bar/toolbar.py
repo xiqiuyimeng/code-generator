@@ -23,7 +23,7 @@ class ToolBar(QToolBar, DraggableWidget):
 
     def fill_tool_bar(self):
         self.add_switch_source_tool()
-        self.add_insert_conn_tool()
+        self.add_conn_tool()
         self.add_refresh_tool()
         self.add_generate_tool()
         self.add_clear_tool()
@@ -38,7 +38,7 @@ class ToolBar(QToolBar, DraggableWidget):
         self.addSeparator()
         self.addAction(switch_tool)
 
-    def add_insert_conn_tool(self):
+    def add_conn_tool(self):
         insert_tool = QAction(QIcon(':/icon/add.png'), '添加连接', self.main_window)
         insert_tool.setStatusTip('在左侧列表中添加一条连接')
         insert_tool.triggered.connect(lambda: open_conn_dialog(self.main_window.tree_widget,

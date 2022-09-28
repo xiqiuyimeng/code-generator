@@ -17,6 +17,7 @@ frame_type_sql = {
     create_time datetime,
     update_time datetime
     );''',
+    'drop': 'drop table frame_type'
 }
 
 
@@ -38,4 +39,6 @@ class FrameTypeSqlite(SqliteBasic):
     def __init__(self):
         super().__init__('frame_type', frame_type_sql.get('create'))
 
+    def drop_table(self):
+        self.db.query(frame_type_sql.get('drop'))
 
