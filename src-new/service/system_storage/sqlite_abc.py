@@ -18,8 +18,8 @@ table_field_dict = dict()
 @dataclasses.dataclass
 class BasicSqliteDTO:
     id: int = dataclasses.field(default=None, init=False, compare=False)
-    create_time: str = dataclasses.field(default=None, init=False)
-    update_time: str = dataclasses.field(default=None, init=False)
+    create_time: str = dataclasses.field(default=None, init=False, compare=False)
+    update_time: str = dataclasses.field(default=None, init=False, compare=False)
 
 
 class SqliteBasic:

@@ -9,8 +9,8 @@ _date_ = '2020/4/20 10:40'
 
 # ---------- 连接对话框中的展示文本 start ---------- #
 # 对话框标题
-ADD_CONN_DIALOG_TITLE = "添加连接"
-EDIT_CONN_DIALOG_TITLE = "编辑连接"
+ADD_CONN_DIALOG_TITLE = "添加{}连接"
+EDIT_CONN_DIALOG_TITLE = "编辑{}连接"
 
 # 输入框部分
 CONN_NAME_TEXT = "连接名："
@@ -18,6 +18,7 @@ HOST_TEXT = "主机："
 PORT_TEXT = "端口号："
 USERNAME_TEXT = "用户名："
 PWD_TEXT = "密码："
+SQLITE_FILE_URL_TXT = "文件："
 # 默认host、端口、用户名
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = "3306"
@@ -40,6 +41,8 @@ OPEN_CONN_FAIL_PROMPT = "打开连接失败"
 SAVE_CONN_TITLE = "保存连接"
 SAVE_CONN_SUCCESS_PROMPT = "保存连接成功"
 SAVE_CONN_FAIL_PROMPT = "保存连接失败"
+CONN_NO_CHANGE_PROMPT = "连接信息无变化"
+CHOOSE_SQLITE_FILE = "选择文件"
 DEL_CONN_TITLE = "删除连接"
 DEL_CONN_SUCCESS_PROMPT = "删除连接成功"
 DEL_CONN_FAIL_PROMPT = "删除连接失败"

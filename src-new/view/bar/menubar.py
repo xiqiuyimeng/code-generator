@@ -68,3 +68,15 @@ class Menubar(QMenuBar):
 
         self.help_menu.addAction(about_action)
 
+
+class SqlDatasourceMenubar(Menubar):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
+
+class StructureDatasourceMenubar(Menubar):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+

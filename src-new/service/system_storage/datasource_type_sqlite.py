@@ -6,27 +6,24 @@ from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:43'
 
-# 使用占位符的形式，避免特殊字符转义问题
-frame_type_sql = {
-    'create': '''create table if not exists frame_type
+datasource_type_sql = {
+    'create': '''create table if not exists datasource_type
     (id integer PRIMARY KEY autoincrement,
     name char(10) not null,
-    type integer not null,
-    frame_order integer not null,
+    datasource_type_order integer not null,
     is_current integer not null,
     create_time datetime,
     update_time datetime
     );''',
-    'drop': 'drop table frame_type'
+    'drop': 'drop table datasource_type'
 }
 
 
 @dataclass
-class FrameType(BasicSqliteDTO):
+class DatasourceType(BasicSqliteDTO):
 
     name: str = field(default=None, init=False)
-    type: int = field(default=None, init=False)
-    frame_order: int = field(default=None, init=False)
+    datasource_type_order: int = field(default=None, init=False)
     is_current: int = field(default=None, init=False)
 
     def __init__(self, **kwargs):
@@ -34,11 +31,11 @@ class FrameType(BasicSqliteDTO):
             setattr(self, k, v)
 
 
-class FrameTypeSqlite(SqliteBasic):
+class DatasourceTypeSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__('frame_type', frame_type_sql.get('create'))
+        super().__init__('datasource_type', datasource_type_sql.get('create'))
 
     def drop_table(self):
-        self.db.query(frame_type_sql.get('drop'))
+        self.db.query(datasource_type_sql.get('drop'))
 

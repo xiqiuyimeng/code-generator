@@ -36,9 +36,6 @@ class AbstractTableFrame(QFrame):
         self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.table_widget)
 
-        # 默认隐藏
-        self.setHidden(True)
-
     def get_header_widget(self) -> QWidget: ...
 
 
@@ -47,6 +44,8 @@ class SqlTableFrame(AbstractTableFrame):
 
     def __init__(self, *args):
         super().__init__(*args)
+        # 默认隐藏
+        self.setHidden(True)
 
     def get_header_widget(self) -> QWidget:
         self.table_header_label = QLabel(self)

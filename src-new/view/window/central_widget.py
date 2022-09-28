@@ -5,7 +5,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSplitter
 
-from service.init.frame_type_init import init_frame_type
 from view.table.table_frame.table_frame import get_table_frame
 from view.tree.tree_frame.tree_frame import get_tree_frame
 
@@ -32,10 +31,7 @@ class CentralWidget(QWidget):
         # 获取当前应该展示的 tree frame 和 table frame
         var = self.main_window.local_db_thread
 
-        # 初始化frame_type
-        tree_frame_type, table_frame_type = init_frame_type()
-
         # 获取tree frame
-        self.tree_frame = get_tree_frame(tree_frame_type.name, self.horizontal_splitter, self.main_window)
+        self.tree_frame = get_tree_frame(self.main_window.datasource_type.name, self.horizontal_splitter, self.main_window)
         # 获取table frame
-        self.table_frame = get_table_frame(tree_frame_type.name, self.horizontal_splitter)
+        self.table_frame = get_table_frame(self.main_window.datasource_type.name, self.horizontal_splitter)

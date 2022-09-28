@@ -30,4 +30,4 @@ def add_datasource_action(main_window, parent, action_name, action_icon_path):
 def add_sql_datasource_actions(main_window, parent):
     """添加sql数据源action"""
     for conn_type in ConnTypeEnum:
-        add_datasource_action(main_window, parent, conn_type.value.display_name, conn_type.value.type_menu_icon)
+        add_datasource_action(main_window, parent, conn_type.value.display_name, conn_type.value.type_icon)

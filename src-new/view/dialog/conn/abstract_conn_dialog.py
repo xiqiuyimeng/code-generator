@@ -1,58 +1,63 @@
 # -*- coding: utf-8 -*-
+import dataclasses
+
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QIntValidator, QIcon
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout, QLineEdit, QGridLayout, QPushButton, QAction
 
+from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, \
+    OK_BTN_TEXT, CANCEL_BTN_TEXT, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE, CONN_NO_CHANGE_PROMPT, SAVE_CONN_TITLE
 from service.async_func.async_conn_task import AddConnExecutor, EditConnExecutor
 from service.async_func.async_mysql_task import TestConnLoadingMaskExecutor
 from service.read_qrc.read_config import read_qss
-from constant.constant import CONN_NAME_TEXT, HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, TEST_CONN_BTN_TEXT, \
-    OK_BTN_TEXT, CANCEL_BTN_TEXT, DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE
 from service.system_storage.conn_sqlite import SqlConnection
+from service.system_storage.conn_type import *
+from view.box.message_box import pop_ok
 from view.custom_widget.draggable_widget import DraggableDialog
 
 _author_ = 'luwt'
 _date_ = '2022/5/29 17:55'
 
 
-class ConnDialog(DraggableDialog):
+class AbstractConnDialog(DraggableDialog):
+    """连接对话框抽象类，整体对话框结构应为四部分：标题区、连接名表单区、连接信息表单区、按钮区"""
 
     conn_changed = pyqtSignal(SqlConnection)
 
-    def __init__(self, connection, dialog_title, screen_rect, conn_name_dict):
+    def __init__(self, connection, dialog_title, screen_rect, conn_name_id_dict):
         super().__init__()
         self.dialog_title = dialog_title
+        # 从数据库中读取到的信息，用来编辑连接时使用
         self.connection: SqlConnection = connection
+        # 初始化一个新的连接对象
+        self.new_connection: SqlConnection = SqlConnection()
+        self.conn_type: ConnType = self.get_conn_type()
+        self.conn_info: dataclass = ...
+
         self.parent_screen_rect = screen_rect
-        # 当前连接名称列表字典，key: id, value: name
-        self.conn_name_dict = conn_name_dict
+        # 当前连接名称列表字典，key: name, value: id
+        self.conn_name_id_dict: dict = conn_name_id_dict
         self.name_available = True
 
         # 当前对话框主布局
         self.dialog_layout: QVBoxLayout = ...
         # 当前对话框框架，用于放置所有部件
         self.frame: QFrame = ...
-        # 框架布局，分三部分，第一部分为标题部分，第二部分为表单部分，第三部分为按钮部分
+        # 框架布局，分四部分，第一部分为标题部分，第二部分为连接名表单部分，第三部分为连接信息表单部分、第四部分为按钮部分
         self.frame_layout: QVBoxLayout = ...
-        self.body_layout: QFormLayout = ...
+        self.conn_name_layout: QFormLayout = ...
+        # 连接信息表单布局
+        self.conn_info_layout = ...
         self.title: QLabel = ...
         self.conn_name_label: QLabel = ...
         self.conn_name_value: QLineEdit = ...
         self.conn_name_checker: QLabel = ...
-        self.host_label: QLabel = ...
-        self.host_value: QLineEdit = ...
-        self.port_label: QLabel = ...
-        self.port_value: QLineEdit = ...
-        self.user_label: QLabel = ...
-        self.user_value: QLineEdit = ...
-        self.pwd_label: QLabel = ...
-        self.pwd_value: QLineEdit = ...
         self.button_layout: QGridLayout = ...
         self.test_conn_button: QPushButton = ...
         self.cancel_button: QPushButton = ...
         self.ok_button: QPushButton = ...
         self.button_blank: QLabel = ...
-        self.action = ...
+        self.name_check_action = ...
 
         self.test_conn_executor: TestConnLoadingMaskExecutor = ...
         self.add_conn_executor: AddConnExecutor = ...
@@ -64,6 +69,8 @@ class ConnDialog(DraggableDialog):
         self.check_input()
         self.setup_input_limit_rule()
         self.connect_signal()
+
+    def get_conn_type(self) -> ConnType: ...
 
     def setup_ui(self):
         # 当前窗口大小根据主窗口大小计算
@@ -83,39 +90,40 @@ class ConnDialog(DraggableDialog):
         self.dialog_layout.addWidget(self.frame)
         self.frame_layout = QVBoxLayout(self.frame)
 
+        # 标题
+        self.setup_title_ui()
+        # 连接名
+        self.setup_conn_name_ui()
+        # 连接信息
+        self.setup_conn_info_ui()
+        self.frame_layout.addLayout(self.conn_info_layout)
+        # 按钮
+        self.setup_button_ui()
+
+    def setup_title_ui(self):
         self.title = QLabel(self.frame)
         self.title.setObjectName("conn_title")
         self.frame_layout.addWidget(self.title)
 
-        # 主体表单布局
-        self.body_layout = QFormLayout()
+    def setup_conn_name_ui(self):
+        self.conn_name_layout = QFormLayout()
+
         # 连接名称
         self.conn_name_label = QLabel(self.frame)
         self.conn_name_value = QLineEdit(self.frame)
         self.conn_name_value.setObjectName("conn_name_value")
-        self.body_layout.addRow(self.conn_name_label, self.conn_name_value)
+        self.conn_name_layout.addRow(self.conn_name_label, self.conn_name_value)
+
         # 连接名称检查器
         self.conn_name_checker = QLabel(self.frame)
         self.conn_name_checker.setFixedHeight(self.conn_name_label.height())
-        self.body_layout.addRow("", self.conn_name_checker)
-        # 主机地址
-        self.host_label = QLabel(self.frame)
-        self.host_value = QLineEdit(self.frame)
-        self.body_layout.addRow(self.host_label, self.host_value)
-        # 端口号
-        self.port_label = QLabel(self.frame)
-        self.port_value = QLineEdit(self.frame)
-        self.body_layout.addRow(self.port_label, self.port_value)
-        # 用户名
-        self.user_label = QLabel(self.frame)
-        self.user_value = QLineEdit(self.frame)
-        self.body_layout.addRow(self.user_label, self.user_value)
-        # 密码
-        self.pwd_label = QLabel(self.frame)
-        self.pwd_value = QLineEdit(self.frame)
-        self.body_layout.addRow(self.pwd_label, self.pwd_value)
-        self.frame_layout.addLayout(self.body_layout)
+        self.conn_name_layout.addRow('', self.conn_name_checker)
 
+        self.frame_layout.addLayout(self.conn_name_layout)
+
+    def setup_conn_info_ui(self): ...
+
+    def setup_button_ui(self):
         # 按钮部分
         self.button_layout = QGridLayout()
         self.test_conn_button = QPushButton(self.frame)
@@ -129,28 +137,49 @@ class ConnDialog(DraggableDialog):
         self.frame_layout.addLayout(self.button_layout)
 
     def setup_label_text(self):
-        self.title.setText(self.dialog_title)
+        self.title.setText(self.dialog_title.format(self.conn_type.display_name))
         self.conn_name_label.setText(CONN_NAME_TEXT)
-        self.host_label.setText(HOST_TEXT)
-        self.port_label.setText(PORT_TEXT)
-        self.user_label.setText(USERNAME_TEXT)
-        self.pwd_label.setText(PWD_TEXT)
+        # 连接信息
+        self.setup_conn_info_label()
+        # 按钮文本
         self.test_conn_button.setText(TEST_CONN_BTN_TEXT)
         self.ok_button.setText(OK_BTN_TEXT)
         self.cancel_button.setText(CANCEL_BTN_TEXT)
 
+    def setup_conn_info_label(self): ...
+
     def setup_lineedit_value(self):
         if self.connection.id:
-            self.conn_name_value.setText(self.connection.name)
-            self.host_value.setText(self.connection.host)
-            self.port_value.setText(str(self.connection.port))
-            self.user_value.setText(self.connection.user)
-            self.pwd_value.setText(self.connection.pwd)
+            self.conn_name_value.setText(self.connection.conn_name)
+            # 数据回显
+            self.setup_conn_info_value_show()
+        else:
+            # 默认值展示
+            self.setup_conn_info_default_value()
+
+    def setup_conn_info_value_show(self): ...
+
+    def setup_conn_info_default_value(self): ...
+
+    def check_input(self):
+        # 收集用户输入数据
+        self.collect_input()
+        # 如果输入框都有值，那么就开放按钮，否则关闭
+        if self.new_connection.conn_name \
+                and all(dataclasses.astuple(self.conn_info)) \
+                and self.name_available:
             self.set_button_available()
         else:
-            self.host_value.setText(DEFAULT_HOST)
-            self.port_value.setText(DEFAULT_PORT)
-            self.user_value.setText(DEFAULT_USER)
+            self.init_button_status()
+
+    def collect_input(self):
+        self.new_connection.conn_name = self.conn_name_value.text()
+        conn_param = self.collect_conn_info_input()
+        # 根据参数构建连接信息对象
+        self.conn_info = globals()[self.conn_type.type_class](*conn_param)
+        self.new_connection.conn_info_type = self.conn_info
+
+    def collect_conn_info_input(self) -> tuple: ...
 
     def init_button_status(self):
         self.test_conn_button.setDisabled(True)
@@ -161,25 +190,23 @@ class ConnDialog(DraggableDialog):
         self.ok_button.setDisabled(False)
 
     def setup_input_limit_rule(self):
-        # 设置端口号只能输入数字
-        self.port_value.setValidator(QIntValidator())
         # 设置最多可输入字符数
         self.conn_name_value.setMaxLength(100)
-        self.host_value.setMaxLength(100)
-        self.user_value.setMaxLength(30)
-        self.pwd_value.setMaxLength(50)
+        # 连接信息的输入限制规则
+        self.setup_input_conn_info_limit_rule()
+
+    def setup_input_conn_info_limit_rule(self): ...
 
     def connect_signal(self):
         self.conn_name_value.textEdited.connect(self.check_name_available)
         self.conn_name_value.textEdited.connect(self.check_input)
-        self.host_value.textEdited.connect(self.check_input)
-        self.port_value.textEdited.connect(self.check_input)
-        self.user_value.textEdited.connect(self.check_input)
-        self.pwd_value.textEdited.connect(self.check_input)
-
         self.test_conn_button.clicked.connect(self.test_connection)
         self.ok_button.clicked.connect(self.save_conn)
         self.cancel_button.clicked.connect(self.close)
+        # 连接信息相关的信号槽连接
+        self.connect_conn_info_signal()
+
+    def connect_conn_info_signal(self): ...
 
     def check_name_available(self, conn_name):
         if conn_name:
@@ -194,70 +221,50 @@ class ConnDialog(DraggableDialog):
                 style = "color:red"
                 self.conn_name_value.setStyleSheet("#conn_name_value{border-color:red;color:red}")
                 icon = QIcon(":/icon/wrong.png")
-            self.action = QAction()
-            self.action.setIcon(icon)
-            self.conn_name_value.addAction(self.action, QLineEdit.ActionPosition.TrailingPosition)
+            self.name_check_action = QAction()
+            self.name_check_action.setIcon(icon)
+            self.conn_name_value.addAction(self.name_check_action, QLineEdit.ActionPosition.TrailingPosition)
             self.conn_name_checker.setText(prompt)
             self.conn_name_checker.setStyleSheet(style)
         else:
             self.conn_name_value.setStyleSheet(read_qss())
             self.conn_name_checker.setStyleSheet(read_qss())
             self.conn_name_checker.setText("")
-            self.conn_name_value.removeAction(self.action)
+            self.conn_name_value.removeAction(self.name_check_action)
 
     def check_available(self, conn_name):
-        conn_names = list(self.conn_name_dict.values())
-        if self.connection.id:
-            # 如果是修改，排除掉原来的名字
-            conn_names.remove(self.connection.name)
-        return conn_name not in conn_names
-
-    def check_input(self):
-        # 检查是否都有值
-        conn = self.get_input()
-        # 如果输入框都有值，那么就开放按钮，否则关闭
-        if all(conn) and self.name_available:
-            self.set_button_available()
-        else:
-            self.init_button_status()
-
-    def get_input_connection(self):
-        return Connection(self.connection.id, *self.get_input())
-
-    def get_input(self):
-        conn_name = self.conn_name_value.text()
-        host = self.host_value.text()
-        port = int(self.port_value.text())
-        user = self.user_value.text()
-        pwd = self.pwd_value.text()
-        return conn_name, host, port, user, pwd
+        # 如果根据name能取到id，判断id是否是当前的id，
+        # 如果当前是新增连接，连接id为空，取出的id应该为空才证明名称可用不重复
+        # 如果当前是编辑连接，那么id如果是当前连接的id，证明名称无变化，可用
+        conn_id = self.conn_name_id_dict.get(conn_name)
+        return conn_id == self.connection.id
 
     def test_connection(self):
-        new_conn = self.get_input_connection()
-        self.test_conn_executor = TestConnLoadingMaskExecutor(new_conn, self, self)
+        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_connection, self, self)
         self.test_conn_executor.start()
 
     def save_conn(self):
-        new_conn = self.get_input_connection()
+        self.new_connection.construct_conn_info()
+        self.new_connection.conn_type = self.conn_type.type
         # 存在id，说明是编辑
         if self.connection.id:
-            self.edit_conn_executor = EditConnExecutor(new_conn, self, self, self.save_post_process)
-            self.edit_conn_executor.start()
+            if self.new_connection != self.connection:
+                self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self, self.save_post_process)
+                self.edit_conn_executor.start()
+            else:
+                # 没有更改任何信息
+                pop_ok(CONN_NO_CHANGE_PROMPT, SAVE_CONN_TITLE, self)
+                self.close()
         else:
             # 新增操作
-            self.add_conn_executor = AddConnExecutor(new_conn, self, self, self.save_post_process)
+            self.add_conn_executor = AddConnExecutor(self.new_connection, self, self, self.save_post_process)
             self.add_conn_executor.start()
 
     def save_post_process(self, conn_id=None):
         # 如果返回了id，视为添加
         if conn_id:
-            new_conn = Connection(conn_id, *self.get_input())
-            self.conn_changed.emit(new_conn)
-            self.close()
-        else:
-            # 视为编辑
-            new_conn = self.get_input_connection()
-            self.conn_changed.emit(new_conn)
-            self.close()
+            self.new_connection.id = conn_id
+        self.conn_changed.emit(self.new_connection)
+        self.close()
 
 

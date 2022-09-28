@@ -20,7 +20,7 @@ class SqlTreeWidget(AbstractTreeWidget):
         super().__init__(parent, window)
         self.main_window = window
         # 存储连接id和名称
-        self.conn_name_dict: dict = ...
+        self.conn_name_id_dict: dict = ...
         # 连接的图标
         self.conn_icon = QIcon(":/icon/mysql_conn_icon.png")
         # 数据库图标
@@ -36,16 +36,16 @@ class SqlTreeWidget(AbstractTreeWidget):
         self.init_conn_name_list(conns)
 
     def init_conn_name_list(self, conns):
-        self.conn_name_dict = dict(zip(map(lambda conn: conn.id, conns), map(lambda conn: conn.conn_name, conns)))
+        self.conn_name_id_dict = dict(zip(map(lambda conn: conn.conn_name, conns), map(lambda conn: conn.id, conns)))
 
     def add_conn_name(self, conn_id, conn_name):
-        self.conn_name_dict[conn_id] = conn_name
+        self.conn_name_id_dict[conn_name] = conn_id
 
     def update_conn_name(self, conn_id, conn_name):
-        self.conn_name_dict[conn_id] = conn_name
+        self.conn_name_id_dict[conn_name] = conn_id
 
-    def del_conn_name(self, conn_id):
-        del self.conn_name_dict[conn_id]
+    def del_conn_name(self, conn_name):
+        del self.conn_name_id_dict[conn_name]
 
     def do_open_tree_item(self, item):
         Context(item, self, self.main_window).open_item()

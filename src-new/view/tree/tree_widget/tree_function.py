@@ -45,8 +45,7 @@ def add_conn_func(sql_type, tree_widget, screen_rect):
     :param tree_widget: 树对象
     :param screen_rect: 主窗口大小
     """
-    conn_info = SqlConnection()
-    show_conn_dialog(sql_type, tree_widget, conn_info, ADD_CONN_DIALOG_TITLE, screen_rect)
+    show_conn_dialog(sql_type, tree_widget, SqlConnection(), ADD_CONN_DIALOG_TITLE, screen_rect)
 
 
 def edit_conn_func(sql_type, tree_widget, screen_rect, conn_info):
@@ -64,7 +63,7 @@ def show_conn_dialog(sql_type, tree_widget, conn_info, title, screen_rect):
     :param screen_rect: 主窗口大小
     """
     # 根据类型，动态获取对话框
-    dialog = globals()[get_conn_dialog(sql_type)](conn_info, title, screen_rect, tree_widget.conn_name_dict)
+    dialog = globals()[get_conn_dialog(sql_type)](conn_info, title, screen_rect, tree_widget.conn_name_id_dict)
     if title == ADD_CONN_DIALOG_TITLE:
         dialog.conn_changed.connect(lambda conn: add_conn_tree_item(tree_widget, conn))
     elif title == EDIT_CONN_DIALOG_TITLE:
@@ -78,8 +77,8 @@ def add_conn_tree_item(tree_widget, connection):
     :param tree_widget: 树对象
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
     """
-    make_sql_tree_item(tree_widget, connection.name, tree_widget.conn_icon, connection)
-    tree_widget.add_conn_name(connection.id, connection.name)
+    make_sql_tree_item(tree_widget, connection.conn_name, tree_widget.conn_icon, connection)
+    tree_widget.add_conn_name(connection.id, connection.conn_name)
 
 
 def update_conn_tree_item(tree_widget, connection):
@@ -89,9 +88,9 @@ def update_conn_tree_item(tree_widget, connection):
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
     """
     item = tree_widget.currentItem()
-    item.setText(0, connection.name)
+    item.setText(0, connection.conn_name)
     item.setData(0, Qt.UserRole, connection)
-    tree_widget.update_conn_name(connection.id, connection.name)
+    tree_widget.update_conn_name(connection.id, connection.conn_name)
 
 
 def make_sql_conn_tree_items(sql_conns, parent, icon):

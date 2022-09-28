@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSta
 
 from service.async_func.async_system_task.async_system_db_task import SystemThreadWorker
 from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
+from service.init.frame_type_init import init_datasource_type
 from service.util.tree_node import Tree
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
@@ -58,6 +59,12 @@ class MainWindow(QMainWindow):
 
         # 保存选中对象
         self.tree_data = Tree()
+
+        # 初始化 datasource_type
+        self.datasource_type = init_datasource_type()
+
+        # 缓存树结构需要使用的icon
+        self.tree_icon_dict = dict()
 
         # 保存操作记录的队列
         self.operation_queue = SystemOperationQueue()
