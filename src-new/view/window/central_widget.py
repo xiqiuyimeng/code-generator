@@ -25,13 +25,17 @@ class CentralWidget(QWidget):
         self.horizontal_splitter.setOrientation(Qt.Horizontal)
         self._layout.addWidget(self.horizontal_splitter)
 
-        # 标识当前展示的数据源列表类型
-        self.datasource_show_type = ''
+        self.tree_frame = None
+        self.table_frame = None
 
-        # 获取当前应该展示的 tree frame 和 table frame
-        var = self.main_window.local_db_thread
-
+    def setup_ui(self):
         # 获取tree frame
-        self.tree_frame = get_tree_frame(self.main_window.datasource_type.name, self.horizontal_splitter, self.main_window)
+        if self.tree_frame:
+            self.tree_frame.hide()
+        self.tree_frame = get_tree_frame(self.main_window.current_ds_type.name,
+                                         self.horizontal_splitter, self.main_window)
+        self.tree_frame.show()
+        if self.table_frame:
+            self.table_frame.hide()
         # 获取table frame
-        self.table_frame = get_table_frame(self.main_window.datasource_type.name, self.horizontal_splitter)
+        self.table_frame = get_table_frame(self.main_window.current_ds_type.name, self.horizontal_splitter)

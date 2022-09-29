@@ -140,9 +140,30 @@ PARAM_PATH_ERROR = "路径参数有误"
 
 """菜单栏"""
 FILE_MENU = '文件'
+SWITCH_ACTION = '切换数据源类型'
+SWITCH_ACTION_TIP = '切换数据源类型'
+REFRESH_ACTION = '刷新'
+REFRESH_ACTION_TIP = '刷新当前数据源类型信息'
+CLEAR_DATA_ACTION = '清空选择'
+CLEAR_DATA_ACTION_TIP = '清空当前数据源类型已选数据'
+TEMPLATE_ACTION = '模板设置'
+TEMPLATE_ACTION_TIP = '查看模板、修改模板、新建模板等操作'
+GENERATE_ACTION = '生成'
+GENERATE_ACTION_TP = '根据选择数据生成代码文件'
+EXIT_ACTION = '退出'
+EXIT_ACTION_TP = '退出程序'
+HELP_ACTION = '帮助'
+HELP_ACTION_TIP = '获取使用帮助'
+ABOUT_ACTION = '关于'
+ABOUT_ACTION_TIP = '关于'
+
 HELP_MENU = '帮助'
 EXIT_MENU = '退出'
 ABOUT_MENU = '关于'
+
+
+SWITCH_DS_TYPE_TITLE = '切换数据源类型'
+DS_TYPE_NO_CHANGE_MSG = '当前数据源类型已经是 {}，无需切换'
 
 
 # 生成

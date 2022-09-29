@@ -84,6 +84,25 @@ class SqliteBasic:
                 id_record = tx.query(self._select_id_sql).first()
                 insert_obj.id = id_record.get("id")
 
+    def batch_insert(self, insert_objs):
+        """批量插入"""
+        for insert_obj in insert_objs:
+            insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        insert_dict_list = list(map(lambda x: dataclasses.asdict(x), insert_objs))
+
+        for insert_dict in insert_dict_list:
+            insert_dict.pop('id')
+            # 过滤掉不合法的field
+            self.filter_illegal_field(insert_dict)
+
+        field_str = ", ".join(insert_dict_list[0].keys())
+        value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict_list[0].keys())))
+        insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
+        print(insert_sql)
+        with self.db.transaction() as tx:
+            tx.bulk_query(insert_sql, insert_dict_list)
+
     def delete(self, obj_id):
         self.db.query(self._delete_sql, **{"id": obj_id})
 
@@ -105,6 +124,28 @@ class SqliteBasic:
             print(update_sql)
 
             self.db.query(update_sql, **update_dict)
+
+    def batch_update(self, update_objs):
+        """批量更新"""
+        update_dict_list = list()
+        for update_obj in update_objs:
+            update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            update_dict = dataclasses.asdict(update_obj)
+            update_dict.pop('create_time')
+            update_dict_list.append(update_dict)
+
+            # 过滤掉不合法的field
+            self.filter_illegal_field(update_dict)
+        # 只更新除id以外不为空的属性
+        update_field_list = list(map(lambda x: x[0],
+                                     filter(lambda x: x[1] is not None and x[0] != 'id', update_dict_list[0].items())))
+
+        if update_field_list:
+            update_field_str = ", ".join(list(map(lambda x: f'{x} = :{x}', update_field_list)))
+            update_sql = f'{self._update_sql} {update_field_str} {self._id_clause_sql}'
+            print(update_sql)
+
+            self.db.bulk_query(update_sql, update_dict_list)
 
     def select(self, select_obj):
         """根据条件查询，根据不为空的属性作为条件进行查询"""

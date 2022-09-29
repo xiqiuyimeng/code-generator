@@ -4,13 +4,16 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar, QFrame, QLabel, \
     QSplitter
 
-from service.async_func.async_system_task.async_system_db_task import SystemThreadWorker
+from constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
+from service.async_func.async_system_task.async_system_db_task import InitDsTypeExecutor, SwitchDsTypeExecutor
 from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
-from service.init.frame_type_init import init_datasource_type
+from service.init.frame_type_init import get_current_datasource_type
+from service.system_storage.datasource_type_sqlite import DatasourceType
 from service.util.tree_node import Tree
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
 from view.bar.toolbar import ToolBar
+from view.box.message_box import pop_ok
 from view.table.table_header import CheckBoxHeader
 from view.table.table_widget import TableWidget
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
@@ -32,7 +35,7 @@ class MainWindow(QMainWindow):
         self.main_layout: QVBoxLayout = ...
 
         # 定义中心控件，用以包含主体内容
-        self.central_widget: QWidget = ...
+        self.central_widget: CentralWidget = ...
         self.central_layout: QHBoxLayout = ...
 
         # 定义水平方向分割器
@@ -60,18 +63,25 @@ class MainWindow(QMainWindow):
         # 保存选中对象
         self.tree_data = Tree()
 
-        # 初始化 datasource_type
-        self.datasource_type = init_datasource_type()
+        self.datasource_types = ...
+        self.current_ds_type = ...
+        self.init_ds_type_executor = ...
 
         # 缓存树结构需要使用的icon
         self.tree_icon_dict = dict()
 
         # 保存操作记录的队列
         self.operation_queue = SystemOperationQueue()
-        # 异步操作本地数据库的线程
-        self.local_db_thread = SystemThreadWorker()
 
         self.setup_ui()
+
+        # 初始化 datasource_type
+        self.init_ds_type_executor = InitDsTypeExecutor(self.setup_ui_by_ds_type,
+                                                        self, self, SWITCH_DS_TYPE_TITLE)
+        self.init_ds_type_executor.start()
+
+        # 切换数据源类型线程
+        self.switch_ds_type_executor = ...
 
     def setup_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -86,7 +96,7 @@ class MainWindow(QMainWindow):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(10, 0, 0, 0)
 
-        self.setup_bars()
+        self.init_bars()
 
         self.central_widget = CentralWidget(self)
 
@@ -96,7 +106,7 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.central_widget)
         self.setCentralWidget(self.main_widget)
 
-    def setup_bars(self):
+    def init_bars(self):
         # 菜单栏
         self.menubar = Menubar(self)
         self.menubar.setObjectName("menubar")
@@ -117,3 +127,24 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.statusbar)
         # 任务栏图标
         self.setWindowIcon(QIcon(":/icon/exec.png"))
+
+    def setup_ui_by_ds_type(self, ds_types):
+        self.datasource_types = ds_types
+        self.current_ds_type: DatasourceType = get_current_datasource_type(self.datasource_types)
+
+        # 首先处理bar
+        self.menubar.switch_ds_type()
+        self.toolbar.switch_ds_type()
+
+        # 处理主窗体
+        self.central_widget.setup_ui()
+
+    def switch_ds_type(self, ds_type_action):
+        ds_type = ds_type_action.text()
+        # 切换数据源类型，如果类型一致，应提示
+        if ds_type != self.current_ds_type.name:
+            self.switch_ds_type_executor = SwitchDsTypeExecutor(ds_type, self.setup_ui_by_ds_type,
+                                                                self, self, SWITCH_DS_TYPE_TITLE)
+            self.switch_ds_type_executor.start()
+        else:
+            pop_ok(DS_TYPE_NO_CHANGE_MSG.format(ds_type), SWITCH_DS_TYPE_TITLE, self)

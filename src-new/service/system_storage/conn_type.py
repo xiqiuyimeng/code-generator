@@ -29,7 +29,7 @@ class ConnType:
     # 对应类型承载实际连接信息的实体类
     type_class: str
     # 对应类型的icon
-    type_icon: str
+    icon_path: str
     # 对应类型的连接对话框
     type_dialog: str
 
