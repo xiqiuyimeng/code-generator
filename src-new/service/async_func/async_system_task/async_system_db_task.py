@@ -2,6 +2,7 @@
 from PyQt5.QtCore import pyqtSignal
 
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
+from service.init.frame_type_init import get_current_datasource_type
 from service.system_storage.datasource_type_sqlite import DatasourceTypeSqlite, DatasourceType, DatasourceTypeEnum
 
 _author_ = 'luwt'
@@ -23,7 +24,8 @@ class InitDsTypeWorker(ThreadWorkerABC):
 
     def get_ds_types(self):
         ds_types = DatasourceTypeSqlite().select(DatasourceType())
-        if not ds_types:
+        # 如果不能查到数据，或数据不正确，都应重新初始化
+        if not ds_types or not get_current_datasource_type(ds_types):
             return self.init_ds_types()
         return ds_types
 

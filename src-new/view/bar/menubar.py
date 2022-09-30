@@ -4,7 +4,7 @@
 """
 from PyQt5.QtWidgets import QMenuBar, QMenu
 
-from constant.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, SWITCH_ACTION
+from constant.constant import FILE_MENU, HELP_MENU, ADD_CONN_MENU, SWITCH_ACTION, ADD_DS_ACTION
 from view.bar.bar_action import *
 
 _author_ = 'luwt'
@@ -51,11 +51,11 @@ class Menubar(QMenuBar):
         add_ds_actions(self.add_datasource_menu, self.main_window)
 
     def add_switch_menu(self):
-        self.switch_ds_type_menu = self.file_menu.addMenu(QIcon(':/icon/exec.png'), SWITCH_ACTION)
+        self.switch_ds_type_menu = self.file_menu.addMenu(get_icon(SWITCH_ACTION), SWITCH_ACTION)
         self.switch_ds_type_menu.triggered.connect(self.main_window.switch_ds_type)
 
     def add_ds_menu(self):
-        self.add_datasource_menu = self.file_menu.addMenu(QIcon(":/icon/add.png"), ADD_CONN_MENU)
+        self.add_datasource_menu = self.file_menu.addMenu(get_icon(ADD_DS_ACTION), ADD_DS_ACTION)
 
     def add_refresh_menu(self):
         refresh_action = add_refresh_action(self.main_window)

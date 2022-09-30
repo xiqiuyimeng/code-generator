@@ -55,7 +55,7 @@ class SqlTreeFrame(AbstractTreeFrame):
         super().__init__(parent, window)
 
     def get_header_text(self) -> str:
-        return 'sql数据源列表'
+        return SQL_DATASOURCE_TYPE
 
     def get_tree_widget(self, window) -> AbstractTreeWidget:
         return SqlTreeWidget(self, window)
@@ -68,7 +68,7 @@ class StructureTreeFrame(AbstractTreeFrame):
         super().__init__(parent, window)
 
     def get_header_text(self) -> str:
-        return '结构体数据源列表'
+        return STRUCTURE_DATASOURCE_TYPE
 
     def get_tree_widget(self, window) -> AbstractTreeWidget:
         return StructureTreeWidget(self, window)

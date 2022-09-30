@@ -32,7 +32,7 @@ class ConnTreeNode(AbstractTreeNode):
 
     def open_item_ui(self, db_names):
         self.item.setData(1, Qt.UserRole, False)
-        make_db_items(self.tree_widget, self.item, db_names)
+        make_db_items(self.item, db_names)
         self.item.setExpanded(True)
         self.tree_widget.set_selected_focus(self.item)
 

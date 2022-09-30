@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QToolBar, QMenu, QToolButton
+from PyQt5.QtCore import QSize
+from PyQt5.QtWidgets import QToolBar, QMenu
 
-from constant.constant import SWITCH_ACTION, ADD_CONN_MENU
+from constant.constant import SWITCH_ACTION, ADD_DS_ACTION, ADD_DS_ACTION_TIP
 from view.bar.bar_action import *
 from view.custom_widget.draggable_widget import DraggableWidget
 
@@ -53,20 +53,12 @@ class ToolBar(QToolBar, DraggableWidget):
         # 重新构建 switch_ds_type_menu 和 add_ds_menu 的下拉列表
         self.switch_ds_type_menu.clear()
         self.add_ds_menu.clear()
-        # 由于 add_ds_menu 是在添加 action 的时候才连接信号槽，所以这里必须先断开之前的信号槽连接，否则会导致信号槽多次连接
-        if self.add_ds_menu.receivers(self.add_ds_menu.triggered):
-            self.add_ds_menu.triggered.disconnect()
         add_switch_ds_type_actions(self.switch_ds_type_menu, self.main_window)
         add_ds_actions(self.add_ds_menu, self.main_window)
 
     def add_switch_source_type_tool(self):
         # 实现工具栏下拉效果，需要使用 QToolButton，设置menu即可下拉
-        switch_ds_type_tool = QToolButton()
-        switch_ds_type_tool.setIcon(QIcon(':/icon/exec.png'))
-        switch_ds_type_tool.setText(SWITCH_ACTION)
-        switch_ds_type_tool.setStatusTip(SWITCH_ACTION_TIP)
-        switch_ds_type_tool.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        switch_ds_type_tool.setPopupMode(QToolButton.InstantPopup)
+        switch_ds_type_tool = add_tool_button(SWITCH_ACTION, SWITCH_ACTION_TIP)
 
         self.switch_ds_type_menu = QMenu()
         self.switch_ds_type_menu.triggered.connect(self.main_window.switch_ds_type)
@@ -76,12 +68,7 @@ class ToolBar(QToolBar, DraggableWidget):
         self.addWidget(switch_ds_type_tool)
 
     def add_ds_tool(self):
-        add_ds_tool = QToolButton()
-        add_ds_tool.setIcon(QIcon(':/icon/add.png'))
-        add_ds_tool.setText(ADD_CONN_MENU)
-        add_ds_tool.setStatusTip(ADD_CONN_MENU)
-        add_ds_tool.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        add_ds_tool.setPopupMode(QToolButton.InstantPopup)
+        add_ds_tool = add_tool_button(ADD_DS_ACTION, ADD_DS_ACTION_TIP)
 
         self.add_ds_menu = QMenu()
         add_ds_tool.setMenu(self.add_ds_menu)

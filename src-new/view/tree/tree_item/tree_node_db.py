@@ -32,7 +32,7 @@ class DBTreeNode(AbstractTreeNode):
     def open_item_ui(self, table_names):
         self.item.setData(1, Qt.UserRole, False)
         if table_names:
-            make_table_items(self.tree_widget, self.item, table_names)
+            make_table_items(self.item, table_names)
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:

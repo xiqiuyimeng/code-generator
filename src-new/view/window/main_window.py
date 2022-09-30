@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar, QFrame, QLabel, \
-    QSplitter
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar
 
 from constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
+from constant.icon_enum import get_icon
 from service.async_func.async_system_task.async_system_db_task import InitDsTypeExecutor, SwitchDsTypeExecutor
 from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
 from service.init.frame_type_init import get_current_datasource_type
@@ -14,9 +13,6 @@ from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
 from view.bar.toolbar import ToolBar
 from view.box.message_box import pop_ok
-from view.table.table_header import CheckBoxHeader
-from view.table.table_widget import TableWidget
-from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.window.central_widget import CentralWidget
 
 _author_ = 'luwt'
@@ -38,27 +34,11 @@ class MainWindow(QMainWindow):
         self.central_widget: CentralWidget = ...
         self.central_layout: QHBoxLayout = ...
 
-        # 定义水平方向分割器
-        self.horizontal_splitter: QSplitter = ...
-
         # 菜单栏、标题栏、工具栏、状态栏
         self.menubar: Menubar = ...
         self.titlebar: TitleBar = ...
         self.toolbar: ToolBar = ...
         self.statusbar: QStatusBar = ...
-
-        # 左侧树结构
-        self.tree_frame: QFrame = ...
-        self.tree_layout: QVBoxLayout = ...
-        self.tree_header_label: QLabel = ...
-        self.tree_widget: AbstractTreeWidget = ...
-
-        # 右侧表结构
-        self.table_frame: QFrame = ...
-        self.table_layout: QVBoxLayout = ...
-        self.table_header: CheckBoxHeader = ...
-        self.table_header_label: QLabel = ...
-        self.table_widget: TableWidget = ...
 
         # 保存选中对象
         self.tree_data = Tree()
@@ -126,7 +106,7 @@ class MainWindow(QMainWindow):
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
         # 任务栏图标
-        self.setWindowIcon(QIcon(":/icon/exec.png"))
+        self.setWindowIcon(get_icon('window'))
 
     def setup_ui_by_ds_type(self, ds_types):
         self.datasource_types = ds_types

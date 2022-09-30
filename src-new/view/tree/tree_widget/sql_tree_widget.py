@@ -2,7 +2,6 @@
 """
 sql数据源树结构
 """
-from PyQt5.QtGui import QIcon
 
 from service.async_func.async_conn_task import ListConnExecutor
 from view.tree.tree_item.context import Context
@@ -21,18 +20,12 @@ class SqlTreeWidget(AbstractTreeWidget):
         self.main_window = window
         # 存储连接id和名称
         self.conn_name_id_dict: dict = ...
-        # 连接的图标
-        self.conn_icon = QIcon(":/icon/mysql_conn_icon.png")
-        # 数据库图标
-        self.db_icon = QIcon(":icon/database_icon.png")
-        # 数据表图标
-        self.tb_icon = QIcon(":icon/table_icon.png")
         # 初始化数据
         self.list_conn_executor = ListConnExecutor(parent, parent, self.init_conn_tree_items)
         self.list_conn_executor.start()
 
     def init_conn_tree_items(self, conns):
-        make_sql_conn_tree_items(conns, self, self.conn_icon)
+        make_sql_conn_tree_items(conns, self)
         self.init_conn_name_list(conns)
 
     def init_conn_name_list(self, conns):

@@ -6,21 +6,39 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE
+from constant.icon_enum import get_icon
 from service.system_storage.conn_sqlite import SqlConnection
-from service.system_storage.conn_type import get_conn_dialog
+from service.system_storage.conn_type import get_conn_dialog, get_conn_type_by_type
 from view.dialog.conn import *
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
 
 
-def make_sql_tree_item(parent, name, icon, sql_conn=None, checkbox=None):
+def get_item_sql_conn(item):
+    return item.data(0, Qt.UserRole)
+
+
+def get_item_conn_type(item):
+    return item.data(1, Qt.UserRole)
+
+
+def get_item_opening_flag(item):
+    return item.data(2, Qt.UserRole)
+
+
+def get_item_testing_flag(item):
+    return item.data(3, Qt.UserRole)
+
+
+def make_sql_tree_item(parent, name, icon, sql_conn=None, conn_type=None, checkbox=None):
     """
     构造树的子项
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
     :param sql_conn: 构造的子节点隐藏属性，第一层连接层存放连接信息
+    :param conn_type: 连接类型，用以区分不同类型连接
     :param checkbox: 构造的子节点的复选框
     """
     item = QTreeWidgetItem(parent)
@@ -29,12 +47,15 @@ def make_sql_tree_item(parent, name, icon, sql_conn=None, checkbox=None):
     if sql_conn:
         # 隐藏属性，放入第一列
         item.setData(0, Qt.UserRole, sql_conn)
+    if conn_type:
+        # 在第二列放入连接类型
+        item.setData(1, Qt.UserRole, conn_type)
     if checkbox is not None:
         item.setCheckState(0, checkbox)
-    # 在第二列放入是否正在打开的标识
-    item.setData(1, Qt.UserRole, False)
-    # 在第三列放入是否正在测试的标识
+    # 在第三列放入是否正在打开的标识
     item.setData(2, Qt.UserRole, False)
+    # 在第四列放入是否正在测试的标识
+    item.setData(3, Qt.UserRole, False)
     return item
 
 
@@ -77,7 +98,9 @@ def add_conn_tree_item(tree_widget, connection):
     :param tree_widget: 树对象
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
     """
-    make_sql_tree_item(tree_widget, connection.conn_name, tree_widget.conn_icon, connection)
+    conn_type = get_conn_type_by_type(connection.conn_type)
+    conn_icon = get_icon(conn_type.display_name)
+    make_sql_tree_item(tree_widget, connection.conn_name, conn_icon, connection, conn_type)
     tree_widget.add_conn_name(connection.id, connection.conn_name)
 
 
@@ -93,24 +116,30 @@ def update_conn_tree_item(tree_widget, connection):
     tree_widget.update_conn_name(connection.id, connection.conn_name)
 
 
-def make_sql_conn_tree_items(sql_conns, parent, icon):
+def make_sql_conn_tree_items(sql_conns, parent):
     """
     根据本地保存的连接列表，构建树节点，在项目启动初始化时调用
     """
     for sql_conn in sql_conns:
-        make_sql_tree_item(parent, sql_conn.conn_name, icon, sql_conn)
+        conn_type = get_conn_type_by_type(sql_conn.conn_type)
+        conn_icon = get_icon(conn_type.display_name)
+        make_sql_tree_item(parent, sql_conn.conn_name, conn_icon, sql_conn, conn_type)
 
 
-def make_db_items(tree_widget, parent_item, db_names):
+def make_db_items(parent_item, db_names):
     """构建数据库层叶子节点"""
     for db_name in db_names:
-        make_sql_tree_item(parent_item, db_name, tree_widget.db_icon)
+        conn_type = get_item_conn_type(parent_item)
+        icon = get_icon(conn_type.db_icon_name)
+        make_sql_tree_item(parent_item, db_name, icon)
 
 
-def make_table_items(tree_widget, parent_item, table_names):
+def make_table_items(parent_item, table_names):
     """构建数据表层叶子节点"""
     for table_name in table_names:
-        make_sql_tree_item(parent_item, table_name, tree_widget.tb_icon, checkbox=Qt.Unchecked)
+        conn_type = get_item_conn_type(parent_item.parent())
+        icon = get_icon(conn_type.tb_icon_name)
+        make_sql_tree_item(parent_item, table_name, icon, checkbox=Qt.Unchecked)
 
 
 def check_table_status(parent):

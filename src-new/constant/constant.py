@@ -142,6 +142,8 @@ PARAM_PATH_ERROR = "路径参数有误"
 FILE_MENU = '文件'
 SWITCH_ACTION = '切换数据源类型'
 SWITCH_ACTION_TIP = '切换数据源类型'
+ADD_DS_ACTION = '添加数据源'
+ADD_DS_ACTION_TIP = '添加数据源'
 REFRESH_ACTION = '刷新'
 REFRESH_ACTION_TIP = '刷新当前数据源类型信息'
 CLEAR_DATA_ACTION = '清空选择'
@@ -424,8 +426,15 @@ TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引�
 TP_KEY_DESC = '模板中的关键词介绍'
 
 SQL_DATASOURCE_TYPE = 'sql数据源'
-STRUCTURE_DATASOURCE_TYPE = 'structure数据源'
+STRUCTURE_DATASOURCE_TYPE = '结构体数据源'
 
 STRUCTURE_TABLE_HEADER_BUTTON_TXT = '导入结构体数据'
 
 SYS_DB_PATH = 'c:\\Users\\luwt-a\\Documents\\generator_db'
+
+SQLITE_DISPLAY_NAME = 'sqlite'
+SQLITE_DB = 'sqlite_db'
+SQLITE_TB = 'sqlite_tb'
+MYSQL_DISPLAY_NAME = 'mysql'
+MYSQL_DB = 'mysql_db'
+MYSQL_TB = 'mysql_tb'

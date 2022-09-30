@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
+from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
 from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 
 _author_ = 'luwt'
@@ -12,7 +13,6 @@ datasource_type_sql = {
     (id integer PRIMARY KEY autoincrement,
     name char(10) not null,
     ds_type_order integer not null,
-    icon_path char(100) not null,
     is_current integer not null,
     create_time datetime,
     update_time datetime
@@ -26,7 +26,6 @@ class DatasourceType(BasicSqliteDTO):
 
     name: str = field(default=None, init=False)
     ds_type_order: int = field(default=None, init=False)
-    icon_path: str = field(default=None, init=False)
     is_current: int = field(default=None, init=False)
 
     def __init__(self, **kwargs):
@@ -35,15 +34,13 @@ class DatasourceType(BasicSqliteDTO):
 
 
 sql_ds_dict = {
-    'name': 'sql数据源',
+    'name': SQL_DATASOURCE_TYPE,
     'ds_type_order': 1,
-    'icon_path': ':/icon/add.png',
     'is_current': 1
 }
 structure_ds_dict = {
-    'name': 'structure数据源',
+    'name': STRUCTURE_DATASOURCE_TYPE,
     'ds_type_order': 2,
-    'icon_path': ':/icon/add.png',
     'is_current': 0
 }
 
