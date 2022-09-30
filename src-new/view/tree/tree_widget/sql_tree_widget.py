@@ -43,8 +43,8 @@ class SqlTreeWidget(AbstractTreeWidget):
     def do_open_tree_item(self, item):
         Context(item, self, self.main_window).open_item()
 
-    def do_get_menu_names(self, item):
-        return Context(item, self, self.main_window).get_menu_names()
+    def do_fill_menu(self, item, menu):
+        Context(item, self, self.main_window).do_fill_menu(menu)
 
     def do_handle_right_menu_func(self, item, func_name):
         Context(item, self, self.main_window).handle_menu_func(func_name)

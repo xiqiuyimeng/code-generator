@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from view.tree.tree_item.tree_node_conn import ConnTreeNode
+from view.tree.tree_item.tree_node_conn.tree_node_conn import ConnTreeNode
 from view.tree.tree_item.tree_node_db import DBTreeNode
 from view.tree.tree_item.tree_node_table import TableTreeNode
 
@@ -34,16 +33,16 @@ class Context:
         self.tree_node = get_tree_node(*args)
 
     def open_item(self):
-        return self.tree_node.open_item()
+        self.tree_node.open_item()
 
     def close_item(self):
-        return self.tree_node.close_item()
+        self.tree_node.close_item()
 
     def change_check_box(self, check_state):
-        return self.tree_node.change_check_box(check_state)
+        self.tree_node.change_check_box(check_state)
 
-    def get_menu_names(self):
-        return self.tree_node.get_menu_names()
+    def do_fill_menu(self, menu):
+        self.tree_node.do_fill_menu(menu)
 
     def handle_menu_func(self, func):
-        return self.tree_node.handle_menu_func(func)
+        self.tree_node.handle_menu_func(func)

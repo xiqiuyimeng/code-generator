@@ -44,7 +44,7 @@ class DBTreeNode(AbstractTreeNode):
     def close_item(self):
         ...
 
-    def get_menu_names(self):
+    def do_fill_menu(self, menu):
         menu_names = list()
         if self.item.childCount():
             check_state = check_table_status(self.item)

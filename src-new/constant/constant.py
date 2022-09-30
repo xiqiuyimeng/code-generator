@@ -68,21 +68,21 @@ NO_TBS_PROMPT = "连接[{}]数据库[{}]下没有表！"
 # ---------- 树节点右键菜单文字 start ---------- #
 """关于连接的右键菜单"""
 # 打开连接
-OPEN_CONN_MENU = '打开连接 [{}]'
+OPEN_CONN_ACTION = '打开连接 [{}]'
 # 取消打开连接
-CANCEL_OPEN_CONN_MENU = '取消打开连接 [{}]'
+CANCEL_OPEN_CONN_ACTION = '取消打开连接 [{}]'
 # 关闭连接
-CLOSE_CONN_MENU = '关闭连接 [{}]'
+CLOSE_CONN_ACTION = '关闭连接 [{}]'
 # 测试连接
-TEST_CONN_MENU = '测试连接 [{}]'
+TEST_CONN_ACTION = '测试连接 [{}]'
 # 取消测试连接
-CANCEL_TEST_CONN_MENU = '取消测试连接 [{}]'
+CANCEL_TEST_CONN_ACTION = '取消测试连接 [{}]'
 # 添加连接
-ADD_CONN_MENU = '添加连接'
+ADD_CONN_ACTION = '添加连接'
 # 编辑连接
-EDIT_CONN_MENU = '编辑连接 [{}]'
+EDIT_CONN_ACTION = '编辑连接 [{}]'
 # 删除连接
-DEL_CONN_MENU = '删除连接 [{}]'
+DEL_CONN_ACTION = '删除连接 [{}]'
 
 """关于数据库的右键菜单"""
 # 打开数据库

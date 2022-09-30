@@ -10,7 +10,7 @@
 """
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QAction
+from PyQt5.QtWidgets import QTreeWidgetItem, QMenu
 
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
@@ -58,8 +58,8 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
         if item:
             # 生成右键菜单
             menu = QMenu()
-            menu_names = self.do_get_menu_names(item)
-            [menu.addAction(QAction(option, menu)) for option in menu_names]
+            # 填充右键菜单内容
+            self.do_fill_menu(item, menu)
             # 右键菜单点击事件
             menu.triggered.connect(self.handle_right_menu_func)
             # 右键菜单弹出位置跟随焦点位置
@@ -87,7 +87,7 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
 
     def do_open_tree_item(self, item): ...
 
-    def do_get_menu_names(self, item) -> list: ...
+    def do_fill_menu(self, item, menu): ...
 
     def do_handle_right_menu_func(self, item, func_name): ...
 

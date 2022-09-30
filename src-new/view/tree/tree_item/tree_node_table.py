@@ -45,7 +45,7 @@ class TableTreeNode(AbstractTreeNode):
     def change_check_box(self, check_state):
         ...
 
-    def get_menu_names(self):
+    def do_fill_menu(self, menu):
         return [
             # 根据是否在打开中标识
             CANCEL_OPEN_TABLE_MENU.format(self.table_name)

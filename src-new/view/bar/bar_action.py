@@ -28,14 +28,14 @@ def add_ds_actions(parent_menu, main_window):
     # 根据当前的数据源类型，决定构建的action类型
     if main_window.current_ds_type.name == SQL_DATASOURCE_TYPE:
         add_sql_ds_actions(parent_menu, main_window)
-        # 连接菜单点击信号槽
-        parent_menu.triggered.connect(lambda action: open_conn_dialog(action, main_window.tree_widget,
-                                                                      main_window.geometry()))
     elif main_window.current_ds_type.name == STRUCTURE_DATASOURCE_TYPE:
         add_structure_ds_actions(parent_menu, main_window)
 
 
 def add_sql_ds_actions(parent_menu, main_window):
+    # 连接菜单点击信号槽
+    parent_menu.triggered.connect(lambda action: open_conn_dialog(action, main_window.tree_widget,
+                                                                  main_window.geometry()))
     for conn_type in ConnTypeEnum:
         conn_type_name = conn_type.value.display_name
         add_action = QAction(get_icon(conn_type_name), conn_type_name, main_window)

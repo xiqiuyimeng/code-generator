@@ -5,7 +5,9 @@ from PyQt5.QtGui import QIcon
 
 from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE, SWITCH_ACTION, ADD_DS_ACTION, \
     REFRESH_ACTION, TEMPLATE_ACTION, GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, \
-    SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB
+    SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, OPEN_CONN_ACTION, \
+    CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
+    EDIT_CONN_ACTION, DEL_CONN_ACTION
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -29,6 +31,16 @@ class IconEnum(Enum):
     exit_icon = EXIT_ACTION, ':/icon/exit.png'
     help_icon = HELP_ACTION, ':/icon/exec.png'
     about_icon = ABOUT_ACTION, ':/icon/exec.png'
+
+    # 右键菜单 icon
+    open_conn_icon = OPEN_CONN_ACTION, ':/icon/exec.png'
+    cancel_open_conn_icon = CANCEL_OPEN_CONN_ACTION, ':/icon/exec.png'
+    close_conn_icon = CLOSE_CONN_ACTION, ':/icon/exec.png'
+    test_conn_icon = TEST_CONN_ACTION, ':/icon/exec.png'
+    cancel_test_conn_icon = CANCEL_TEST_CONN_ACTION, ':/icon/exec.png'
+    add_conn_icon = ADD_CONN_ACTION, ':/icon/exec.png'
+    edit_conn_icon = EDIT_CONN_ACTION, ':/icon/exec.png'
+    del_conn_icon = DEL_CONN_ACTION, ':/icon/exec.png'
 
     # datasource type icon
     sql_ds_icon = SQL_DATASOURCE_TYPE, ':/icon/add.png'
