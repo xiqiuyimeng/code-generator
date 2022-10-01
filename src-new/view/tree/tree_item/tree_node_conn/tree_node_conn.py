@@ -10,8 +10,9 @@ from service.async_func.async_mysql_task import OpenConnExecutor, TestConnIconMo
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_widget.tree_function import make_db_items, add_conn_func, edit_conn_func, set_item_opening_flag, \
-    set_item_opening_worker, set_item_testing_flag, get_item_opening_flag, get_item_testing_flag
+from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, set_item_opening_flag, \
+    set_item_opening_worker, set_item_testing_flag, get_item_opening_flag, get_item_testing_flag, get_item_conn_type, \
+    get_item_sql_conn
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -103,12 +104,10 @@ class ConnTreeNode(AbstractTreeNode):
         # 取消测试连接
         elif func == CANCEL_TEST_CONN_ACTION.format(self.conn_name):
             self.item.data(2, Qt.UserRole + 1).worker_terminate(self.test_conn_fail)
-        # 添加连接
-        elif func == ADD_CONN_ACTION:
-            add_conn_func(self.tree_widget, self.window.geometry())
         # 编辑连接
         elif func == EDIT_CONN_ACTION.format(self.conn_name):
-            edit_conn_func(self.tree_widget, self.window.geometry(), self.item.data(0, Qt.UserRole))
+            edit_conn_func(get_item_conn_type(self.item).display_name, self.tree_widget,
+                           self.window.geometry(), get_item_sql_conn(self.item))
         # 删除连接
         elif func == DEL_CONN_ACTION.format(self.conn_name):
             pass

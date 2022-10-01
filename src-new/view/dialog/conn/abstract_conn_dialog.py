@@ -210,7 +210,8 @@ class AbstractConnDialog(DraggableDialog):
 
     def check_name_available(self, conn_name):
         if conn_name:
-            if self.check_available(conn_name):
+            self.name_available = self.check_available(conn_name)
+            if self.name_available:
                 prompt = CONN_NAME_AVAILABLE.format(conn_name)
                 style = "color:green"
                 # 重载样式表
@@ -237,7 +238,7 @@ class AbstractConnDialog(DraggableDialog):
         # 如果当前是新增连接，连接id为空，取出的id应该为空才证明名称可用不重复
         # 如果当前是编辑连接，那么id如果是当前连接的id，证明名称无变化，可用
         conn_id = self.conn_name_id_dict.get(conn_name)
-        return conn_id == self.connection.id
+        return (conn_id is None) or (conn_id == self.connection.id)
 
     def test_connection(self):
         self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_connection, self, self)
@@ -249,6 +250,7 @@ class AbstractConnDialog(DraggableDialog):
         # 存在id，说明是编辑
         if self.connection.id:
             if self.new_connection != self.connection:
+                self.new_connection.id = self.connection.id
                 self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self, self.save_post_process)
                 self.edit_conn_executor.start()
             else:

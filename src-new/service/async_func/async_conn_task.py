@@ -144,7 +144,7 @@ class ListConnWorker(ThreadWorkerABC):
         self.success_signal.emit(connections)
 
     def do_exception(self, e: Exception):
-        log.error(f'{LIST_ALL_CONN_FAIL_PROMPT} --> {e}')
+        log.exception(LIST_ALL_CONN_FAIL_PROMPT)
         self.error_signal.emit(f'{LIST_ALL_CONN_FAIL_PROMPT}\n{e}')
 
 

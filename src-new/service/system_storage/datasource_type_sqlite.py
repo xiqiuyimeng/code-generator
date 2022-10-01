@@ -60,10 +60,14 @@ class DatasourceTypeSqlite(SqliteBasic):
 
     def switch_ds_type(self, ds_type_name):
         datasource_types = self.select(DatasourceType())
+        update_ds_types = list()
         for ds_type in datasource_types:
+            update_ds_type = DatasourceType()
+            update_ds_type.id = ds_type.id
             if ds_type.name == ds_type_name:
-                ds_type.is_current = 1
+                update_ds_type.is_current = 1
             else:
-                ds_type.is_current = 0
-        self.batch_update(datasource_types)
+                update_ds_type.is_current = 0
+            update_ds_types.append(update_ds_type)
+        self.batch_update(update_ds_types)
 

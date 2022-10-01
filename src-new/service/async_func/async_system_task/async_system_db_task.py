@@ -5,6 +5,8 @@ from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThread
 from service.init.frame_type_init import get_current_datasource_type
 from service.system_storage.datasource_type_sqlite import DatasourceTypeSqlite, DatasourceType, DatasourceTypeEnum
 
+from logger.log import logger as log
+
 _author_ = 'luwt'
 _date_ = '2022/9/26 18:33'
 
@@ -18,6 +20,7 @@ class InitDsTypeWorker(ThreadWorkerABC):
         super().__init__()
 
     def do_run(self):
+        log.info("读取数据源类型列表")
         datasource_types = self.get_ds_types()
         # 返回数据
         self.success_signal.emit(datasource_types)
@@ -31,6 +34,7 @@ class InitDsTypeWorker(ThreadWorkerABC):
 
     def init_ds_types(self):
         # 上述条件不满足，则进行初始化，将库里原有数据清空，初始化数据
+        log.info("数据源类型列表数据初始化")
         DatasourceTypeSqlite().drop_table()
         datasource_types = list()
         for ds_type in DatasourceTypeEnum:
@@ -63,12 +67,14 @@ class SwitchDsTypeWorker(InitDsTypeWorker):
         self.switch_ds_type = switch_ds_type
 
     def do_run(self):
+        log.info(f'切换数据源类型 ==> {self.switch_ds_type}')
         DatasourceTypeSqlite().switch_ds_type(self.switch_ds_type)
         super().do_run()
 
     def do_exception(self, e: Exception):
-        # todo 记录错误日志
-        self.error_signal.emit('切换失败')
+        # 记录错误日志
+        log.exception('切换数据源类型失败')
+        self.error_signal.emit('切换数据源类型失败')
 
 
 class SwitchDsTypeExecutor(LoadingMaskThreadExecutor):

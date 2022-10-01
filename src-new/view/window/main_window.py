@@ -47,9 +47,6 @@ class MainWindow(QMainWindow):
         self.current_ds_type = ...
         self.init_ds_type_executor = ...
 
-        # 缓存树结构需要使用的icon
-        self.tree_icon_dict = dict()
-
         # 保存操作记录的队列
         self.operation_queue = SystemOperationQueue()
 

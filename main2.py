@@ -8,6 +8,7 @@ from PyQt5.QtGui import QPixmap
 import sys
 from service.read_qrc.read_config import read_qss
 from view.window.main_window import MainWindow
+from logger.log import logger as log
 from static import image_rc
 
 _author_ = 'luwt'
@@ -15,6 +16,7 @@ _date_ = '2022/5/11 10:33'
 
 
 if __name__ == "__main__":
+    log.info("**********生成器启动**********")
     app = QtWidgets.QApplication(sys.argv)
     splash = QtWidgets.QSplashScreen(
         QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -33,4 +35,5 @@ if __name__ == "__main__":
     ui.show()
     splash.finish(ui)
     app.exec_()
+    log.info("**********生成器退出**********")
     sys.exit()

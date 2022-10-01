@@ -7,6 +7,7 @@ import records
 from sqlalchemy.pool import SingletonThreadPool
 
 from constant.constant import SYS_DB_PATH
+from logger.log import logger as log
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
@@ -45,7 +46,6 @@ class SqliteBasic:
         self._select_count_sql = f'select count(*) as count from {self.table_name}'
         self._select_id_sql = f'select max(id) as id from {self.table_name}'
         self._field_list_sql = f'PRAGMA table_info("{self.table_name}")'
-        print("init-----")
 
     def _create_table(self):
         if not os.path.exists(SYS_DB_PATH):
@@ -78,7 +78,8 @@ class SqliteBasic:
             field_str = ", ".join(insert_dict.keys())
             value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict.keys())))
             insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
-            print(insert_sql)
+            log.info(f'插入[{self.table_name}]语句 ==> {insert_sql}')
+            log.info(f'插入[{self.table_name}]参数 ==> {insert_dict}')
             with self.db.transaction() as tx:
                 tx.query(insert_sql, **insert_dict)
                 id_record = tx.query(self._select_id_sql).first()
@@ -99,11 +100,14 @@ class SqliteBasic:
         field_str = ", ".join(insert_dict_list[0].keys())
         value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict_list[0].keys())))
         insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
-        print(insert_sql)
+        log.info(f'批量插入[{self.table_name}]语句 ==> {insert_sql}')
+        log.info(f'批量插入[{self.table_name}]参数 ==> {insert_dict_list}')
         with self.db.transaction() as tx:
             tx.bulk_query(insert_sql, insert_dict_list)
 
     def delete(self, obj_id):
+        log.info(f'删除[{self.table_name}]语句 ==> {self._delete_sql}')
+        log.info(f'删除[{self.table_name}]参数 ==> {obj_id}')
         self.db.query(self._delete_sql, **{"id": obj_id})
 
     def update(self, update_obj: BasicSqliteDTO):
@@ -118,12 +122,19 @@ class SqliteBasic:
         # 只更新除id以外不为空的属性
         update_field_list = list(map(lambda x: x[0],
                                      filter(lambda x: x[1] is not None and x[0] != 'id', update_dict.items())))
+
+        # 收集更新的value dict
+        update_val_dict = {"id": update_dict.get("id")}
+        for field in update_field_list:
+            update_val_dict[field] = update_dict.get(field)
+
         if update_field_list:
             update_field_str = ", ".join(list(map(lambda x: f'{x} = :{x}', update_field_list)))
             update_sql = f'{self._update_sql} {update_field_str} {self._id_clause_sql}'
-            print(update_sql)
+            log.info(f'更新[{self.table_name}]语句 ==> {update_sql}')
+            log.info(f'更新[{self.table_name}]参数 ==> {update_val_dict}')
 
-            self.db.query(update_sql, **update_dict)
+            self.db.query(update_sql, **update_val_dict)
 
     def batch_update(self, update_objs):
         """批量更新"""
@@ -140,12 +151,21 @@ class SqliteBasic:
         update_field_list = list(map(lambda x: x[0],
                                      filter(lambda x: x[1] is not None and x[0] != 'id', update_dict_list[0].items())))
 
+        # 收集value list
+        update_value_list = list()
+        for update_obj_dict in update_dict_list:
+            update_val_dict = {"id": update_obj_dict.get("id")}
+            for field in update_field_list:
+                update_val_dict[field] = update_obj_dict.get(field)
+            update_value_list.append(update_val_dict)
+
         if update_field_list:
             update_field_str = ", ".join(list(map(lambda x: f'{x} = :{x}', update_field_list)))
             update_sql = f'{self._update_sql} {update_field_str} {self._id_clause_sql}'
-            print(update_sql)
+            log.info(f'批量更新[{self.table_name}]语句 ==> {update_sql}')
+            log.info(f'批量更新[{self.table_name}]参数 ==> {update_value_list}')
 
-            self.db.bulk_query(update_sql, update_dict_list)
+            self.db.bulk_query(update_sql, update_value_list)
 
     def select(self, select_obj):
         """根据条件查询，根据不为空的属性作为条件进行查询"""
@@ -168,11 +188,17 @@ class SqliteBasic:
         self.filter_illegal_field(select_dict)
 
         select_field_list = list(map(lambda x: x[0], filter(lambda x: x[1] is not None, select_dict.items())))
+        select_value_dict = dict()
         if select_field_list:
             select_clause = ' and '.join(list(map(lambda x: f'{x} = :{x}', select_field_list)))
             select_sql = f'{sql} where {select_clause}'
-        print(select_sql)
-        return self.db.query(select_sql, **select_dict)
+            # 收集查询value
+            for select_field in select_field_list:
+                select_value_dict[select_field] = select_dict[select_field]
+
+        log.info(f'查询[{self.table_name}]语句 ==> {select_sql}')
+        log.info(f'查询[{self.table_name}]参数 ==> {select_value_dict}')
+        return self.db.query(select_sql, **select_value_dict)
 
     def filter_illegal_field(self, operation_dict):
         # 过滤掉不合法的field

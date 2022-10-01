@@ -146,7 +146,7 @@ def update_conn_tree_item(tree_widget, connection):
     """
     item = tree_widget.currentItem()
     item.setText(0, connection.conn_name)
-    item.setData(0, Qt.UserRole, connection)
+    set_item_sql_conn(item, connection)
     tree_widget.update_conn_name(connection.id, connection.conn_name)
 
 

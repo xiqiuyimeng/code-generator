@@ -2,6 +2,7 @@
 """
 所有用到的常量
 """
+import os
 
 _author_ = 'luwt'
 _date_ = '2020/4/20 10:40'
@@ -430,7 +431,8 @@ STRUCTURE_DATASOURCE_TYPE = '结构体数据源'
 
 STRUCTURE_TABLE_HEADER_BUTTON_TXT = '导入结构体数据'
 
-SYS_DB_PATH = 'c:\\Users\\luwt-a\\Documents\\generator_db'
+# windows家目录变量：USERPROFILE，unix：HOME
+SYS_DB_PATH = os.path.join(os.environ['USERPROFILE'], '.generator_db')
 
 SQLITE_DISPLAY_NAME = 'sqlite'
 SQLITE_DB = 'sqlite_db'
