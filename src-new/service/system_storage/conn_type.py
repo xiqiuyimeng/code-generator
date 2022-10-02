@@ -61,12 +61,6 @@ class ConnType:
     type_class: str = field(init=False)
     # 对应类型的连接对话框
     type_dialog: str = field(init=False)
-    # 对应类型的树连接节点类
-    conn_node: str = field(init=False)
-    # 对应类型的树库节点类
-    db_node: str = field(init=False)
-    # 对应类型的树表节点类
-    tb_node: str = field(init=False)
     # 对应类型的数据库连接类
     db_executor: str = field(init=False)
     # 查询数据库列表sql
@@ -86,9 +80,6 @@ class ConnTypeEnum(Enum):
     sqlite.tb_icon_name = SQLITE_TB
     sqlite.type_class = 'SqliteConn'
     sqlite.type_dialog = 'SqliteConnDialog'
-    sqlite.conn_node = 'SqliteConnNode'
-    sqlite.db_node = 'SqliteDBNode'
-    sqlite.tb_node = 'SqliteTBNode'
     sqlite.db_executor = 'SqliteDBExecutor'
     sqlite.query_db_sql = SQLITE_QUERY_DB_SQL
     sqlite.query_tb_sql = SQLITE_QUERY_TB_SQL
@@ -101,9 +92,6 @@ class ConnTypeEnum(Enum):
     mysql.tb_icon_name = MYSQL_TB
     mysql.type_class = 'InternetSqlConn'
     mysql.type_dialog = 'MysqlConnDialog'
-    mysql.conn_node = 'MysqlConnNode'
-    mysql.db_node = 'MysqlDBNode'
-    mysql.tb_node = 'MysqlTBNode'
     mysql.db_executor = 'MySqlDBExecutor'
     mysql.query_db_sql = MYSQL_QUERY_DB_SQL
     mysql.query_tb_sql = MYSQL_QUERY_TB_SQL

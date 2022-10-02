@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
@@ -13,7 +12,7 @@ from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, set_item_opening_flag, \
     set_item_testing_flag, get_item_conn_type
 from view.tree.tree_widget.tree_item_func import set_item_opening_worker, get_item_opening_flag, \
-    get_item_testing_flag, get_item_sql_conn
+    get_item_testing_flag, get_item_sql_conn, get_item_testing_worker, get_item_opening_worker, set_item_testing_worker
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -79,7 +78,7 @@ class ConnTreeNode(AbstractTreeNode):
         self.test_conn_executor = TestConnIconMovieExecutor(self.item, self.window,
                                                             self.test_conn_success, self.test_conn_fail)
         # 将测试连接的线程执行器绑定到item中
-        self.item.setData(2, Qt.UserRole + 1, self.test_conn_executor)
+        set_item_testing_worker(self.item, self.test_conn_executor)
         self.test_conn_executor.start()
 
     def test_conn_success(self):
@@ -95,7 +94,7 @@ class ConnTreeNode(AbstractTreeNode):
             self.open_item()
         # 取消打开连接
         elif func == CANCEL_OPEN_CONN_ACTION.format(self.conn_name):
-            self.item.data(1, Qt.UserRole + 1).worker_terminate(self.open_item_fail)
+            get_item_opening_worker(self.item).worker_terminate(self.open_item_fail)
         # 关闭连接
         elif func == CLOSE_CONN_ACTION.format(self.conn_name):
             pass
@@ -104,7 +103,7 @@ class ConnTreeNode(AbstractTreeNode):
             self.test_conn()
         # 取消测试连接
         elif func == CANCEL_TEST_CONN_ACTION.format(self.conn_name):
-            self.item.data(2, Qt.UserRole + 1).worker_terminate(self.test_conn_fail)
+            get_item_testing_worker(self.item).worker_terminate(self.test_conn_fail)
         # 编辑连接
         elif func == EDIT_CONN_ACTION.format(self.conn_name):
             edit_conn_func(get_item_conn_type(self.item).display_name, self.tree_widget,

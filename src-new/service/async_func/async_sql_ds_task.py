@@ -168,7 +168,8 @@ class OpenTBWorker(ThreadWorkerABC):
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}\n{e}')
+        self.error_signal.emit(f'[{self.connection.conn_name}][{self.db_name}]'
+                               f'[{self.tb_name}]{OPEN_TB_FAIL_PROMPT}\n{e}')
 
 
 class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
