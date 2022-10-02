@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal
 
-from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
-from service.db_operator.db_executor import DBExecutor
-from logger.log import logger as log
-from service.system_storage.conn_sqlite import SqlConnection
-from view.box.message_box import pop_ok
 from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
     OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, OPEN_DB_TITLE, \
     OPEN_TB_TITLE, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT
+from logger.log import logger as log
+from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
+from service.sql_ds_executor import *
+from service.system_storage.conn_sqlite import SqlConnection
+from service.system_storage.conn_type import get_conn_type_by_type
+from view.box.message_box import pop_ok
+from view.tree.tree_widget.tree_item_func import get_item_sql_conn
 
 _author_ = 'luwt'
 _date_ = '2022/5/31 19:05'
 
 
-class MysqlIconMovieThreadExecutor(IconMovieThreadExecutor):
+class SqlDSIconMovieThreadExecutor(IconMovieThreadExecutor):
 
     def __init__(self, item, window, error_box_title, success_callback, fail_callback):
         self.success_callback = success_callback
@@ -39,14 +41,16 @@ class TestConnWorker(ThreadWorkerABC):
         self.connection = connection
 
     def do_run(self):
-        with DBExecutor(*self.connection[1:]) as executor:
-            executor.test_conn()
-            log.info(f'[{self.connection.conn_name}]{TEST_CONN_SUCCESS_PROMPT}')
-            self.success_signal.emit()
+        db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
+        executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
+        executor.test_conn()
+        log.info(f'[{self.connection.conn_name}]{TEST_CONN_SUCCESS_PROMPT}')
+        self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.conn_name}]{TEST_CONN_FAIL_PROMPT} --> {e}')
-        self.error_signal.emit(f'[{self.connection.conn_name}]{TEST_CONN_FAIL_PROMPT}\n{e}')
+        log.exception(f'[{self.connection.conn_name}]{TEST_CONN_FAIL_PROMPT}')
+        self.error_signal.emit(f'[{self.connection.conn_name}]{TEST_CONN_FAIL_PROMPT}\n'
+                               f'{e.orig.original_exception.strerror}')
 
 
 class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
@@ -63,13 +67,13 @@ class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
                TEST_CONN_TITLE, self.window)
 
 
-class TestConnIconMovieExecutor(MysqlIconMovieThreadExecutor):
+class TestConnIconMovieExecutor(SqlDSIconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, TEST_CONN_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return TestConnWorker(self.item.data(0, Qt.UserRole))
+        return TestConnWorker(get_item_sql_conn(self.item))
 
 # ---------------------------------------- 测试连接 end ---------------------------------------- #
 
@@ -85,23 +89,25 @@ class OpenConnWorker(ThreadWorkerABC):
         self.connection = connection
 
     def do_run(self):
-        with DBExecutor(*self.connection[1:]) as executor:
-            dbs = executor.open_conn()
-            self.success_signal.emit(dbs)
-            log.info(f'[{self.connection.conn_name}]{OPEN_CONN_SUCCESS_PROMPT} ==> {dbs}')
+        db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
+        executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
+        db_names = executor.open_conn()
+        self.success_signal.emit(db_names)
+        log.info(f'[{self.connection.conn_name}]{OPEN_CONN_SUCCESS_PROMPT} ==> {db_names}')
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.conn_name}]{OPEN_CONN_FAIL_PROMPT} --> {e}')
-        self.error_signal.emit(f'[{self.connection.conn_name}]{OPEN_CONN_FAIL_PROMPT}\n{e}')
+        log.exception(f'[{self.connection.conn_name}]{OPEN_CONN_FAIL_PROMPT}')
+        self.error_signal.emit(f'[{self.connection.conn_name}]{OPEN_CONN_FAIL_PROMPT}\n'
+                               f'{e.orig.original_exception.strerror}')
 
 
-class OpenConnExecutor(MysqlIconMovieThreadExecutor):
+class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, OPEN_CONN_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return OpenConnWorker(self.item.data(0, Qt.UserRole))
+        return OpenConnWorker(get_item_sql_conn(self.item))
 
 # ---------------------------------------- 打开连接 end ---------------------------------------- #
 
@@ -118,23 +124,24 @@ class OpenDBWorker(ThreadWorkerABC):
         self.db_name = db_name
 
     def do_run(self):
-        with DBExecutor(*self.connection[1:]) as executor:
-            tables = executor.open_db(self.db_name)
-            self.success_signal.emit(tables)
-            log.info(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT} ==> {tables}')
+        db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
+        executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
+        tb_names = executor.open_db(self.db_name)
+        self.success_signal.emit(tb_names)
+        log.info(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT} ==> {tb_names}')
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT} --> {e}')
+        log.exception(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}')
         self.error_signal.emit(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}\n{e}')
 
 
-class OpenDBExecutor(MysqlIconMovieThreadExecutor):
+class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, OPEN_DB_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return OpenDBWorker(self.item.parent().data(0, Qt.UserRole), self.item.text(0))
+        return OpenDBWorker(get_item_sql_conn(self.item.parent()), self.item.text(0))
 
 # ---------------------------------------- 打开数据库 end ---------------------------------------- #
 
@@ -152,24 +159,25 @@ class OpenTBWorker(ThreadWorkerABC):
         self.tb_name = tb_name
 
     def do_run(self):
-        with DBExecutor(*self.connection[1:]) as executor:
-            columns = executor.open_tb(self.db_name, self.tb_name)
-            log.info(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}'
-                     f' ==> {columns}')
-            self.success_signal.emit(columns)
+        db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
+        executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
+        columns = executor.open_tb(self.db_name, self.tb_name)
+        log.info(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}'
+                 f' ==> {columns}')
+        self.success_signal.emit(columns)
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT} --> {e}')
+        log.exception(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}')
         self.error_signal.emit(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}\n{e}')
 
 
-class OpenTBExecutor(MysqlIconMovieThreadExecutor):
+class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, OPEN_TB_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return OpenTBWorker(self.item.parent().parent().data(0, Qt.UserRole),
+        return OpenTBWorker(get_item_sql_conn(self.item.parent().parent()),
                             self.item.parent().text(0), self.item.text(0))
 
 # ---------------------------------------- 打开数据表 end ---------------------------------------- #

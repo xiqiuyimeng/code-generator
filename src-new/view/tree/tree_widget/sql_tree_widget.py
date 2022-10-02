@@ -3,7 +3,7 @@
 sql数据源树结构
 """
 
-from service.async_func.async_conn_task import ListConnExecutor
+from service.async_func.async_sql_conn_task import ListConnExecutor
 from view.tree.tree_item.context import Context
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.tree_function import make_sql_conn_tree_items

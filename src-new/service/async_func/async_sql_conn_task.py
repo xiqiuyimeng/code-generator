@@ -30,7 +30,7 @@ class AddConnWorker(ThreadWorkerABC):
         self.success_signal.emit(self.connection.id)
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT} --> {e}')
+        log.exception(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}')
         self.error_signal.emit(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
 
 
@@ -69,7 +69,7 @@ class EditConnWorker(ThreadWorkerABC):
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT} --> {e}')
+        log.exception(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}')
         self.error_signal.emit(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
 
 
@@ -108,7 +108,7 @@ class DelConnWorker(ThreadWorkerABC):
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.error(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT} --> {e}')
+        log.exception(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}')
         self.error_signal.emit(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}\n{e}')
 
 

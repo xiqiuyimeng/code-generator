@@ -110,12 +110,19 @@ SELECT_ALL_FIELD_MENU = '全选 [{}] 表中所有字段'
 UNSELECT_FIELD_MENU = '取消选择字段'
 # ---------- 树节点右键菜单文字 end ---------- #
 
-# 查询数据库列表sql
-QUERY_DB_SQL = 'show databases;'
-# 查询数据库中的表名sql
-QUERY_TABLES_SQL = 'show tables;'
-# 查询数据库表的列名sql
-QUERY_COLUMNS_SQL = "show full columns from {};"
+# mysql查询数据库列表sql
+MYSQL_QUERY_DB_SQL = 'show databases;'
+# mysql查询数据库中的表名sql
+MYSQL_QUERY_TB_SQL = 'show tables;'
+# mysql查询数据库表的列名sql
+MYSQL_QUERY_COL_SQL = "show full columns from {};"
+
+# sqlite 查询数据库列表sql
+SQLITE_QUERY_DB_SQL = 'PRAGMA database_list;'
+# sqlite 查询数据库表名sql
+SQLITE_QUERY_TB_SQL = 'select tbl_name from sqlite_master where tbl_name != "sqlite_sequence";'
+# sqlite 查询数据库表列名sql
+SQLITE_QUERY_COL_SQL = 'PRAGMA table_info({});'
 
 # 查询系统表sql
 QUERY_SYS_TB = 'select column_name, data_type, column_key, column_comment from information_schema.columns'

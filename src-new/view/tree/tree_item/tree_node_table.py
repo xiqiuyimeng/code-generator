@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
-from service.async_func.async_mysql_task import OpenTBExecutor
+from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.table.table_function import fill_table, resize_table_rows
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 

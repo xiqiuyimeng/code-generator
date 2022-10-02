@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout, QLineEdit,
 
 from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, \
     OK_BTN_TEXT, CANCEL_BTN_TEXT, CONN_NAME_EXISTS, CONN_NAME_AVAILABLE, CONN_NO_CHANGE_PROMPT, SAVE_CONN_TITLE
-from service.async_func.async_conn_task import AddConnExecutor, EditConnExecutor
-from service.async_func.async_mysql_task import TestConnLoadingMaskExecutor
+from service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor
+from service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from service.read_qrc.read_config import read_qss
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import *
@@ -178,6 +178,7 @@ class AbstractConnDialog(DraggableDialog):
         # 根据参数构建连接信息对象
         self.conn_info = globals()[self.conn_type.type_class](*conn_param)
         self.new_connection.conn_info_type = self.conn_info
+        self.new_connection.conn_type = self.conn_type.type
 
     def collect_conn_info_input(self) -> tuple: ...
 
@@ -246,7 +247,6 @@ class AbstractConnDialog(DraggableDialog):
 
     def save_conn(self):
         self.new_connection.construct_conn_info()
-        self.new_connection.conn_type = self.conn_type.type
         # 存在id，说明是编辑
         if self.connection.id:
             if self.new_connection != self.connection:

@@ -6,13 +6,14 @@ from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_C
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
     ADD_DS_ACTION
 from constant.icon_enum import get_icon
-from service.async_func.async_mysql_task import OpenConnExecutor, TestConnIconMovieExecutor
+from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, set_item_opening_flag, \
-    set_item_opening_worker, set_item_testing_flag, get_item_opening_flag, get_item_testing_flag, get_item_conn_type, \
-    get_item_sql_conn
+    set_item_testing_flag, get_item_conn_type
+from view.tree.tree_widget.tree_item_func import set_item_opening_worker, get_item_opening_flag, \
+    get_item_testing_flag, get_item_sql_conn
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'

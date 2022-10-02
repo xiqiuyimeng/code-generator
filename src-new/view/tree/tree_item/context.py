@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from view.tree.tree_item.tree_node_conn.tree_node_conn import ConnTreeNode
+from view.tree.tree_item.tree_node_conn import ConnTreeNode
 from view.tree.tree_item.tree_node_db import DBTreeNode
 from view.tree.tree_item.tree_node_table import TableTreeNode
 
