@@ -10,10 +10,12 @@
 """
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTreeWidgetItem, QMenu
+from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator
 
+from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
+from view.tree.tree_widget.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
@@ -26,10 +28,15 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
         self.main_window = window
         # item 是否正在被鼠标左键点击
         self.item_clicked = False
+        # 是否正在重新打开中，重新打开的过程，会创建子节点，并设置展开状态等，影响部分信号槽
+        self.reopening_flag = False
         self.headerItem().setHidden(True)
         # 统一设置图标大小
         self.setIconSize(QSize(40, 30))
         self.connect_signal()
+        # 用来记录item变化：当前项变化、展开状态
+        self.item_changed_executor = ItemChangedExecutor()
+        self.item_changed_executor.start()
 
     def mousePressEvent(self, e) -> None:
         if e.button() == Qt.LeftButton:
@@ -47,6 +54,11 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
         # 主要为了实现监听复选框点击
         self.itemClicked.connect(self.handle_item_clicked)
         self.itemChanged.connect(self.handle_item_change)
+        # 展开折叠信号
+        self.itemCollapsed.connect(self.handle_item_collapsed)
+        self.itemExpanded.connect(self.handle_item_expanded)
+        # 当前项变化信号
+        self.currentItemChanged.connect(self.handle_current_item_changed)
 
     def open_tree_item(self, idx):
         item = self.itemFromIndex(idx)
@@ -84,6 +96,48 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
         item = self.currentItem()
         func_name = action.text()
         self.do_handle_right_menu_func(item, func_name)
+
+    def handle_item_collapsed(self, item):
+        if not self.reopening_flag:
+            # item收起
+            self.item_changed_executor.item_collapsed(item)
+            self.recursive_collapse_item(item)
+
+    def recursive_collapse_item(self, item):
+        if item.childCount():
+            for index in range(item.childCount()):
+                child_item = item.child(index)
+                if child_item.isExpanded():
+                    child_item.setExpanded(False)
+                    self.item_changed_executor.item_collapsed(child_item)
+                    self.recursive_collapse_item(child_item)
+                if get_item_opened_record(child_item).is_current:
+                    self.item_changed_executor.not_current_item(child_item)
+
+    def handle_item_expanded(self, item):
+        if not self.reopening_flag:
+            self.item_changed_executor.item_expanded(item)
+
+    def handle_current_item_changed(self, current_item):
+        if current_item and not self.reopening_flag:
+            self.item_changed_executor.current_item_changed(current_item)
+
+    def get_item_by_opened_id(self, opened_id):
+        """根据打开记录表中的id查找"""
+        iterator = QTreeWidgetItemIterator(self)
+        while iterator.value():
+            item = iterator.value()
+            if get_item_opened_record(item).id == opened_id:
+                return item
+            iterator = iterator.__iadd__(1)
+
+    def set_record_current_item(self):
+        iterator = QTreeWidgetItemIterator(self)
+        while iterator.value():
+            item = iterator.value()
+            if get_item_opened_record(item).is_current:
+                self.set_selected_focus(item)
+            iterator = iterator.__iadd__(1)
 
     def do_open_tree_item(self, item): ...
 

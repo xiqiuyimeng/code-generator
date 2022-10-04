@@ -80,10 +80,11 @@ class SqliteBasic:
             insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
             log.info(f'插入[{self.table_name}]语句 ==> {insert_sql}')
             log.info(f'插入[{self.table_name}]参数 ==> {insert_dict}')
-            with self.db.transaction() as tx:
-                tx.query(insert_sql, **insert_dict)
-                id_record = tx.query(self._select_id_sql).first()
-                insert_obj.id = id_record.get("id")
+
+            self.db.query(insert_sql, **insert_dict)
+            # 查询id
+            id_record = self.select(insert_obj)[0]
+            insert_obj.id = id_record.id
 
     def batch_insert(self, insert_objs):
         """批量插入"""
@@ -102,8 +103,12 @@ class SqliteBasic:
         insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
         log.info(f'批量插入[{self.table_name}]语句 ==> {insert_sql}')
         log.info(f'批量插入[{self.table_name}]参数 ==> {insert_dict_list}')
-        with self.db.transaction() as tx:
-            tx.bulk_query(insert_sql, insert_dict_list)
+
+        self.db.bulk_query(insert_sql, insert_dict_list)
+        # 查询id
+        for insert_obj in insert_objs:
+            id_record = self.select(insert_obj)[0]
+            insert_obj.id = id_record.id
 
     def delete(self, obj_id):
         log.info(f'删除[{self.table_name}]语句 ==> {self._delete_sql}')

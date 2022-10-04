@@ -49,7 +49,7 @@ class SearchStyledItemDelegate(QStyledItemDelegate):
 
     @staticmethod
     def draw_selected_background(option, painter):
-        # 由于在计算图标和文本位置时，将坐标系平移到了当前展示项的起始位置，所以行的坐标，在坐标系变换后，相当于左移了 option.rect.x()
-        rect = QRect(0 - option.rect.x(), 0, option.rect.width() + option.rect.x(), option.rect.height())
+        # 计算选中框大小
+        rect = QRect(0, 0, option.rect.width(), option.rect.height())
         # 背景色设置为青绿色
         painter.fillRect(rect, QBrush(QColor(175, 238, 238)))

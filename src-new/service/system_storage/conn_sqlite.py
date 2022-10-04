@@ -14,13 +14,11 @@ conn_sql = {
     'create': '''create table  if not exists sql_connection
     (id integer primary key autoincrement,
     conn_name char(50) not null,
-    conn_type integer  not null,
+    conn_type integer not null,
     conn_info text,
     create_time datetime,
     update_time datetime
     );''',
-    'select_name_exist': 'select count(*) > 0 from connection where name = ?',
-    'select_id_by_name': 'select id from connection where name = ?',
 }
 
 

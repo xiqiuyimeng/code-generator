@@ -2,8 +2,8 @@
 from PyQt5.QtCore import pyqtSignal
 
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from service.init.frame_type_init import get_current_datasource_type
-from service.system_storage.datasource_type_sqlite import DatasourceTypeSqlite, DatasourceType, DatasourceTypeEnum
+from service.util.ds_type_util import get_current_datasource_type
+from service.system_storage.ds_type_sqlite import DatasourceTypeSqlite, DatasourceType, DatasourceTypeEnum
 
 from logger.log import logger as log
 

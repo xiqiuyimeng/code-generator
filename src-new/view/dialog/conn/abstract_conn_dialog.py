@@ -12,6 +12,7 @@ from service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from service.read_qrc.read_config import read_qss
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import *
+from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from view.box.message_box import pop_ok
 from view.custom_widget.draggable_widget import DraggableDialog
 
@@ -22,7 +23,7 @@ _date_ = '2022/5/29 17:55'
 class AbstractConnDialog(DraggableDialog):
     """连接对话框抽象类，整体对话框结构应为四部分：标题区、连接名表单区、连接信息表单区、按钮区"""
 
-    conn_changed = pyqtSignal(SqlConnection)
+    conn_changed = pyqtSignal(SqlConnection, OpenedTreeItem)
 
     def __init__(self, connection, dialog_title, screen_rect, conn_name_id_dict):
         super().__init__()
@@ -262,11 +263,11 @@ class AbstractConnDialog(DraggableDialog):
             self.add_conn_executor = AddConnExecutor(self.new_connection, self, self, self.save_post_process)
             self.add_conn_executor.start()
 
-    def save_post_process(self, conn_id=None):
+    def save_post_process(self, conn_id=None, opened_item_record=None):
         # 如果返回了id，视为添加
-        if conn_id:
+        if conn_id and opened_item_record:
             self.new_connection.id = conn_id
-        self.conn_changed.emit(self.new_connection)
+        self.conn_changed.emit(self.new_connection, opened_item_record)
         self.close()
 
 

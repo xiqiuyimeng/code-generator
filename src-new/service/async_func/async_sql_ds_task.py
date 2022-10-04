@@ -9,8 +9,10 @@ from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThread
 from service.sql_ds_executor import *
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_type_by_type
+from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel
 from view.box.message_box import pop_ok
-from view.tree.tree_widget.tree_item_func import get_item_sql_conn
+from view.tree.tree_widget.tree_item_func import get_item_sql_conn, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/31 19:05'
@@ -82,18 +84,31 @@ class TestConnIconMovieExecutor(SqlDSIconMovieThreadExecutor):
 
 class OpenConnWorker(ThreadWorkerABC):
 
-    success_signal = pyqtSignal(tuple)
+    success_signal = pyqtSignal(list)
 
-    def __init__(self, connection: SqlConnection):
+    def __init__(self, connection: SqlConnection, opened_conn_id):
         super().__init__()
         self.connection = connection
+        self.opened_conn_id = opened_conn_id
 
     def do_run(self):
         db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         db_names = executor.open_conn()
-        self.success_signal.emit(db_names)
+        db_opened_items = self.save_opened_items(db_names)
+        self.success_signal.emit(db_opened_items)
         log.info(f'[{self.connection.conn_name}]{OPEN_CONN_SUCCESS_PROMPT} ==> {db_names}')
+
+    def save_opened_items(self, db_names):
+        log.info(f"保存打开连接[{self.connection.conn_name}]下的库名列表")
+        # 更新连接节点为展开状态，当前项
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_tree_item_sqlite.open_item(self.opened_conn_id)
+        # 添加库节点
+        db_level = SqlTreeItemLevel.db_level.value
+        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        return opened_tree_item_sqlite.add_opened_child_item(db_names, self.opened_conn_id,
+                                                             db_level, ds_type)
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}]{OPEN_CONN_FAIL_PROMPT}')
@@ -107,7 +122,7 @@ class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
         super().__init__(item, window, OPEN_CONN_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return OpenConnWorker(get_item_sql_conn(self.item))
+        return OpenConnWorker(get_item_sql_conn(self.item), get_item_opened_record(self.item).id)
 
 # ---------------------------------------- 打开连接 end ---------------------------------------- #
 
@@ -116,19 +131,32 @@ class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
 
 class OpenDBWorker(ThreadWorkerABC):
 
-    success_signal = pyqtSignal(tuple)
+    success_signal = pyqtSignal(list)
 
-    def __init__(self, connection: SqlConnection, db_name):
+    def __init__(self, connection: SqlConnection, db_name, opened_db_id):
         super().__init__()
         self.connection = connection
         self.db_name = db_name
+        self.opened_db_id = opened_db_id
 
     def do_run(self):
         db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         tb_names = executor.open_db(self.db_name)
-        self.success_signal.emit(tb_names)
+        tb_opened_items = self.save_opened_items(tb_names)
+        self.success_signal.emit(tb_opened_items)
         log.info(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT} ==> {tb_names}')
+
+    def save_opened_items(self, tb_names):
+        log.info(f"保存打开库[{self.db_name}]下的表名列表")
+        # 更新库节点
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_tree_item_sqlite.open_item(self.opened_db_id)
+        # 添加表节点
+        tb_level = SqlTreeItemLevel.tb_level.value
+        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        return opened_tree_item_sqlite.add_opened_child_item(tb_names, self.opened_db_id,
+                                                             tb_level, ds_type)
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}')
@@ -141,7 +169,8 @@ class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
         super().__init__(item, window, OPEN_DB_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return OpenDBWorker(get_item_sql_conn(self.item.parent()), self.item.text(0))
+        return OpenDBWorker(get_item_sql_conn(self.item.parent()), self.item.text(0),
+                            get_item_opened_record(self.item).id)
 
 # ---------------------------------------- 打开数据库 end ---------------------------------------- #
 

@@ -5,6 +5,9 @@ from PyQt5.QtCore import pyqtSignal
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
+from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel, \
+    CurrentEnum, ExpandedEnum
 from view.box.message_box import pop_ok
 from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
@@ -18,7 +21,7 @@ _date_ = '2022/5/30 20:31'
 
 class AddConnWorker(ThreadWorkerABC):
 
-    success_signal = pyqtSignal(int)
+    success_signal = pyqtSignal(int, OpenedTreeItem)
 
     def __init__(self, connection: SqlConnection):
         super().__init__()
@@ -26,8 +29,20 @@ class AddConnWorker(ThreadWorkerABC):
 
     def do_run(self):
         ConnSqlite().insert(self.connection)
+        # 历史记录中的连接id
+        opened_conn = self.add_opened_item()
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
-        self.success_signal.emit(self.connection.id)
+        self.success_signal.emit(self.connection.id, opened_conn)
+
+    def add_opened_item(self):
+        conn_item = OpenedTreeItem()
+        conn_item.is_current = CurrentEnum.not_current.value
+        conn_item.expanded = ExpandedEnum.collapsed.value
+        conn_item.parent_id = self.connection.id
+        conn_item.level = SqlTreeItemLevel.conn_level.value
+        conn_item.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
+        OpenedTreeItemSqlite().insert(conn_item)
+        return conn_item
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}')
@@ -104,8 +119,13 @@ class DelConnWorker(ThreadWorkerABC):
 
     def do_run(self):
         ConnSqlite().delete(self.conn_id)
+        self.del_opened_item()
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
+
+    def del_opened_item(self):
+        # 根据连接id，递归删除历史表中所有相关记录
+        pass
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}')
@@ -133,15 +153,45 @@ class DelConnExecutor(IconMovieThreadExecutor):
 
 class ListConnWorker(ThreadWorkerABC):
 
-    success_signal = pyqtSignal(list)
+    # 连接表中查询结果
+    conn_list_signal = pyqtSignal(list)
+    # 打开表中的查询结果
+    opened_items_result = pyqtSignal(list)
+
+    success_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
     def do_run(self):
+        # 首选读取存储的连接信息
         connections = ConnSqlite().select(SqlConnection())
+        self.conn_list_signal.emit(connections)
+
+        # 查询 OpenedItem
+        for conn in connections:
+            # 从打开记录中查询连接，正常来说，一定可以查到，并且应该只有一条数据
+            self.recursive_get_children(0, conn.id)
         log.info(LIST_ALL_CONN_SUCCESS_PROMPT)
-        self.success_signal.emit(connections)
+
+    def do_finally(self):
+        self.success_signal.emit()
+
+    def recursive_get_children(self, level, parent_id):
+        if level < 3:
+            opened_items = self.get_children(level, parent_id)
+            if opened_items:
+                [self.recursive_get_children(level + 1, opened_item.id) for opened_item in opened_items]
+
+    def get_children(self, level, parent_id):
+        opened_param = OpenedTreeItem()
+        opened_param.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
+        opened_param.level = level
+        opened_param.parent_id = parent_id
+        opened_items = OpenedTreeItemSqlite().select(opened_param)
+        if opened_items:
+            self.opened_items_result.emit(opened_items)
+            return opened_items
 
     def do_exception(self, e: Exception):
         log.exception(LIST_ALL_CONN_FAIL_PROMPT)
@@ -150,15 +200,28 @@ class ListConnWorker(ThreadWorkerABC):
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, masked_widget, window, callback):
-        self.callback = callback
+    def __init__(self, masked_widget, window, conn_list_callback, opened_items_callback, reopen_end_callback):
+        self.reopen_end_callback = reopen_end_callback
         super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE)
+        self.conn_list_callback = conn_list_callback
+        self.opened_items_callback = opened_items_callback
+        self.worker.conn_list_signal.connect(self.conn_list_slot)
+        self.worker.opened_items_result.connect(self.opened_items_slot)
 
-    def get_worker(self) -> ThreadWorkerABC:
+    def get_worker(self) -> ListConnWorker:
         return ListConnWorker()
 
-    def success_post_process(self, *args):
-        self.callback(*args)
+    def conn_list_slot(self, *args):
+        self.conn_list_callback(*args)
+
+    def opened_items_slot(self, *args):
+        self.opened_items_callback(*args)
+
+    def success_post_process(self):
+        self.reopen_end_callback()
+
+    def fail_post_process(self):
+        self.reopen_end_callback()
 
 # ---------------------------------------- 获取所有连接 end ---------------------------------------- #
 

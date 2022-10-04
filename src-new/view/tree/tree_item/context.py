@@ -35,6 +35,9 @@ class Context:
     def open_item(self):
         self.tree_node.open_item()
 
+    def reopen_item(self, opened_items):
+        self.tree_node.reopen_item(opened_items)
+
     def close_item(self):
         self.tree_node.close_item()
 

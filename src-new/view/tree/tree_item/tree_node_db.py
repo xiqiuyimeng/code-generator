@@ -5,8 +5,9 @@ from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU,
     SELECT_ALL_TB_MENU, UNSELECT_TB_MENU
 from service.async_func.async_sql_ds_task import OpenDBExecutor
 from view.box.message_box import pop_fail
-from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
+from view.tree.tree_widget.tree_item_func import set_item_opening_flag, set_item_opening_worker, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -22,24 +23,32 @@ class DBTreeNode(AbstractTreeNode):
     def open_item(self):
         if not self.item.childCount():
             # 设置正在打开中状态
-            self.item.setData(1, Qt.UserRole, True)
+            set_item_opening_flag(self.item, True)
             self.open_db_executor = OpenDBExecutor(self.item, self.window, self.open_item_ui, self.open_item_fail)
             # 将打开连接的线程执行器绑定到item中
-            self.item.setData(1, Qt.UserRole + 1, self.open_db_executor)
+            set_item_opening_worker(self.item, self.open_db_executor)
             self.open_db_executor.start()
         self.tree_widget.set_selected_focus(self.item)
 
-    def open_item_ui(self, table_names):
-        self.item.setData(1, Qt.UserRole, False)
-        if table_names:
-            make_table_items(self.item, table_names)
+    def open_item_ui(self, opened_table_items):
+        set_item_opening_flag(self.item, False)
+        if opened_table_items:
+            make_table_items(self.item, opened_table_items)
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:
             pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name), OPEN_TB_TITLE, self.window)
 
     def open_item_fail(self):
-        self.item.setData(1, Qt.UserRole, False)
+        set_item_opening_flag(self.item, False)
+
+    def reopen_item(self, opened_items):
+        # 打开库下的表节点
+        make_table_items(self.item, opened_items)
+        opened_item_record = get_item_opened_record(self.item)
+        self.item.setExpanded(opened_item_record.expanded)
+        if opened_item_record.is_current:
+            self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
         ...

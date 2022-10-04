@@ -18,7 +18,7 @@ class TreeSearcher(Searcher):
         i = 0
         while iterator.value():
             item = iterator.value()
-            item.setData(0, Qt.UserRole, i)
+            item.setData(0, Qt.UserRole + 1, i)
             # 简单搜索，单字符匹配，确定范围
             self.simple_match_text(text, item, match_items)
             iterator = iterator.__iadd__(1)
@@ -29,7 +29,7 @@ class TreeSearcher(Searcher):
         i = 0
         while iterator.value():
             item = iterator.value()
-            item.setData(0, Qt.UserRole, i)
+            item.setData(0, Qt.UserRole + 1, i)
             iterator = iterator.__iadd__(1)
             i += 1
 
@@ -43,8 +43,13 @@ class TreeSearcher(Searcher):
     def expand_selected_items(self):
         """展开选中的元素，如果当前元素是一个父节点，且其下子节点中存在选中元素，则展开父节点"""
         if self.match_item_records and self.match_item_records[-1]:
-            [item.setExpanded(True) for item in self.match_item_records[-1]
-             if item.childCount() and self.child_selected(item)]
+            [self.recursive_expanded(item) for item in self.match_item_records[-1]]
+
+    def recursive_expanded(self, item):
+        parent = item.parent()
+        if parent is not None and not parent.isExpanded():
+            parent.setExpanded(True)
+            self.recursive_expanded(parent)
 
     def child_selected(self, item):
         for i in range(item.childCount()):
@@ -52,8 +57,8 @@ class TreeSearcher(Searcher):
                 return True
 
     def get_row(self, item):
-        user_data = item.data(0, Qt.UserRole)
+        user_data = item.data(0, Qt.UserRole + 1)
         if not user_data:
             self.fill_user_data()
-            user_data = item.data(0, Qt.UserRole)
+            user_data = item.data(0, Qt.UserRole + 1)
         return user_data

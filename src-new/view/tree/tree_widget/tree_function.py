@@ -11,18 +11,20 @@ from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_dialog, get_conn_type_by_type
 from view.dialog.conn import *
 from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, set_item_opening_flag, \
-    set_item_testing_flag, get_item_conn_type
+    set_item_testing_flag, get_item_conn_type, set_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
 
 
-def make_sql_tree_item(parent, name, icon, sql_conn=None, conn_type=None, checkbox=None):
+def make_sql_tree_item(parent, name, icon, opened_item_record=None,
+                       sql_conn=None, conn_type=None, checkbox=None):
     """
     构造树的子项
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
+    :param opened_item_record: 打开记录表中的记录
     :param sql_conn: 构造的子节点隐藏属性，第一层连接层存放连接信息
     :param conn_type: 连接类型，用以区分不同类型连接
     :param checkbox: 构造的子节点的复选框
@@ -30,6 +32,8 @@ def make_sql_tree_item(parent, name, icon, sql_conn=None, conn_type=None, checkb
     item = QTreeWidgetItem(parent)
     item.setIcon(0, icon)
     item.setText(0, name)
+    if opened_item_record:
+        set_item_opened_record(item, opened_item_record)
     if sql_conn:
         set_item_sql_conn(item, sql_conn)
     if conn_type:
@@ -69,21 +73,28 @@ def show_conn_dialog(sql_type, tree_widget, conn_info, title, screen_rect):
     dialog: AbstractConnDialog = globals()[get_conn_dialog(sql_type)](conn_info, title, screen_rect,
                                                                       tree_widget.conn_name_id_dict)
     if title == ADD_CONN_DIALOG_TITLE:
-        dialog.conn_changed.connect(lambda conn: add_conn_tree_item(tree_widget, conn))
+        dialog.conn_changed.connect(lambda conn, opened_conn_record:
+                                    add_conn_tree_item(tree_widget, conn, opened_conn_record))
+
     elif title == EDIT_CONN_DIALOG_TITLE:
-        dialog.conn_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
+        dialog.conn_changed.connect(lambda conn, opened_conn_record:
+                                    update_conn_tree_item(tree_widget, conn))
     dialog.exec()
 
 
-def add_conn_tree_item(tree_widget, connection):
+def add_conn_tree_item(tree_widget, connection, opened_conn_record):
     """
     添加树节点（连接），弹窗中点击确定后信号连接的槽函数，负责处理添加数据的操作
     :param tree_widget: 树对象
     :param connection: 弹窗中信号发射的连接对象，带有用户填写的信息
+    :param opened_conn_record: 打开记录表中的连接信息
     """
     conn_type = get_conn_type_by_type(connection.conn_type)
     conn_icon = get_icon(conn_type.display_name)
-    make_sql_tree_item(tree_widget, connection.conn_name, conn_icon, connection, conn_type)
+    conn_item = make_sql_tree_item(tree_widget, connection.conn_name, conn_icon,
+                                   opened_conn_record, connection, conn_type)
+    # 设置当前项
+    tree_widget.set_selected_focus(conn_item)
     tree_widget.add_conn_name(connection.id, connection.conn_name)
 
 
@@ -106,23 +117,25 @@ def make_sql_conn_tree_items(sql_conns, parent):
     for sql_conn in sql_conns:
         conn_type = get_conn_type_by_type(sql_conn.conn_type)
         conn_icon = get_icon(conn_type.display_name)
-        make_sql_tree_item(parent, sql_conn.conn_name, conn_icon, sql_conn, conn_type)
+        make_sql_tree_item(parent, sql_conn.conn_name, conn_icon,
+                           sql_conn=sql_conn, conn_type=conn_type)
 
 
-def make_db_items(parent_item, db_names):
+def make_db_items(parent_item, opened_db_items):
     """构建数据库层叶子节点"""
-    for db_name in db_names:
+    for opened_db_item in opened_db_items:
         conn_type = get_item_conn_type(parent_item)
         icon = get_icon(conn_type.db_icon_name)
-        make_sql_tree_item(parent_item, db_name, icon)
+        make_sql_tree_item(parent_item, opened_db_item.item_name, icon, opened_db_item)
 
 
-def make_table_items(parent_item, table_names):
+def make_table_items(parent_item, opened_table_items):
     """构建数据表层叶子节点"""
-    for table_name in table_names:
+    for opened_table_item in opened_table_items:
         conn_type = get_item_conn_type(parent_item.parent())
         icon = get_icon(conn_type.tb_icon_name)
-        make_sql_tree_item(parent_item, table_name, icon, checkbox=Qt.Unchecked)
+        make_sql_tree_item(parent_item, opened_table_item.item_name,
+                           icon, opened_table_item, checkbox=Qt.Unchecked)
 
 
 def check_table_status(parent):

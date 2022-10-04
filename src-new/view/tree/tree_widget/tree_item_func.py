@@ -57,3 +57,12 @@ def get_item_testing_worker(item):
 def set_item_testing_worker(item, testing_worker):
     # 第六列放入正在测试网络连接的线程
     item.setData(5, Qt.UserRole, testing_worker)
+
+
+def set_item_opened_record(item, opened_item_record):
+    # 放入历史记录表中的记录
+    item.setData(6, Qt.UserRole, opened_item_record)
+
+
+def get_item_opened_record(item):
+    return item.data(6, Qt.UserRole)

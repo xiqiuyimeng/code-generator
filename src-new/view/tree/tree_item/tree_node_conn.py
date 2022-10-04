@@ -12,7 +12,8 @@ from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, set_item_opening_flag, \
     set_item_testing_flag, get_item_conn_type
 from view.tree.tree_widget.tree_item_func import set_item_opening_worker, get_item_opening_flag, \
-    get_item_testing_flag, get_item_sql_conn, get_item_testing_worker, get_item_opening_worker, set_item_testing_worker
+    get_item_testing_flag, get_item_sql_conn, get_item_testing_worker, get_item_opening_worker, set_item_testing_worker, \
+    get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -36,14 +37,22 @@ class ConnTreeNode(AbstractTreeNode):
             self.open_conn_executor.start()
         self.tree_widget.set_selected_focus(self.item)
 
-    def open_item_ui(self, db_names):
+    def open_item_ui(self, opened_db_items):
         set_item_opening_flag(self.item, False)
-        make_db_items(self.item, db_names)
+        make_db_items(self.item, opened_db_items)
         self.item.setExpanded(True)
         self.tree_widget.set_selected_focus(self.item)
 
     def open_item_fail(self):
         set_item_opening_flag(self.item, False)
+
+    def reopen_item(self, opened_items):
+        # 打开连接下的库节点
+        make_db_items(self.item, opened_items)
+        opened_item_record = get_item_opened_record(self.item)
+        self.item.setExpanded(opened_item_record.expanded)
+        if opened_item_record.is_current:
+            self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
         ...

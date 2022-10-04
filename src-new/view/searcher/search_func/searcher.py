@@ -108,7 +108,7 @@ class Searcher:
         if len(item_list) == 2 and self.get_row(item_list[0]) < self.get_row(item) < self.get_row(item_list[1]):
             return item_list[0], item_list[1]
         # 获取中间索引
-        mid_idx = len(item_list) // 2
+        mid_idx = len(item_list) >> 1
         # 如果中间数大于查找元素，查找左边元素，否则查找右边
         if self.get_row(item_list[mid_idx]) - self.get_row(item) > 0:
             return self.get_up_down_next(item_list[0: mid_idx + 1], item)

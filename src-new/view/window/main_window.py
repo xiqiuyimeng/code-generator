@@ -4,10 +4,10 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSta
 
 from constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
 from constant.icon_enum import get_icon
-from service.async_func.async_system_task.async_system_db_task import InitDsTypeExecutor, SwitchDsTypeExecutor
+from service.async_func.async_ds_type_task import InitDsTypeExecutor, SwitchDsTypeExecutor
 from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
-from service.init.frame_type_init import get_current_datasource_type
-from service.system_storage.datasource_type_sqlite import DatasourceType
+from service.util.ds_type_util import get_current_datasource_type
+from service.system_storage.ds_type_sqlite import DatasourceType
 from service.util.tree_node import Tree
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
