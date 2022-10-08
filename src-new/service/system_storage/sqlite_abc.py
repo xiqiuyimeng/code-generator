@@ -50,7 +50,7 @@ class SqliteBasic:
     def _create_table(self):
         if not os.path.exists(SYS_DB_PATH):
             os.makedirs(SYS_DB_PATH)
-        db_name = os.path.join(SYS_DB_PATH, f'{self.table_name}_db')
+        db_name = os.path.join(SYS_DB_PATH, f'generator_db')
         self.db = records.Database(f'sqlite:///{db_name}',
                                    poolclass=SingletonThreadPool,
                                    connect_args={'check_same_thread': False})
