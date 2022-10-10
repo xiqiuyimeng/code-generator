@@ -38,7 +38,7 @@ class TabBar(QTabBar):
             # 获取当前tab页
             current_tab = self.parent.widget(index)
             # 设置气泡提示
-            self.setTabToolTip(index, current_tab.property("tool_tip"))
+            self.setTabToolTip(index, current_tab.toolTip())
         return super().eventFilter(obj, event)
 
     def right_click_menu(self, pos):

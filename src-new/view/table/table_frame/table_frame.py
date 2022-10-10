@@ -29,7 +29,10 @@ class AbstractTableFrame(QFrame):
 
         self.table_header_label = QLabel(self)
         self.table_header_label.setObjectName('table_header_label')
-        self.table_header_label.setText(self.get_header_label_text())
+        header_label_text = self.get_header_label_text()
+        self.table_header_label.setText(header_label_text)
+
+        parent.setToolTip(header_label_text)
 
         self._layout = QVBoxLayout(self)
         self._layout.addWidget(self.get_header_widget())
@@ -58,7 +61,7 @@ class SqlTableFrame(AbstractTableFrame):
     def get_header_label_text(self) -> str:
         return f'数据库连接：{self.item.parent().parent().text(0)}\n' \
                f'当前数据库：{self.item.parent().text(0)}\n' \
-               f'当前数据表：{self.item.text(0)}\n'
+               f'当前数据表：{self.item.text(0)}'
 
 
 class StructureTableFrame(AbstractTableFrame):
