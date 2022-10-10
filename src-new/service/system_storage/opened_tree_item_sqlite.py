@@ -7,9 +7,10 @@ from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
 
+table_name = 'opened_tree_item'
 
-opened_item_sql = {
-    'create': '''create table  if not exists opened_tree_item
+opened_item_sql_dict = {
+    'create': f'''create table  if not exists {table_name}
     (id integer primary key autoincrement,
     item_name char(100) default null,
     is_current integer not null,
@@ -18,6 +19,7 @@ opened_item_sql = {
     parent_id integer not null,
     level integer not null,
     ds_type_name char(10) not null,
+    table_tab_id integer default null,
     create_time datetime,
     update_time datetime
     );''',
@@ -41,6 +43,8 @@ class OpenedTreeItem(BasicSqliteDTO):
     level: int = field(init=False, default=None)
     # 数据源 name
     ds_type_name: str = field(init=False, default=None)
+    # table_tab表id，用来关联table_tab
+    table_tab_id: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -75,7 +79,7 @@ class CheckedEnum(Enum):
 class OpenedTreeItemSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__('opened_tree_item', opened_item_sql.get('create'))
+        super().__init__(table_name, opened_item_sql_dict)
 
     def open_item(self, opened_item_id):
         opened_item = OpenedTreeItem()

@@ -9,9 +9,10 @@ from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:26'
 
+table_name = 'sql_connection'
 
-conn_sql = {
-    'create': '''create table  if not exists sql_connection
+conn_sql_dict = {
+    'create': f'''create table  if not exists {table_name}
     (id integer primary key autoincrement,
     conn_name char(50) not null,
     conn_type integer not null,
@@ -48,7 +49,7 @@ class SqlConnection(BasicSqliteDTO):
 class ConnSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__('sql_connection', conn_sql.get('create'))
+        super().__init__(table_name, conn_sql_dict)
 
     def check_name_available(self, sql_conn):
         """检查连接名称是否可用，名称必须唯一"""

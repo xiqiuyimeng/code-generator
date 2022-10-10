@@ -57,6 +57,12 @@ class InternetDBExecutor(SqlDBExecutor):
         db_records = self.get_data(query_tb_sql)
         return tuple(map(lambda x: map(lambda y: y, x.values()).__next__(), db_records.as_dict(ordered=True)))
 
-    def open_tb(self, db, tb): ...
+    def open_tb(self, db, tb):
+        self.db.query(f'use {db};')
+        query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(tb)
+        db_records = self.get_data(query_col_sql)
+        return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
 
     def get_dialect_driver(self) -> str: ...
+
+    def convert_tb_data(self, db_record): ...

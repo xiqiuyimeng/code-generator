@@ -16,7 +16,7 @@ def add_table_ext_info(window, tree_item):
     db_name = tree_item.parent().text(0)
     conn_name = tree_item.parent().parent().text(0)
     # 标题
-    window.table_header_label.setText(f"当前展示表为：{tb_name}")
+    window.tab_header_label.setText(f"当前展示表为：{tb_name}")
     # 状态栏提示
     window.statusbar.showMessage(f"当前展示的表为：{tb_name}")
     # 设置气泡提示

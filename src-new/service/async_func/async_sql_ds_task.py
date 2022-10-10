@@ -9,6 +9,8 @@ from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThread
 from service.sql_ds_executor import *
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_type_by_type
+from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite
+from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel
 from view.box.message_box import pop_ok
@@ -181,19 +183,28 @@ class OpenTBWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal(tuple)
 
-    def __init__(self, connection: SqlConnection, db_name, tb_name):
+    def __init__(self, connection: SqlConnection, db_name, tb_name, opened_table_item):
         super().__init__()
         self.connection = connection
         self.db_name = db_name
         self.tb_name = tb_name
+        self.opened_table_item = opened_table_item
 
     def do_run(self):
         db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         columns = executor.open_tb(self.db_name, self.tb_name)
+        self.save_opened_items(columns)
         log.info(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}'
                  f' ==> {columns}')
         self.success_signal.emit(columns)
+
+    def save_opened_items(self, columns):
+        log.info(f"保存打开表[{self.db_name}][{self.tb_name}]下的列信息")
+        # 存储tab信息
+        table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
+        # 存储列信息
+        DsTableInfoSqlite().add_table(columns, table_tab.id)
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}')
@@ -208,6 +219,7 @@ class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return OpenTBWorker(get_item_sql_conn(self.item.parent().parent()),
-                            self.item.parent().text(0), self.item.text(0))
+                            self.item.parent().text(0), self.item.text(0),
+                            get_item_opened_record(self.item))
 
 # ---------------------------------------- 打开数据表 end ---------------------------------------- #

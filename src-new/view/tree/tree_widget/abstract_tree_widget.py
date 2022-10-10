@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator
 from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
+from view.tab.tab_ui import TabTableUI
 from view.tree.tree_widget.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
@@ -139,6 +140,11 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
                 self.set_selected_focus(item)
             iterator = iterator.__iadd__(1)
 
+    def locate_item(self):
+        # 找到当前tab，取出对应item
+        tab = self.get_current_tab()
+        self.set_selected_focus(tab.tree_item)
+
     def do_open_tree_item(self, item): ...
 
     def do_fill_menu(self, item, menu): ...
@@ -146,3 +152,7 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
     def do_handle_right_menu_func(self, item, func_name): ...
 
     def do_handle_item_change(self, item): ...
+
+    def reopen_tree(self): ...
+
+    def get_current_tab(self) -> TabTableUI: ...

@@ -8,8 +8,10 @@ from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:43'
 
-datasource_type_sql = {
-    'create': '''create table if not exists datasource_type
+table_name = 'datasource_type'
+
+datasource_type_sql_dict = {
+    'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     name char(10) not null,
     ds_type_order integer not null,
@@ -17,7 +19,7 @@ datasource_type_sql = {
     create_time datetime,
     update_time datetime
     );''',
-    'drop': 'drop table datasource_type'
+    'drop': f'drop table {table_name}'
 }
 
 
@@ -53,10 +55,10 @@ class DatasourceTypeEnum(Enum):
 class DatasourceTypeSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__('datasource_type', datasource_type_sql.get('create'))
+        super().__init__(table_name, datasource_type_sql_dict)
 
     def drop_table(self):
-        self.db.query(datasource_type_sql.get('drop'))
+        self.db.query(datasource_type_sql_dict.get('drop'))
 
     def switch_ds_type(self, ds_type_name):
         datasource_types = self.select(DatasourceType())

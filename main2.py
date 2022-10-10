@@ -35,5 +35,5 @@ if __name__ == "__main__":
     ui.show()
     splash.finish(ui)
     app.exec_()
-    log.info("**********生成器退出**********")
+    log.info("**********生成器退出**********\n")
     sys.exit()

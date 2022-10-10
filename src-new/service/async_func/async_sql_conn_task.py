@@ -5,6 +5,8 @@ from PyQt5.QtCore import pyqtSignal
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
+from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite, DsTableInfo
+from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel, \
     CurrentEnum, ExpandedEnum
@@ -156,7 +158,9 @@ class ListConnWorker(ThreadWorkerABC):
     # 连接表中查询结果
     conn_list_signal = pyqtSignal(list)
     # 打开表中的查询结果
-    opened_items_result = pyqtSignal(list)
+    opened_items_signal = pyqtSignal(list)
+    # tab页表信息查询结果
+    tab_info_signal = pyqtSignal(list)
 
     success_signal = pyqtSignal()
 
@@ -172,7 +176,19 @@ class ListConnWorker(ThreadWorkerABC):
         for conn in connections:
             # 从打开记录中查询连接，正常来说，一定可以查到，并且应该只有一条数据
             self.recursive_get_children(0, conn.id)
+        # 查找tab页信息
+        self.get_tab_cols()
         log.info(LIST_ALL_CONN_SUCCESS_PROMPT)
+
+    def get_tab_cols(self):
+        tab_param = DsTableTab()
+        tab_param.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
+        tab_list = DsTableTabSqlite().select(tab_param)
+        for tab in tab_list:
+            col_param = DsTableInfo()
+            col_param.parent_tab_id = tab.id
+            tab.col_list = DsTableInfoSqlite().select(col_param)
+        self.tab_info_signal.emit(tab_list)
 
     def do_finally(self):
         self.success_signal.emit()
@@ -190,7 +206,7 @@ class ListConnWorker(ThreadWorkerABC):
         opened_param.parent_id = parent_id
         opened_items = OpenedTreeItemSqlite().select(opened_param)
         if opened_items:
-            self.opened_items_result.emit(opened_items)
+            self.opened_items_signal.emit(opened_items)
             return opened_items
 
     def do_exception(self, e: Exception):
@@ -200,22 +216,21 @@ class ListConnWorker(ThreadWorkerABC):
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, masked_widget, window, conn_list_callback, opened_items_callback, reopen_end_callback):
+    def __init__(self, masked_widget, window, conn_list_callback, opened_items_callback,
+                 opened_tab_callback, reopen_end_callback):
         self.reopen_end_callback = reopen_end_callback
         super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE)
+
         self.conn_list_callback = conn_list_callback
         self.opened_items_callback = opened_items_callback
-        self.worker.conn_list_signal.connect(self.conn_list_slot)
-        self.worker.opened_items_result.connect(self.opened_items_slot)
+        self.opened_tab_callback = opened_tab_callback
+
+        self.worker.conn_list_signal.connect(self.conn_list_callback)
+        self.worker.opened_items_signal.connect(self.opened_items_callback)
+        self.worker.tab_info_signal.connect(self.opened_tab_callback)
 
     def get_worker(self) -> ListConnWorker:
         return ListConnWorker()
-
-    def conn_list_slot(self, *args):
-        self.conn_list_callback(*args)
-
-    def opened_items_slot(self, *args):
-        self.opened_items_callback(*args)
 
     def success_post_process(self):
         self.reopen_end_callback()

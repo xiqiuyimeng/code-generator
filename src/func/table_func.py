@@ -18,22 +18,22 @@ _date_ = '2020/7/2 16:17'
 
 def add_table(gui, tree_item):
     """添加表格"""
-    gui.table_frame = QtWidgets.QFrame(gui.centralwidget)
-    gui.table_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-    gui.table_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-    gui.table_frame.setObjectName("table_frame")
-    gui.table_verticalLayout = QtWidgets.QVBoxLayout(gui.table_frame)
+    gui.tab_frame = QtWidgets.QFrame(gui.centralwidget)
+    gui.tab_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+    gui.tab_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+    gui.tab_frame.setObjectName("table_frame")
+    gui.table_verticalLayout = QtWidgets.QVBoxLayout(gui.tab_frame)
     gui.table_verticalLayout.setObjectName("table_verticalLayout")
-    gui.table_header_label = QtWidgets.QLabel(gui.table_frame)
-    gui.table_header_label.setObjectName("table_header_label")
-    gui.table_verticalLayout.addWidget(gui.table_header_label)
+    gui.tab_header_label = QtWidgets.QLabel(gui.tab_frame)
+    gui.tab_header_label.setObjectName("table_header_label")
+    gui.table_verticalLayout.addWidget(gui.tab_header_label)
 
-    gui.tableWidget = MyTableWidget(gui.table_frame)
+    gui.tableWidget = MyTableWidget(gui.tab_frame)
     gui.tableWidget.setObjectName("tableWidget")
     gui.tableWidget.setAttribute(Qt.WA_TranslucentBackground, True)
     # 在布局中添加表格
     gui.table_verticalLayout.addWidget(gui.tableWidget)
-    gui.horizontalLayout.addWidget(gui.table_frame)
+    gui.horizontalLayout.addWidget(gui.tab_frame)
     # 设置只读表格
     gui.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
     # 交替行颜色
@@ -52,7 +52,7 @@ def add_table_ext_info(gui, tree_item):
     db_name = tree_item.parent().text(0)
     conn_name = tree_item.parent().parent().text(0)
     # 标题
-    gui.table_header_label.setText(f"当前展示表为：{tb_name}")
+    gui.tab_header_label.setText(f"当前展示表为：{tb_name}")
     # 状态栏提示
     gui.statusbar.showMessage(f"当前展示的表为：{tb_name}")
     # 设置气泡提示
@@ -90,11 +90,11 @@ def close_table(gui):
     :param gui: 启动的主窗口界面对象
     """
     # 在布局中移除表格
-    gui.horizontalLayout.removeWidget(gui.table_frame)
+    gui.horizontalLayout.removeWidget(gui.tab_frame)
     # 必须调用sip才能彻底删除
-    sip.delete(gui.table_frame)
+    sip.delete(gui.tab_frame)
     # 删除table_frame属性，方便后续判断
-    del gui.table_frame
+    del gui.tab_frame
     gui.table_header.all_header_combobox.clear()
     # 重置打开表
     gui.opened_table = tuple()

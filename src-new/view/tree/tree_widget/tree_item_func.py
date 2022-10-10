@@ -66,3 +66,12 @@ def set_item_opened_record(item, opened_item_record):
 
 def get_item_opened_record(item):
     return item.data(6, Qt.UserRole)
+
+
+def set_item_opened_tab(item, tab_widget):
+    # 放入打开的tab_widget
+    item.setData(7, Qt.UserRole, tab_widget)
+
+
+def get_item_opened_tab(item):
+    return item.data(7, Qt.UserRole)

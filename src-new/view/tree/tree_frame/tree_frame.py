@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
 from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
@@ -29,19 +29,30 @@ class AbstractTreeFrame(QFrame):
         self.setObjectName('tree_frame')
 
         self._layout = QVBoxLayout(self)
+        self.header_layout = QHBoxLayout()
+        self._layout.addLayout(self.header_layout)
+
         # 树头部标题
         self.tree_header_label = QLabel(self)
         self.tree_header_label.setText(self.get_header_text())
         self.tree_header_label.setObjectName('tree_header_label')
-        self._layout.addWidget(self.tree_header_label)
+        self.header_layout.addWidget(self.tree_header_label)
+
+        self.tree_locate_button = QPushButton(self)
+        self.tree_locate_button.setText('定位')
+        # 设置比例
+        self.header_layout.setStretch(0, 1)
+        self.header_layout.addWidget(self.tree_locate_button)
 
         self.tree_widget = self.get_tree_widget(window)
         self.tree_widget.setObjectName('tree_widget')
         self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.tree_widget)
 
-        # 为了方便访问，树部件引用也挂到window上
-        window.tree_widget = self.tree_widget
+        self.tree_locate_button.clicked.connect(self.tree_widget.locate_item)
+
+    def reopen_tree(self):
+        self.tree_widget.reopen_tree()
 
     def get_header_text(self) -> str: ...
 
@@ -53,6 +64,8 @@ class SqlTreeFrame(AbstractTreeFrame):
 
     def __init__(self, parent, window):
         super().__init__(parent, window)
+        # 为了方便访问，树部件引用也挂到window上
+        window.sql_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
         return SQL_DATASOURCE_TYPE
@@ -66,6 +79,8 @@ class StructureTreeFrame(AbstractTreeFrame):
 
     def __init__(self, parent, window):
         super().__init__(parent, window)
+        # 为了方便访问，树部件引用也挂到window上
+        window.structure_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
         return STRUCTURE_DATASOURCE_TYPE

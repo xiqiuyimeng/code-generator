@@ -25,7 +25,7 @@ class BasicSqliteDTO:
 
 class SqliteBasic:
 
-    def __init__(self, table_name, create_table_sql):
+    def __init__(self, table_name, sql_dict):
         """
         操作sqlite数据库的基类，
         约定：每个表必须有id且为自增主键，
@@ -34,7 +34,7 @@ class SqliteBasic:
         """
         self.db: records.Database = ...
         self.table_name = table_name
-        self._create_table_sql = create_table_sql
+        self._create_table_sql = sql_dict.get('create')
         self._create_table()
 
         # 常用的增删改查sql
