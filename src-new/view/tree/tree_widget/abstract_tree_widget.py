@@ -143,7 +143,8 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
     def locate_item(self):
         # 找到当前tab，取出对应item
         tab = self.get_current_tab()
-        self.set_selected_focus(tab.tree_item)
+        if tab:
+            self.set_selected_focus(tab.tree_item)
 
     def do_open_tree_item(self, item): ...
 

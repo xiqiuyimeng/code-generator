@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from service.sql_ds_executor.db_executor import InternetDBExecutor
-from service.system_storage.ds_table_info_sqlite import DsTableInfo
+from service.system_storage.ds_table_info_sqlite import DsTableInfo, CheckedEnum
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -20,6 +20,7 @@ class MySqlDBExecutor(InternetDBExecutor):
         table_info.full_data_type = db_record.get('Type')
         table_info.is_pk = db_record.get('Key') == 'PRI'
         table_info.col_comment = db_record.get('Comment')
+        table_info.checked = CheckedEnum.unchecked.value
         table_info.handle_data_type()
         return table_info
 
