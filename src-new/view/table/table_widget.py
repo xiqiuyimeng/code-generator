@@ -24,6 +24,9 @@ class TableWidget(QTableWidget, ScrollableWidget):
         super().__init__(parent)
         self.table_header = ...
         self.filling_table = False
+        # 保存代理引用，否则将会被垃圾回收
+        self.combox_delegate = ...
+        self.text_input_delegate = ...
         self.setup_ui()
         self.connect_signal()
         # 用来记录item变化：当前项变化、展开状态
@@ -53,13 +56,21 @@ class TableWidget(QTableWidget, ScrollableWidget):
         self.horizontalHeader().setStretchLastSection(True)
         # 默认行号隐藏
         self.verticalHeader().setHidden(True)
+
         # 设置第五列（是否是主键）combox代理项，在编辑时触发
-        self.setItemDelegateForColumn(4, ComboboxDelegate())
-        # todo 设置了多个代理会报错，启动失败
-        self.setItemDelegateForColumn(5, TextInputDelegate())
+        self.combox_delegate = ComboboxDelegate()
+        self.setItemDelegateForColumn(4, self.combox_delegate)
+        # 第六列设置代理项
+        self.text_input_delegate = TextInputDelegate()
+        self.setItemDelegateForColumn(5, self.text_input_delegate)
 
     def connect_signal(self):
         self.itemChanged.connect(self.change)
+        self.setMouseTracking(True)
+        self.entered.connect(self.show_tool_tip)
+
+    def show_tool_tip(self, model_index):
+        self.setToolTip(model_index.data())
 
     def change(self, item):
         if not self.filling_table:
