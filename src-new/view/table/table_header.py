@@ -52,6 +52,7 @@ class CheckBoxHeader(QHeaderView):
                     self.is_on = True
                     # 当用户点击了行表头复选框，发射 自定义信号 select_all_clicked()
                 self.select_all_clicked.emit(self.is_on)
+                self.change_state(self.is_on)
 
                 self.updateSection(0)
         super(CheckBoxHeader, self).mousePressEvent(event)
