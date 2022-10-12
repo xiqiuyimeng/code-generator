@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QModelIndex
+from PyQt5.QtCore import QModelIndex, QRect
 from PyQt5.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox, QPlainTextEdit
 
 _author_ = 'luwt'
@@ -29,4 +29,8 @@ class TextInputDelegate(QItemDelegate):
         """创建编辑器，只有在编辑时才会触发，编辑器控件选择combox"""
         text_edit = QPlainTextEdit(parent)
         return text_edit
+
+    def updateEditorGeometry(self, editor: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex):
+        """调整文本输入框位置，编辑框高度变大"""
+        editor.setGeometry(QRect(option.rect.x(), option.rect.y(), option.rect.width(), option.rect.height() << 2))
 

@@ -66,7 +66,7 @@ class SqlTreeWidget(AbstractTreeWidget):
         for opened_tab in opened_tabs:
             # 找到表节点
             item = self.get_item_by_opened_id(opened_tab.parent_opened_id)
-            Context(item, self, self.main_window).reopen_item(opened_tab.col_list)
+            Context(item, self, self.main_window).reopen_item(opened_tab)
             tab = get_item_opened_tab(item)
             if opened_tab.is_current:
                 current_tab = tab

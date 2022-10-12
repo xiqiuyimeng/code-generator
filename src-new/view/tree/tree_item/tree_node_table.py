@@ -34,14 +34,14 @@ class TableTreeNode(AbstractTreeNode):
             set_item_opening_worker(self.item, self.open_tb_executor)
             self.open_tb_executor.start()
 
-    def open_item_ui(self, column_list):
-        set_item_opening_flag(self.item, False)
-        tab = self.reopen_item(column_list)
+    def open_item_ui(self, table_tab):
+        tab = self.reopen_item(table_tab)
         self.window.sql_tab_widget.setCurrentWidget(tab)
+        set_item_opening_flag(self.item, False)
 
-    def reopen_item(self, col_list):
+    def reopen_item(self, table_tab):
         # 创建tab页
-        tab = TabTableUI(self.window, col_list, self.item)
+        tab = TabTableUI(self.window, table_tab, self.item)
         self.window.sql_tab_widget.addTab(tab, self.table_name)
         # 记录tab对象
         set_item_opened_tab(self.item, tab)

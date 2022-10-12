@@ -29,9 +29,6 @@ class TableWidget(QTableWidget, ScrollableWidget):
         self.text_input_delegate = ...
         self.setup_ui()
         self.connect_signal()
-        # 用来记录item变化：当前项变化、展开状态
-        # self.item_changed_executor = ItemChangedExecutor()
-        # self.item_changed_executor.start()
 
     def setup_ui(self):
         # 设置双击触发修改
@@ -66,6 +63,7 @@ class TableWidget(QTableWidget, ScrollableWidget):
 
     def connect_signal(self):
         self.itemChanged.connect(self.change)
+        # 需要开启鼠标追踪，才能实现tooltip
         self.setMouseTracking(True)
         self.entered.connect(self.show_tool_tip)
 

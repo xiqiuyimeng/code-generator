@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
+from logger.log import logger as log
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:32'
@@ -22,6 +23,7 @@ ds_table_info_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
+    'delete_by_parent_tab_id': f'delete from {table_name} where parent_tab_id = ',
 }
 
 
@@ -65,3 +67,8 @@ class DsTableInfoSqlite(SqliteBasic):
         for column in columns:
             column.parent_tab_id = parent_tab_id
         self.batch_insert(columns)
+
+    def delete_by_parent_tab_id(self, parent_tab_id):
+        delete_sql = f"{ds_table_info_sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
+        self.db.query(delete_sql)
+        log.info(f"删除{table_name}语句 ==> {delete_sql}")

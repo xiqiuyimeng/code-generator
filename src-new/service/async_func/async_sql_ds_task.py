@@ -10,7 +10,7 @@ from service.sql_ds_executor import *
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_type_by_type
 from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite
-from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
+from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel
 from view.box.message_box import pop_ok
@@ -181,7 +181,7 @@ class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
 
 class OpenTBWorker(ThreadWorkerABC):
 
-    success_signal = pyqtSignal(tuple)
+    success_signal = pyqtSignal(DsTableTab)
 
     def __init__(self, connection: SqlConnection, db_name, tb_name, opened_table_item):
         super().__init__()
@@ -194,10 +194,10 @@ class OpenTBWorker(ThreadWorkerABC):
         db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         columns = executor.open_tb(self.db_name, self.tb_name)
-        self.save_opened_items(columns)
+        table_tab = self.save_opened_items(columns)
         log.info(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}'
                  f' ==> {columns}')
-        self.success_signal.emit(columns)
+        self.success_signal.emit(table_tab)
 
     def save_opened_items(self, columns):
         log.info(f"保存打开表[{self.db_name}][{self.tb_name}]下的列信息")
@@ -205,6 +205,8 @@ class OpenTBWorker(ThreadWorkerABC):
         table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
         # 存储列信息
         DsTableInfoSqlite().add_table(columns, table_tab.id)
+        table_tab.col_list = columns
+        return table_tab
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}')

@@ -183,7 +183,7 @@ class ListConnWorker(ThreadWorkerABC):
     def get_tab_cols(self):
         tab_param = DsTableTab()
         tab_param.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
-        tab_list = DsTableTabSqlite().select(tab_param)
+        tab_list = DsTableTabSqlite().select(tab_param, order_by='tab_order')
         for tab in tab_list:
             col_param = DsTableInfo()
             col_param.parent_tab_id = tab.id

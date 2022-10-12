@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QObject, QEvent
+from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
 from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
     CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX
+from service.system_storage.ds_table_tab_sqlite import DsTableTab
+from view.tree.tree_widget.tree_item_func import set_item_opened_tab, get_item_opening_flag
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'
@@ -12,10 +14,14 @@ _date_ = '2022/10/9 17:39'
 
 class TabBar(QTabBar):
 
+    remove_tab_signal = pyqtSignal(DsTableTab)
+
     def __init__(self, parent: QTabWidget):
         """tab bar index按照从左到右变大的顺序,0,1,2..."""
         super().__init__(parent=parent)
         self.parent = parent
+        self.is_moving = False
+        self.current_changed = False
         # tab_bar在tab页过多时，开启滚动按钮
         self.setUsesScrollButtons(True)
         # 选项卡增加关闭按钮
@@ -29,6 +35,19 @@ class TabBar(QTabBar):
         self.customContextMenuRequested.connect(self.right_click_menu)
         # 关闭选项卡事件
         self.tabCloseRequested.connect(self.remove_tab)
+
+    def mousePressEvent(self, event):
+        # 如果按下了鼠标左键，将标志位设置为true
+        if event.button() == Qt.LeftButton:
+            self.is_moving = True
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if hasattr(self, "is_moving"):
+            # 鼠标按键松开，恢复标志位
+            self.is_moving = False
+            self.sort_tab(True)
+        super().mouseReleaseEvent(event)
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         # 当事件的对象是tab bar时，并且是气泡提示事件
@@ -64,7 +83,8 @@ class TabBar(QTabBar):
             [self.remove_tab(0) for idx in range(self.count()) if idx < index]
         elif act.text() == CLOSE_ALL_TABS:
             # 删除所有tab
-            [self.remove_tab(0) for idx in range(self.count())]
+            while self.count():
+                self.remove_tab(0)
         elif act.text() == CLOSE_TABS_TO_THE_LEFT:
             # 关闭标签页左边所有tab，找到比当前tab索引小的tab个数，按个数删除，删除左边一位即可
             [self.remove_tab(0) for idx in range(self.count()) if idx < index]
@@ -76,35 +96,40 @@ class TabBar(QTabBar):
             self.setCurrentIndex(index)
 
     def remove_tab(self, index):
-        tab_id = self.parent.widget(index).property("tab_id")
+        # 获取tab table
+        tab_widget = self.parent.widget(index)
+        # 删除tab widget在树节点中的引用
+        set_item_opened_tab(tab_widget.tree_item, None)
         # 删除tab
         self.parent.removeTab(index)
-        # 删除存储的打开tab记录
-        self.parent.async_save_manager.remove_tab(tab_id)
+        table_tab = tab_widget.table_tab
+        self.remove_tab_signal.emit(table_tab)
 
-    def change_current_order(self, index):
-        """修改is current值和item order"""
-        current_widget = self.parent.widget(index)
-        if current_widget:
-            current_tab_id = current_widget.property("tab_id")
-            # 元素是否相等
-            tab_id_equal_flag = False
-            # 列表大小是否相等
-            len_equal_flag = self.parent.count() == len(self.parent.tab_id_list)
-            tab_ids = list()
-            # order信息保存
-            for idx in range(self.parent.count()):
-                tab = self.parent.widget(idx)
-                tab_id = tab.property("tab_id")
-                tab_ids.append(tab_id)
-                tab_id_equal_flag = tab_id == self.parent.tab_id_list[idx]
-            self.parent.fill_tab_id_list(tab_ids)
-            # 如果列表中每一个元素相等，并且大小一致，可以证明两者相同，不需要更新order
-            if tab_id_equal_flag and len_equal_flag:
-                self.parent.async_save_manager.change_current(current_tab_id, None)
-            else:
-                self.parent.async_save_manager.change_current(current_tab_id, tab_ids)
-        else:
-            # 如果是删除，删除到最后一个了，那么清空tab_id_list
-            self.parent.clear_tab_id_list()
+    def change_current(self, index):
+        # 获取当前项
+        current_tab = self.parent.widget(index)
+        # 项目初始化中，或正在打开tab页不处理
+        if self.parent.main_window.sql_tree_widget.reopening_flag or \
+                (current_tab and get_item_opening_flag(current_tab.tree_item)):
+            return
+        if current_tab:
+            self.parent.async_save_executor.change_current(current_tab.table_tab)
+            # 考虑处理tab顺序问题
+            if self.is_moving:
+                # 设置标志位，方便排序时判断使用
+                self.current_changed = True
+
+    def sort_tab(self, mouse_released):
+        """在拖拉tab页签，松开鼠标时触发，对最终状态的tab widget进行排序并保存"""
+        if mouse_released and self.current_changed:
+            tab_table_list = list()
+            # 首先收集现在的tab list
+            for i in range(self.count()):
+                table_tab = self.parent.widget(i).table_tab
+                if table_tab.tab_order != i + 1:
+                    table_tab.tab_order = i + 1
+                    tab_table_list.append(table_tab)
+            # 保存数据
+            if tab_table_list:
+                self.parent.async_save_executor.sort_order(tab_table_list)
 

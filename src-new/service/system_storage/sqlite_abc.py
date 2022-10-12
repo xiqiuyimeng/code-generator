@@ -172,19 +172,19 @@ class SqliteBasic:
 
             self.db.bulk_query(update_sql, update_value_list)
 
-    def select(self, select_obj):
+    def select(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询"""
-        rows = self._do_select(self._select_sql, select_obj)
+        rows = self._do_select(self._select_sql, select_obj, order_by, sort_order)
         # 映射为参数对象类
         result = list(map(lambda x: select_obj.__class__(**x), rows.all()))
         return result
 
-    def select_count(self, select_obj):
+    def select_count(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，查询存在的记录数量"""
-        rows = self._do_select(self._select_count_sql, select_obj)
+        rows = self._do_select(self._select_count_sql, select_obj, order_by, sort_order)
         return rows.first().as_dict().get('count')
 
-    def _do_select(self, sql, select_obj):
+    def _do_select(self, sql, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，查询存在的记录数量"""
         select_sql = sql
         select_dict = dataclasses.asdict(select_obj)
@@ -200,6 +200,9 @@ class SqliteBasic:
             # 收集查询value
             for select_field in select_field_list:
                 select_value_dict[select_field] = select_dict[select_field]
+
+        if order_by:
+            select_sql = f'{select_sql} order by {order_by} {sort_order}'
 
         log.info(f'查询[{self.table_name}]语句 ==> {select_sql}')
         log.info(f'查询[{self.table_name}]参数 ==> {select_value_dict}')

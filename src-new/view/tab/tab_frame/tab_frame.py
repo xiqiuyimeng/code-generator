@@ -3,7 +3,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
 from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
-from view.tab.tab_bar import TabBar
 from view.tab.tab_widget import TabWidget
 
 _author_ = 'luwt'
@@ -21,7 +20,7 @@ def get_tab_frame(current_frame_name, frame_parent, window):
 class AbstractTabFrame(QFrame):
     """tab frame抽象类"""
 
-    def __init__(self, parent):
+    def __init__(self, parent, window):
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         self.setFrameShadow(QFrame.Raised)
@@ -29,11 +28,8 @@ class AbstractTabFrame(QFrame):
 
         self._layout = QVBoxLayout(self)
 
-        self.tab_widget = TabWidget(self, main_window=self)
+        self.tab_widget = TabWidget(self, main_window=window)
         self.tab_widget.setObjectName("tab_widget")
-        self.tab_bar = TabBar(self.tab_widget)
-        self.tab_bar.setObjectName("tab_bar")
-        self.tab_widget.setTabBar(self.tab_bar)
         self.tab_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.tab_widget)
 
@@ -41,7 +37,7 @@ class AbstractTabFrame(QFrame):
 class SqlTabFrame(AbstractTabFrame):
 
     def __init__(self, parent, window):
-        super().__init__(parent)
+        super().__init__(parent, window)
         # 为了方便访问
         window.sql_tab_widget = self.tab_widget
 
@@ -49,6 +45,6 @@ class SqlTabFrame(AbstractTabFrame):
 class StructureTabFrame(AbstractTabFrame):
 
     def __init__(self, parent, window):
-        super().__init__(parent)
+        super().__init__(parent, window)
         # 为了方便访问
         window.structure_tab_widget = self.tab_widget

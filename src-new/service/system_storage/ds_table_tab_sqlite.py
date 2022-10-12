@@ -5,6 +5,7 @@ from typing import List
 
 from service.system_storage.ds_table_info_sqlite import DsTableInfo
 from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
+from logger.log import logger as log
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:30'
@@ -21,7 +22,8 @@ ds_table_tab_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'max_order_sql': f'select ifnull(max(id), 0) as max_order from {table_name}'
+    'max_order_sql': f'select ifnull(max(tab_order), 0) as max_order from {table_name}',
+    'move_order_forward': f'update {table_name} set tab_order = tab_order - 1 where tab_order > ',
 }
 
 
@@ -68,7 +70,7 @@ class DsTableTabSqlite(SqliteBasic):
 
     def get_max_order(self):
         db_record = self.db.query(ds_table_tab_sql_dict.get('max_order_sql'))
-        return db_record.first().max_order
+        return db_record.first().max_order + 1
 
     def change_current(self, current_tab: DsTableTab):
         # 将同一数据源下的其他项全部置为非当前，将当前值置为当前项
@@ -88,3 +90,11 @@ class DsTableTabSqlite(SqliteBasic):
             origin_current_tab.is_current = CurrentEnum.not_current.value
             origin_current_tab.id = current_tabs[0].id
             self.update(origin_current_tab)
+
+    def remove_tab(self, tab):
+        self.delete(tab.id)
+        # 调整order，找出排序在删除项之后的，向前整体移动一位
+        order = tab.tab_order
+        move_order_forward_sql = f"{ds_table_tab_sql_dict.get('move_order_forward')}{order}"
+        self.db.query(move_order_forward_sql)
+        log.info(f'将tab_table顺序前移语句 ==> {move_order_forward_sql}')
