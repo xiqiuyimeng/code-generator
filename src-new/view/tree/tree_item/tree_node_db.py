@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QAction
 
 from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
     SELECT_ALL_TB_MENU, UNSELECT_TB_MENU
@@ -7,7 +8,8 @@ from service.async_func.async_sql_ds_task import OpenDBExecutor
 from view.box.message_box import pop_fail
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
-from view.tree.tree_widget.tree_item_func import set_item_opening_flag, set_item_opening_worker, get_item_opened_record
+from view.tree.tree_widget.tree_item_func import set_item_opening_flag, set_item_opening_worker, get_item_opened_record, \
+    get_item_opened_tab, get_item_opening_worker
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -51,29 +53,37 @@ class DBTreeNode(AbstractTreeNode):
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
-        ...
+        # 找到所有打开表的item，删除相关的tab
+        for i in range(self.item.childCount()):
+            item = self.item.child(i)
+            tab = get_item_opened_tab(item)
+            if tab:
+                index = self.window.sql_tab_widget.indexOf(tab)
+                self.window.sql_tab_widget.tab_bar.remove_tab(index)
+        # 删除库下的节点
+        self.tree_widget.item_changed_executor.close_item(self.item)
+        self.item.takeChildren()
+        self.item.setExpanded(False)
 
     def do_fill_menu(self, menu):
-        menu_names = list()
         if self.item.childCount():
             check_state = check_table_status(self.item)
-            menu_names.append(CLOSE_DB_MENU.format(self.db_name))
+            menu.addAction(QAction(CLOSE_DB_MENU.format(self.db_name), menu))
             # 全选时：添加取消选择菜单
             if check_state[0]:
-                menu_names.append(UNSELECT_TB_MENU)
+                menu.addAction(QAction(UNSELECT_TB_MENU, menu))
             # 部分选中时：添加全选菜单和取消选择菜单
             elif check_state[1]:
-                menu_names.append(SELECT_ALL_TB_MENU)
-                menu_names.append(UNSELECT_TB_MENU)
+                menu.addAction(QAction(SELECT_ALL_TB_MENU, menu))
+                menu.addAction(QAction(UNSELECT_TB_MENU, menu))
             else:
                 # 都未选中时：添加全选菜单
-                menu_names.append(SELECT_ALL_TB_MENU)
+                menu.addAction(QAction(SELECT_ALL_TB_MENU, menu))
         # 根据打开标识判断是否正在打开中
         elif self.item.data(1, Qt.UserRole):
-            menu_names.append(CANCEL_OPEN_DB_MENU.format(self.db_name))
+            menu.addAction(QAction(CANCEL_OPEN_DB_MENU.format(self.db_name), menu))
         else:
-            menu_names.append(OPEN_DB_MENU.format(self.db_name))
-        return menu_names
+            menu.addAction(QAction(OPEN_DB_MENU.format(self.db_name), menu))
 
     def handle_menu_func(self, func):
         # 打开数据库
@@ -81,32 +91,14 @@ class DBTreeNode(AbstractTreeNode):
             self.open_item()
         # 取消打开数据库
         elif func == CANCEL_OPEN_DB_MENU.format(self.db_name):
-            self.item.data(1, Qt.UserRole + 1).worker_terminate(self.open_item_fail)
+            get_item_opening_worker(self.item).worker_terminate(self.open_item_fail)
         # 关闭数据库
         elif func == CLOSE_DB_MENU.format(self.db_name):
-            pass
+            self.close_item()
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
-            tbs = set_children_check_state(self.item, Qt.Checked)
-            # 首先删除已存储的信息
-            del_data = {
-                'conn': self.item.parent().text(0),
-                'db': self.db_name
-            }
-            self.window.tree_data.del_node(del_data)
+            set_children_check_state(self.item, Qt.Checked, self.tree_widget, self.window)
             # 再添加
-            conn_info = self.item.parent().data(0, Qt.UserRole)
-            add_data = {
-                'conn': self.item.parent().text(0),
-                'db': self.db_name,
-                'tb': tbs
-            }
-            self.window.tree_data.add_node(add_data, conn_info)
         # 取消全选所有表
         elif func == UNSELECT_TB_MENU:
-            set_children_check_state(self.item, Qt.Unchecked)
-            del_data = {
-                'conn': self.item.parent().text(0),
-                'db': self.db_name
-            }
-            self.window.tree_data.del_node(del_data)
+            set_children_check_state(self.item, Qt.Unchecked, self.tree_widget, self.window)

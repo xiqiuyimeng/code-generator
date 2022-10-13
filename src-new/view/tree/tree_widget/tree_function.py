@@ -10,6 +10,7 @@ from constant.icon_enum import get_icon
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_dialog, get_conn_type_by_type
 from view.dialog.conn import *
+from view.tree.tree_item.tree_node_table import TableTreeNode
 from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, set_item_opening_flag, \
     set_item_testing_flag, get_item_conn_type, set_item_opened_record
 
@@ -135,7 +136,7 @@ def make_table_items(parent_item, opened_table_items):
         conn_type = get_item_conn_type(parent_item.parent())
         icon = get_icon(conn_type.tb_icon_name)
         make_sql_tree_item(parent_item, opened_table_item.item_name,
-                           icon, opened_table_item, checkbox=Qt.Unchecked)
+                           icon, opened_table_item, checkbox=opened_table_item.checked)
 
 
 def check_table_status(parent):
@@ -160,15 +161,18 @@ def check_table_status(parent):
     return all_checked, parted_checked
 
 
-def set_children_check_state(item, check_state):
+def set_children_check_state(item, check_state, tree_widget, window):
     """
     将当前节点下所有项的复选框统一改为一个状态，并返回子元素名称列表
     :param item: 当前点击的树节点元素
     :param check_state: 复选框状态
+    :param tree_widget: 树
+    :param window: 主窗体
     """
     children = list()
     for index in range(item.childCount()):
         child = item.child(index)
         child.setCheckState(0, check_state)
+        TableTreeNode(child, tree_widget, window).change_check_box(check_state)
         children.append(child.text(0))
     return children

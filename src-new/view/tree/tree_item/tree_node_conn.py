@@ -9,6 +9,7 @@ from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconM
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from view.tree.tree_item.tree_node_db import DBTreeNode
 from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, set_item_opening_flag, \
     set_item_testing_flag, get_item_conn_type
 from view.tree.tree_widget.tree_item_func import set_item_opening_worker, get_item_opening_flag, \
@@ -55,7 +56,15 @@ class ConnTreeNode(AbstractTreeNode):
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
-        ...
+        # 遍历子元素，如果有打开项，调用库节点的关闭方法
+        for i in range(self.item.childCount()):
+            child = self.item.child(i)
+            if child.childCount():
+                DBTreeNode(child, self.tree_widget, self.window).close_item()
+        # 删除连接下的节点
+        self.tree_widget.item_changed_executor.close_item(self.item)
+        self.item.takeChildren()
+        self.item.setExpanded(False)
 
     def do_fill_menu(self, menu: QMenu):
         # 添加连接需要有二级菜单
@@ -106,7 +115,7 @@ class ConnTreeNode(AbstractTreeNode):
             get_item_opening_worker(self.item).worker_terminate(self.open_item_fail)
         # 关闭连接
         elif func == CLOSE_CONN_ACTION.format(self.conn_name):
-            pass
+            self.close_item()
         # 测试连接
         elif func == TEST_CONN_ACTION.format(self.conn_name):
             self.test_conn()
@@ -119,4 +128,5 @@ class ConnTreeNode(AbstractTreeNode):
                            self.window.geometry(), get_item_sql_conn(self.item))
         # 删除连接
         elif func == DEL_CONN_ACTION.format(self.conn_name):
-            pass
+            self.close_item()
+            self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))

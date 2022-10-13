@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QAction
 
-from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
+from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, \
+    TABLE_CLOSE_WITH_PARTIALLY_CHECKED
 from service.async_func.async_sql_ds_task import OpenTBExecutor
+from view.box.message_box import pop_fail
 from view.tab.tab_ui import TabTableUI
-from view.table.table_function import resize_table_rows
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_widget.tree_item_func import set_item_opening_flag, set_item_opening_worker, get_item_opened_tab, \
-    set_item_opened_tab
+    set_item_opened_tab, get_item_opening_flag, get_item_opening_worker
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -45,27 +47,48 @@ class TableTreeNode(AbstractTreeNode):
         self.window.sql_tab_widget.addTab(tab, self.table_name)
         # 记录tab对象
         set_item_opened_tab(self.item, tab)
+        # 连接表头复选框变化信号
+        tab.table_frame.table_widget.table_header.header_check_state\
+            .connect(lambda check_state: self.set_check_state(check_state))
         return tab
 
     def open_item_fail(self):
         set_item_opening_flag(self.item, False)
 
     def close_item(self):
-        self.window.tab_frame.setHidden(True)
-        # 将表格行数置位0
-        resize_table_rows(0, self.window.table_widget)
-        self.window.table_widget.tree_item = None
+        # 如果当前复选框的状态未部分选中，则关闭将不可用，因为关闭后，无法获取部分选中的具体列
+        if self.item.checkState(0) == Qt.PartiallyChecked:
+            pop_fail(TABLE_CLOSE_WITH_PARTIALLY_CHECKED,
+                     CLOSE_TABLE_MENU.format(self.table_name), self.window)
+            return
+        # 首先删除引用
+        tab = get_item_opened_tab(self.item)
+        set_item_opened_tab(self.item, None)
+        # 删除tab
+        index = self.window.sql_tab_widget.indexOf(tab)
+        self.window.sql_tab_widget.tab_bar.remove_tab(index)
 
     def change_check_box(self, check_state):
-        ...
+        # 保存复选框状态变化
+        self.save_check_state()
+        # 联动表格内的复选框
+        tab = get_item_opened_tab(self.item)
+        if tab:
+            tab.table_frame.table_widget.table_header.change_header_state(check_state)
+
+    def save_check_state(self):
+        self.tree_widget.item_changed_executor.item_checked(self.item)
+
+    def set_check_state(self, check_state):
+        self.item.setCheckState(0, check_state)
+        self.save_check_state()
 
     def do_fill_menu(self, menu):
-        return [
-            # 根据是否在打开中标识
-            CANCEL_OPEN_TABLE_MENU.format(self.table_name)
-            if self.item.data(1, Qt.UserRole) else OPEN_TABLE_MENU.format(self.table_name)
-            if self.window.table_widget.tree_item is not self.item else CLOSE_TABLE_MENU.format(self.table_name)
-        ]
+        open_menu_name = CANCEL_OPEN_TABLE_MENU.format(self.table_name) \
+            if get_item_opening_flag(self.item) else OPEN_TABLE_MENU.format(self.table_name) \
+            if not get_item_opened_tab(self.item) else CLOSE_TABLE_MENU.format(self.table_name)
+
+        menu.addAction(QAction(open_menu_name.format(self.table_name), menu))
 
     def handle_menu_func(self, func):
         # 打开表
@@ -73,7 +96,7 @@ class TableTreeNode(AbstractTreeNode):
             self.open_item()
         # 取消打开表
         elif func == CANCEL_OPEN_TABLE_MENU.format(self.table_name):
-            self.item.data(1, Qt.UserRole + 1).worker_terminate(self.open_item_fail)
+            get_item_opening_worker(self.item).worker_terminate(self.open_item_fail)
         # 关闭表
         elif func == CLOSE_TABLE_MENU.format(self.table_name):
-            pass
+            self.close_item()

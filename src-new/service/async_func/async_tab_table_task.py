@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+import dataclasses
 from queue import Queue
 
 from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
-from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite
+from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite, DsTableInfo
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
 
 _author_ = 'luwt'
@@ -30,6 +31,8 @@ class TabChangedWorker(ThreadWorkerABC):
                 DsTableTabSqlite().change_current(data)
             elif method == 'sort_order':
                 DsTableTabSqlite().batch_update(data)
+            elif method == 'save_table_data':
+                DsTableInfoSqlite().update(data)
             log.info(f'{method}: {data}')
 
     def do_exception(self, e: Exception):
@@ -53,4 +56,7 @@ class AsyncSaveTabObjExecutor(ThreadExecutorABC):
 
     def sort_order(self, tabs):
         self.queue.put(('sort_order', tabs))
+
+    def save_table_data(self, modify_data: DsTableInfo):
+        self.queue.put(('save_table_data', modify_data))
 

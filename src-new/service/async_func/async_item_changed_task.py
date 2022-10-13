@@ -7,7 +7,7 @@ from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, ExpandedEnum, OpenedTreeItemSqlite, \
     CurrentEnum
-from view.tree.tree_widget.tree_item_func import get_item_opened_record, set_item_opened_record
+from view.tree.tree_widget.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/10/3 10:10'
@@ -30,6 +30,10 @@ class ItemChangedWorker(ThreadWorkerABC):
                 OpenedTreeItemSqlite().update(opened_item)
             elif method == 'current_item_changed':
                 OpenedTreeItemSqlite().item_current_changed(opened_item)
+            elif method == 'item_checked':
+                OpenedTreeItemSqlite().update(opened_item)
+            elif method == 'close_item':
+                OpenedTreeItemSqlite().delete_by_parent_id(opened_item.id)
             log.info(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):
@@ -48,23 +52,28 @@ class ItemChangedExecutor(ThreadExecutorABC):
     def item_collapsed(self, item):
         opened_record: OpenedTreeItem = get_item_opened_record(item)
         opened_record.expanded = ExpandedEnum.collapsed.value
-        set_item_opened_record(item, opened_record)
         self.queue.put(('item_collapsed', opened_record))
 
     def item_expanded(self, item):
         opened_record: OpenedTreeItem = get_item_opened_record(item)
         opened_record.expanded = ExpandedEnum.expanded.value
-        set_item_opened_record(item, opened_record)
         self.queue.put(('item_expanded', opened_record))
 
     def current_item_changed(self, current_item):
         current_opened_record: OpenedTreeItem = get_item_opened_record(current_item)
         current_opened_record.is_current = CurrentEnum.is_current.value
-        set_item_opened_record(current_item, current_opened_record)
         self.queue.put(('current_item_changed', current_opened_record))
 
     def not_current_item(self, item):
         opened_item = get_item_opened_record(item)
         opened_item.is_current = CurrentEnum.not_current.value
-        set_item_opened_record(item, opened_item)
         self.queue.put(('current_item_changed', opened_item))
+
+    def item_checked(self, item):
+        opened_item = get_item_opened_record(item)
+        opened_item.checked = item.checkState(0)
+        self.queue.put(('item_checked', opened_item))
+
+    def close_item(self, item):
+        opened_item = get_item_opened_record(item)
+        self.queue.put(('close_item', opened_item))

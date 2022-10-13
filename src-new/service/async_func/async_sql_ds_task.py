@@ -183,12 +183,13 @@ class OpenTBWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, connection: SqlConnection, db_name, tb_name, opened_table_item):
+    def __init__(self, connection: SqlConnection, db_name, tb_name, opened_table_item, check_state):
         super().__init__()
         self.connection = connection
         self.db_name = db_name
         self.tb_name = tb_name
         self.opened_table_item = opened_table_item
+        self.check_state = check_state
 
     def do_run(self):
         db_executor_class = get_conn_type_by_type(self.connection.conn_type).db_executor
@@ -204,7 +205,7 @@ class OpenTBWorker(ThreadWorkerABC):
         # 存储tab信息
         table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
         # 存储列信息
-        DsTableInfoSqlite().add_table(columns, table_tab.id)
+        DsTableInfoSqlite().add_table(columns, table_tab.id, self.check_state)
         table_tab.col_list = columns
         return table_tab
 
@@ -222,6 +223,6 @@ class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return OpenTBWorker(get_item_sql_conn(self.item.parent().parent()),
                             self.item.parent().text(0), self.item.text(0),
-                            get_item_opened_record(self.item))
+                            get_item_opened_record(self.item), self.item.checkState(0))
 
 # ---------------------------------------- 打开数据表 end ---------------------------------------- #

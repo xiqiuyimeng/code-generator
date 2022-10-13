@@ -28,7 +28,8 @@ ds_table_info_sql_dict = {
 
 
 class CheckedEnum(Enum):
-    checked = 1
+
+    checked = 2
     unchecked = 0
 
 
@@ -45,7 +46,7 @@ class DsTableInfo(BasicSqliteDTO):
     is_pk: int = field(init=False, default=None)
     # 列注释
     col_comment: str = field(init=False, default=None)
-    # 是否勾选
+    # 是否勾选，与qt中选中状态枚举保持一致
     checked: int = field(init=False, default=None)
     # 指向table_tab
     parent_tab_id: int = field(init=False, default=None)
@@ -63,9 +64,10 @@ class DsTableInfoSqlite(SqliteBasic):
     def __init__(self):
         super().__init__(table_name, ds_table_info_sql_dict)
 
-    def add_table(self, columns, parent_tab_id):
+    def add_table(self, columns, parent_tab_id, check_state):
         for column in columns:
             column.parent_tab_id = parent_tab_id
+            column.checked = check_state
         self.batch_insert(columns)
 
     def delete_by_parent_tab_id(self, parent_tab_id):

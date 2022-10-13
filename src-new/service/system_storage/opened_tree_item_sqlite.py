@@ -23,6 +23,7 @@ opened_item_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
+    'delete_child': f'delete from {table_name} where parent_id = :parent_id'
 }
 
 
@@ -35,7 +36,7 @@ class OpenedTreeItem(BasicSqliteDTO):
     is_current: int = field(init=False, default=None)
     # 标识元素是否展开
     expanded: int = field(init=False, default=None)
-    # 复选框状态
+    # 复选框状态，与qt复选框选中状态枚举保持一致
     checked: int = field(init=False, default=None)
     # 父id，树第一层元素，指向对应外表id，其余子项，指向当前表父项id
     parent_id: int = field(init=False, default=None)
@@ -72,7 +73,7 @@ class ExpandedEnum(Enum):
 
 class CheckedEnum(Enum):
 
-    checked = 1
+    checked = 2
     unchecked = 0
 
 
@@ -100,6 +101,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
             opened_child_item.parent_id = opened_item_id
             opened_child_item.level = child_level
             opened_child_item.ds_type_name = ds_type
+            opened_child_item.checked = CheckedEnum.unchecked.value
             opened_child_items.append(opened_child_item)
         self.batch_insert(opened_child_items)
         return opened_child_items
@@ -121,3 +123,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
             self.batch_update(update_params)
 
         self.update(opened_item)
+
+    def delete_by_parent_id(self, parent_id):
+        delete_child_sql = opened_item_sql_dict.get('delete_child')
+        self.db.query(delete_child_sql, **{'parent_id': parent_id})

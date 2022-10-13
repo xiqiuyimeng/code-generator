@@ -20,9 +20,9 @@ def get_table_frame(current_frame_name, *args):
 class AbstractTableFrame(QFrame):
     """表结构frame抽象类"""
 
-    def __init__(self, parent, column_list, item):
+    def __init__(self, parent, column_list, tree_item):
         super().__init__(parent)
-        self.item = item
+        self.tree_item = tree_item
         self.setFrameShape(QFrame.StyledPanel)
         self.setFrameShadow(QFrame.Raised)
         self.setObjectName('table_frame')
@@ -37,12 +37,15 @@ class AbstractTableFrame(QFrame):
         self._layout = QVBoxLayout(self)
         self._layout.addWidget(self.get_header_widget())
 
-        self.table_widget = TableWidget(self)
+        self.table_widget = TableWidget(self, column_list)
         self.table_widget.setObjectName('table_widget')
         self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.table_widget)
 
-        self.table_widget.fill_table(column_list)
+        # 设置表头复选框状态，与树节点状态同步
+        self.table_widget.table_header.set_header_checked(self.tree_item.checkState(0))
+
+        self.table_widget.fill_table()
 
     def get_header_widget(self) -> QWidget: ...
 
@@ -59,9 +62,9 @@ class SqlTableFrame(AbstractTableFrame):
         return self.table_header_label
 
     def get_header_label_text(self) -> str:
-        return f'数据库连接：{self.item.parent().parent().text(0)}\n' \
-               f'当前数据库：{self.item.parent().text(0)}\n' \
-               f'当前数据表：{self.item.text(0)}'
+        return f'数据库连接：{self.tree_item.parent().parent().text(0)}\n' \
+               f'当前数据库：{self.tree_item.parent().text(0)}\n' \
+               f'当前数据表：{self.tree_item.text(0)}'
 
 
 class StructureTableFrame(AbstractTableFrame):

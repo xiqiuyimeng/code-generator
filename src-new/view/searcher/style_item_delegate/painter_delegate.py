@@ -96,10 +96,12 @@ class CheckBoxItemPainter(ItemPainterAbstract):
         opt = QStyleOptionButton()
         opt.rect = rect
         opt.state = QStyle.State_Enabled | QStyle.State_Active
-        if self.check_state == Qt.CheckState.Checked:
-            opt.state |= QStyle.State_On
-        else:
+        if self.check_state == Qt.Unchecked:
             opt.state |= QStyle.State_Off
+        elif self.check_state == Qt.PartiallyChecked:
+            opt.state |= QStyle.State_NoChange
+        elif self.check_state == Qt.Checked:
+            opt.state |= QStyle.State_On
         self.style.drawControl(QStyle.CE_CheckBox, opt, self.painter)
 
 
