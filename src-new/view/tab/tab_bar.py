@@ -46,7 +46,7 @@ class TabBar(QTabBar):
         if hasattr(self, "is_moving"):
             # 鼠标按键松开，恢复标志位
             self.is_moving = False
-            self.sort_tab(True)
+            self.sort_tab()
         super().mouseReleaseEvent(event)
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
@@ -119,9 +119,9 @@ class TabBar(QTabBar):
                 # 设置标志位，方便排序时判断使用
                 self.current_changed = True
 
-    def sort_tab(self, mouse_released):
+    def sort_tab(self):
         """在拖拉tab页签，松开鼠标时触发，对最终状态的tab widget进行排序并保存"""
-        if mouse_released and self.current_changed:
+        if self.current_changed:
             tab_table_list = list()
             # 首先收集现在的tab list
             for i in range(self.count()):
@@ -132,4 +132,6 @@ class TabBar(QTabBar):
             # 保存数据
             if tab_table_list:
                 self.parent.async_save_executor.sort_order(tab_table_list)
+            # 重置标志位
+            self.current_changed = False
 

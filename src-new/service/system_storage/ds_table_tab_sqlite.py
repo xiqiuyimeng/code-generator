@@ -22,8 +22,10 @@ ds_table_tab_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'max_order_sql': f'select ifnull(max(tab_order), 0) as max_order from {table_name}',
-    'move_order_forward': f'update {table_name} set tab_order = tab_order - 1 where tab_order > ',
+    'max_order_sql': f'select ifnull(max(tab_order), 0) as max_order from {table_name}'
+                     f' where ds_type_name = :ds_type_name',
+    'move_order_forward': f'update {table_name} set tab_order = tab_order - 1 '
+                          f'where tab_order > :tab_order and ds_type_name = :ds_type_name',
 }
 
 
@@ -62,14 +64,17 @@ class DsTableTabSqlite(SqliteBasic):
 
         table_tab = DsTableTab()
         table_tab.parent_opened_id = opened_table_item.id
-        table_tab.tab_order = self.get_max_order()
+        table_tab.tab_order = self.get_max_order(table_tab.ds_type_name)
         table_tab.is_current = CurrentEnum.is_current.value
         table_tab.ds_type_name = opened_table_item.ds_type_name
         self.insert(table_tab)
         return table_tab
 
-    def get_max_order(self):
-        db_record = self.db.query(ds_table_tab_sql_dict.get('max_order_sql'))
+    def get_max_order(self, ds_type_name):
+        max_order_sql = ds_table_tab_sql_dict.get('max_order_sql')
+        db_record = self.db.query(max_order_sql, **{'ds_type_name': ds_type_name})
+        log.info(f"查询当前数据源最大order值语句 ==> {max_order_sql}")
+        log.info(f"查询当前数据源最大order值参数 ==> {ds_type_name}")
         return db_record.first().max_order + 1
 
     def change_current(self, current_tab: DsTableTab):
@@ -94,7 +99,11 @@ class DsTableTabSqlite(SqliteBasic):
     def remove_tab(self, tab):
         self.delete(tab.id)
         # 调整order，找出排序在删除项之后的，向前整体移动一位
-        order = tab.tab_order
-        move_order_forward_sql = f"{ds_table_tab_sql_dict.get('move_order_forward')}{order}"
-        self.db.query(move_order_forward_sql)
+        move_order_forward_sql = ds_table_tab_sql_dict.get('move_order_forward')
+        param = {
+            'tab_order': tab.tab_order,
+            'ds_type_name': tab.ds_type_name
+        }
+        self.db.query(move_order_forward_sql, **param)
         log.info(f'将tab_table顺序前移语句 ==> {move_order_forward_sql}')
+        log.info(f'将tab_table顺序前移参数 ==> {param}')
