@@ -4,6 +4,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from service.sql_ds_executor.db_executor import SqlDBExecutor
 from service.system_storage.conn_type import get_conn_type_by_type
+from service.system_storage.ds_table_info_sqlite import DsTableInfo, CheckedEnum
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -31,4 +32,17 @@ class SqliteDBExecutor(SqlDBExecutor):
         db_records = self.get_data(query_tb_sql)
         return tuple(map(lambda x: x.get('tbl_name'), db_records.as_dict(ordered=True)))
 
-    def open_tb(self, db, tb): ...
+    def open_tb(self, db, tb):
+        query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(tb)
+        db_records = self.get_data(query_col_sql)
+        return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
+
+    def convert_tb_data(self, db_record):
+        table_info = DsTableInfo()
+        table_info.col_name = db_record.get('name')
+        table_info.full_data_type = db_record.get('type')
+        table_info.is_pk = db_record.get('pk')
+        table_info.checked = CheckedEnum.unchecked.value
+        table_info.col_comment = ''
+        table_info.handle_data_type()
+        return table_info
