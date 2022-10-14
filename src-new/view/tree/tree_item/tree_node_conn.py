@@ -141,3 +141,4 @@ class ConnTreeNode(AbstractTreeNode):
 
     def del_conn_callback(self):
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
+        self.tree_widget.del_conn_name(self.conn_name)
