@@ -74,12 +74,11 @@ def show_conn_dialog(sql_type, tree_widget, conn_info, title, screen_rect):
     dialog: AbstractConnDialog = globals()[get_conn_dialog(sql_type)](conn_info, title, screen_rect,
                                                                       tree_widget.conn_name_id_dict)
     if title == ADD_CONN_DIALOG_TITLE:
-        dialog.conn_changed.connect(lambda conn, opened_conn_record:
-                                    add_conn_tree_item(tree_widget, conn, opened_conn_record))
+        dialog.conn_saved.connect(lambda conn, opened_conn_record:
+                                  add_conn_tree_item(tree_widget, conn, opened_conn_record))
 
     elif title == EDIT_CONN_DIALOG_TITLE:
-        dialog.conn_changed.connect(lambda conn, opened_conn_record:
-                                    update_conn_tree_item(tree_widget, conn))
+        dialog.conn_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
     dialog.exec()
 
 

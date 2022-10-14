@@ -23,7 +23,9 @@ _date_ = '2022/5/29 17:55'
 class AbstractConnDialog(DraggableDialog):
     """连接对话框抽象类，整体对话框结构应为四部分：标题区、连接名表单区、连接信息表单区、按钮区"""
 
-    conn_changed = pyqtSignal(SqlConnection, OpenedTreeItem)
+    conn_saved = pyqtSignal(SqlConnection, OpenedTreeItem)
+
+    conn_changed = pyqtSignal(SqlConnection)
 
     def __init__(self, connection, dialog_title, screen_rect, conn_name_id_dict):
         super().__init__()
@@ -252,7 +254,7 @@ class AbstractConnDialog(DraggableDialog):
         if self.connection.id:
             if self.new_connection != self.connection:
                 self.new_connection.id = self.connection.id
-                self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self, self.save_post_process)
+                self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self, self.edit_post_process)
                 self.edit_conn_executor.start()
             else:
                 # 没有更改任何信息
@@ -263,11 +265,13 @@ class AbstractConnDialog(DraggableDialog):
             self.add_conn_executor = AddConnExecutor(self.new_connection, self, self, self.save_post_process)
             self.add_conn_executor.start()
 
-    def save_post_process(self, conn_id=None, opened_item_record=None):
-        # 如果返回了id，视为添加
-        if conn_id and opened_item_record:
-            self.new_connection.id = conn_id
-        self.conn_changed.emit(self.new_connection, opened_item_record)
+    def save_post_process(self, conn_id, opened_item_record):
+        self.new_connection.id = conn_id
+        self.conn_saved.emit(self.new_connection, opened_item_record)
+        self.close()
+
+    def edit_post_process(self):
+        self.conn_changed.emit(self.new_connection)
         self.close()
 
 
