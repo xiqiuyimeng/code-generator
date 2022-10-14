@@ -23,7 +23,8 @@ opened_item_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_child': f'delete from {table_name} where parent_id = :parent_id'
+    'delete_child': f'delete from {table_name} where parent_id = :parent_id',
+    'delete_conn': f'delete from {table_name} where parent_id = :parent_id and item_name is null',
 }
 
 
@@ -127,3 +128,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
     def delete_by_parent_id(self, parent_id):
         delete_child_sql = opened_item_sql_dict.get('delete_child')
         self.db.query(delete_child_sql, **{'parent_id': parent_id})
+
+    def delete_conn(self, parent_id):
+        delete_conn_sql = opened_item_sql_dict.get('delete_conn')
+        self.db.query(delete_conn_sql, **{'parent_id': parent_id})

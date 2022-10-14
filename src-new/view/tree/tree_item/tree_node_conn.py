@@ -5,6 +5,7 @@ from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_C
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
     ADD_DS_ACTION
 from constant.icon_enum import get_icon
+from service.async_func.async_sql_conn_task import DelConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok
@@ -27,6 +28,7 @@ class ConnTreeNode(AbstractTreeNode):
         self.conn_name = self.item.text(0)
         self.open_conn_executor: OpenConnExecutor = ...
         self.test_conn_executor: TestConnIconMovieExecutor = ...
+        self.del_conn_executor: DelConnExecutor = ...
 
     def open_item(self):
         if not self.item.childCount():
@@ -129,4 +131,13 @@ class ConnTreeNode(AbstractTreeNode):
         # 删除连接
         elif func == DEL_CONN_ACTION.format(self.conn_name):
             self.close_item()
-            self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
+            self.del_conn()
+
+    def del_conn(self):
+        conn = get_item_sql_conn(self.item)
+        self.del_conn_executor = DelConnExecutor(conn.id, conn.conn_name,
+                                                 self.item, self.window, self.del_conn_callback)
+        self.del_conn_executor.start()
+
+    def del_conn_callback(self):
+        self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))

@@ -121,13 +121,10 @@ class DelConnWorker(ThreadWorkerABC):
 
     def do_run(self):
         ConnSqlite().delete(self.conn_id)
-        self.del_opened_item()
+        # 根据连接id，删除打开记录表中的记录
+        OpenedTreeItemSqlite().delete_conn(self.conn_id)
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
-
-    def del_opened_item(self):
-        # 根据连接id，递归删除历史表中所有相关记录
-        pass
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}')
