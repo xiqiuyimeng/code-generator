@@ -113,22 +113,26 @@ class TabBar(QTabBar):
                 (current_tab and get_item_opening_flag(current_tab.tree_item)):
             return
         if current_tab:
-            self.parent.async_save_executor.change_current(current_tab.table_tab)
             # 考虑处理tab顺序问题
             if self.is_moving:
                 # 设置标志位，方便排序时判断使用
                 self.current_changed = True
+            self.parent.async_save_executor.change_current(current_tab.table_tab)
 
     def sort_tab(self):
         """在拖拉tab页签，松开鼠标时触发，对最终状态的tab widget进行排序并保存"""
         if self.current_changed:
             tab_table_list = list()
-            # 首先收集现在的tab list
+            current_index = self.parent.currentIndex()
+            # 首先收集现在的tab list，收集顺序及是否当前，全量更新tab
             for i in range(self.count()):
                 table_tab = self.parent.widget(i).table_tab
-                if table_tab.tab_order != i + 1:
-                    table_tab.tab_order = i + 1
-                    tab_table_list.append(table_tab)
+                table_tab.tab_order = i + 1
+                if current_index == i:
+                    table_tab.is_current = table_tab.set_current()
+                else:
+                    table_tab.is_current = table_tab.set_not_current()
+                tab_table_list.append(table_tab)
             # 保存数据
             if tab_table_list:
                 self.parent.async_save_executor.sort_order(tab_table_list)

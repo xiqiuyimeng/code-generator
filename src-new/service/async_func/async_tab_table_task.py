@@ -33,7 +33,7 @@ class TabChangedWorker(ThreadWorkerABC):
                 DsTableTabSqlite().batch_update(data)
             elif method == 'save_table_data':
                 DsTableInfoSqlite().update(data)
-            log.info(f'{method}: {data}')
+            log.debug(f'{method}: {data}')
 
     def do_exception(self, e: Exception):
         log.exception('更新tab页数据异常')

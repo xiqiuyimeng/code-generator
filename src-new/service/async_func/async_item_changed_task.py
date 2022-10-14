@@ -34,7 +34,7 @@ class ItemChangedWorker(ThreadWorkerABC):
                 OpenedTreeItemSqlite().update(opened_item)
             elif method == 'close_item':
                 OpenedTreeItemSqlite().delete_by_parent_id(opened_item.id)
-            log.info(f'{method}: {opened_item}')
+            log.debug(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):
         log.exception('更改树节点状态异常')

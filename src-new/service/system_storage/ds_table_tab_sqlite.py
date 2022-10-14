@@ -47,6 +47,12 @@ class DsTableTab(BasicSqliteDTO):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    def set_current(self):
+        self.is_current = CurrentEnum.is_current.value
+
+    def set_not_current(self):
+        self.is_current = CurrentEnum.not_current.value
+
 
 class CurrentEnum(Enum):
 
@@ -65,8 +71,8 @@ class DsTableTabSqlite(SqliteBasic):
         table_tab = DsTableTab()
         table_tab.parent_opened_id = opened_table_item.id
         table_tab.tab_order = self.get_max_order(table_tab.ds_type_name)
-        table_tab.is_current = CurrentEnum.is_current.value
         table_tab.ds_type_name = opened_table_item.ds_type_name
+        table_tab.set_current()
         self.insert(table_tab)
         return table_tab
 
@@ -80,19 +86,19 @@ class DsTableTabSqlite(SqliteBasic):
     def change_current(self, current_tab: DsTableTab):
         # 将同一数据源下的其他项全部置为非当前，将当前值置为当前项
         self.change_other_not_current(current_tab.ds_type_name)
-        current_tab.is_current = CurrentEnum.is_current.value
+        current_tab.set_current()
         self.update(current_tab)
 
     def change_other_not_current(self, ds_type_name):
         # 将同一数据源下的其他项全部置为非当前
         table_tab = DsTableTab()
-        table_tab.is_current = CurrentEnum.is_current.value
+        table_tab.set_current()
         table_tab.ds_type_name = ds_type_name
         current_tabs = self.select(table_tab)
         # 当前项应该不多于1个
         if current_tabs:
             origin_current_tab = DsTableTab()
-            origin_current_tab.is_current = CurrentEnum.not_current.value
+            origin_current_tab.set_not_current()
             origin_current_tab.id = current_tabs[0].id
             self.update(origin_current_tab)
 
