@@ -27,15 +27,15 @@ class CentralWidget(QWidget):
 
         self.frame_dict = dict()
 
-        self.tree_frame = None
-        self.tab_frame = None
+        self.tree_frame = ...
+        self.tab_frame = ...
 
     def setup_ui(self):
         # 隐藏frame的原因是：如果在切换数据源的时候，也就是frame存在，那么重新获取一个frame，
         # 会导致页面一直增加frame，而非切换的效果，所以需要将之前的frame先隐藏，再展示需要展示的frame
-        if self.tree_frame:
+        if self.tree_frame is not Ellipsis:
             self.tree_frame.hide()
-        if self.tab_frame:
+        if self.tab_frame is not Ellipsis:
             self.tab_frame.hide()
 
         # 获取tree frame

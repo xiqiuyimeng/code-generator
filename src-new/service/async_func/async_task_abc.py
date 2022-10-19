@@ -67,12 +67,13 @@ class ThreadExecutorABC(QObject):
         self.fail_post_process()
         pop_fail(error_msg, self.error_box_title, self.window)
 
-    def worker_terminate(self, terminate_callback):
+    def worker_terminate(self, terminate_callback=None):
         if self.worker.isRunning():
             self.worker.terminate()
         self.worker_quit()
         # 停止后，首先调用回调函数
-        terminate_callback()
+        if terminate_callback:
+            terminate_callback()
         self.post_process()
 
     def worker_quit(self):

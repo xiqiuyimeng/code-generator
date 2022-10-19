@@ -20,7 +20,7 @@ class TabWidget(QTabWidget):
     def __init__(self, parent, main_window):
         super().__init__(parent=parent)
         self.main_window = main_window
-        self.tab_bar = TabBar(self)
+        self.tab_bar = TabBar(self, main_window)
         self.setTabBar(self.tab_bar)
 
         self.async_save_executor = AsyncSaveTabObjExecutor()

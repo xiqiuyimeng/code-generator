@@ -4,8 +4,9 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
 from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
-    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX
+    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_MENU
 from service.system_storage.ds_table_tab_sqlite import DsTableTab
+from view.box.message_box import pop_fail
 from view.tree.tree_widget.tree_item_func import set_item_opened_tab, get_item_opening_flag
 
 _author_ = 'luwt'
@@ -16,10 +17,11 @@ class TabBar(QTabBar):
 
     remove_tab_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, parent: QTabWidget):
+    def __init__(self, parent: QTabWidget, main_window):
         """tab bar index按照从左到右变大的顺序,0,1,2..."""
         super().__init__(parent=parent)
         self.parent = parent
+        self.main_window = main_window
         self.is_moving = False
         self.current_changed = False
         # tab_bar在tab页过多时，开启滚动按钮
@@ -78,19 +80,33 @@ class TabBar(QTabBar):
             # 删除当前tab
             self.remove_tab(index)
         elif act.text() == CLOSE_OTHER_TABS:
-            # 删除其他tab，先删除右边的，再删除左边的
-            [self.remove_tab(index + 1) for idx in range(self.count()) if idx > index]
-            [self.remove_tab(0) for idx in range(self.count()) if idx < index]
+            # 删除其他tab，先删除右边的
+            for idx in range(self.count()):
+                if idx > index:
+                    if not self.remove_tab(index + 1):
+                        break
+            # 再删除左边的
+            for idx in range(self.count()):
+                if idx < index:
+                    if not self.remove_tab(0):
+                        break
         elif act.text() == CLOSE_ALL_TABS:
             # 删除所有tab
             while self.count():
-                self.remove_tab(0)
+                if not self.remove_tab(0):
+                    break
         elif act.text() == CLOSE_TABS_TO_THE_LEFT:
             # 关闭标签页左边所有tab，找到比当前tab索引小的tab个数，按个数删除，删除左边一位即可
-            [self.remove_tab(0) for idx in range(self.count()) if idx < index]
+            for idx in range(self.count()):
+                if idx < index:
+                    if not self.remove_tab(0):
+                        break
         elif act.text() == CLOSE_TABS_TO_THE_RIGHT:
             # 关闭标签页右边所有tab，找到比当前索引大的tab个数，按个数删除，删除右边一位即可
-            [self.remove_tab(index + 1) for idx in range(self.count()) if idx > index]
+            for idx in range(self.count()):
+                if idx > index:
+                    if not self.remove_tab(index + 1):
+                        break
         elif act.text() == SET_CURRENT_INDEX:
             # 当前页置顶
             self.setCurrentIndex(index)
@@ -98,12 +114,20 @@ class TabBar(QTabBar):
     def remove_tab(self, index):
         # 获取tab table
         tab_widget = self.parent.widget(index)
+        # 如果当前复选框的状态未部分选中，则关闭将不可用，因为关闭后，无法获取部分选中的具体列
+        if tab_widget.tree_item.checkState(0) == Qt.PartiallyChecked:
+            pop_fail(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format(tab_widget.tree_item.parent().parent().text(0),
+                                                               tab_widget.tree_item.parent().text(0),
+                                                               tab_widget.tree_item.text(0)),
+                     CLOSE_TABLE_MENU.format(tab_widget.tree_item.text(0)), self.main_window)
+            return False
         # 删除tab widget在树节点中的引用
         set_item_opened_tab(tab_widget.tree_item, None)
         # 删除tab
         self.parent.removeTab(index)
         table_tab = tab_widget.table_tab
         self.remove_tab_signal.emit(table_tab)
+        return True
 
     def change_current(self, index):
         # 获取当前项

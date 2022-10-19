@@ -456,4 +456,5 @@ CLOSE_TABS_TO_THE_LEFT = '关闭左边所有标签页'
 CLOSE_TABS_TO_THE_RIGHT = '关闭右边所有标签页'
 SET_CURRENT_INDEX = '当前页置顶'
 
-TABLE_CLOSE_WITH_PARTIALLY_CHECKED = '当前表数据只选择了一部分，关闭表后，将无法获知选中的具体数据，请全选表数据或清空选择'
+TABLE_CLOSE_WITH_PARTIALLY_CHECKED = '当前表 [{}] [{}] [{}] 数据只选择了一部分，关闭表后，' \
+                                     '将无法获知选中的具体数据，请全选表数据或清空选择'
