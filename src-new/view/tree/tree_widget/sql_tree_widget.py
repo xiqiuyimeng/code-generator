@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QTreeWidgetItemIterator
 from service.async_func.async_sql_conn_task import ListConnExecutor
 from service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_item.context import Context
+from view.tree.tree_item.context import get_tree_node
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.tree_function import make_sql_conn_tree_items
 from view.tree.tree_widget.tree_item_func import set_item_opened_record, get_item_sql_conn, get_item_opened_tab
@@ -66,7 +66,7 @@ class SqlTreeWidget(AbstractTreeWidget):
         for opened_tab in opened_tabs:
             # 找到表节点
             item = self.get_item_by_opened_id(opened_tab.parent_opened_id)
-            Context(item, self, self.main_window).reopen_item(opened_tab)
+            get_tree_node(item, self, self.main_window).reopen_item(opened_tab)
             tab = get_item_opened_tab(item)
             if opened_tab.is_current:
                 current_tab = tab
@@ -86,7 +86,7 @@ class SqlTreeWidget(AbstractTreeWidget):
     def reopen_tree_item(self, opened_items):
         # 首先获取父元素
         parent_item = self.get_item_by_opened_id(opened_items[0].parent_id)
-        Context(parent_item, self, self.main_window).reopen_item(opened_items)
+        get_tree_node(parent_item, self, self.main_window).reopen_item(opened_items)
 
     def get_item_by_opened_parent_id(self, opened_parent_id):
         """
@@ -114,14 +114,14 @@ class SqlTreeWidget(AbstractTreeWidget):
         del self.conn_name_id_dict[conn_name]
 
     def do_open_tree_item(self, item):
-        Context(item, self, self.main_window).open_item()
+        get_tree_node(item, self, self.main_window).open_item()
 
     def do_fill_menu(self, item, menu):
-        Context(item, self, self.main_window).do_fill_menu(menu)
+        get_tree_node(item, self, self.main_window).do_fill_menu(menu)
 
     def do_handle_right_menu_func(self, item, func_name):
-        Context(item, self, self.main_window).handle_menu_func(func_name)
+        get_tree_node(item, self, self.main_window).handle_menu_func(func_name)
 
     def do_handle_item_change(self, item):
-        Context(item, self, self.main_window).change_check_box(item.checkState(0))
+        get_tree_node(item, self, self.main_window).change_check_box(item.checkState(0))
 

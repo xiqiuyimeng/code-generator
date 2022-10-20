@@ -11,8 +11,8 @@ from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_dialog, get_conn_type_by_type
 from view.dialog.conn import *
 from view.tree.tree_item.tree_node_table import TableTreeNode
-from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, set_item_opening_flag, \
-    set_item_testing_flag, get_item_conn_type, set_item_opened_record
+from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, get_item_conn_type, \
+    set_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
@@ -41,8 +41,6 @@ def make_sql_tree_item(parent, name, icon, opened_item_record=None,
         set_item_conn_type(item, conn_type)
     if checkbox is not None:
         item.setCheckState(0, checkbox)
-    set_item_opening_flag(item, False)
-    set_item_testing_flag(item, False)
     return item
 
 

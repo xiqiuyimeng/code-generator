@@ -5,8 +5,8 @@ from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TAB
 from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_widget.tree_item_func import set_item_opening_flag, set_item_opening_worker, get_item_opened_tab, \
-    set_item_opened_tab, get_item_opening_flag, get_item_opening_worker
+from view.tree.tree_widget.tree_item_func import get_item_opened_tab, \
+    set_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -17,7 +17,8 @@ class TableTreeNode(AbstractTreeNode):
     def __init__(self, *args):
         super().__init__(*args)
         self.table_name = self.item.text(0)
-        self.open_tb_executor = ...
+        if not hasattr(self, 'open_tb_executor'):
+            self.open_tb_executor: OpenTBExecutor = ...
 
     def open_item(self):
         # 获取打开的tab
@@ -27,16 +28,14 @@ class TableTreeNode(AbstractTreeNode):
             self.window.sql_tab_widget.setCurrentWidget(tab_widget)
         else:
             # 执行打开tab页, 设置正在打开中状态
-            set_item_opening_flag(self.item, True)
+            self.is_opening = True
             self.open_tb_executor = OpenTBExecutor(self.item, self.window, self.open_item_ui, self.open_item_fail)
-            # 将打开连接的线程执行器绑定到item中
-            set_item_opening_worker(self.item, self.open_tb_executor)
             self.open_tb_executor.start()
 
     def open_item_ui(self, table_tab):
         tab = self.reopen_item(table_tab)
         self.window.sql_tab_widget.setCurrentWidget(tab)
-        set_item_opening_flag(self.item, False)
+        self.is_opening = False
 
     def reopen_item(self, table_tab):
         # 创建tab页
@@ -50,13 +49,16 @@ class TableTreeNode(AbstractTreeNode):
         return tab
 
     def open_item_fail(self):
-        set_item_opening_flag(self.item, False)
+        self.is_opening = False
 
     def close_item(self):
         tab = get_item_opened_tab(self.item)
-        index = self.window.sql_tab_widget.indexOf(tab)
-        # 删除tab
-        self.window.sql_tab_widget.tab_bar.remove_tab(index)
+        if tab:
+            index = self.window.sql_tab_widget.indexOf(tab)
+            tab_bar = self.window.sql_tab_widget.tab_bar
+            if tab_bar.table_allow_close((index, )):
+                # 删除tab
+                tab_bar.remove_tab(index)
 
     def change_check_box(self, check_state):
         # 保存复选框状态变化
@@ -75,7 +77,7 @@ class TableTreeNode(AbstractTreeNode):
 
     def do_fill_menu(self, menu):
         open_menu_name = CANCEL_OPEN_TABLE_MENU.format(self.table_name) \
-            if get_item_opening_flag(self.item) else OPEN_TABLE_MENU.format(self.table_name) \
+            if self.is_opening else OPEN_TABLE_MENU.format(self.table_name) \
             if not get_item_opened_tab(self.item) else CLOSE_TABLE_MENU.format(self.table_name)
 
         menu.addAction(QAction(open_menu_name.format(self.table_name), menu))
@@ -86,7 +88,11 @@ class TableTreeNode(AbstractTreeNode):
             self.open_item()
         # 取消打开表
         elif func == CANCEL_OPEN_TABLE_MENU.format(self.table_name):
-            get_item_opening_worker(self.item).worker_terminate(self.open_item_fail)
+            self.open_tb_executor.worker_terminate(self.open_item_fail)
         # 关闭表
         elif func == CLOSE_TABLE_MENU.format(self.table_name):
             self.close_item()
+
+    def worker_terminate(self):
+        if self.open_tb_executor is not Ellipsis:
+            self.open_tb_executor.worker_terminate()

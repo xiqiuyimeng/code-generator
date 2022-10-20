@@ -108,6 +108,7 @@ CLOSE_TABLE_MENU = '关闭表 [{}]'
 SELECT_ALL_FIELD_MENU = '全选 [{}] 表中所有字段'
 # 取消选择字段
 UNSELECT_FIELD_MENU = '取消选择字段'
+CLOSE_TABLE_TITLE = '关闭表'
 # ---------- 树节点右键菜单文字 end ---------- #
 
 # mysql查询数据库列表sql
@@ -456,5 +457,6 @@ CLOSE_TABS_TO_THE_LEFT = '关闭左边所有标签页'
 CLOSE_TABS_TO_THE_RIGHT = '关闭右边所有标签页'
 SET_CURRENT_INDEX = '当前页置顶'
 
-TABLE_CLOSE_WITH_PARTIALLY_CHECKED = '当前表 [{}] [{}] [{}] 数据只选择了一部分，关闭表后，' \
-                                     '将无法获知选中的具体数据，请全选表数据或清空选择'
+TABLE_CLOSE_WITH_PARTIALLY_CHECKED = '以下表数据只选择了一部分，关闭表后，' \
+                                     '将无法获知选中的具体数据，请全选表数据或清空选择：\n{}'
+

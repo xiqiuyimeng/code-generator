@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_item.tree_node_conn import ConnTreeNode
 from view.tree.tree_item.tree_node_db import DBTreeNode
 from view.tree.tree_item.tree_node_table import TableTreeNode
@@ -7,7 +8,7 @@ _author_ = 'luwt'
 _date_ = '2022/7/6 22:03'
 
 
-def get_tree_node(item, tree_widget, window):
+def get_tree_node(item, tree_widget, window) -> AbstractTreeNode:
     """
     获取树节点对应的实例化对象。
     树结构：
@@ -26,26 +27,3 @@ def get_tree_node(item, tree_widget, window):
     elif item.parent().parent().parent() is None:
         return TableTreeNode(item, tree_widget, window)
 
-
-class Context:
-
-    def __init__(self, *args):
-        self.tree_node = get_tree_node(*args)
-
-    def open_item(self):
-        self.tree_node.open_item()
-
-    def reopen_item(self, opened_items):
-        self.tree_node.reopen_item(opened_items)
-
-    def close_item(self):
-        self.tree_node.close_item()
-
-    def change_check_box(self, check_state):
-        self.tree_node.change_check_box(check_state)
-
-    def do_fill_menu(self, menu):
-        self.tree_node.do_fill_menu(menu)
-
-    def handle_menu_func(self, func):
-        self.tree_node.handle_menu_func(func)

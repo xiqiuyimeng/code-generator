@@ -4,10 +4,11 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
 from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
-    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_MENU
+    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE
 from service.system_storage.ds_table_tab_sqlite import DsTableTab
 from view.box.message_box import pop_fail
-from view.tree.tree_widget.tree_item_func import set_item_opened_tab, get_item_opening_flag
+from view.tree.tree_item.context import get_tree_node
+from view.tree.tree_widget.tree_item_func import set_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'
@@ -36,7 +37,7 @@ class TabBar(QTabBar):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.right_click_menu)
         # 关闭选项卡事件
-        self.tabCloseRequested.connect(self.remove_tab)
+        self.tabCloseRequested.connect(self.close_current_tab)
 
     def mousePressEvent(self, event):
         # 如果按下了鼠标左键，将标志位设置为true
@@ -77,64 +78,89 @@ class TabBar(QTabBar):
     def handle_menu_func(self, act: QAction, index):
         """tab bar右键菜单功能实现，需要注意的是，删除tab后，索引也会刷新"""
         if act.text() == CLOSE_CURRENT_TAB:
-            # 删除当前tab
-            self.remove_tab(index)
+            self.close_current_tab(index)
         elif act.text() == CLOSE_OTHER_TABS:
-            # 删除其他tab，先删除右边的
-            for idx in range(self.count()):
-                if idx > index:
-                    if not self.remove_tab(index + 1):
-                        break
-            # 再删除左边的
-            for idx in range(self.count()):
-                if idx < index:
-                    if not self.remove_tab(0):
-                        break
+            self.close_other_tabs(index)
         elif act.text() == CLOSE_ALL_TABS:
-            # 删除所有tab
-            while self.count():
-                if not self.remove_tab(0):
-                    break
+            self.close_all_tabs()
         elif act.text() == CLOSE_TABS_TO_THE_LEFT:
-            # 关闭标签页左边所有tab，找到比当前tab索引小的tab个数，按个数删除，删除左边一位即可
-            for idx in range(self.count()):
-                if idx < index:
-                    if not self.remove_tab(0):
-                        break
+            self.close_tabs_to_left(index)
         elif act.text() == CLOSE_TABS_TO_THE_RIGHT:
-            # 关闭标签页右边所有tab，找到比当前索引大的tab个数，按个数删除，删除右边一位即可
-            for idx in range(self.count()):
-                if idx > index:
-                    if not self.remove_tab(index + 1):
-                        break
+            self.close_tabs_to_right(index)
         elif act.text() == SET_CURRENT_INDEX:
             # 当前页置顶
             self.setCurrentIndex(index)
 
+    def close_current_tab(self, index):
+        # 检查表的选中状态
+        if self.table_allow_close((index,)):
+            # 删除当前tab
+            self.remove_tab(index)
+
+    def close_other_tabs(self, index):
+        # 左侧的index
+        left_index_list = list(range(0, index))
+        # 右侧的index
+        right_index_list = list(range(index + 1, self.count()))
+        if self.table_allow_close((*left_index_list, *right_index_list)):
+            # 删除其他tab，先删除右边的，因为在删除的过程中，index会发生变化，所以要从大到小删除
+            [self.remove_tab(idx) for idx in reversed(right_index_list)]
+            # 再删除左边的
+            [self.remove_tab(idx) for idx in reversed(left_index_list)]
+
+    def close_all_tabs(self):
+        index_list = range(0, self.count())
+        # 删除所有tab
+        [self.remove_tab(idx) for idx in reversed(index_list)
+         if self.table_allow_close(index_list)]
+
+    def close_tabs_to_left(self, index):
+        # 左侧的index
+        left_index_list = range(0, index)
+        # 关闭标签页左边所有tab
+        [self.remove_tab(idx) for idx in reversed(left_index_list)
+         if self.table_allow_close(left_index_list)]
+
+    def close_tabs_to_right(self, index):
+        # 右侧的index
+        right_index_list = range(index + 1, self.count())
+        # 关闭标签页右边所有tab
+        [self.remove_tab(idx) for idx in reversed(right_index_list)
+         if self.table_allow_close(right_index_list)]
+
+    def table_allow_close(self, indexes):
+        """根据索引，检查表是否都可以关闭，检查规则是：是否存在部分选中的表，如果部分选中则不可关闭"""
+        partially_checked_tables = list()
+        for index in indexes:
+            tab_widget = self.parent.widget(index)
+            if tab_widget.tree_item.checkState(0) == Qt.PartiallyChecked:
+                partially_checked_tables.append(f'连接：{tab_widget.tree_item.parent().parent().text(0)} '
+                                                f'库：{tab_widget.tree_item.parent().text(0)} '
+                                                f'表：{tab_widget.tree_item.text(0)}')
+        if partially_checked_tables:
+            # 弹窗提示
+            pop_fail(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format('\n'.join(partially_checked_tables)),
+                     CLOSE_TABLE_TITLE, self.main_window)
+        return not partially_checked_tables
+
     def remove_tab(self, index):
         # 获取tab table
         tab_widget = self.parent.widget(index)
-        # 如果当前复选框的状态未部分选中，则关闭将不可用，因为关闭后，无法获取部分选中的具体列
-        if tab_widget.tree_item.checkState(0) == Qt.PartiallyChecked:
-            pop_fail(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format(tab_widget.tree_item.parent().parent().text(0),
-                                                               tab_widget.tree_item.parent().text(0),
-                                                               tab_widget.tree_item.text(0)),
-                     CLOSE_TABLE_MENU.format(tab_widget.tree_item.text(0)), self.main_window)
-            return False
         # 删除tab widget在树节点中的引用
         set_item_opened_tab(tab_widget.tree_item, None)
         # 删除tab
         self.parent.removeTab(index)
         table_tab = tab_widget.table_tab
         self.remove_tab_signal.emit(table_tab)
-        return True
 
     def change_current(self, index):
         # 获取当前项
         current_tab = self.parent.widget(index)
         # 项目初始化中，或正在打开tab页不处理
-        if self.parent.main_window.sql_tree_widget.reopening_flag or \
-                (current_tab and get_item_opening_flag(current_tab.tree_item)):
+        if self.main_window.sql_tree_widget.reopening_flag \
+                or (current_tab and get_tree_node(current_tab.tree_item,
+                                                  self.main_window.sql_tree_widget,
+                                                  self.main_window).is_opening):
             return
         if current_tab:
             # 考虑处理tab顺序问题

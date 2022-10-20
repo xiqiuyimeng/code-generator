@@ -7,10 +7,17 @@ _date_ = '2022/7/6 22:08'
 
 class AbstractTreeNode:
 
+    def __new__(cls, item: QTreeWidgetItem, tree_widget, window):
+        if not hasattr(item, 'node'):
+            item.node = object.__new__(cls)
+        return item.node
+
     def __init__(self, item: QTreeWidgetItem, tree_widget, window):
         self.item = item
         self.tree_widget = tree_widget
         self.window = window
+        if not hasattr(self, 'is_opening'):
+            self.is_opening = False
 
     def open_item(self): ...
 
@@ -27,4 +34,6 @@ class AbstractTreeNode:
     def do_fill_menu(self, menu): ...
 
     def handle_menu_func(self, func): ...
+
+    def worker_terminate(self): ...
 
