@@ -9,10 +9,11 @@ from constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE
 from constant.icon_enum import get_icon
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_dialog, get_conn_type_by_type
+from service.util.tree_node import TreeData
 from view.dialog.conn import *
 from view.tree.tree_item.tree_node_table import TableTreeNode
 from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, get_item_conn_type, \
-    set_item_opened_record
+    set_item_opened_record, get_item_sql_conn
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
@@ -127,13 +128,25 @@ def make_db_items(parent_item, opened_db_items):
         make_sql_tree_item(parent_item, opened_db_item.item_name, icon, opened_db_item)
 
 
-def make_table_items(parent_item, opened_table_items):
+def make_table_items(parent_item, opened_table_items, tree_data: TreeData):
     """构建数据表层叶子节点"""
+    checked_tables = list()
     for opened_table_item in opened_table_items:
         conn_type = get_item_conn_type(parent_item.parent())
         icon = get_icon(conn_type.tb_icon_name)
         make_sql_tree_item(parent_item, opened_table_item.item_name,
                            icon, opened_table_item, checkbox=opened_table_item.checked)
+        if opened_table_item.checked:
+            checked_tables.append(opened_table_item.item_name)
+    # 如果表已选中，添加到选中数据集合中
+    if checked_tables:
+        sql_conn = get_item_sql_conn(parent_item.parent())
+        tb_data = {
+            'conn': sql_conn.conn_name,
+            'db': parent_item.text(0),
+            'tb': checked_tables
+        }
+        tree_data.add_node(tb_data, sql_conn)
 
 
 def check_table_status(parent):

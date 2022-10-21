@@ -2,7 +2,7 @@
 """
 表格结构，大体与树结构类似
 """
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QWidget, QHBoxLayout, QCheckBox
 
 from constant_.constant import TABLE_HEADER_LABELS
@@ -11,6 +11,7 @@ from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
 from view.table.table_item import TableWidgetItem
 from view.table.table_item_delegate import ComboboxDelegate, TextInputDelegate
+from view.tree.tree_widget.tree_item_func import get_item_sql_conn
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
@@ -18,15 +19,14 @@ _date_ = '2022/5/10 15:25'
 
 class TableWidget(QTableWidget, ScrollableWidget):
 
-    # 定义信号，点击第一列复选框时，发送当前选中状态、第二列的字段名称和当前行
-    item_checkbox_clicked = pyqtSignal(bool, str, int)
-
     def __init__(self, parent, cols):
         super().__init__(parent)
         self.cols = cols
         # 获取tab widget中的队列线程执行器
         self.async_save_executor = self.parent().parent()\
             .main_window.sql_tab_widget.async_save_executor
+        # 选中数据
+        self.tree_data = self.parent().parent().main_window.sql_tree_widget.tree_data
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
@@ -87,12 +87,16 @@ class TableWidget(QTableWidget, ScrollableWidget):
         将列名字段全数填充在表中，四列多行表
         """
         self.filling_table = True
+        checked_col_list = list()
         # 填充数据
         for i, col in enumerate(self.cols):
             # 插入新的一行
             self.insertRow(i)
             # 设置checkbox在第一列
             self.setCellWidget(i, 0, self.make_checkbox_num_item(i, col.checked))
+
+            if col.checked:
+                checked_col_list.append(col)
 
             self.setItem(i, 1, self.make_item(col.col_name))
             self.setItem(i, 2, self.make_item(col.data_type))
@@ -102,6 +106,29 @@ class TableWidget(QTableWidget, ScrollableWidget):
         # 设置表格根据内容调整
         self.resizeRowsToContents()
         self.filling_table = False
+
+        # 保存选中数据
+        if checked_col_list:
+            self.add_checked_data(checked_col_list)
+
+    def add_checked_data(self, cols):
+        sql_conn = get_item_sql_conn(self.tree_item.parent().parent())
+        add_data = {
+            'conn': self.tree_item.parent().parent().text(0),
+            'db': self.tree_item.parent().text(0),
+            'tb': self.tree_item.text(0),
+            'col': cols,
+        }
+        self.tree_data.add_node(add_data, sql_conn)
+
+    def remove_checked_data(self, cols):
+        add_data = {
+            'conn': self.tree_item.parent().parent().text(0),
+            'db': self.tree_item.parent().text(0),
+            'tb': self.tree_item.text(0),
+            'col': cols,
+        }
+        self.tree_data.del_node(add_data, recursive_del=True)
 
     def make_item(self, text):
         item = TableWidgetItem(self)
@@ -135,8 +162,7 @@ class TableWidget(QTableWidget, ScrollableWidget):
     def row_checked(self, checked, row):
         # 选中一行数据
         if not self.filling_table:
-            # todo 第一步，选中一行数据
-            # 第二步，将列数据置为选中状态，保存数据
+            # 将列数据置为选中状态，保存数据
             self.save_data(row, 0, checked)
 
     def click_row_checkbox(self, checked, row):
@@ -170,6 +196,14 @@ class TableWidget(QTableWidget, ScrollableWidget):
         elif col == 5:
             col_data.col_comment = data
             modify_col_data.col_comment = data
+
+        # 保存到树选中数据中，由于保存的列对象是从 self.cols中取的，
+        # 所以树中保存的列对象引用指向列表中对象，在数据变化时，无需手动同步
+        # 如果是选中，则为添加数据，否则为删除数据
+        if col_data.checked:
+            self.add_checked_data(col_data)
+        else:
+            self.remove_checked_data(col_data)
 
         # 保存数据
         self.async_save_executor.save_table_data(modify_col_data)

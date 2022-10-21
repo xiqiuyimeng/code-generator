@@ -6,23 +6,6 @@ from view.table.table_item import TableWidgetItem
 
 _author_ = 'luwt'
 _date_ = '2022/5/31 21:09'
-
-
-def add_table_ext_info(window, tree_item):
-    # 表格复选框改变事件
-    window.tableWidget.item_checkbox_clicked.connect(window.on_table_check_changed)
-    window.current_table = tree_item
-    tb_name = tree_item.text(0)
-    db_name = tree_item.parent().text(0)
-    conn_name = tree_item.parent().parent().text(0)
-    # 标题
-    window.tab_header_label.setText(f"当前展示表为：{tb_name}")
-    # 状态栏提示
-    window.statusbar.showMessage(f"当前展示的表为：{tb_name}")
-    # 设置气泡提示
-    window.tableWidget.setToolTip(f'当前表为{tb_name}')
-    # 已经打开的表，记录下连接名、库名和表名
-    window.opened_table = conn_name, db_name, tb_name
     
     
 def fill_table(table_widget, cols):

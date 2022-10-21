@@ -34,7 +34,7 @@ class DBTreeNode(AbstractTreeNode):
     def open_item_ui(self, opened_table_items):
         self.is_opening = False
         if opened_table_items:
-            make_table_items(self.item, opened_table_items)
+            make_table_items(self.item, opened_table_items, self.tree_widget.tree_data)
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:
@@ -45,7 +45,7 @@ class DBTreeNode(AbstractTreeNode):
 
     def reopen_item(self, opened_items):
         # 打开库下的表节点
-        make_table_items(self.item, opened_items)
+        make_table_items(self.item, opened_items, self.tree_widget.tree_data)
         opened_item_record = get_item_opened_record(self.item)
         self.item.setExpanded(opened_item_record.expanded)
         if opened_item_record.is_current:

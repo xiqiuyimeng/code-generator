@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QTreeWidgetItemIterator
 
 from service.async_func.async_sql_conn_task import ListConnExecutor
 from service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
+from service.util.tree_node import TreeData
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.context import get_tree_node
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
@@ -24,11 +25,13 @@ class SqlTreeWidget(AbstractTreeWidget):
         self.main_window = window
         # 存储连接id和名称
         self.conn_name_id_dict: dict = ...
-        self.list_conn_executor = None
+        self.list_conn_executor = ...
+        # 保存 sql tree 选中数据
+        self.tree_data = TreeData()
 
     def reopen_tree(self):
         # 如果还没初始化过，再执行初始化
-        if not self.list_conn_executor:
+        if self.list_conn_executor is Ellipsis:
             # 初始化数据
             self.list_conn_executor = ListConnExecutor(self.main_window, self.main_window,
                                                        self.init_conn_tree_items,

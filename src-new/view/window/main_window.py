@@ -6,9 +6,8 @@ from constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
 from constant.icon_enum import get_icon
 from service.async_func.async_ds_type_task import InitDsTypeExecutor, SwitchDsTypeExecutor
 from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
-from service.util.ds_type_util import get_current_datasource_type
 from service.system_storage.ds_type_sqlite import DatasourceType
-from service.util.tree_node import Tree
+from service.util.ds_type_util import get_current_datasource_type
 from view.bar.menubar import Menubar
 from view.bar.titlebar import TitleBar
 from view.bar.toolbar import ToolBar
@@ -39,9 +38,6 @@ class MainWindow(QMainWindow):
         self.titlebar: TitleBar = ...
         self.toolbar: ToolBar = ...
         self.statusbar: QStatusBar = ...
-
-        # 保存选中对象
-        self.tree_data = Tree()
 
         self.datasource_types = ...
         self.current_ds_type = ...
