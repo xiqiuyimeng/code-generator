@@ -10,6 +10,7 @@ from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTable
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel, \
     CurrentEnum, ExpandedEnum
+from service.system_storage.sqlite_abc import transactional
 from view.box.message_box import pop_ok
 from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
@@ -29,6 +30,7 @@ class AddConnWorker(ThreadWorkerABC):
         super().__init__()
         self.connection = connection
 
+    @transactional
     def do_run(self):
         ConnSqlite().insert(self.connection)
         # 历史记录中的连接id
@@ -119,6 +121,7 @@ class DelConnWorker(ThreadWorkerABC):
         self.conn_id = conn_id
         self.conn_name = conn_name
 
+    @transactional
     def do_run(self):
         ConnSqlite().delete(self.conn_id)
         # 根据连接id，删除打开记录表中的记录

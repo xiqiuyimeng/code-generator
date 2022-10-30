@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
+from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
 from logger.log import logger as log
 
 _author_ = 'luwt'
@@ -70,7 +70,8 @@ class DsTableInfoSqlite(SqliteBasic):
             column.checked = check_state
         self.batch_insert(columns)
 
-    def delete_by_parent_tab_id(self, parent_tab_id):
+    @staticmethod
+    def delete_by_parent_tab_id(parent_tab_id):
         delete_sql = f"{ds_table_info_sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
-        self.db.query(delete_sql)
+        get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")

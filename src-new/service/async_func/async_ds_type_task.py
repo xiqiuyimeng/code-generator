@@ -2,6 +2,7 @@
 from PyQt5.QtCore import pyqtSignal
 
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
+from service.system_storage.sqlite_abc import transactional
 from service.util.ds_type_util import get_current_datasource_type
 from service.system_storage.ds_type_sqlite import DatasourceTypeSqlite, DatasourceType, DatasourceTypeEnum
 
@@ -19,6 +20,7 @@ class InitDsTypeWorker(ThreadWorkerABC):
     def __init__(self):
         super().__init__()
 
+    @transactional
     def do_run(self):
         log.info("读取数据源类型列表")
         datasource_types = self.get_ds_types()

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
-from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
+from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:43'
@@ -57,9 +57,11 @@ class DatasourceTypeSqlite(SqliteBasic):
     def __init__(self):
         super().__init__(table_name, datasource_type_sql_dict)
 
-    def drop_table(self):
-        self.db.query(datasource_type_sql_dict.get('drop'))
+    @staticmethod
+    def drop_table():
+        get_db_conn().query(datasource_type_sql_dict.get('drop'))
 
+    @transactional
     def switch_ds_type(self, ds_type_name):
         datasource_types = self.select(DatasourceType())
         update_ds_types = list()

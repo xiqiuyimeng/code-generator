@@ -4,7 +4,7 @@ from enum import Enum
 from typing import List
 
 from service.system_storage.ds_table_info_sqlite import DsTableInfo
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
+from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
 from logger.log import logger as log
 
 _author_ = 'luwt'
@@ -76,13 +76,15 @@ class DsTableTabSqlite(SqliteBasic):
         self.insert(table_tab)
         return table_tab
 
-    def get_max_order(self, ds_type_name):
+    @staticmethod
+    def get_max_order(ds_type_name):
         max_order_sql = ds_table_tab_sql_dict.get('max_order_sql')
-        db_record = self.db.query(max_order_sql, **{'ds_type_name': ds_type_name})
+        db_record = get_db_conn().query(max_order_sql, **{'ds_type_name': ds_type_name})
         log.info(f"查询当前数据源最大order值语句 ==> {max_order_sql}")
         log.info(f"查询当前数据源最大order值参数 ==> {ds_type_name}")
         return db_record.first().max_order + 1
 
+    @transactional
     def change_current(self, current_tab: DsTableTab):
         # 将同一数据源下的其他项全部置为非当前，将当前值置为当前项
         self.change_other_not_current(current_tab.ds_type_name)
@@ -102,6 +104,7 @@ class DsTableTabSqlite(SqliteBasic):
             origin_current_tab.id = current_tabs[0].id
             self.update(origin_current_tab)
 
+    @transactional
     def remove_tab(self, tab):
         self.delete(tab.id)
         # 调整order，找出排序在删除项之后的，向前整体移动一位
@@ -110,6 +113,6 @@ class DsTableTabSqlite(SqliteBasic):
             'tab_order': tab.tab_order,
             'ds_type_name': tab.ds_type_name
         }
-        self.db.query(move_order_forward_sql, **param)
+        get_db_conn().query(move_order_forward_sql, **param)
         log.info(f'将tab_table顺序前移语句 ==> {move_order_forward_sql}')
         log.info(f'将tab_table顺序前移参数 ==> {param}')

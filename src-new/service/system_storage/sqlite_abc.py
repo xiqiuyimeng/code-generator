@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import dataclasses
+import threading
 from datetime import datetime
 import os
 
@@ -12,8 +13,9 @@ from logger.log import logger as log
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
 
-
+db_name = os.path.join(SYS_DB_PATH, f'generator_db')
 table_field_dict = dict()
+thread_id_db_dict = dict()
 
 
 @dataclasses.dataclass
@@ -21,6 +23,58 @@ class BasicSqliteDTO:
     id: int = dataclasses.field(default=None, init=False, compare=False)
     create_time: str = dataclasses.field(default=None, init=False, compare=False)
     update_time: str = dataclasses.field(default=None, init=False, compare=False)
+
+
+def get_db():
+    if not os.path.exists(SYS_DB_PATH):
+        os.makedirs(SYS_DB_PATH)
+    db = records.Database(f'sqlite:///{db_name}',
+                          poolclass=SingletonThreadPool,
+                          connect_args={'check_same_thread': False})
+    # 放入缓存
+    thread_id_db_dict[threading.get_ident()] = db
+    return db
+
+
+def transactional(f):
+    def do_transaction(*args, **kw):
+        thread_id = threading.get_ident()
+        # 获取db_conn
+        db_conn = get_db_conn()
+        # 如果是 Database 对象，那么证明前面没有事务，获取连接，替换缓存中的 Database 对象，
+        # 如果不是 Database 对象，说明是 Connection 对象，那么应该已经处于事务中，直接使用即可
+        if isinstance(db_conn, records.Database):
+            cache_db, allow_close_conn = True, True
+            new_db = get_db()
+            conn = new_db.get_connection()
+            # 放入缓存
+            thread_id_db_dict[thread_id] = conn
+        else:
+            conn = db_conn
+            cache_db, allow_close_conn = False, False
+        # 开启事务
+        tx = conn.transaction()
+        try:
+            func_result = f(*args, **kw)
+            tx.commit()
+            return func_result
+        except Exception as e:
+            tx.rollback()
+            log.exception("操作本地数据库事务错误：", e)
+        finally:
+            if cache_db:
+                # 将原来的 Database 对象重新放回去
+                thread_id_db_dict[thread_id] = db_conn
+            if allow_close_conn:
+                # 关闭当前事务创建的连接
+                conn.close()
+    return do_transaction
+
+
+def get_db_conn():
+    # 如果从缓存中取不到，则获取一个新的对象
+    current_thread_db = thread_id_db_dict.get(threading.get_ident())
+    return current_thread_db if current_thread_db else get_db()
 
 
 class SqliteBasic:
@@ -32,7 +86,6 @@ class SqliteBasic:
             每个表必须有create_time自动初始化，
             每个表必须有update_time自动更新
         """
-        self.db: records.Database = ...
         self.table_name = table_name
         self._create_table_sql = sql_dict.get('create')
         self._create_table()
@@ -48,18 +101,12 @@ class SqliteBasic:
         self._field_list_sql = f'PRAGMA table_info("{self.table_name}")'
 
     def _create_table(self):
-        if not os.path.exists(SYS_DB_PATH):
-            os.makedirs(SYS_DB_PATH)
-        db_name = os.path.join(SYS_DB_PATH, f'generator_db')
-        self.db = records.Database(f'sqlite:///{db_name}',
-                                   poolclass=SingletonThreadPool,
-                                   connect_args={'check_same_thread': False})
-        self.db.query(self._create_table_sql)
+        get_db_conn().query(self._create_table_sql)
 
     def get_field_list(self):
         field_list = table_field_dict.get(self.table_name)
         if not field_list:
-            rows = self.db.query(self._field_list_sql)
+            rows = get_db_conn().query(self._field_list_sql)
             field_list = list(map(lambda x: x.name, rows.all()))
             table_field_dict[self.table_name] = field_list
         return field_list
@@ -81,7 +128,7 @@ class SqliteBasic:
             log.info(f'插入[{self.table_name}]语句 ==> {insert_sql}')
             log.info(f'插入[{self.table_name}]参数 ==> {insert_dict}')
 
-            self.db.query(insert_sql, **insert_dict)
+            get_db_conn().query(insert_sql, **insert_dict)
             # 查询id
             id_record = self.select(insert_obj)[0]
             insert_obj.id = id_record.id
@@ -104,7 +151,7 @@ class SqliteBasic:
         log.info(f'批量插入[{self.table_name}]语句 ==> {insert_sql}')
         log.info(f'批量插入[{self.table_name}]参数 ==> {insert_dict_list}')
 
-        self.db.bulk_query(insert_sql, insert_dict_list)
+        get_db_conn().bulk_query(insert_sql, insert_dict_list)
         # 查询id
         for insert_obj in insert_objs:
             id_record = self.select(insert_obj)[0]
@@ -113,7 +160,7 @@ class SqliteBasic:
     def delete(self, obj_id):
         log.info(f'删除[{self.table_name}]语句 ==> {self._delete_sql}')
         log.info(f'删除[{self.table_name}]参数 ==> {obj_id}')
-        self.db.query(self._delete_sql, **{"id": obj_id})
+        get_db_conn().query(self._delete_sql, **{"id": obj_id})
 
     def update(self, update_obj: BasicSqliteDTO):
         """更新记录方法，根据id更新，创建时间不修改，更新时间传入当前时间"""
@@ -139,7 +186,7 @@ class SqliteBasic:
             log.info(f'更新[{self.table_name}]语句 ==> {update_sql}')
             log.info(f'更新[{self.table_name}]参数 ==> {update_val_dict}')
 
-            self.db.query(update_sql, **update_val_dict)
+            get_db_conn().query(update_sql, **update_val_dict)
 
     def batch_update(self, update_objs):
         """批量更新"""
@@ -170,7 +217,7 @@ class SqliteBasic:
             log.info(f'批量更新[{self.table_name}]语句 ==> {update_sql}')
             log.info(f'批量更新[{self.table_name}]参数 ==> {update_value_list}')
 
-            self.db.bulk_query(update_sql, update_value_list)
+            get_db_conn().bulk_query(update_sql, update_value_list)
 
     def select(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询"""
@@ -206,7 +253,7 @@ class SqliteBasic:
 
         log.info(f'查询[{self.table_name}]语句 ==> {select_sql}')
         log.info(f'查询[{self.table_name}]参数 ==> {select_value_dict}')
-        return self.db.query(select_sql, **select_value_dict)
+        return get_db_conn().query(select_sql, **select_value_dict)
 
     def filter_illegal_field(self, operation_dict):
         # 过滤掉不合法的field

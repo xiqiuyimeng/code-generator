@@ -13,6 +13,7 @@ from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel
+from service.system_storage.sqlite_abc import transactional
 from view.box.message_box import pop_ok
 from view.tree.tree_widget.tree_item_func import get_item_sql_conn, get_item_opened_record
 
@@ -200,6 +201,7 @@ class OpenTBWorker(ThreadWorkerABC):
                  f' ==> {columns}')
         self.success_signal.emit(table_tab)
 
+    @transactional
     def save_opened_items(self, columns):
         log.info(f"保存打开表[{self.db_name}][{self.tb_name}]下的列信息")
         # 存储tab信息

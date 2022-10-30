@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
+from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
 
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
@@ -107,6 +107,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         self.batch_insert(opened_child_items)
         return opened_child_items
 
+    @transactional
     def item_current_changed(self, opened_item: OpenedTreeItem):
         # 找出当前数据源类型中当前项，全部置为非当前
         item_param = OpenedTreeItem()
@@ -125,10 +126,12 @@ class OpenedTreeItemSqlite(SqliteBasic):
 
         self.update(opened_item)
 
-    def delete_by_parent_id(self, parent_id):
+    @staticmethod
+    def delete_by_parent_id(parent_id):
         delete_child_sql = opened_item_sql_dict.get('delete_child')
-        self.db.query(delete_child_sql, **{'parent_id': parent_id})
+        get_db_conn().query(delete_child_sql, **{'parent_id': parent_id})
 
-    def delete_conn(self, parent_id):
+    @staticmethod
+    def delete_conn(parent_id):
         delete_conn_sql = opened_item_sql_dict.get('delete_conn')
-        self.db.query(delete_conn_sql, **{'parent_id': parent_id})
+        get_db_conn().query(delete_conn_sql, **{'parent_id': parent_id})
