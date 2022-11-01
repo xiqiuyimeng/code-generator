@@ -172,6 +172,8 @@ HELP_MENU = '帮助'
 EXIT_MENU = '退出'
 ABOUT_MENU = '关于'
 
+NO_SELECTED_DATA = '当前未选中任何数据，请先选择数据'
+
 
 SWITCH_DS_TYPE_TITLE = '切换数据源类型'
 DS_TYPE_NO_CHANGE_MSG = '当前数据源类型已经是 {}，无需切换'
@@ -445,9 +447,11 @@ SYS_DB_PATH = os.path.join(os.environ['USERPROFILE'], '.generator_db')
 SQLITE_DISPLAY_NAME = 'sqlite'
 SQLITE_DB = 'sqlite_db'
 SQLITE_TB = 'sqlite_tb'
+SQLITE_COL = 'sqlite_col'
 MYSQL_DISPLAY_NAME = 'mysql'
 MYSQL_DB = 'mysql_db'
 MYSQL_TB = 'mysql_tb'
+MYSQL_COL = 'mysql_col'
 
 # tab bar右键菜单
 CLOSE_CURRENT_TAB = '关闭当前标签页'
@@ -459,4 +463,7 @@ SET_CURRENT_INDEX = '当前页置顶'
 
 TABLE_CLOSE_WITH_PARTIALLY_CHECKED = '以下表数据只选择了一部分，关闭表后，' \
                                      '将无法获知选中的具体数据，请全选表数据或清空选择：\n{}'
+
+SQL_CONFIRM_SELECTED_HEADER_TXT = 'sql数据源已选数据展示'
+STRUCTURE_CONFIRM_SELECTED_HEADER_TXT = '结构体数据源已选数据展示'
 

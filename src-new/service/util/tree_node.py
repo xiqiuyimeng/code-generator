@@ -28,6 +28,29 @@ class TreeData:
             TreeData._instance._root_node.child_type = TreeData._keys[0]
         return TreeData._instance
 
+    def __bool__(self):
+        return bool(self._root_node.children)
+
+    def root_children(self):
+        return self._root_node.children
+
+    def iterator(self):
+        current_node = self._root_node
+        generator = self._iterate_node(current_node)
+        while True:
+            try:
+                yield generator.__next__()
+            except StopIteration:
+                break
+
+    def _iterate_node(self, node):
+        if node.children:
+            for value in node.children.values():
+                current_node = value
+                yield current_node
+                if node.children:
+                    yield from self._iterate_node(current_node)
+
     @staticmethod
     def get_node(parent_node: TreeDataNode, name):
         if parent_node.children:

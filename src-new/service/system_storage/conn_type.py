@@ -5,7 +5,7 @@ from enum import Enum
 
 from constant.constant import SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, \
     MYSQL_QUERY_DB_SQL, MYSQL_QUERY_TB_SQL, MYSQL_QUERY_COL_SQL, SQLITE_QUERY_DB_SQL, SQLITE_QUERY_TB_SQL, \
-    SQLITE_QUERY_COL_SQL
+    SQLITE_QUERY_COL_SQL, SQLITE_COL, MYSQL_COL
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 17:59'
@@ -37,18 +37,6 @@ def get_conn_dialog(display_name):
     return get_conn_type(display_name).type_dialog
 
 
-def get_conn_node(display_name):
-    return get_conn_type(display_name).conn_node
-
-
-def get_db_node(display_name):
-    return get_conn_type(display_name).db_node
-
-
-def get_tb_node(display_name):
-    return get_conn_type(display_name).tb_node
-
-
 @dataclass
 class ConnType:
 
@@ -57,6 +45,7 @@ class ConnType:
     display_name: str = field(init=False)
     db_icon_name: str = field(init=False)
     tb_icon_name: str = field(init=False)
+    col_icon_name: str = field(init=False)
     # 对应类型承载实际连接信息的实体类
     type_class: str = field(init=False)
     # 对应类型的连接对话框
@@ -78,6 +67,7 @@ class ConnTypeEnum(Enum):
     sqlite.display_name = SQLITE_DISPLAY_NAME
     sqlite.db_icon_name = SQLITE_DB
     sqlite.tb_icon_name = SQLITE_TB
+    sqlite.col_icon_name = SQLITE_COL
     sqlite.type_class = 'SqliteConn'
     sqlite.type_dialog = 'SqliteConnDialog'
     sqlite.db_executor = 'SqliteDBExecutor'
@@ -90,6 +80,7 @@ class ConnTypeEnum(Enum):
     mysql.display_name = MYSQL_DISPLAY_NAME
     mysql.db_icon_name = MYSQL_DB
     mysql.tb_icon_name = MYSQL_TB
+    mysql.col_icon_name = MYSQL_COL
     mysql.type_class = 'InternetSqlConn'
     mysql.type_dialog = 'MysqlConnDialog'
     mysql.db_executor = 'MySqlDBExecutor'

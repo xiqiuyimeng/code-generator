@@ -61,6 +61,7 @@ def transactional(f):
         except Exception as e:
             tx.rollback()
             log.exception("操作本地数据库事务错误：", e)
+            raise e
         finally:
             if cache_db:
                 # 将原来的 Database 对象重新放回去

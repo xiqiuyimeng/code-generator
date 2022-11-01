@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
+from view.box.message_box import pop_ok
+from view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
 from view.tree.tree_widget.tree_function import add_conn_func
 
 _author_ = 'luwt'
@@ -13,4 +16,19 @@ def open_conn_dialog(sql_type_action, tree_widget, screen_rect):
     :param screen_rect: 父窗口大小
     """
     add_conn_func(sql_type_action.text(), tree_widget, screen_rect)
+
+
+def generate(main_window):
+    # 取出当前保存的数据
+    selected_data = main_window.central_widget.tree_frame.tree_widget.tree_data
+    # 如果还未选择数据，应提示
+    if not selected_data:
+        pop_ok(NO_SELECTED_DATA, GENERATE_ACTION, main_window)
+    else:
+        if main_window.current_ds_type.name == SQL_DATASOURCE_TYPE:
+            confirm_selected_dialog = SqlConfirmSelectedDialog(selected_data, main_window.geometry())
+            confirm_selected_dialog.exec()
+        elif main_window.current_ds_type.name == STRUCTURE_DATASOURCE_TYPE:
+            pass
+
 

@@ -8,7 +8,7 @@ from constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACT
     STRUCTURE_DATASOURCE_TYPE
 from constant.icon_enum import get_icon
 from service.system_storage.conn_type import ConnTypeEnum
-from view.bar.bar_function import open_conn_dialog
+from view.bar.bar_function import open_conn_dialog, generate
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -70,6 +70,7 @@ def add_template_action(main_window):
 def add_generate_action(main_window):
     generate_action = QAction(get_icon(GENERATE_ACTION), GENERATE_ACTION, main_window)
     generate_action.setStatusTip(GENERATE_ACTION_TP)
+    generate_action.triggered.connect(lambda: generate(main_window))
     return generate_action
 
 

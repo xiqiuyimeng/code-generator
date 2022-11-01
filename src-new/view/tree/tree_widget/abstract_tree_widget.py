@@ -22,7 +22,16 @@ _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
 
 
-class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
+class DisplayTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.headerItem().setHidden(True)
+        # 统一设置图标大小
+        self.setIconSize(QSize(40, 30))
+
+
+class AbstractTreeWidget(DisplayTreeWidget):
 
     def __init__(self, parent, window):
         super().__init__(parent)
@@ -31,9 +40,6 @@ class AbstractTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
         self.item_clicked = False
         # 是否正在重新打开中，重新打开的过程，会创建子节点，并设置展开状态等，影响部分信号槽
         self.reopening_flag = False
-        self.headerItem().setHidden(True)
-        # 统一设置图标大小
-        self.setIconSize(QSize(40, 30))
         self.connect_signal()
         # 用来记录item变化：当前项变化、展开状态
         self.item_changed_executor = ItemChangedExecutor()
