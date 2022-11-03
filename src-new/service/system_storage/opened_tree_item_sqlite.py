@@ -18,13 +18,12 @@ opened_item_sql_dict = {
     checked integer default null,
     parent_id integer not null,
     level integer not null,
-    ds_type_name char(10) not null,
-    table_tab_id integer default null,
+    ds_type char(10) not null,
+    item_order integer not null,
     create_time datetime,
     update_time datetime
     );''',
-    'delete_child': f'delete from {table_name} where parent_id = :parent_id',
-    'delete_conn': f'delete from {table_name} where parent_id = :parent_id and item_name is null',
+    'batch_delete': f'delete from {table_name} where id in',
 }
 
 
@@ -44,9 +43,8 @@ class OpenedTreeItem(BasicSqliteDTO):
     # 元素在树中的级别
     level: int = field(init=False, default=None)
     # 数据源 name
-    ds_type_name: str = field(init=False, default=None)
-    # table_tab表id，用来关联table_tab
-    table_tab_id: int = field(init=False, default=None)
+    ds_type: str = field(init=False, default=None)
+    item_order: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -94,15 +92,16 @@ class OpenedTreeItemSqlite(SqliteBasic):
         is_current = CurrentEnum.not_current.value
         expanded = ExpandedEnum.collapsed.value
         opened_child_items = list()
-        for child_name in child_item_names:
+        for index, child_name in enumerate(child_item_names, start=1):
             opened_child_item = OpenedTreeItem()
             opened_child_item.item_name = child_name
             opened_child_item.is_current = is_current
             opened_child_item.expanded = expanded
             opened_child_item.parent_id = opened_item_id
             opened_child_item.level = child_level
-            opened_child_item.ds_type_name = ds_type
+            opened_child_item.ds_type = ds_type
             opened_child_item.checked = CheckedEnum.unchecked.value
+            opened_child_item.item_order = index
             opened_child_items.append(opened_child_item)
         self.batch_insert(opened_child_items)
         return opened_child_items
@@ -112,7 +111,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         # 找出当前数据源类型中当前项，全部置为非当前
         item_param = OpenedTreeItem()
         item_param.is_current = CurrentEnum.is_current.value
-        item_param.ds_type_name = opened_item.ds_type_name
+        item_param.ds_type = opened_item.ds_type
         origin_current_items = self.select(item_param)
 
         update_params = list()
@@ -126,12 +125,32 @@ class OpenedTreeItemSqlite(SqliteBasic):
 
         self.update(opened_item)
 
-    @staticmethod
-    def delete_by_parent_id(parent_id):
-        delete_child_sql = opened_item_sql_dict.get('delete_child')
-        get_db_conn().query(delete_child_sql, **{'parent_id': parent_id})
+    @transactional
+    def delete_all_by_parent_id(self, parent_id, level, ds_type):
+        delete_child_sql = opened_item_sql_dict.get('batch_delete')
+        delete_param = {
+            'parent_id': parent_id,
+            'level': level,
+            'ds_type': ds_type
+        }
+        children_generator = self.recursive_get_children(parent_id, level, ds_type)
+        children_list = list()
+        for children in children_generator:
+            children_list.extend(children)
+        delete_child_sql = f'{delete_child_sql} {tuple(map(lambda x: x.id, children_list))}'
+        get_db_conn().query(delete_child_sql, **delete_param)
 
-    @staticmethod
-    def delete_conn(parent_id):
-        delete_conn_sql = opened_item_sql_dict.get('delete_conn')
-        get_db_conn().query(delete_conn_sql, **{'parent_id': parent_id})
+    def recursive_get_children(self, parent_id, level, ds_type):
+        opened_items = self.get_children(parent_id, level, ds_type)
+        if opened_items:
+            yield opened_items
+            for opened_item in opened_items:
+                # 作为父元素，继续查询子元素
+                yield from self.recursive_get_children(opened_item.id, opened_item.level + 1, opened_item.ds_type)
+
+    def get_children(self, parent_id, level, ds_type):
+        opened_param = OpenedTreeItem()
+        opened_param.ds_type = ds_type
+        opened_param.level = level
+        opened_param.parent_id = parent_id
+        return self.select_by_order(opened_param)

@@ -32,19 +32,22 @@ class AddConnWorker(ThreadWorkerABC):
 
     @transactional
     def do_run(self):
-        ConnSqlite().insert(self.connection)
+        ConnSqlite().add_conn(self.connection)
         # 历史记录中的连接id
-        opened_conn = self.add_opened_item()
+        opened_conn = self.add_opened_item(self.connection.item_order, self.connection.conn_name)
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit(self.connection.id, opened_conn)
 
-    def add_opened_item(self):
+    def add_opened_item(self, order, conn_name):
         conn_item = OpenedTreeItem()
+        conn_item.item_name = conn_name
         conn_item.is_current = CurrentEnum.not_current.value
         conn_item.expanded = ExpandedEnum.collapsed.value
         conn_item.parent_id = self.connection.id
         conn_item.level = SqlTreeItemLevel.conn_level.value
-        conn_item.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
+        conn_item.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        # 顺序保持与连接一致
+        conn_item.item_order = order
         OpenedTreeItemSqlite().insert(conn_item)
         return conn_item
 
@@ -78,14 +81,30 @@ class EditConnWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal()
 
-    def __init__(self, connection: SqlConnection):
+    def __init__(self, connection: SqlConnection, name_changed: bool):
         super().__init__()
         self.connection = connection
+        self.name_changed = name_changed
 
+    @transactional
     def do_run(self):
         ConnSqlite().update(self.connection)
+        if self.name_changed:
+            self.update_opened_record()
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
+
+    def update_opened_record(self):
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_tree_item_param = OpenedTreeItem()
+        opened_tree_item_param.parent_id = self.connection.id
+        opened_tree_item_param.level = SqlTreeItemLevel.conn_level.value
+        opened_tree_item_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        opened_conn_tree_items = opened_tree_item_sqlite.select(opened_tree_item_param)
+        if opened_conn_tree_items:
+            opened_conn_tree_item = opened_conn_tree_items[0]
+            opened_conn_tree_item.item_name = self.connection.conn_name
+            opened_tree_item_sqlite.update(opened_conn_tree_item)
 
     def do_exception(self, e: Exception):
         log.exception(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}')
@@ -94,13 +113,14 @@ class EditConnWorker(ThreadWorkerABC):
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
     
-    def __init__(self, connection: SqlConnection, masked_widget, window, callback):
+    def __init__(self, connection: SqlConnection, masked_widget, window, callback, name_changed):
         self.connection = connection
         self.callback = callback
+        self.name_changed = name_changed
         super().__init__(masked_widget, window, SAVE_CONN_TITLE)
         
     def get_worker(self) -> ThreadWorkerABC:
-        return EditConnWorker(self.connection)
+        return EditConnWorker(self.connection, self.name_changed)
     
     def success_post_process(self, *args):
         pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
@@ -116,16 +136,26 @@ class DelConnWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal()
     
-    def __init__(self, conn_id, conn_name):
+    def __init__(self, conn_id, conn_name, reorder_conns, reorder_items):
         super().__init__()
         self.conn_id = conn_id
         self.conn_name = conn_name
+        self.reorder_conns = reorder_conns
+        self.reorder_items = reorder_items
 
     @transactional
     def do_run(self):
-        ConnSqlite().delete(self.conn_id)
+        conn_sqlite = ConnSqlite()
+        conn_sqlite.delete(self.conn_id)
         # 根据连接id，删除打开记录表中的记录
-        OpenedTreeItemSqlite().delete_conn(self.conn_id)
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_tree_item_sqlite.delete_all_by_parent_id(self.conn_id,
+                                                        SqlTreeItemLevel.conn_level.value,
+                                                        DatasourceTypeEnum.sql_ds_type.value.name)
+        # 对被影响到的连接项进行重排序
+        if self.reorder_conns:
+            conn_sqlite.batch_update(self.reorder_conns)
+            opened_tree_item_sqlite.batch_update(self.reorder_items)
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
@@ -136,14 +166,17 @@ class DelConnWorker(ThreadWorkerABC):
 
 class DelConnExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, conn_id, conn_name, item, window, callback):
+    def __init__(self, conn_id, conn_name, item, window, callback,
+                 reorder_conns, reorder_items):
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.callback = callback
+        self.reorder_conns = reorder_conns
+        self.reorder_items = reorder_items
         super().__init__(item, window, DEL_CONN_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelConnWorker(self.conn_id, self.conn_name)
+        return DelConnWorker(self.conn_id, self.conn_name, self.reorder_conns, self.reorder_items)
 
     def success_post_process(self, *args):
         self.callback()
@@ -169,45 +202,33 @@ class ListConnWorker(ThreadWorkerABC):
 
     def do_run(self):
         # 首选读取存储的连接信息
-        connections = ConnSqlite().select(SqlConnection())
+        connections = ConnSqlite().select_by_order(SqlConnection())
         self.conn_list_signal.emit(connections)
 
         # 查询 OpenedItem
+        level = SqlTreeItemLevel.conn_level.value
+        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
         for conn in connections:
             # 从打开记录中查询连接，正常来说，一定可以查到，并且应该只有一条数据
-            self.recursive_get_children(0, conn.id)
+            children_generator = OpenedTreeItemSqlite().recursive_get_children(conn.id, level, ds_type)
+            for children in children_generator:
+                self.opened_items_signal.emit(children)
         # 查找tab页信息
         self.get_tab_cols()
         log.info(LIST_ALL_CONN_SUCCESS_PROMPT)
 
+    def do_finally(self):
+        self.success_signal.emit()
+        
     def get_tab_cols(self):
         tab_param = DsTableTab()
-        tab_param.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
-        tab_list = DsTableTabSqlite().select(tab_param, order_by='tab_order')
+        tab_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        tab_list = DsTableTabSqlite().select_by_order(tab_param)
         for tab in tab_list:
             col_param = DsTableInfo()
             col_param.parent_tab_id = tab.id
-            tab.col_list = DsTableInfoSqlite().select(col_param)
+            tab.col_list = DsTableInfoSqlite().select_by_order(col_param)
         self.tab_info_signal.emit(tab_list)
-
-    def do_finally(self):
-        self.success_signal.emit()
-
-    def recursive_get_children(self, level, parent_id):
-        if level < 3:
-            opened_items = self.get_children(level, parent_id)
-            if opened_items:
-                [self.recursive_get_children(level + 1, opened_item.id) for opened_item in opened_items]
-
-    def get_children(self, level, parent_id):
-        opened_param = OpenedTreeItem()
-        opened_param.ds_type_name = DatasourceTypeEnum.sql_ds_type.value.name
-        opened_param.level = level
-        opened_param.parent_id = parent_id
-        opened_items = OpenedTreeItemSqlite().select(opened_param)
-        if opened_items:
-            self.opened_items_signal.emit(opened_items)
-            return opened_items
 
     def do_exception(self, e: Exception):
         log.exception(LIST_ALL_CONN_FAIL_PROMPT)

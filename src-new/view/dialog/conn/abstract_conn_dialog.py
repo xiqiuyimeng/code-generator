@@ -24,8 +24,8 @@ class AbstractConnDialog(DraggableDialog):
     """连接对话框抽象类，整体对话框结构应为四部分：标题区、连接名表单区、连接信息表单区、按钮区"""
 
     conn_saved = pyqtSignal(SqlConnection, OpenedTreeItem)
-
-    conn_changed = pyqtSignal(SqlConnection)
+    # 第一个元素为修改后的连接对象，第二个元素为名称是否变化
+    conn_changed = pyqtSignal(SqlConnection, bool)
 
     def __init__(self, connection, dialog_title, screen_rect, conn_name_id_dict):
         super().__init__()
@@ -41,6 +41,7 @@ class AbstractConnDialog(DraggableDialog):
         # 当前连接名称列表字典，key: name, value: id
         self.conn_name_id_dict: dict = conn_name_id_dict
         self.name_available = True
+        self.name_changed = False
 
         # 当前对话框主布局
         self.dialog_layout: QVBoxLayout = ...
@@ -254,7 +255,9 @@ class AbstractConnDialog(DraggableDialog):
         if self.connection.id:
             if self.new_connection != self.connection:
                 self.new_connection.id = self.connection.id
-                self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self, self.edit_post_process)
+                self.name_changed = self.new_connection.conn_name != self.connection.conn_name
+                self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self,
+                                                           self.edit_post_process, self.name_changed)
                 self.edit_conn_executor.start()
             else:
                 # 没有更改任何信息
@@ -271,7 +274,7 @@ class AbstractConnDialog(DraggableDialog):
         self.close()
 
     def edit_post_process(self):
-        self.conn_changed.emit(self.new_connection)
+        self.conn_changed.emit(self.new_connection, self.name_changed)
         self.close()
 
 

@@ -13,7 +13,7 @@ from service.util.tree_node import TreeData
 from view.dialog.conn import *
 from view.tree.tree_item.tree_node_table import TableTreeNode
 from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, get_item_conn_type, \
-    set_item_opened_record, get_item_sql_conn
+    set_item_opened_record, get_item_sql_conn, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
@@ -106,6 +106,8 @@ def update_conn_tree_item(tree_widget, connection):
     item = tree_widget.currentItem()
     item.setText(0, connection.conn_name)
     set_item_sql_conn(item, connection)
+    opened_record = get_item_opened_record(item)
+    opened_record.item_name = connection.conn_name
     tree_widget.update_conn_name(connection.id, connection.conn_name)
 
 
@@ -130,7 +132,7 @@ def make_db_items(parent_item, opened_db_items):
 
 def make_table_items(parent_item, opened_table_items, tree_data: TreeData):
     """构建数据表层叶子节点"""
-    checked_tables = list()
+    checked_tables, checked_table_opened_items = list(), list()
     for opened_table_item in opened_table_items:
         conn_type = get_item_conn_type(parent_item.parent())
         icon = get_icon(conn_type.tb_icon_name)
@@ -138,15 +140,15 @@ def make_table_items(parent_item, opened_table_items, tree_data: TreeData):
                            icon, opened_table_item, checkbox=opened_table_item.checked)
         if opened_table_item.checked:
             checked_tables.append(opened_table_item.item_name)
+            checked_table_opened_items.append(opened_table_item)
     # 如果表已选中，添加到选中数据集合中
     if checked_tables:
-        sql_conn = get_item_sql_conn(parent_item.parent())
         tb_data = {
-            'conn': sql_conn.conn_name,
-            'db': parent_item.text(0),
-            'tb': checked_tables
+            'conn': get_item_opened_record(parent_item.parent()),
+            'db': get_item_opened_record(parent_item),
+            'tb': checked_table_opened_items
         }
-        tree_data.add_node(tb_data, sql_conn)
+        tree_data.add_node(tb_data, get_item_sql_conn(parent_item.parent()))
 
 
 def check_table_status(parent):

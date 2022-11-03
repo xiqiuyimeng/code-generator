@@ -28,7 +28,7 @@ class InitDsTypeWorker(ThreadWorkerABC):
         self.success_signal.emit(datasource_types)
 
     def get_ds_types(self):
-        ds_types = DatasourceTypeSqlite().select(DatasourceType())
+        ds_types = DatasourceTypeSqlite().select_by_order(DatasourceType())
         # 如果不能查到数据，或数据不正确，都应重新初始化
         if not ds_types or not get_current_datasource_type(ds_types):
             return self.init_ds_types()

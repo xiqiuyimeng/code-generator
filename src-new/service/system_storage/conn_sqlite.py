@@ -15,8 +15,9 @@ conn_sql_dict = {
     'create': f'''create table  if not exists {table_name}
     (id integer primary key autoincrement,
     conn_name char(50) not null,
-    conn_type integer not null,
+    conn_type char(30) not null,
     conn_info text,
+    item_order integer not null,
     create_time datetime,
     update_time datetime
     );''',
@@ -27,11 +28,12 @@ conn_sql_dict = {
 class SqlConnection(BasicSqliteDTO):
 
     conn_name: str = field(init=False, default=None)
-    conn_type: int = field(init=False, default=None)
+    conn_type: str = field(init=False, default=None)
     # json串，存储连接信息
     conn_info: str = field(init=False, default=None)
     # 根据 conn_info 映射的实体类
     conn_info_type: dataclass = field(init=False, default=None)
+    item_order: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -55,3 +57,7 @@ class ConnSqlite(SqliteBasic):
         """检查连接名称是否可用，名称必须唯一"""
         result = self.select_count(sql_conn)
         return result == 0
+
+    def add_conn(self, sql_conn: SqlConnection):
+        sql_conn.item_order = self.get_max_order()
+        self.insert(sql_conn)

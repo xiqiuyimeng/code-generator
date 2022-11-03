@@ -22,7 +22,7 @@ class SqlConfirmSelectedDialog(AbstractDisplaySelectedDialog):
         # 读取已选中数据，填充树结构
         for node in self.selected_data.root_children().values():
             # 获取连接类型
-            conn_type = get_conn_type_by_type(node.data.conn_type)
+            conn_type = get_conn_type_by_type(node.top_level_data.conn_type)
             item = make_sql_tree_item(self.display_tree_widget, node.name_text, get_icon(conn_type.display_name))
             # 处理子元素
             self._iterate_make_node(node, item, conn_type)

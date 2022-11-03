@@ -177,7 +177,7 @@ class TabBar(QTabBar):
             # 首先收集现在的tab list，收集顺序及是否当前，全量更新tab
             for i in range(self.count()):
                 table_tab = self.parent.widget(i).table_tab
-                table_tab.tab_order = i + 1
+                table_tab.item_order = i + 1
                 if current_index == i:
                     table_tab.is_current = table_tab.set_current()
                 else:

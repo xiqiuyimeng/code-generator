@@ -14,7 +14,7 @@ datasource_type_sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     name char(10) not null,
-    ds_type_order integer not null,
+    item_order integer not null,
     is_current integer not null,
     create_time datetime,
     update_time datetime
@@ -27,7 +27,7 @@ datasource_type_sql_dict = {
 class DatasourceType(BasicSqliteDTO):
 
     name: str = field(default=None, init=False)
-    ds_type_order: int = field(default=None, init=False)
+    item_order: int = field(default=None, init=False)
     is_current: int = field(default=None, init=False)
 
     def __init__(self, **kwargs):
@@ -37,12 +37,12 @@ class DatasourceType(BasicSqliteDTO):
 
 sql_ds_dict = {
     'name': SQL_DATASOURCE_TYPE,
-    'ds_type_order': 1,
+    'item_order': 1,
     'is_current': 1
 }
 structure_ds_dict = {
     'name': STRUCTURE_DATASOURCE_TYPE,
-    'ds_type_order': 2,
+    'item_order': 2,
     'is_current': 0
 }
 
@@ -62,13 +62,13 @@ class DatasourceTypeSqlite(SqliteBasic):
         get_db_conn().query(datasource_type_sql_dict.get('drop'))
 
     @transactional
-    def switch_ds_type(self, ds_type_name):
+    def switch_ds_type(self, ds_type):
         datasource_types = self.select(DatasourceType())
         update_ds_types = list()
         for ds_type in datasource_types:
             update_ds_type = DatasourceType()
             update_ds_type.id = ds_type.id
-            if ds_type.name == ds_type_name:
+            if ds_type.name == ds_type:
                 update_ds_type.is_current = 1
             else:
                 update_ds_type.is_current = 0

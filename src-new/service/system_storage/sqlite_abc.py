@@ -84,6 +84,7 @@ class SqliteBasic:
         """
         操作sqlite数据库的基类，
         约定：每个表必须有id且为自增主键，
+            每个表必须有item_order，描述顺序关系
             每个表必须有create_time自动初始化，
             每个表必须有update_time自动更新
         """
@@ -100,6 +101,7 @@ class SqliteBasic:
         self._select_count_sql = f'select count(*) as count from {self.table_name}'
         self._select_id_sql = f'select max(id) as id from {self.table_name}'
         self._field_list_sql = f'PRAGMA table_info("{self.table_name}")'
+        self._max_order_sql = f'select ifnull(max(item_order), 0) as max_order from {self.table_name}'
 
     def _create_table(self):
         get_db_conn().query(self._create_table_sql)
@@ -220,6 +222,9 @@ class SqliteBasic:
 
             get_db_conn().bulk_query(update_sql, update_value_list)
 
+    def select_by_order(self, select_obj, sort_order='asc'):
+        return self.select(select_obj, order_by='item_order', sort_order=sort_order)
+
     def select(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询"""
         rows = self._do_select(self._select_sql, select_obj, order_by, sort_order)
@@ -260,3 +265,17 @@ class SqliteBasic:
         # 过滤掉不合法的field
         illegal_field_list = operation_dict.keys() - self.get_field_list()
         [operation_dict.pop(k) for k in illegal_field_list]
+
+    def get_max_order(self, condition_dict=None):
+        max_order_sql = self._max_order_sql
+        if condition_dict:
+            clause_list = list()
+            for key in condition_dict.keys():
+                clause_list.append(f'{key} = :{key}')
+            max_order_sql = f'{max_order_sql} where {" and ".join(clause_list)}'
+            db_record = get_db_conn().query(max_order_sql, **condition_dict)
+        else:
+            db_record = get_db_conn().query(max_order_sql)
+        log.info(f"查询 {self.table_name} 最大order值语句 ==> {max_order_sql}")
+        log.info(f"查询 {self.table_name} 最大order值参数 ==> {condition_dict}")
+        return db_record.first().max_order + 1

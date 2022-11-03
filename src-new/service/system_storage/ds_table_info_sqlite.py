@@ -20,6 +20,7 @@ ds_table_info_sql_dict = {
     col_comment char(200) default null,
     checked integer not null,
     parent_tab_id integer not null,
+    item_order integer not null,
     create_time datetime,
     update_time datetime
     );''',
@@ -50,6 +51,7 @@ class DsTableInfo(BasicSqliteDTO):
     checked: int = field(init=False, default=None)
     # 指向table_tab
     parent_tab_id: int = field(init=False, default=None)
+    item_order: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -65,9 +67,10 @@ class DsTableInfoSqlite(SqliteBasic):
         super().__init__(table_name, ds_table_info_sql_dict)
 
     def add_table(self, columns, parent_tab_id, check_state):
-        for column in columns:
+        for index, column in enumerate(columns, start=1):
             column.parent_tab_id = parent_tab_id
             column.checked = check_state
+            column.item_order = index
         self.batch_insert(columns)
 
     @staticmethod

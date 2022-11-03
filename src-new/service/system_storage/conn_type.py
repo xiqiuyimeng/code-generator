@@ -5,7 +5,7 @@ from enum import Enum
 
 from constant.constant import SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, \
     MYSQL_QUERY_DB_SQL, MYSQL_QUERY_TB_SQL, MYSQL_QUERY_COL_SQL, SQLITE_QUERY_DB_SQL, SQLITE_QUERY_TB_SQL, \
-    SQLITE_QUERY_COL_SQL, SQLITE_COL, MYSQL_COL
+    SQLITE_QUERY_COL_SQL, SQLITE_COL, MYSQL_COL, SQLITE_TYPE, MYSQL_TYPE
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 17:59'
@@ -63,7 +63,7 @@ class ConnType:
 class ConnTypeEnum(Enum):
 
     sqlite = ConnType()
-    sqlite.type = 0
+    sqlite.type = SQLITE_TYPE
     sqlite.display_name = SQLITE_DISPLAY_NAME
     sqlite.db_icon_name = SQLITE_DB
     sqlite.tb_icon_name = SQLITE_TB
@@ -76,7 +76,7 @@ class ConnTypeEnum(Enum):
     sqlite.query_col_sql = SQLITE_QUERY_COL_SQL
 
     mysql = ConnType()
-    mysql.type = 1
+    mysql.type = MYSQL_TYPE
     mysql.display_name = MYSQL_DISPLAY_NAME
     mysql.db_icon_name = MYSQL_DB
     mysql.tb_icon_name = MYSQL_TB

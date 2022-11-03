@@ -11,7 +11,7 @@ from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
 from view.table.table_item import TableWidgetItem
 from view.table.table_item_delegate import ComboboxDelegate, TextInputDelegate
-from view.tree.tree_widget.tree_item_func import get_item_sql_conn
+from view.tree.tree_widget.tree_item_func import get_item_sql_conn, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
@@ -114,21 +114,21 @@ class TableWidget(QTableWidget, ScrollableWidget):
     def add_checked_data(self, cols):
         sql_conn = get_item_sql_conn(self.tree_item.parent().parent())
         add_data = {
-            'conn': self.tree_item.parent().parent().text(0),
-            'db': self.tree_item.parent().text(0),
-            'tb': self.tree_item.text(0),
+            'conn': get_item_opened_record(self.tree_item.parent().parent()),
+            'db': get_item_opened_record(self.tree_item.parent()),
+            'tb': get_item_opened_record(self.tree_item),
             'col': cols,
         }
         self.tree_data.add_node(add_data, sql_conn)
 
     def remove_checked_data(self, cols):
-        add_data = {
+        del_data = {
             'conn': self.tree_item.parent().parent().text(0),
             'db': self.tree_item.parent().text(0),
             'tb': self.tree_item.text(0),
             'col': cols,
         }
-        self.tree_data.del_node(add_data, recursive_del=True)
+        self.tree_data.del_node(del_data, recursive_del=True)
 
     def make_item(self, text):
         item = TableWidgetItem(self)

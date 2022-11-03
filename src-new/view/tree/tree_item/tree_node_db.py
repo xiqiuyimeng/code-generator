@@ -3,9 +3,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
-    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU
+    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT
 from service.async_func.async_sql_ds_task import OpenDBExecutor
-from view.box.message_box import pop_fail
+from view.box.message_box import pop_fail, pop_question
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_item.tree_node_table import TableTreeNode
 from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
@@ -52,23 +52,34 @@ class DBTreeNode(AbstractTreeNode):
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
-        # 关闭子项目
-        allow_close_children, index_list = self.allow_close_children()
-        if allow_close_children:
-            # 首先处理tab
-            [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
-            # 再处理子节点线程和引用
-            for i in range(self.item.childCount()):
-                child_item = self.item.child(i)
-                child_node = TableTreeNode(child_item, self.tree_widget, self.window)
-                # 将线程停止
-                child_node.worker_terminate()
-            # 删除库下的节点
-            self.tree_widget.item_changed_executor.close_item(self.item)
-            self.item.takeChildren()
-            self.item.setExpanded(False)
+        # 判断是否有选中数据
+        del_data = {
+            'conn': self.item.parent().text(0),
+            'db': self.item.text(0)
+        }
+        db_data_node = self.tree_widget.tree_data.get_node(del_data)
+        # 如果能找到选中数据，提示应先清空
+        if db_data_node:
+            if pop_question(CLOSE_DB_PROMPT, CLOSE_DB_MENU, self.window):
+                # 删除选中数据
+                self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
+            else:
+                return
+        index_list = self.get_tab_indexes()
+        # 首先处理tab
+        [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
+        # 再处理子节点线程和引用
+        for i in range(self.item.childCount()):
+            child_item = self.item.child(i)
+            child_node = TableTreeNode(child_item, self.tree_widget, self.window)
+            # 将线程停止
+            child_node.worker_terminate()
+        # 删除库下的节点
+        self.tree_widget.item_changed_executor.close_item(self.item)
+        self.item.takeChildren()
+        self.item.setExpanded(False)
 
-    def allow_close_children(self):
+    def get_tab_indexes(self):
         index_list = list()
         for i in range(self.item.childCount()):
             item = self.item.child(i)
@@ -76,15 +87,10 @@ class DBTreeNode(AbstractTreeNode):
             if tab:
                 index = self.window.sql_tab_widget.indexOf(tab)
                 index_list.append(index)
-        allow_close = False
         if index_list:
             # 倒序
             index_list.sort(reverse=True)
-            if self.window.sql_tab_widget.tab_bar.table_allow_close(index_list):
-                allow_close = True
-        else:
-            allow_close = True
-        return allow_close, index_list
+        return index_list
 
     def do_fill_menu(self, menu):
         if self.item.childCount():

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
-    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT
+    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import DelConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
@@ -60,35 +60,43 @@ class ConnTreeNode(AbstractTreeNode):
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
-        allow_close_children, index_list = self.allow_close_children()
-        if allow_close_children:
-            # 首先处理tab
-            [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
-            # 遍历子元素，停止线程
-            for i in range(self.item.childCount()):
-                child_item = self.item.child(i)
-                if child_item.childCount():
-                    child_node = DBTreeNode(child_item, self.tree_widget, self.window)
-                    # 将线程停止
-                    child_node.worker_terminate()
-            # 删除连接下的节点
-            self.tree_widget.item_changed_executor.close_item(self.item)
-            self.item.takeChildren()
-            self.item.setExpanded(False)
-        return allow_close_children
+        # 判断是否有选中数据
+        del_data = {
+            'conn': self.item.text(0)
+        }
+        conn_data_node = self.tree_widget.tree_data.get_node(del_data)
+        # 如果能找到选中数据，提示应先清空
+        if conn_data_node:
+            if pop_question(CLOSE_CONN_PROMPT, CLOSE_CONN_ACTION, self.window):
+                # 删除选中数据
+                self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
+            else:
+                return
+        index_list = self.get_tab_indexes()
+        # 首先处理tab
+        [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
+        # 遍历子元素，停止线程
+        for i in range(self.item.childCount()):
+            child_item = self.item.child(i)
+            if child_item.childCount():
+                child_node = DBTreeNode(child_item, self.tree_widget, self.window)
+                # 将线程停止
+                child_node.worker_terminate()
+        # 删除连接下的节点
+        self.tree_widget.item_changed_executor.close_item(self.item)
+        self.item.takeChildren()
+        self.item.setExpanded(False)
+        return True
 
-    def allow_close_children(self):
+    def get_tab_indexes(self):
         index_list = list()
-        children_allow_close = list()
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
             child_node = DBTreeNode(child_item, self.tree_widget, self.window)
-            allow_close_children, child_tab_index_list = child_node.allow_close_children()
-
-            children_allow_close.append(allow_close_children)
+            child_tab_index_list = child_node.get_tab_indexes()
             index_list.extend(child_tab_index_list)
         index_list.sort(reverse=True)
-        return all(children_allow_close), index_list
+        return index_list
 
     def do_fill_menu(self, menu: QMenu):
         # 添加连接需要有二级菜单
@@ -171,9 +179,26 @@ class ConnTreeNode(AbstractTreeNode):
 
     def del_conn(self):
         conn = get_item_sql_conn(self.item)
+        # 在删除连接之后的连接项，应该对其进行重新排序
+        reorder_conns, reorder_items = self.reorder_conns()
         self.del_conn_executor = DelConnExecutor(conn.id, conn.conn_name,
-                                                 self.item, self.window, self.del_conn_callback)
+                                                 self.item, self.window, self.del_conn_callback,
+                                                 reorder_conns, reorder_items)
         self.del_conn_executor.start()
+
+    def reorder_conns(self):
+        conn_items = self.tree_widget.get_top_level_items()
+        index = conn_items.index(self.item)
+        need_reorder_items = conn_items[index + 1:]
+        if need_reorder_items:
+            reorder_conns = tuple(map(lambda x: get_item_sql_conn(x), need_reorder_items))
+            for reorder_conn in reorder_conns:
+                reorder_conn.item_order -= 1
+            reorder_items = tuple(map(lambda x: get_item_opened_record(x), need_reorder_items))
+            for reorder_item in reorder_items:
+                reorder_item.item_order -= 1
+            return reorder_conns, reorder_items
+        return None, None
 
     def del_conn_callback(self):
         self.worker_terminate()

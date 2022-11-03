@@ -146,6 +146,16 @@ class AbstractTreeWidget(DisplayTreeWidget):
                 self.set_selected_focus(item)
             iterator = iterator.__iadd__(1)
 
+    def get_top_level_items(self):
+        top_level_items = list()
+        iterator = QTreeWidgetItemIterator(self)
+        while iterator.value():
+            item = iterator.value()
+            if item.parent() is None:
+                top_level_items.append(item)
+            iterator = iterator.__iadd__(1)
+        return top_level_items
+
     def locate_item(self):
         # 找到当前tab，取出对应item
         tab = self.get_current_tab()
