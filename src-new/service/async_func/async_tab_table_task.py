@@ -33,6 +33,8 @@ class TabChangedWorker(ThreadWorkerABC):
                 DsTableTabSqlite().batch_update(data)
             elif method == 'save_table_data':
                 DsTableInfoSqlite().update(data)
+            elif method == 'batch_save_data':
+                DsTableInfoSqlite().batch_update(data)
             log.debug(f'{method}: {data}')
 
     def do_exception(self, e: Exception):
@@ -59,4 +61,7 @@ class AsyncSaveTabObjExecutor(ThreadExecutorABC):
 
     def save_table_data(self, modify_data: DsTableInfo):
         self.queue.put(('save_table_data', modify_data))
+
+    def batch_save_data(self, data):
+        self.queue.put(('batch_save_data', data))
 

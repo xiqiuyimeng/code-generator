@@ -8,7 +8,7 @@ from constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACT
     STRUCTURE_DATASOURCE_TYPE
 from constant.icon_enum import get_icon
 from service.system_storage.conn_type import ConnTypeEnum
-from view.bar.bar_function import open_conn_dialog, generate
+from view.bar.bar_function import open_conn_dialog, generate, clear_data
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -77,6 +77,7 @@ def add_generate_action(main_window):
 def add_clear_data_action(main_window):
     clear_action = QAction(get_icon(CLEAR_DATA_ACTION), CLEAR_DATA_ACTION, main_window)
     clear_action.setStatusTip(CLEAR_DATA_ACTION_TIP)
+    clear_action.triggered.connect(lambda: clear_data(main_window))
     return clear_action
 
 

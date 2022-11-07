@@ -16,7 +16,7 @@ from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_widget.tree_item_func import get_item_opened_record, get_item_no_change
+from view.tree.tree_widget.tree_item_func import get_item_opened_record, get_item_no_change, link_table_checkbox
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
@@ -155,6 +155,17 @@ class AbstractTreeWidget(DisplayTreeWidget):
                 top_level_items.append(item)
             iterator = iterator.__iadd__(1)
         return top_level_items
+
+    def set_tree_unchecked(self):
+        iterator = QTreeWidgetItemIterator(self)
+        while iterator.value():
+            item = iterator.value()
+            # 如果选中，置为非选中
+            if item.checkState(0):
+                item.setCheckState(0, Qt.Unchecked)
+                self.item_changed_executor.item_checked(item)
+                link_table_checkbox(item, Qt.Unchecked)
+            iterator = iterator.__iadd__(1)
 
     def locate_item(self):
         # 找到当前tab，取出对应item

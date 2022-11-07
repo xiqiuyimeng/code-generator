@@ -7,7 +7,7 @@ from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_widget.tree_item_func import get_item_opened_tab, \
-    set_item_opened_tab, get_item_sql_conn, get_item_opened_record
+    set_item_opened_tab, get_item_sql_conn, get_item_opened_record, link_table_checkbox
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -45,8 +45,8 @@ class TableTreeNode(AbstractTreeNode):
         # 记录tab对象
         set_item_opened_tab(self.item, tab)
         # 连接表头复选框变化信号
-        tab.table_frame.table_widget.table_header.header_check_state\
-            .connect(lambda check_state: self.set_check_state(check_state))
+        tab.table_frame.table_widget.table_header.header_check_state.connect(
+            lambda check_state: self.set_check_state(check_state))
         return tab
 
     def open_item_fail(self):
@@ -65,9 +65,7 @@ class TableTreeNode(AbstractTreeNode):
         # 保存复选框状态变化
         self.save_check_state()
         # 联动表格内的复选框
-        tab = get_item_opened_tab(self.item)
-        if tab:
-            tab.table_frame.table_widget.table_header.change_header_state(check_state)
+        link_table_checkbox(self.item, check_state)
 
     def save_check_state(self):
         # 保存选中数据

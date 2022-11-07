@@ -45,7 +45,7 @@ class TableWidget(QTableWidget, ScrollableWidget):
         # 表格设置为6列
         self.setColumnCount(6)
         # 实例化自定义表头
-        self.table_header = CheckBoxHeader()
+        self.table_header = CheckBoxHeader(parent=self)
         self.table_header.setObjectName("table_header")
         # 设置表头
         self.setHorizontalHeader(self.table_header)
@@ -150,8 +150,6 @@ class TableWidget(QTableWidget, ScrollableWidget):
         check_box.setText(str(i + 1))
         if check_state:
             check_box.setCheckState(Qt.Checked)
-        # 连接checkbox状态变化信号
-        check_box.stateChanged.connect(lambda checked: self.row_checked(checked, i))
         # 点击时需要保存数据，并联动表头复选框
         check_box.clicked.connect(lambda checked: self.click_row_checkbox(checked, i))
 
@@ -159,17 +157,13 @@ class TableWidget(QTableWidget, ScrollableWidget):
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
 
-    def row_checked(self, checked, row):
+    def click_row_checkbox(self, checked, row):
+        # 联动表头
+        self.table_header.link_header_checked()
         # 选中一行数据
         if not self.filling_table:
             # 将列数据置为选中状态，保存数据
             self.save_data(row, 0, checked)
-
-    def click_row_checkbox(self, checked, row):
-        # 联动表头
-        self.table_header.link_header_checked()
-        # 选择行并保存数据
-        self.row_checked(checked, row)
 
     def save_data(self, row, col, data):
         # 根据row找到对应的列信息数据
@@ -207,3 +201,14 @@ class TableWidget(QTableWidget, ScrollableWidget):
 
         # 保存数据
         self.async_save_executor.save_table_data(modify_col_data)
+
+    def batch_update_check_state(self, check_state):
+        modify_col_data_list = list()
+        for col in self.cols:
+            col.checked = check_state
+            modify_col_data = DsTableInfo()
+            modify_col_data.id = col.id
+            modify_col_data.checked = check_state
+            modify_col_data_list.append(modify_col_data)
+        # 保存数据
+        self.async_save_executor.batch_save_data(modify_col_data_list)

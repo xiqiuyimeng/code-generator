@@ -32,3 +32,11 @@ def generate(main_window):
             pass
 
 
+def clear_data(main_window):
+    tree_widget = main_window.central_widget.tree_frame.tree_widget
+    # 取出当前保存的数据
+    selected_data = tree_widget.tree_data
+    # 清空数据
+    selected_data.clear_tree()
+    # 设置树的复选框为非选中，并检查是否有打开的表，将状态同步到表格复选框，保存树和表格复选框状态
+    tree_widget.set_tree_unchecked()

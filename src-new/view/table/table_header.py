@@ -59,6 +59,8 @@ class CheckBoxHeader(QHeaderView):
                     # 当用户点击了行表头复选框，发射 自定义信号 header_check_state
                 self.header_check_state.emit(self.check_state)
                 self.change_state(self.check_state)
+                # 调用表格控件中批量保存复选框数据方法
+                self.parent().batch_update_check_state(self.check_state)
 
                 self.updateSection(0)
         super(CheckBoxHeader, self).mousePressEvent(event)
