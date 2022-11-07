@@ -155,6 +155,9 @@ class DelConnWorker(ThreadWorkerABC):
         # 对被影响到的连接项进行重排序
         if self.reorder_conns:
             conn_sqlite.batch_update(self.reorder_conns)
+            self.reorder_items[0].is_current = 1
+            for item in self.reorder_items[1:]:
+                item.is_current = 0
             opened_tree_item_sqlite.batch_update(self.reorder_items)
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
@@ -167,10 +170,11 @@ class DelConnWorker(ThreadWorkerABC):
 class DelConnExecutor(IconMovieThreadExecutor):
 
     def __init__(self, conn_id, conn_name, item, window, callback,
-                 reorder_conns, reorder_items):
+                 need_reorder_items, reorder_conns, reorder_items):
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.callback = callback
+        self.need_reorder_items = need_reorder_items
         self.reorder_conns = reorder_conns
         self.reorder_items = reorder_items
         super().__init__(item, window, DEL_CONN_TITLE)
@@ -179,7 +183,7 @@ class DelConnExecutor(IconMovieThreadExecutor):
         return DelConnWorker(self.conn_id, self.conn_name, self.reorder_conns, self.reorder_items)
 
     def success_post_process(self, *args):
-        self.callback()
+        self.callback(self.need_reorder_items)
 
 # ---------------------------------------- 删除连接 end ---------------------------------------- #
 

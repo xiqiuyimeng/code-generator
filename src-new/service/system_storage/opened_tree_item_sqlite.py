@@ -137,8 +137,13 @@ class OpenedTreeItemSqlite(SqliteBasic):
         children_list = list()
         for children in children_generator:
             children_list.extend(children)
-        delete_child_sql = f'{delete_child_sql} {tuple(map(lambda x: x.id, children_list))}'
-        get_db_conn().query(delete_child_sql, **delete_param)
+        if children_list:
+            id_list = tuple(map(lambda x: x.id, children_list))
+            if len(children_list) == 1:
+                delete_child_sql = f'{delete_child_sql} ({id_list[0]})'
+            else:
+                delete_child_sql = f'{delete_child_sql} {id_list}'
+            get_db_conn().query(delete_child_sql, **delete_param)
 
     def recursive_get_children(self, parent_id, level, ds_type):
         opened_items = self.get_children(parent_id, level, ds_type)
