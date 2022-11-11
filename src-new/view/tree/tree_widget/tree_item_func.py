@@ -54,9 +54,23 @@ def get_item_no_change(item):
 
 
 def link_table_checkbox(tree_item, check_state):
+    # 联动表格复选框
     tab = get_item_opened_tab(tree_item)
     if tab:
         table_widget = tab.table_frame.table_widget
         table_widget.table_header.change_header_state(check_state)
         # 批量处理数据保存
         table_widget.batch_update_check_state(check_state)
+
+
+def get_children_opened_ids(parent_item):
+    return list(map(lambda x: x.id, recursive_get_children_opened_items(parent_item)))
+
+
+def recursive_get_children_opened_items(parent_item):
+    child_count = parent_item.childCount()
+    if child_count:
+        for index in range(child_count):
+            child_item = parent_item.child(index)
+            yield get_item_opened_record(child_item)
+            yield from recursive_get_children_opened_items(child_item)

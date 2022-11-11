@@ -15,6 +15,7 @@ from view.box.message_box import pop_ok
 from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
     LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT, LIST_ALL_CONN_TITLE
+from view.tree.tree_widget.tree_item_func import get_children_opened_ids, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/30 20:31'
@@ -136,12 +137,13 @@ class DelConnWorker(ThreadWorkerABC):
 
     success_signal = pyqtSignal()
     
-    def __init__(self, conn_id, conn_name, reorder_conns, reorder_items):
+    def __init__(self, conn_id, conn_name, reorder_conns, reorder_items, delete_opened_ids):
         super().__init__()
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.reorder_conns = reorder_conns
         self.reorder_items = reorder_items
+        self.delete_opened_ids = delete_opened_ids
 
     @transactional
     def do_run(self):
@@ -149,9 +151,7 @@ class DelConnWorker(ThreadWorkerABC):
         conn_sqlite.delete(self.conn_id)
         # 根据连接id，删除打开记录表中的记录
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
-        opened_tree_item_sqlite.delete_all_by_parent_id(self.conn_id,
-                                                        SqlTreeItemLevel.conn_level.value,
-                                                        DatasourceTypeEnum.sql_ds_type.value.name)
+        opened_tree_item_sqlite.batch_delete(self.delete_opened_ids)
         # 对被影响到的连接项进行重排序
         if self.reorder_conns:
             conn_sqlite.batch_update(self.reorder_conns)
@@ -180,7 +180,12 @@ class DelConnExecutor(IconMovieThreadExecutor):
         super().__init__(item, window, DEL_CONN_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelConnWorker(self.conn_id, self.conn_name, self.reorder_conns, self.reorder_items)
+        # 获取要删除的节点对象
+        conn_opened_record = get_item_opened_record(self.item)
+        # 获取子节点所有id
+        delete_opened_ids = get_children_opened_ids(self.item)
+        delete_opened_ids.append(conn_opened_record.id)
+        return DelConnWorker(self.conn_id, self.conn_name, self.reorder_conns, self.reorder_items, delete_opened_ids)
 
     def success_post_process(self, *args):
         self.callback(self.need_reorder_items)

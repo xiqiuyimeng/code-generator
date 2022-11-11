@@ -50,8 +50,7 @@ class TreeData:
             for value in node.children.values():
                 current_node = value
                 yield current_node
-                if node.children:
-                    yield from self._iterate_node(current_node)
+                yield from self._iterate_node(current_node)
 
     @staticmethod
     def _get_node(parent_node: TreeDataNode, name):

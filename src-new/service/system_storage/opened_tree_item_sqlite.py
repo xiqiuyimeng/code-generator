@@ -125,26 +125,6 @@ class OpenedTreeItemSqlite(SqliteBasic):
 
         self.update(opened_item)
 
-    @transactional
-    def delete_all_by_parent_id(self, parent_id, level, ds_type):
-        delete_child_sql = opened_item_sql_dict.get('batch_delete')
-        delete_param = {
-            'parent_id': parent_id,
-            'level': level,
-            'ds_type': ds_type
-        }
-        children_generator = self.recursive_get_children(parent_id, level, ds_type)
-        children_list = list()
-        for children in children_generator:
-            children_list.extend(children)
-        if children_list:
-            id_list = tuple(map(lambda x: x.id, children_list))
-            if len(children_list) == 1:
-                delete_child_sql = f'{delete_child_sql} ({id_list[0]})'
-            else:
-                delete_child_sql = f'{delete_child_sql} {id_list}'
-            get_db_conn().query(delete_child_sql, **delete_param)
-
     def recursive_get_children(self, parent_id, level, ds_type):
         opened_items = self.get_children(parent_id, level, ds_type)
         if opened_items:

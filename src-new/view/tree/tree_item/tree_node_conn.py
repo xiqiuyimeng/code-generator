@@ -72,20 +72,21 @@ class ConnTreeNode(AbstractTreeNode):
                 self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
             else:
                 return
-        index_list = self.get_tab_indexes()
-        # 首先处理tab
-        [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
-        # 遍历子元素，停止线程
-        for i in range(self.item.childCount()):
-            child_item = self.item.child(i)
-            if child_item.childCount():
-                child_node = DBTreeNode(child_item, self.tree_widget, self.window)
-                # 将线程停止
-                child_node.worker_terminate()
-        # 删除连接下的节点
-        self.tree_widget.item_changed_executor.close_item(self.item)
-        self.item.takeChildren()
-        self.item.setExpanded(False)
+        if self.item.childCount():
+            index_list = self.get_tab_indexes()
+            # 首先处理tab
+            [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
+            # 遍历子元素，停止线程
+            for i in range(self.item.childCount()):
+                child_item = self.item.child(i)
+                if child_item.childCount():
+                    child_node = DBTreeNode(child_item, self.tree_widget, self.window)
+                    # 将线程停止
+                    child_node.worker_terminate()
+            # 删除连接下的节点
+            self.tree_widget.item_changed_executor.close_item(self.item)
+            self.item.takeChildren()
+            self.item.setExpanded(False)
         return True
 
     def get_tab_indexes(self):
@@ -203,7 +204,8 @@ class ConnTreeNode(AbstractTreeNode):
     def del_conn_callback(self, need_reorder_items):
         self.worker_terminate()
         # 给需要排序的这些连接节点，增加标志位，不再触发节点改变事件
-        [set_item_no_change(item, True) for item in need_reorder_items]
+        if need_reorder_items:
+            [set_item_no_change(item, True) for item in need_reorder_items]
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
         self.tree_widget.del_conn_name(self.conn_name)

@@ -130,6 +130,17 @@ class TableWidget(QTableWidget, ScrollableWidget):
         }
         self.tree_data.del_node(del_data, recursive_del=True)
 
+    def add_all_table_cols_checked(self):
+        self.add_checked_data(self.cols)
+
+    def remove_all_table_checked(self):
+        del_data = {
+            'conn': self.tree_item.parent().parent().text(0),
+            'db': self.tree_item.parent().text(0),
+            'tb': self.tree_item.text(0)
+        }
+        self.tree_data.del_node(del_data, recursive_del=True)
+
     def make_item(self, text):
         item = TableWidgetItem(self)
         item.setText(text)
@@ -212,3 +223,8 @@ class TableWidget(QTableWidget, ScrollableWidget):
             modify_col_data_list.append(modify_col_data)
         # 保存数据
         self.async_save_executor.batch_save_data(modify_col_data_list)
+        # 批量选中数据或取消选中
+        if check_state == Qt.Unchecked:
+            self.remove_all_table_checked()
+        elif check_state == Qt.Checked:
+            self.add_all_table_cols_checked()

@@ -165,6 +165,11 @@ class SqliteBasic:
         log.info(f'删除[{self.table_name}]参数 ==> {obj_id}')
         get_db_conn().query(self._delete_sql, **{"id": obj_id})
 
+    def batch_delete(self, obj_ids):
+        log.info(f'批量删除[{self.table_name}]语句 ==> {self._delete_sql}')
+        log.info(f'批量删除[{self.table_name}]参数 ==> {obj_ids}')
+        get_db_conn().bulk_query(self._delete_sql, list(map(lambda x: {'id': x}, obj_ids)))
+
     def update(self, update_obj: BasicSqliteDTO):
         """更新记录方法，根据id更新，创建时间不修改，更新时间传入当前时间"""
         update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

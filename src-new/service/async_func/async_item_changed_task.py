@@ -7,7 +7,7 @@ from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, ExpandedEnum, OpenedTreeItemSqlite, \
     CurrentEnum
-from view.tree.tree_widget.tree_item_func import get_item_opened_record
+from view.tree.tree_widget.tree_item_func import get_item_opened_record, get_children_opened_ids
 
 _author_ = 'luwt'
 _date_ = '2022/10/3 10:10'
@@ -33,8 +33,7 @@ class ItemChangedWorker(ThreadWorkerABC):
             elif method == 'item_checked':
                 OpenedTreeItemSqlite().update(opened_item)
             elif method == 'close_item':
-                OpenedTreeItemSqlite().delete_all_by_parent_id(opened_item.id, opened_item.level + 1,
-                                                               opened_item.ds_type)
+                OpenedTreeItemSqlite().batch_delete(opened_item)
             log.debug(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):
@@ -76,5 +75,5 @@ class ItemChangedExecutor(ThreadExecutorABC):
         self.queue.put(('item_checked', opened_item))
 
     def close_item(self, item):
-        opened_item = get_item_opened_record(item)
-        self.queue.put(('close_item', opened_item))
+        opened_ids = get_children_opened_ids(item)
+        self.queue.put(('close_item', opened_ids))
