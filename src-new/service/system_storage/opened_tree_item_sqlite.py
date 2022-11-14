@@ -44,7 +44,6 @@ class OpenedTreeItem(BasicSqliteDTO):
     level: int = field(init=False, default=None)
     # 数据源 name
     ds_type: str = field(init=False, default=None)
-    item_order: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():

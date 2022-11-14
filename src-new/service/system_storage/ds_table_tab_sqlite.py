@@ -32,8 +32,6 @@ class DsTableTab(BasicSqliteDTO):
 
     # 父id，指向opened_tree_item表
     parent_opened_id: int = field(init=False, default=None)
-    # tab 顺序
-    item_order: str = field(init=False, default=None)
     # 标识tab是否应该置为当前项
     is_current: int = field(init=False, default=None)
     # 数据源类型

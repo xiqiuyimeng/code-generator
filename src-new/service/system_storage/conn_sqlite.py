@@ -33,7 +33,6 @@ class SqlConnection(BasicSqliteDTO):
     conn_info: str = field(init=False, default=None)
     # 根据 conn_info 映射的实体类
     conn_info_type: dataclass = field(init=False, default=None)
-    item_order: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import dataclasses
+from dataclasses import dataclass, field, asdict
 import threading
 from datetime import datetime
 import os
@@ -18,11 +18,12 @@ table_field_dict = dict()
 thread_id_db_dict = dict()
 
 
-@dataclasses.dataclass
+@dataclass
 class BasicSqliteDTO:
-    id: int = dataclasses.field(default=None, init=False, compare=False)
-    create_time: str = dataclasses.field(default=None, init=False, compare=False)
-    update_time: str = dataclasses.field(default=None, init=False, compare=False)
+    id: int = field(default=None, init=False, compare=False)
+    item_order: int = field(init=False, default=None)
+    create_time: str = field(default=None, init=False, compare=False)
+    update_time: str = field(default=None, init=False, compare=False)
 
 
 def get_db():
@@ -84,9 +85,9 @@ class SqliteBasic:
         """
         操作sqlite数据库的基类，
         约定：每个表必须有id且为自增主键，
-            每个表必须有item_order，描述顺序关系
             每个表必须有create_time自动初始化，
-            每个表必须有update_time自动更新
+            每个表必须有update_time自动更新，
+            每个表应该有item_order，描述顺序关系
         """
         self.table_name = table_name
         self._create_table_sql = sql_dict.get('create')
@@ -118,7 +119,7 @@ class SqliteBasic:
         """新增记录方法，根据约定，id由数据库管理，创建时间、更新时间传入当前时间"""
         insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        insert_dict = dataclasses.asdict(insert_obj)
+        insert_dict = asdict(insert_obj)
         if insert_dict:
             insert_dict.pop('id')
 
@@ -141,7 +142,7 @@ class SqliteBasic:
         for insert_obj in insert_objs:
             insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        insert_dict_list = list(map(lambda x: dataclasses.asdict(x), insert_objs))
+        insert_dict_list = list(map(lambda x: asdict(x), insert_objs))
 
         for insert_dict in insert_dict_list:
             insert_dict.pop('id')
@@ -173,7 +174,7 @@ class SqliteBasic:
     def update(self, update_obj: BasicSqliteDTO):
         """更新记录方法，根据id更新，创建时间不修改，更新时间传入当前时间"""
         update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        update_dict = dataclasses.asdict(update_obj)
+        update_dict = asdict(update_obj)
         update_dict.pop('create_time')
 
         # 过滤掉不合法的field
@@ -185,8 +186,8 @@ class SqliteBasic:
 
         # 收集更新的value dict
         update_val_dict = {"id": update_dict.get("id")}
-        for field in update_field_list:
-            update_val_dict[field] = update_dict.get(field)
+        for update_field in update_field_list:
+            update_val_dict[update_field] = update_dict.get(update_field)
 
         if update_field_list:
             update_field_str = ", ".join(list(map(lambda x: f'{x} = :{x}', update_field_list)))
@@ -201,7 +202,7 @@ class SqliteBasic:
         update_dict_list = list()
         for update_obj in update_objs:
             update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            update_dict = dataclasses.asdict(update_obj)
+            update_dict = asdict(update_obj)
             update_dict.pop('create_time')
             update_dict_list.append(update_dict)
 
@@ -215,8 +216,8 @@ class SqliteBasic:
         update_value_list = list()
         for update_obj_dict in update_dict_list:
             update_val_dict = {"id": update_obj_dict.get("id")}
-            for field in update_field_list:
-                update_val_dict[field] = update_obj_dict.get(field)
+            for update_field in update_field_list:
+                update_val_dict[update_field] = update_obj_dict.get(update_field)
             update_value_list.append(update_val_dict)
 
         if update_field_list:
@@ -245,7 +246,7 @@ class SqliteBasic:
     def _do_select(self, sql, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，查询存在的记录数量"""
         select_sql = sql
-        select_dict = dataclasses.asdict(select_obj)
+        select_dict = asdict(select_obj)
 
         # 过滤掉不合法的field
         self.filter_illegal_field(select_dict)

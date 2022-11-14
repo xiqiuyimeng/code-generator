@@ -27,7 +27,6 @@ datasource_type_sql_dict = {
 class DatasourceType(BasicSqliteDTO):
 
     name: str = field(default=None, init=False)
-    item_order: int = field(default=None, init=False)
     is_current: int = field(default=None, init=False)
 
     def __init__(self, **kwargs):

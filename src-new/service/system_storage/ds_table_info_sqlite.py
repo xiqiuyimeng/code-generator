@@ -51,7 +51,6 @@ class DsTableInfo(BasicSqliteDTO):
     checked: int = field(init=False, default=None)
     # 指向table_tab
     parent_tab_id: int = field(init=False, default=None)
-    item_order: int = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
