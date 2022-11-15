@@ -2,7 +2,7 @@
 
 from constant.constant import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER
 from service.system_storage.conn_type import ConnTypeEnum
-from view.dialog.conn.internet_conn_dialog import InternetConnDialog
+from view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 19:31'

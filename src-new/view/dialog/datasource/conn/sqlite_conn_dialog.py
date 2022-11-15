@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QPushButton, QFileDi
 
 from constant.constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
 from service.system_storage.conn_type import ConnTypeEnum
-from view.dialog.conn.abstract_conn_dialog import AbstractConnDialog
+from view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 19:31'
@@ -22,21 +22,21 @@ class SqliteConnDialog(AbstractConnDialog):
 
     def setup_conn_info_ui(self):
         """sqlite只需要一个数据库文件地址即可"""
-        self.conn_info_layout = QGridLayout()
+        self.ds_info_layout = QGridLayout()
         # 数据库文件地址
         self.file_url_label = QLabel(self.frame)
-        self.conn_info_layout.addWidget(self.file_url_label, 0, 0, 1, 1)
+        self.ds_info_layout.addWidget(self.file_url_label, 0, 0, 1, 1)
         self.file_url_value = QLineEdit(self.frame)
-        self.conn_info_layout.addWidget(self.file_url_value, 0, 1, 1, 1)
+        self.ds_info_layout.addWidget(self.file_url_value, 0, 1, 1, 1)
         self.file_url_button = QPushButton(self.frame)
         self.file_url_button.setObjectName('file_url_button')
-        self.conn_info_layout.addWidget(self.file_url_button, 0, 2, 1, 1)
+        self.ds_info_layout.addWidget(self.file_url_button, 0, 2, 1, 1)
 
     def setup_conn_info_label(self):
         self.file_url_label.setText(SQLITE_FILE_URL_TXT)
 
     def setup_conn_info_value_show(self):
-        self.file_url_value.setText(self.connection.conn_info_type.file_url)
+        self.file_url_value.setText(self.ds_info.conn_info_type.file_url)
 
     def collect_conn_info_input(self):
         file_url = self.file_url_value.text()

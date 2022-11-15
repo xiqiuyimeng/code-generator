@@ -21,7 +21,7 @@ thread_id_db_dict = dict()
 @dataclass
 class BasicSqliteDTO:
     id: int = field(default=None, init=False, compare=False)
-    item_order: int = field(init=False, default=None)
+    item_order: int = field(init=False, default=None, compare=False)
     create_time: str = field(default=None, init=False, compare=False)
     update_time: str = field(default=None, init=False, compare=False)
 

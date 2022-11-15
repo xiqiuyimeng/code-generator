@@ -31,6 +31,11 @@ OK_BTN_TEXT = "保存"
 CANCEL_BTN_TEXT = "取消"
 # ---------- 连接对话框中的展示文本 end ---------- #
 
+# ---------- 操作数据源时提示语 start ---------- #
+SAVE_DS_INFO_TITLE = "保存数据源"
+DS_INFO_NO_CHANGE_PROMPT = "数据源信息无变化"
+# ---------- 操作数据源时提示语 end ---------- #
+
 
 # ---------- 操作连接时提示语 start ---------- #
 TEST_CONN_TITLE = "测试连接"
@@ -42,7 +47,6 @@ OPEN_CONN_FAIL_PROMPT = "打开连接失败"
 SAVE_CONN_TITLE = "保存连接"
 SAVE_CONN_SUCCESS_PROMPT = "保存连接成功"
 SAVE_CONN_FAIL_PROMPT = "保存连接失败"
-CONN_NO_CHANGE_PROMPT = "连接信息无变化"
 CHOOSE_SQLITE_FILE = "选择文件"
 DEL_CONN_TITLE = "删除连接"
 DEL_CONN_SUCCESS_PROMPT = "删除连接成功"
@@ -222,8 +226,8 @@ SELECT_TABLE_FAIL_PROMPT = '选择数据库表失败'
 # 选择字段失败
 SELECT_FIELD_FAIL_PROMPT = '选择数据库字段失败'
 # 检查系统库中连接名字存在提示语
-CONN_NAME_EXISTS = '当前名称不可用，{}已存在！'
-CONN_NAME_AVAILABLE = '连接名称{}可用'
+DS_NAME_EXISTS = '当前名称不可用，{}已存在！'
+DS_NAME_AVAILABLE = '名称{}可用'
 # 关闭连接时的提示语
 CLOSE_CONN_PROMPT = '该连接下有已选的字段，强行关闭将清空连接下所选字段，是否继续'
 
@@ -454,6 +458,9 @@ MYSQL_DISPLAY_NAME = 'mysql'
 MYSQL_DB = 'mysql_db'
 MYSQL_TB = 'mysql_tb'
 MYSQL_COL = 'mysql_col'
+
+JSON_TYPE = 'json'
+JSON_DISPLAY_NAME = 'json'
 
 # tab bar右键菜单
 CLOSE_CURRENT_TAB = '关闭当前标签页'

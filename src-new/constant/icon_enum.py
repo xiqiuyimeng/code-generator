@@ -7,7 +7,7 @@ from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE, SW
     REFRESH_ACTION, TEMPLATE_ACTION, GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, \
     SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, OPEN_CONN_ACTION, \
     CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
-    EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL
+    EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -57,6 +57,9 @@ class IconEnum(Enum):
     sql_mysql_db_icon = MYSQL_DB, ':/icon/database_icon.png'
     sql_mysql_tb_icon = MYSQL_TB, ':/icon/table_icon.png'
     sql_mysql_col_icon = MYSQL_COL, ':/icon/column_icon.png'
+
+    # structure datasource icon
+    json_type_icon = JSON_DISPLAY_NAME, ':/icon/exec.png'
 
 
 def get_icon_path(name):

@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit
 
 from constant.constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT
-from view.dialog.conn.abstract_conn_dialog import AbstractConnDialog
+from view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 18:05'
@@ -29,11 +29,11 @@ class InternetConnDialog(AbstractConnDialog):
 
     def setup_conn_info_ui(self):
         # 主体表单布局
-        self.conn_info_layout = QFormLayout()
+        self.ds_info_layout = QFormLayout()
         # 主机地址
         self.host_label = QLabel(self.frame)
         self.host_value = QLineEdit(self.frame)
-        self.conn_info_layout.addRow(self.host_label, self.host_value)
+        self.ds_info_layout.addRow(self.host_label, self.host_value)
 
         # 开放扩展点，可以增加其他特有信息
         self.setup_special_conn_info_ui()
@@ -41,15 +41,15 @@ class InternetConnDialog(AbstractConnDialog):
         # 端口号
         self.port_label = QLabel(self.frame)
         self.port_value = QLineEdit(self.frame)
-        self.conn_info_layout.addRow(self.port_label, self.port_value)
+        self.ds_info_layout.addRow(self.port_label, self.port_value)
         # 用户名
         self.user_label = QLabel(self.frame)
         self.user_value = QLineEdit(self.frame)
-        self.conn_info_layout.addRow(self.user_label, self.user_value)
+        self.ds_info_layout.addRow(self.user_label, self.user_value)
         # 密码
         self.pwd_label = QLabel(self.frame)
         self.pwd_value = QLineEdit(self.frame)
-        self.conn_info_layout.addRow(self.pwd_label, self.pwd_value)
+        self.ds_info_layout.addRow(self.pwd_label, self.pwd_value)
 
     def setup_special_conn_info_ui(self): ...
 
@@ -60,10 +60,10 @@ class InternetConnDialog(AbstractConnDialog):
         self.pwd_label.setText(PWD_TEXT)
 
     def setup_conn_info_value_show(self):
-        self.host_value.setText(self.connection.conn_info_type.host)
-        self.port_value.setText(str(self.connection.conn_info_type.port))
-        self.user_value.setText(self.connection.conn_info_type.user)
-        self.pwd_value.setText(self.connection.conn_info_type.pwd)
+        self.host_value.setText(self.ds_info.conn_info_type.host)
+        self.port_value.setText(str(self.ds_info.conn_info_type.port))
+        self.user_value.setText(self.ds_info.conn_info_type.user)
+        self.pwd_value.setText(self.ds_info.conn_info_type.pwd)
 
     def collect_conn_info_input(self):
         host = self.host_value.text()
