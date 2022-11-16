@@ -4,7 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout, QLineEdit, QGridLayout, QPushButton, QAction
 
-from constant.constant import DS_NAME_EXISTS, DS_NAME_AVAILABLE, DS_INFO_NO_CHANGE_PROMPT, SAVE_DS_INFO_TITLE
+from constant.constant import DS_NAME_EXISTS, DS_NAME_AVAILABLE, DS_INFO_NO_CHANGE_PROMPT, SAVE_DS_INFO_TITLE, \
+    OK_BTN_TEXT, CANCEL_BTN_TEXT
 from service.read_qrc.read_config import read_qss
 from view.box.message_box import pop_ok
 from view.custom_widget.draggable_widget import DraggableDialog
@@ -107,9 +108,24 @@ class AbstractDsInfoDialog(DraggableDialog):
 
     def setup_ds_content_info_ui(self): ...
 
-    def setup_button_ui(self): ...
+    def setup_button_ui(self):
+        # 按钮部分
+        self.button_layout = QGridLayout()
+        self.setup_other_button_ui()
+        self.ok_button = QPushButton(self.frame)
+        self.button_layout.addWidget(self.ok_button, 0, 2, 1, 1)
+        self.cancel_button = QPushButton(self.frame)
+        self.button_layout.addWidget(self.cancel_button, 0, 3, 1, 1)
+        self.frame_layout.addLayout(self.button_layout)
 
-    def setup_label_text(self): ...
+    def setup_other_button_ui(self): ...
+
+    def setup_label_text(self):
+        self.ok_button.setText(OK_BTN_TEXT)
+        self.cancel_button.setText(CANCEL_BTN_TEXT)
+        self.setup_content_label_text()
+
+    def setup_content_label_text(self): ...
 
     def setup_lineedit_value(self):
         if self.ds_info.id:

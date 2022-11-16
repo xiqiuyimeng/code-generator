@@ -10,3 +10,5 @@ class StructureTreeWidget(AbstractTreeWidget):
 
     def __init__(self, parent, window):
         super().__init__(parent, window)
+        # 存储结构体名称和id
+        self.struct_name_id_dict: dict = dict()

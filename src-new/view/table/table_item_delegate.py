@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import QModelIndex, QRect
-from PyQt5.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox, QPlainTextEdit
+from PyQt5.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox
+
+from view.custom_widget.scrollable_widget import ScrollableTextEdit
 
 _author_ = 'luwt'
 _date_ = '2022/10/11 17:54'
@@ -27,7 +29,7 @@ class TextInputDelegate(QItemDelegate):
 
     def createEditor(self, parent: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex) -> QWidget:
         """创建编辑器，只有在编辑时才会触发，编辑器控件选择combox"""
-        text_edit = QPlainTextEdit(parent)
+        text_edit = ScrollableTextEdit(parent)
         return text_edit
 
     def updateEditorGeometry(self, editor: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex):

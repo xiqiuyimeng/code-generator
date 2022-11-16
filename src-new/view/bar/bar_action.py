@@ -8,7 +8,8 @@ from constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACT
     STRUCTURE_DATASOURCE_TYPE
 from constant.icon_enum import get_icon
 from service.system_storage.conn_type import ConnTypeEnum
-from view.bar.bar_function import open_conn_dialog, generate, clear_data
+from service.system_storage.struct_type import StructTypeEnum
+from view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -42,7 +43,13 @@ def add_sql_ds_actions(parent_menu, main_window):
         parent_menu.addAction(add_action)
 
 
-def add_structure_ds_actions(parent_menu, main_window): ...
+def add_structure_ds_actions(parent_menu, main_window):
+    parent_menu.triggered.connect(lambda action: open_structure_dialog(action, main_window.structure_tree_widget,
+                                                                       main_window.geometry()))
+    for structure_type in StructTypeEnum:
+        structure_type_name = structure_type.value.display_name
+        add_action = QAction(get_icon(structure_type_name), structure_type_name, main_window)
+        parent_menu.addAction(add_action)
 
 
 def add_tool_button(action_name, action_tip):

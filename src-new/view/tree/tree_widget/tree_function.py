@@ -5,10 +5,13 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE
+from constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
+    EDIT_STRUCT_DIALOG_TITLE
 from constant.icon_enum import get_icon
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_dialog, get_conn_type_by_type
+from service.system_storage.struct_sqlite import StructInfo
+from service.system_storage.struct_type import get_struct_dialog
 from service.util.tree_node import TreeData
 from view.dialog.datasource import *
 from view.tree.tree_item.tree_node_table import TableTreeNode
@@ -78,6 +81,43 @@ def show_conn_dialog(sql_type, tree_widget, conn_info, title, screen_rect):
 
     elif title == EDIT_CONN_DIALOG_TITLE:
         dialog.conn_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
+    dialog.exec()
+
+
+def add_struct_func(struct_type, tree_widget, screen_rect):
+    """
+    添加结构体，打开弹窗，接收输入，保存系统库
+    :param struct_type: 用来标识结构体数据源类型
+    :param tree_widget: 树对象
+    :param screen_rect: 主窗口大小
+    """
+    show_struct_dialog(struct_type, tree_widget, StructInfo(), ADD_STRUCT_DIALOG_TITLE, screen_rect)
+
+
+def edit_struct_func(struct_type, tree_widget, screen_rect, struct_info):
+    show_struct_dialog(struct_type, tree_widget, struct_info, EDIT_STRUCT_DIALOG_TITLE, screen_rect)
+
+
+def show_struct_dialog(struct_type, tree_widget, struct_info, title, screen_rect):
+    """
+    打开添加、编辑结构体子窗口
+    :param struct_type: 用来标识结构体数据源类型
+    :param tree_widget: 树对象
+    :param struct_info: Connection对象，若该对象有id值，则认为操作为编辑操作，
+        将在弹窗界面回显数据，若无数据，则为添加操作
+    :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
+    :param screen_rect: 主窗口大小
+    """
+    # 根据类型，动态获取对话框
+    dialog: AbstractStructDialog = globals()[get_struct_dialog(struct_type)](struct_info, title, screen_rect,
+                                                                             tree_widget.struct_name_id_dict)
+    # dialog = AbstractStructDialog(struct_info, title, screen_rect, dict())
+    # if title == ADD_CONN_DIALOG_TITLE:
+    #     dialog.struct_saved.connect(lambda conn, opened_conn_record:
+    #                                 add_conn_tree_item(tree_widget, conn, opened_conn_record))
+    #
+    # elif title == EDIT_CONN_DIALOG_TITLE:
+    #     dialog.struct_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
     dialog.exec()
 
 

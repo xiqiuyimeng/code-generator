@@ -2,10 +2,9 @@
 import dataclasses
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QLabel, QGridLayout, QPushButton
+from PyQt5.QtWidgets import QLabel, QPushButton
 
-from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, \
-    OK_BTN_TEXT, CANCEL_BTN_TEXT
+from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT
 from service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor
 from service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from service.system_storage.conn_sqlite import SqlConnection
@@ -50,34 +49,26 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     def setup_conn_info_ui(self): ...
 
-    def setup_button_ui(self):
+    def setup_other_button_ui(self):
         # 按钮部分
-        self.button_layout = QGridLayout()
         self.test_conn_button = QPushButton(self.frame)
         self.button_layout.addWidget(self.test_conn_button, 0, 0, 1, 1)
         self.button_blank = QLabel(self.frame)
         self.button_layout.addWidget(self.button_blank, 0, 1, 1, 1)
-        self.ok_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.ok_button, 0, 2, 1, 1)
-        self.cancel_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.cancel_button, 0, 3, 1, 1)
-        self.frame_layout.addLayout(self.button_layout)
 
-    def setup_label_text(self):
+    def setup_content_label_text(self):
         self.title.setText(self.dialog_title.format(self.conn_type.display_name))
         self.ds_name_label.setText(CONN_NAME_TEXT)
         # 连接信息
         self.setup_conn_info_label()
         # 按钮文本
         self.test_conn_button.setText(TEST_CONN_BTN_TEXT)
-        self.ok_button.setText(OK_BTN_TEXT)
-        self.cancel_button.setText(CANCEL_BTN_TEXT)
 
     def setup_conn_info_label(self): ...
 
     def setup_ds_info_value_show(self):
-        self.ds_name_value.setText(self.ds_info.conn_name)
         # 数据回显
+        self.ds_name_value.setText(self.ds_info.conn_name)
         self.setup_conn_info_value_show()
 
     def setup_ds_info_default_value(self):

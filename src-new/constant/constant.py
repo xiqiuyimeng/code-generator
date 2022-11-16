@@ -25,6 +25,12 @@ DEFAULT_HOST = "localhost"
 DEFAULT_PORT = "3306"
 DEFAULT_USER = "root"
 
+ADD_STRUCT_DIALOG_TITLE = "添加{}数据源"
+EDIT_STRUCT_DIALOG_TITLE = "编辑{}数据源"
+STRUCTURE_NAME_TEXT = "{}数据源名称："
+STRUCTURE_FILE_URL_TEXT = "{}文件地址： "
+STRUCTURE_CONTENT_TEXT = "{}数据源内容："
+
 # 按钮部分
 TEST_CONN_BTN_TEXT = "测试连接"
 OK_BTN_TEXT = "保存"

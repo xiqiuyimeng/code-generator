@@ -23,7 +23,7 @@ class SqlTreeWidget(AbstractTreeWidget):
     def __init__(self, parent, window):
         super().__init__(parent, window)
         self.main_window = window
-        # 存储连接id和名称
+        # 存储连接名称和id
         self.conn_name_id_dict: dict = ...
         self.list_conn_executor = ...
         # 保存 sql tree 选中数据
