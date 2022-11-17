@@ -69,6 +69,26 @@ class Searcher:
         # 重置line edit
         self.dock_widget.line_edit.setText("")
 
+    def search(self, cur_text):
+        match_items = list()
+        # 当前搜索的文本，加上前面输入的
+        text = self.dock_widget.line_edit.text() + cur_text
+        # 如果搜索过，在当前的小范围内搜索
+        if self.match_item_records:
+            self.smart_match_text(text, match_items)
+        else:
+            # 如果还没搜索过，用迭代器，在所有节点中搜寻
+            self.iterate_search(text, match_items)
+        self.match_item_records.append(match_items)
+        # 展示dock窗口
+        self.dock_widget.show()
+        self.dock_widget.line_edit.setText(text)
+        # 如果匹配不到，把输入框文本变为错误颜色
+        if not match_items:
+            self.dock_widget.line_edit.paint_wrong_color()
+        # 设置焦点
+        self.set_selected_focus()
+
     def backspace_search(self):
         if self.match_item_records:
             # 退格，删除字符，弹出容器最后一个元素
@@ -116,26 +136,6 @@ class Searcher:
             return self.get_up_down_next(item_list[mid_idx:], item)
 
     def get_row(self, item) -> int: ...
-
-    def search(self, cur_text):
-        match_items = list()
-        # 当前搜索的文本，加上前面输入的
-        text = self.dock_widget.line_edit.text() + cur_text
-        # 如果搜索过，在当前的小范围内搜索
-        if self.match_item_records:
-            self.smart_match_text(text, match_items)
-        else:
-            # 如果还没搜索过，用迭代器，在所有节点中搜寻
-            self.iterate_search(text, match_items)
-        self.match_item_records.append(match_items)
-        # 展示dock窗口
-        self.dock_widget.show()
-        self.dock_widget.line_edit.setText(text)
-        # 如果匹配不到，把输入框文本变为错误颜色
-        if not match_items:
-            self.dock_widget.line_edit.paint_wrong_color()
-        # 设置焦点
-        self.set_selected_focus()
 
     def simple_match_text(self, text, item, match_items):
         smart_matcher = SmartMatcher(text)

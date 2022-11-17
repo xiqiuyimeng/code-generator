@@ -48,6 +48,7 @@ class SqliteConnDialog(AbstractConnDialog):
 
     def path_select(self):
         file_url = QFileDialog.getOpenFileName(self.frame, CHOOSE_SQLITE_FILE, '/')
-        self.file_url_value.setText(file_url[0])
+        if file_url[0]:
+            self.file_url_value.setText(file_url[0])
 
 

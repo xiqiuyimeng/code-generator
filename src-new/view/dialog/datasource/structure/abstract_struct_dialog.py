@@ -2,9 +2,10 @@
 import dataclasses
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QGridLayout, QLabel, QFormLayout, QLineEdit, QAction
+from PyQt5.QtWidgets import QGridLayout, QLabel, QFormLayout, QLineEdit, QAction, QFileDialog
 
-from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT
+from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
+    CHOOSE_STRUCT_FILE_TEXT
 from constant.icon_enum import get_icon
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from service.system_storage.struct_content_sqlite import StructContent, StorageTypeEnum
@@ -12,6 +13,7 @@ from service.system_storage.struct_sqlite import StructInfo
 from service.system_storage.struct_type import StructType
 from view.custom_widget.scrollable_widget import ScrollableTextEdit
 from view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
+from view.dialog.datasource.structure.choose_folder_dialog import ChooseFolderDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:46'
@@ -35,6 +37,8 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_file_action: QAction = ...
         self.struct_text_label: QLabel = ...
         self.struct_text_input: ScrollableTextEdit = ...
+
+        self.choose_folder_dialog: ChooseFolderDialog = ...
 
         # 如果是编辑，需要读取数据库中存储的实际的结构体信息，用来回显
 
@@ -89,10 +93,7 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_text_input.setPlainText(self.struct_content.content)
 
     def button_available(self) -> bool:
-        return self.new_struct.struct_name \
-                and all(dataclasses.astuple(self.struct_info)) \
-                and all(dataclasses.astuple(self.struct_content)) \
-                and self.name_available
+        return all((self.struct_info.struct_name, self.struct_content.content))
 
     def collect_input(self):
         self.new_struct.struct_name = self.ds_name_value.text()
@@ -104,18 +105,26 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_info.struct_type = self.struct_type.display_name
         self.struct_info.struct_name = self.ds_name_value.text()
         self.struct_content = StructContent()
-        self.struct_content.content = self.struct_text_input
+        self.struct_content.content = self.struct_text_input.toPlainText()
         file_url = self.struct_file_url_linedit.text()
         self.struct_content.file_url = file_url
         self.struct_content.storage_type = StorageTypeEnum.file.value \
             if file_url else StorageTypeEnum.text.value
 
     def connect_ds_other_signal(self):
-        self.struct_file_action.triggered.connect(lambda x: print(x))
+        self.struct_file_action.triggered.connect(self.choose_file)
         self.struct_file_url_linedit.textEdited.connect(self.check_input)
         self.struct_text_input.textChanged.connect(self.check_input)
 
-    # def save_ds_info(self):
+    def choose_file(self):
+        file_url = QFileDialog.getOpenFileName(self, CHOOSE_STRUCT_FILE_TEXT, '/')
+        if file_url[0]:
+            self.struct_file_url_linedit.setText(file_url[0])
+
+    def save_ds_info(self):
+        # 打开保存文件夹框，选择父级文件夹
+        self.choose_folder_dialog = ChooseFolderDialog(self.parent_screen_rect)
+        self.choose_folder_dialog.exec()
     #     self.new_connection.construct_conn_info()
     #     # 存在id，说明是编辑
     #     if self.ds_info.id:
