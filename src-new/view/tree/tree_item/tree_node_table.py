@@ -6,7 +6,7 @@ from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TAB
 from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_widget.tree_item_func import get_item_opened_tab, \
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
     set_item_opened_tab, get_item_sql_conn, get_item_opened_record, link_table_checkbox
 
 _author_ = 'luwt'

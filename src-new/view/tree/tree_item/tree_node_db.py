@@ -9,7 +9,7 @@ from view.box.message_box import pop_fail, pop_question
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_item.tree_node_table import TableTreeNode
 from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
-from view.tree.tree_widget.tree_item_func import get_item_opened_record, get_item_opened_tab
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'

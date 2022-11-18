@@ -16,7 +16,7 @@ from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_widget.tree_item_func import get_item_opened_record, get_item_no_change, link_table_checkbox
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_no_change, link_table_checkbox
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'

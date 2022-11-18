@@ -12,7 +12,7 @@ from view.box.message_box import pop_ok, pop_question
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_item.tree_node_db import DBTreeNode
 from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, get_item_conn_type
-from view.tree.tree_widget.tree_item_func import get_item_sql_conn, \
+from view.tree.tree_item.tree_item_func import get_item_sql_conn, \
     get_item_opened_record, set_item_no_change
 
 _author_ = 'luwt'

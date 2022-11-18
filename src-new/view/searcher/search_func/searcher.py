@@ -58,12 +58,11 @@ class Searcher:
         # 渲染，触发界面绘制刷新
         self.target.viewport().update()
 
-    def search_post_processor(self): ...
-
     def clear_search(self):
         # 容器清空
         self.search_item_dict.clear()
         self.match_item_records.clear()
+        self.clear_row_index()
         # 隐藏dock窗口
         self.dock_widget.hide()
         # 重置line edit
@@ -103,7 +102,7 @@ class Searcher:
 
     def up_down_select_item(self, key):
         item_records = self.match_item_records[-1]
-        # 如果当前节点不在搜索列表中，找出离当前元素最近的搜索节点
+        # 如果当前节点在搜索列表中，按索引查找
         if self.target.currentItem() in item_records:
             index = item_records.index(self.target.currentItem())
             if key == Qt.Key_Up:
@@ -111,6 +110,7 @@ class Searcher:
             else:
                 next_item = item_records[index + 1 if index < len(item_records) - 1 else 0]
         else:
+            # 如果当前节点不在搜索列表中，找出离当前元素最近的搜索节点，也就是选中元素并非搜索高亮节点
             up_item, next_item = self.get_up_down_next(item_records, self.target.currentItem())
             if key == Qt.Key_Up:
                 # 找出离当前元素最近的上一个元素
@@ -122,20 +122,20 @@ class Searcher:
 
     def get_up_down_next(self, item_list, item):
         # 如果查找元素小于第一个元素或大于最后一个元素，则返回(-1，0)
-        if self.get_row(item) < self.get_row(item_list[0]) or self.get_row(item) > self.get_row(item_list[-1]):
+        if self.get_row_index(item) < self.get_row_index(item_list[0]) \
+                or self.get_row_index(item) > self.get_row_index(item_list[-1]):
             return item_list[-1], item_list[0]
         # 最终查找到只有两个元素，且查找在元素在其范围之内，返回
-        if len(item_list) == 2 and self.get_row(item_list[0]) < self.get_row(item) < self.get_row(item_list[1]):
+        if len(item_list) == 2 \
+                and self.get_row_index(item_list[0]) < self.get_row_index(item) < self.get_row_index(item_list[1]):
             return item_list[0], item_list[1]
         # 获取中间索引
         mid_idx = len(item_list) >> 1
         # 如果中间数大于查找元素，查找左边元素，否则查找右边
-        if self.get_row(item_list[mid_idx]) - self.get_row(item) > 0:
+        if self.get_row_index(item_list[mid_idx]) - self.get_row_index(item) > 0:
             return self.get_up_down_next(item_list[0: mid_idx + 1], item)
         else:
             return self.get_up_down_next(item_list[mid_idx:], item)
-
-    def get_row(self, item) -> int: ...
 
     def simple_match_text(self, text, item, match_items):
         smart_matcher = SmartMatcher(text)
@@ -160,6 +160,12 @@ class Searcher:
         if self.match_item_records and self.match_item_records[-1]:
             self.target.set_selected_focus(self.match_item_records[-1][0])
 
+    def get_item_text(self, item) -> str: ...
+
+    def search_post_processor(self): ...
+
+    def clear_row_index(self): ...
+
     def iterate_search(self, text, match_items): ...
 
-    def get_item_text(self, item) -> str: ...
+    def get_row_index(self, item) -> int: ...

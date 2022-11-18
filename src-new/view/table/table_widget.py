@@ -11,7 +11,7 @@ from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
 from view.table.table_item import TableWidgetItem
 from view.table.table_item_delegate import ComboboxDelegate, TextInputDelegate
-from view.tree.tree_widget.tree_item_func import get_item_sql_conn, get_item_opened_record
+from view.tree.tree_item.tree_item_func import get_item_sql_conn, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'

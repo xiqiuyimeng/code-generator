@@ -15,7 +15,7 @@ from service.system_storage.struct_type import get_struct_dialog
 from service.util.tree_node import TreeData
 from view.dialog.datasource import *
 from view.tree.tree_item.tree_node_table import TableTreeNode
-from view.tree.tree_widget.tree_item_func import set_item_sql_conn, set_item_conn_type, get_item_conn_type, \
+from view.tree.tree_item.tree_item_func import set_item_sql_conn, set_item_conn_type, get_item_conn_type, \
     set_item_opened_record, get_item_sql_conn, get_item_opened_record
 
 _author_ = 'luwt'

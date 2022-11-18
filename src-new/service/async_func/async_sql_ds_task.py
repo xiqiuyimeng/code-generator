@@ -15,7 +15,7 @@ from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel
 from service.system_storage.sqlite_abc import transactional
 from view.box.message_box import pop_ok
-from view.tree.tree_widget.tree_item_func import get_item_sql_conn, get_item_opened_record
+from view.tree.tree_item.tree_item_func import get_item_sql_conn, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/31 19:05'

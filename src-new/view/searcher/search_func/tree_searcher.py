@@ -24,7 +24,7 @@ class TreeSearcher(Searcher):
             iterator = iterator.__iadd__(1)
             i += 1
 
-    def fill_user_data(self):
+    def fill_row_index(self):
         iterator = QTreeWidgetItemIterator(self.target)
         i = 0
         while iterator.value():
@@ -56,9 +56,17 @@ class TreeSearcher(Searcher):
             if item.child(i) in self.match_item_records[-1]:
                 return True
 
-    def get_row(self, item):
+    def get_row_index(self, item) -> int:
+        """获取按顺序排列的索引号"""
         user_data = item.data(0, Qt.UserRole + 1)
         if not user_data:
-            self.fill_user_data()
+            self.fill_row_index()
             user_data = item.data(0, Qt.UserRole + 1)
         return user_data
+
+    def clear_row_index(self):
+        iterator = QTreeWidgetItemIterator(self.target)
+        while iterator.value():
+            item = iterator.value()
+            item.setData(0, Qt.UserRole + 1, None)
+            iterator = iterator.__iadd__(1)

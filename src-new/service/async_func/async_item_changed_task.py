@@ -7,7 +7,7 @@ from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, ExpandedEnum, OpenedTreeItemSqlite, \
     CurrentEnum
-from view.tree.tree_widget.tree_item_func import get_item_opened_record, get_children_opened_ids
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_children_opened_ids
 
 _author_ = 'luwt'
 _date_ = '2022/10/3 10:10'

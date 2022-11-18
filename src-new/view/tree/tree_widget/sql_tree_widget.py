@@ -11,7 +11,7 @@ from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.context import get_tree_node
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.tree_function import make_sql_conn_tree_items
-from view.tree.tree_widget.tree_item_func import set_item_opened_record, get_item_sql_conn, get_item_opened_tab
+from view.tree.tree_item.tree_item_func import set_item_opened_record, get_item_sql_conn, get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:21'

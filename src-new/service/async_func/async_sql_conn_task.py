@@ -15,7 +15,7 @@ from view.box.message_box import pop_ok
 from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
     LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT, LIST_ALL_CONN_TITLE
-from view.tree.tree_widget.tree_item_func import get_children_opened_ids, get_item_opened_record
+from view.tree.tree_item.tree_item_func import get_children_opened_ids, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/30 20:31'

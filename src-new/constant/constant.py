@@ -31,6 +31,9 @@ STRUCTURE_NAME_TEXT = "{}数据源名称："
 STRUCTURE_FILE_URL_TEXT = "{}文件地址： "
 STRUCTURE_CONTENT_TEXT = "{}数据源内容："
 CHOOSE_STRUCT_FILE_TEXT = "选择文件"
+SAVE_STRUCT_TITLE = '保存数据源{}'
+SAVE_STRUCT_TO = '保存到：'
+CREATE_NEW_FOLDER = '新建文件夹'
 
 # 按钮部分
 TEST_CONN_BTN_TEXT = "测试连接"

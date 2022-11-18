@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QAbstractItemView, QTreeWidget, QListWidget
 
+from view.searcher.search_func.list_searcher import ListSearcher
 from view.searcher.search_func.tree_searcher import TreeSearcher
 
 _author_ = 'luwt'
@@ -45,4 +46,4 @@ class SmartSearcherListWidget(QListWidget, SmartSearcherItemView):
         super().__init__(parent)
 
     def get_searcher(self):
-        return
+        return ListSearcher(self, self.parent_widget)

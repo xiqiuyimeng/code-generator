@@ -8,7 +8,7 @@ from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TAB
 from service.system_storage.ds_table_tab_sqlite import DsTableTab
 from view.box.message_box import pop_fail
 from view.tree.tree_item.context import get_tree_node
-from view.tree.tree_widget.tree_item_func import set_item_opened_tab
+from view.tree.tree_item.tree_item_func import set_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'
