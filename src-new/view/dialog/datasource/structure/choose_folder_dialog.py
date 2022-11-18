@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout
+from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QFormLayout, QGridLayout, QPushButton, QListWidgetItem
 
+from constant.constant import SAVE_STRUCT_TITLE, SAVE_STRUCT_TO, CREATE_NEW_FOLDER, OK_BTN_TEXT, CANCEL_BTN_TEXT
 from view.custom_widget.draggable_widget import DraggableDialog
+from view.list.list_widget import ListWidget
 
 _author_ = 'luwt'
 _date_ = '2022/11/17 10:16'
@@ -23,6 +25,12 @@ class ChooseFolderDialog(DraggableDialog):
         self.choose_folder_layout: QFormLayout = ...
         self.choose_folder_label: QLabel = ...
         self.choose_folder_display_label: QLabel = ...
+        self.list_widget: ListWidget = ...
+        self.button_layout: QGridLayout = ...
+        self.create_folder_button: QPushButton = ...
+        self.button_blank: QLabel = ...
+        self.save_button: QPushButton = ...
+        self.cancel_button: QPushButton = ...
 
         self.setup_ui()
 
@@ -48,6 +56,16 @@ class ChooseFolderDialog(DraggableDialog):
         self.setup_title_ui()
         # 已选文件夹展示
         self.setup_choose_folder_form()
+        # 列表部件
+        self.setup_list_widget()
+        # 按钮
+        self.setup_button_ui()
+        # 文本
+        self.setup_label_text()
+        # 连接信号
+        self.connect_signal()
+        # 展示列表项
+        self.setup_list_item()
 
     def setup_title_ui(self):
         self.title = QLabel(self.frame)
@@ -66,3 +84,47 @@ class ChooseFolderDialog(DraggableDialog):
         self.choose_folder_layout.addRow(self.choose_folder_label, self.choose_folder_display_label)
 
         self.frame_layout.addLayout(self.choose_folder_layout)
+
+    def setup_list_widget(self):
+        self.list_widget = ListWidget(self.frame)
+        self.list_widget.setObjectName('list_widget')
+        self.frame_layout.addWidget(self.list_widget)
+
+    def setup_button_ui(self):
+        self.button_layout = QGridLayout()
+
+        self.create_folder_button = QPushButton(self.frame)
+        self.create_folder_button.setObjectName('create_folder_button')
+        self.button_layout.addWidget(self.create_folder_button, 0, 0, 1, 1)
+        self.button_blank = QLabel(self.frame)
+        self.button_layout.addWidget(self.button_blank, 0, 1, 1, 1)
+        self.save_button = QPushButton(self.frame)
+        self.save_button.setObjectName('save_button')
+        self.button_layout.addWidget(self.save_button, 0, 2, 1, 1)
+        self.cancel_button = QPushButton(self.frame)
+        self.button_layout.addWidget(self.cancel_button, 0, 3, 1, 1)
+
+        self.frame_layout.addLayout(self.button_layout)
+
+    def setup_label_text(self):
+        self.title.setText(SAVE_STRUCT_TITLE)
+        self.choose_folder_label.setText(SAVE_STRUCT_TO)
+        self.create_folder_button.setText(CREATE_NEW_FOLDER)
+        self.save_button.setText(OK_BTN_TEXT)
+        self.cancel_button.setText(CANCEL_BTN_TEXT)
+
+    def connect_signal(self):
+        self.cancel_button.clicked.connect(self.close)
+
+    def setup_list_item(self):
+        item = QListWidgetItem()
+        item.setText('test1')
+        self.list_widget.addItem(item)
+
+        item1 = QListWidgetItem()
+        item1.setText('test2')
+        self.list_widget.addItem(item1)
+
+        item2 = QListWidgetItem()
+        item2.setText('test3')
+        self.list_widget.addItem(item2)
