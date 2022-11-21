@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import dataclasses
 from queue import Queue
 
 from PyQt5.QtCore import pyqtSignal
@@ -14,7 +13,6 @@ _date_ = '2022/10/12 12:10'
 
 
 class TabChangedWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal()
 
     def __init__(self, queue: Queue):
@@ -64,4 +62,3 @@ class AsyncSaveTabObjExecutor(ThreadExecutorABC):
 
     def batch_save_data(self, data):
         self.queue.put(('batch_save_data', data))
-

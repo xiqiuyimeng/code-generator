@@ -38,7 +38,6 @@ class SqlDSIconMovieThreadExecutor(IconMovieThreadExecutor):
 # ---------------------------------------- 测试连接 start ---------------------------------------- #
 
 class TestConnWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal()
 
     def __init__(self, connection: SqlConnection):
@@ -80,13 +79,13 @@ class TestConnIconMovieExecutor(SqlDSIconMovieThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return TestConnWorker(get_item_sql_conn(self.item))
 
+
 # ---------------------------------------- 测试连接 end ---------------------------------------- #
 
 
 # ---------------------------------------- 打开连接 start ---------------------------------------- #
 
 class OpenConnWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal(list)
 
     def __init__(self, connection: SqlConnection, opened_conn_id):
@@ -127,13 +126,13 @@ class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return OpenConnWorker(get_item_sql_conn(self.item), get_item_opened_record(self.item).id)
 
+
 # ---------------------------------------- 打开连接 end ---------------------------------------- #
 
 
 # ---------------------------------------- 打开数据库 start ---------------------------------------- #
 
 class OpenDBWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal(list)
 
     def __init__(self, connection: SqlConnection, db_name, opened_db_id):
@@ -175,13 +174,13 @@ class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
         return OpenDBWorker(get_item_sql_conn(self.item.parent()), self.item.text(0),
                             get_item_opened_record(self.item).id)
 
+
 # ---------------------------------------- 打开数据库 end ---------------------------------------- #
 
 
 # ---------------------------------------- 打开数据表 start ---------------------------------------- #
 
 class OpenTBWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal(DsTableTab)
 
     def __init__(self, connection: SqlConnection, db_name, tb_name, opened_table_item, check_state):

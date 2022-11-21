@@ -14,7 +14,6 @@ _date_ = '2022/10/3 10:10'
 
 
 class ItemChangedWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal()
 
     def __init__(self, queue: Queue):

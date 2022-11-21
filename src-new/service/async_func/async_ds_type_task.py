@@ -14,7 +14,6 @@ _date_ = '2022/9/26 18:33'
 
 # ----------------------- 初始化 datasource type start ----------------------- #
 class InitDsTypeWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal(list)
 
     def __init__(self):

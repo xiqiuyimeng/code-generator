@@ -24,7 +24,6 @@ _date_ = '2022/5/30 20:31'
 # ---------------------------------------- 添加连接 start ---------------------------------------- #
 
 class AddConnWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal(int, OpenedTreeItem)
 
     def __init__(self, connection: SqlConnection):
@@ -73,13 +72,13 @@ class AddConnExecutor(LoadingMaskThreadExecutor):
                SAVE_CONN_TITLE, self.window)
         self.callback(*args)
 
+
 # ---------------------------------------- 添加连接 end ---------------------------------------- #
 
 
 # ---------------------------------------- 编辑连接 start ---------------------------------------- #
 
 class EditConnWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal()
 
     def __init__(self, connection: SqlConnection, name_changed: bool):
@@ -113,20 +112,21 @@ class EditConnWorker(ThreadWorkerABC):
 
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
-    
+
     def __init__(self, connection: SqlConnection, masked_widget, window, callback, name_changed):
         self.connection = connection
         self.callback = callback
         self.name_changed = name_changed
         super().__init__(masked_widget, window, SAVE_CONN_TITLE)
-        
+
     def get_worker(self) -> ThreadWorkerABC:
         return EditConnWorker(self.connection, self.name_changed)
-    
+
     def success_post_process(self, *args):
         pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
                SAVE_CONN_TITLE, self.window)
         self.callback()
+
 
 # ---------------------------------------- 编辑连接 end ---------------------------------------- #
 
@@ -134,9 +134,8 @@ class EditConnExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 删除连接 start ---------------------------------------- #
 
 class DelConnWorker(ThreadWorkerABC):
-
     success_signal = pyqtSignal()
-    
+
     def __init__(self, conn_id, conn_name, reorder_conns, reorder_items, delete_opened_ids):
         super().__init__()
         self.conn_id = conn_id
@@ -190,13 +189,13 @@ class DelConnExecutor(IconMovieThreadExecutor):
     def success_post_process(self, *args):
         self.callback(self.need_reorder_items)
 
+
 # ---------------------------------------- 删除连接 end ---------------------------------------- #
 
 
 # ---------------------------------------- 获取所有连接 start ---------------------------------------- #
 
 class ListConnWorker(ThreadWorkerABC):
-
     # 连接表中查询结果
     conn_list_signal = pyqtSignal(list)
     # 打开表中的查询结果
@@ -228,7 +227,7 @@ class ListConnWorker(ThreadWorkerABC):
 
     def do_finally(self):
         self.success_signal.emit()
-        
+
     def get_tab_cols(self):
         tab_param = DsTableTab()
         tab_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
@@ -269,4 +268,3 @@ class ListConnExecutor(LoadingMaskThreadExecutor):
         self.reopen_end_callback()
 
 # ---------------------------------------- 获取所有连接 end ---------------------------------------- #
-
