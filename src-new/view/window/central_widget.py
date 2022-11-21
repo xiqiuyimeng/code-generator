@@ -61,3 +61,6 @@ class CentralWidget(QWidget):
 
         self.horizontal_splitter.setStretchFactor(0, 1)
         self.horizontal_splitter.setStretchFactor(1, 3)
+
+        self.horizontal_splitter.setStretchFactor(2, 1)
+        self.horizontal_splitter.setStretchFactor(3, 3)
