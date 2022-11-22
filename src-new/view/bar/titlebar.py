@@ -72,11 +72,11 @@ class TitleBar(DraggableWidget):
         self.parent.showFullScreen()
         self.restore_button.setVisible(True)
         self.max_button.setVisible(False)
-        self.parent.title_bar.setFixedWidth(self.parent.width())
+        self.setFixedWidth(self.parent.width())
 
     def restore_window(self):
         """窗口还原"""
         self.parent.setWindowState(Qt.WindowNoState)
         self.restore_button.setVisible(False)
         self.max_button.setVisible(True)
-        self.parent.title_bar.setFixedWidth(self.parent.width())
+        self.setFixedWidth(self.parent.width())

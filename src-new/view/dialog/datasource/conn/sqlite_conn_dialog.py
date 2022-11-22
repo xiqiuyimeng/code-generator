@@ -20,7 +20,7 @@ class SqliteConnDialog(AbstractConnDialog):
     def get_conn_type(self):
         return ConnTypeEnum.sqlite.value
 
-    def setup_conn_info_ui(self):
+    def setup_ds_content_info_ui(self):
         """sqlite只需要一个数据库文件地址即可"""
         self.ds_info_layout = QGridLayout()
         # 数据库文件地址
@@ -35,8 +35,8 @@ class SqliteConnDialog(AbstractConnDialog):
     def setup_conn_info_label(self):
         self.file_url_label.setText(SQLITE_FILE_URL_TXT)
 
-    def setup_conn_info_value_show(self):
-        self.file_url_value.setText(self.ds_info.conn_info_type.file_url)
+    def setup_echo_other_data(self):
+        self.file_url_value.setText(self.dialog_data.conn_info_type.file_url)
 
     def collect_conn_info_input(self):
         file_url = self.file_url_value.text()

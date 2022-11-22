@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import dataclasses
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QGridLayout, QLabel, QFormLayout, QLineEdit, QAction, QFileDialog
+from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog
 
 from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
     CHOOSE_STRUCT_FILE_TEXT
@@ -27,9 +26,9 @@ class AbstractStructDialog(AbstractDsInfoDialog):
 
     def __init__(self, struct_info: StructInfo, dialog_title, screen_rect, struct_name_id_dict):
         # 初始化一个新的结构体对象
-        self.new_struct: StructInfo = StructInfo()
+        self.new_dialog_data: StructInfo = ...
         self.struct_type: StructType = self.get_struct_type()
-        self.struct_info: StructInfo = ...
+        self.dialog_data: StructInfo = ...
         self.struct_content: StructContent = ...
 
         self.struct_file_url_label: QLabel = ...
@@ -50,7 +49,13 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.frame_layout.setStretch(2, 4)
         self.frame_layout.setStretch(3, 1)
 
-    def resize_window(self):
+    def get_new_dialog_data(self):
+        return StructInfo()
+
+    def get_old_name(self) -> str:
+        return self.dialog_data.struct_name
+
+    def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.8)
 
@@ -72,38 +77,31 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_text_input = ScrollableTextEdit(self.frame)
         self.ds_info_layout.addRow(self.struct_text_label, self.struct_text_input)
 
-    def setup_other_button_ui(self):
-        # 按钮部分
-        self.button_layout = QGridLayout()
-        self.button_blank = QLabel(self.frame)
-        self.button_layout.addWidget(self.button_blank, 0, 0, 1, 2)
-
-    def setup_content_label_text(self):
+    def setup_other_label_text(self):
         self.title.setText(self.dialog_title.format(self.struct_type.display_name))
-        self.ds_name_label.setText(STRUCTURE_NAME_TEXT.format(self.struct_type.display_name))
+        self.name_label.setText(STRUCTURE_NAME_TEXT.format(self.struct_type.display_name))
         # 结构体信息
         self.struct_file_url_label.setText(STRUCTURE_FILE_URL_TEXT.format(self.struct_type.display_name))
         self.struct_text_label.setText(STRUCTURE_CONTENT_TEXT.format(self.struct_type.display_name))
 
-    def setup_ds_info_value_show(self):
+    def setup_echo_other_data(self):
         # 数据回显
-        self.ds_name_value.setText(self.ds_info.struct_name)
         if self.struct_content.storage_type:
             self.struct_file_url_linedit.setText(self.struct_content.file_url)
         self.struct_text_input.setPlainText(self.struct_content.content)
 
     def button_available(self) -> bool:
-        return all((self.struct_info.struct_name, self.struct_content.content))
+        return all((self.dialog_data.struct_name, self.struct_content.content)) and self.name_available
 
     def collect_input(self):
-        self.new_struct.struct_name = self.ds_name_value.text()
+        self.new_dialog_data.struct_name = self.name_input.text()
         self.collect_structure_info_input()
 
     def collect_structure_info_input(self):
         # 根据参数构建结构体信息对象
-        self.struct_info = StructInfo()
-        self.struct_info.struct_type = self.struct_type.display_name
-        self.struct_info.struct_name = self.ds_name_value.text()
+        self.dialog_data = StructInfo()
+        self.dialog_data.struct_type = self.struct_type.display_name
+        self.dialog_data.struct_name = self.name_input.text()
         self.struct_content = StructContent()
         self.struct_content.content = self.struct_text_input.toPlainText()
         file_url = self.struct_file_url_linedit.text()

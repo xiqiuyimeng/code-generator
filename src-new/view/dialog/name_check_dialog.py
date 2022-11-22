@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
+
+from constant.constant import NAME_AVAILABLE, NAME_EXISTS
+from constant.icon_enum import get_icon
+from read_qrc.read_file import read_qss
+from service.system_storage.sqlite_abc import BasicSqliteDTO
+from view.dialog.custom_dialog import CustomDialog
+
+_author_ = 'luwt'
+_date_ = '2022/11/22 9:02'
+
+
+class NameCheckDialog(CustomDialog):
+
+    def __init__(self, screen_rect, dialog_title, name_id_dict, dialog_data=None):
+        # 框架布局，分四部分，第一部分：标题部分，第二部分：名称表单，第三部分：其他内容，第四部分：按钮部分
+        # 存储当前名称不允许重复的字典
+        self.name_id_dict = name_id_dict
+        # 原数据对象，编辑时，回显数据使用
+        self.dialog_data: BasicSqliteDTO = dialog_data
+        # 新的数据对象，保存编辑使用
+        self.new_dialog_data: BasicSqliteDTO = self.get_new_dialog_data()
+        self.old_name = self.get_old_name()
+        self.name_layout: QFormLayout = ...
+        self.name_label: QLabel = ...
+        self.name_available: bool = ...
+        self.name_changed: bool = ...
+        self.name_input: QLineEdit = ...
+        self.name_checker: QLabel = ...
+        self.name_check_action: QAction = ...
+
+        super().__init__(screen_rect, dialog_title)
+
+    def get_new_dialog_data(self) -> BasicSqliteDTO: ...
+
+    def get_old_name(self) -> str: ...
+
+    def setup_content_ui(self):
+        self.setup_name_form()
+        self.setup_other_content_ui()
+
+    def setup_name_form(self):
+        self.name_layout = QFormLayout()
+
+        self.name_label = QLabel(self.frame)
+        self.name_label.setObjectName('name_label')
+
+        self.name_input = QLineEdit(self.frame)
+        self.name_input.setObjectName('name_input')
+
+        self.name_layout.addRow(self.name_label, self.name_input)
+
+        self.placeholder_blank = QLabel(self.frame)
+        self.name_checker = QLabel(self.frame)
+
+        self.name_layout.addRow(self.placeholder_blank, self.name_checker)
+
+        self.frame_layout.addLayout(self.name_layout)
+
+    def setup_other_content_ui(self): ...
+
+    def connect_other_signal(self):
+        self.name_input.textEdited.connect(self.check_name_available)
+        self.name_input.textEdited.connect(self.check_input)
+        self.connect_child_signal()
+
+    def connect_child_signal(self): ...
+
+    def check_name_available(self, name):
+        if name:
+            self.name_available = self.check_available(name)
+            if self.name_available:
+                prompt = NAME_AVAILABLE.format(name)
+                style = "color:green"
+                # 重载样式表
+                self.name_input.setStyleSheet(read_qss())
+                icon = get_icon(NAME_AVAILABLE)
+            else:
+                prompt = NAME_EXISTS.format(name)
+                style = "color:red"
+                self.name_input.setStyleSheet("#name_input{border-color:red;color:red}")
+                icon = get_icon(NAME_EXISTS)
+            self.name_check_action = QAction()
+            self.name_check_action.setIcon(icon)
+            self.name_input.addAction(self.name_check_action, QLineEdit.ActionPosition.TrailingPosition)
+            self.name_checker.setText(prompt)
+            self.name_checker.setStyleSheet(style)
+        else:
+            self.name_input.setStyleSheet(read_qss())
+            self.name_checker.setStyleSheet(read_qss())
+            self.name_checker.setText('')
+            self.name_input.removeAction(self.name_check_action)
+
+    def check_available(self, name):
+        if self.old_name:
+            return (self.old_name != name and name not in self.name_id_dict) or self.old_name == name
+        else:
+            return name not in self.name_id_dict
+
+    def post_process(self):
+        self.setup_lineedit_value()
+        self.setup_input_limit_rule()
+        self.check_input()
+
+    def setup_lineedit_value(self):
+        if self.dialog_data and self.dialog_data.id:
+            # 数据回显
+            self.setup_echo_data()
+        else:
+            # 默认值展示
+            self.setup_default_value()
+
+    def setup_echo_data(self):
+        self.name_input.setText(self.old_name)
+        self.setup_echo_other_data()
+
+    def setup_echo_other_data(self): ...
+
+    def setup_default_value(self): ...
+
+    def setup_input_limit_rule(self):
+        # 设置名称最多可输入100字
+        self.name_input.setMaxLength(100)
+        self.setup_other_input_limit_rule()
+
+    def setup_other_input_limit_rule(self): ...
+
+    def check_input(self):
+        # 收集用户输入数据
+        self.collect_input()
+        # 如果输入框都有值，那么就开放按钮，否则关闭
+        if self.button_available():
+            self.set_button_available()
+        else:
+            self.init_button_status()
+
+    def collect_input(self): ...
+
+    def button_available(self) -> bool: ...
+
+    def set_button_available(self):
+        self.save_button.setDisabled(False)
+        self.set_other_button_available()
+
+    def set_other_button_available(self): ...
+
+    def init_button_status(self):
+        self.save_button.setDisabled(True)
+        self.init_other_button_status()
+
+    def init_other_button_status(self): ...

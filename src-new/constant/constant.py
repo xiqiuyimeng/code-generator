@@ -34,6 +34,7 @@ CHOOSE_STRUCT_FILE_TEXT = "选择文件"
 SAVE_STRUCT_TITLE = '保存数据源{}'
 SAVE_STRUCT_TO = '保存到：'
 CREATE_NEW_FOLDER = '新建文件夹'
+EDIT_FOLDER_NAME = '编辑文件夹名称'
 
 # 按钮部分
 TEST_CONN_BTN_TEXT = "测试连接"
@@ -236,8 +237,8 @@ SELECT_TABLE_FAIL_PROMPT = '选择数据库表失败'
 # 选择字段失败
 SELECT_FIELD_FAIL_PROMPT = '选择数据库字段失败'
 # 检查系统库中连接名字存在提示语
-DS_NAME_EXISTS = '当前名称不可用，{}已存在！'
-DS_NAME_AVAILABLE = '名称{}可用'
+NAME_EXISTS = '当前名称不可用，{}已存在！'
+NAME_AVAILABLE = '名称{}可用'
 # 关闭连接时的提示语
 CLOSE_CONN_PROMPT = '该连接下有已选的字段，强行关闭将清空连接下所选字段，是否继续'
 
@@ -471,6 +472,9 @@ MYSQL_COL = 'mysql_col'
 
 JSON_TYPE = 'json'
 JSON_DISPLAY_NAME = 'json'
+FOLDER_TYPE = 'folder'
+
+LOCATION_TXT = '定位'
 
 # tab bar右键菜单
 CLOSE_CURRENT_TAB = '关闭当前标签页'

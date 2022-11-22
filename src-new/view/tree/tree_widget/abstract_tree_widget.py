@@ -94,6 +94,20 @@ class AbstractTreeWidget(DisplayTreeWidget):
         if self.item_clicked:
             self.do_handle_item_change(item)
 
+    def handle_item_collapsed(self, item):
+        if not self.reopening_flag:
+            # item收起
+            self.item_changed_executor.item_collapsed(item)
+            self.recursive_collapse_item(item)
+
+    def handle_item_expanded(self, item):
+        if not self.reopening_flag:
+            self.item_changed_executor.item_expanded(item)
+
+    def handle_current_item_changed(self, current_item):
+        if current_item and not self.reopening_flag and not get_item_no_change(current_item):
+            self.item_changed_executor.current_item_changed(current_item)
+
     def handle_right_menu_func(self, action):
         """
         点击右键菜单选项后触发事件
@@ -103,12 +117,6 @@ class AbstractTreeWidget(DisplayTreeWidget):
         item = self.currentItem()
         func_name = action.text()
         self.do_handle_right_menu_func(item, func_name)
-
-    def handle_item_collapsed(self, item):
-        if not self.reopening_flag:
-            # item收起
-            self.item_changed_executor.item_collapsed(item)
-            self.recursive_collapse_item(item)
 
     def recursive_collapse_item(self, item):
         if item.childCount():
@@ -120,14 +128,6 @@ class AbstractTreeWidget(DisplayTreeWidget):
                     self.recursive_collapse_item(child_item)
                 if get_item_opened_record(child_item).is_current:
                     self.item_changed_executor.not_current_item(child_item)
-
-    def handle_item_expanded(self, item):
-        if not self.reopening_flag:
-            self.item_changed_executor.item_expanded(item)
-
-    def handle_current_item_changed(self, current_item):
-        if current_item and not self.reopening_flag and not get_item_no_change(current_item):
-            self.item_changed_executor.current_item_changed(current_item)
 
     def get_item_by_opened_id(self, opened_id):
         """根据打开记录表中的id查找"""

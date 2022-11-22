@@ -2,7 +2,7 @@
 import dataclasses
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QLabel, QPushButton
+from PyQt5.QtWidgets import QPushButton
 
 from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT
 from service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor
@@ -24,8 +24,8 @@ class AbstractConnDialog(AbstractDsInfoDialog):
     conn_changed = pyqtSignal(SqlConnection, bool)
 
     def __init__(self, connection: SqlConnection, dialog_title, screen_rect, conn_name_id_dict):
-        # 初始化一个新的连接对象
-        self.new_connection: SqlConnection = SqlConnection()
+        self.dialog_data: SqlConnection = ...
+        self.new_dialog_data: SqlConnection = ...
         self.conn_type: ConnType = self.get_conn_type()
         self.conn_info: dataclass = ...
 
@@ -38,27 +38,26 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
         super().__init__(connection, dialog_title, screen_rect, conn_name_id_dict)
 
-    def resize_window(self):
+    def get_new_dialog_data(self):
+        return SqlConnection()
+
+    def get_old_name(self) -> str:
+        return self.dialog_data.conn_name
+
+    def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.4, self.parent_screen_rect.height() * 0.5)
 
     def get_conn_type(self) -> ConnType: ...
 
-    def setup_ds_content_info_ui(self):
-        self.setup_conn_info_ui()
-
-    def setup_conn_info_ui(self): ...
-
-    def setup_other_button_ui(self):
+    def setup_other_button(self):
         # 按钮部分
         self.test_conn_button = QPushButton(self.frame)
         self.button_layout.addWidget(self.test_conn_button, 0, 0, 1, 1)
-        self.button_blank = QLabel(self.frame)
-        self.button_layout.addWidget(self.button_blank, 0, 1, 1, 1)
 
-    def setup_content_label_text(self):
+    def setup_other_label_text(self):
         self.title.setText(self.dialog_title.format(self.conn_type.display_name))
-        self.ds_name_label.setText(CONN_NAME_TEXT)
+        self.name_label.setText(CONN_NAME_TEXT)
         # 连接信息
         self.setup_conn_info_label()
         # 按钮文本
@@ -66,30 +65,18 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     def setup_conn_info_label(self): ...
 
-    def setup_ds_info_value_show(self):
-        # 数据回显
-        self.ds_name_value.setText(self.ds_info.conn_name)
-        self.setup_conn_info_value_show()
-
-    def setup_ds_info_default_value(self):
-        self.setup_conn_info_default_value()
-
-    def setup_conn_info_value_show(self): ...
-
-    def setup_conn_info_default_value(self): ...
-
     def button_available(self) -> bool:
-        return self.new_connection.conn_name \
+        return self.new_dialog_data.conn_name \
                 and all(dataclasses.astuple(self.conn_info)) \
                 and self.name_available
 
     def collect_input(self):
-        self.new_connection.conn_name = self.ds_name_value.text()
+        self.new_dialog_data.conn_name = self.name_input.text()
         conn_param = self.collect_conn_info_input()
         # 根据参数构建连接信息对象
         self.conn_info = globals()[self.conn_type.type_class](*conn_param)
-        self.new_connection.conn_info_type = self.conn_info
-        self.new_connection.conn_type = self.conn_type.type
+        self.new_dialog_data.conn_info_type = self.conn_info
+        self.new_dialog_data.conn_type = self.conn_type.type
 
     def collect_conn_info_input(self) -> tuple: ...
 
@@ -99,13 +86,7 @@ class AbstractConnDialog(AbstractDsInfoDialog):
     def set_other_button_available(self):
         self.test_conn_button.setDisabled(False)
 
-    def setup_input_ds_info_limit_rule(self):
-        # 连接信息的输入限制规则
-        self.setup_input_conn_info_limit_rule()
-
-    def setup_input_conn_info_limit_rule(self): ...
-
-    def connect_ds_other_signal(self):
+    def connect_child_signal(self):
         self.test_conn_button.clicked.connect(self.test_connection)
         # 连接信息相关的信号槽连接
         self.connect_conn_info_signal()
@@ -113,17 +94,17 @@ class AbstractConnDialog(AbstractDsInfoDialog):
     def connect_conn_info_signal(self): ...
 
     def test_connection(self):
-        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_connection, self, self)
+        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self, self)
         self.test_conn_executor.start()
 
-    def save_ds_info(self):
-        self.new_connection.construct_conn_info()
+    def save_func(self):
+        self.new_dialog_data.construct_conn_info()
         # 存在id，说明是编辑
-        if self.ds_info.id:
-            if self.new_connection != self.ds_info:
-                self.new_connection.id = self.ds_info.id
-                self.name_changed = self.new_connection.conn_name != self.ds_info.conn_name
-                self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self,
+        if self.dialog_data.id:
+            if self.new_dialog_data != self.dialog_data:
+                self.new_dialog_data.id = self.dialog_data.id
+                self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name
+                self.edit_conn_executor = EditConnExecutor(self.new_dialog_data, self, self,
                                                            self.edit_post_process, self.name_changed)
                 self.edit_conn_executor.start()
             else:
@@ -131,16 +112,14 @@ class AbstractConnDialog(AbstractDsInfoDialog):
                 self.ds_info_no_change()
         else:
             # 新增操作
-            self.add_conn_executor = AddConnExecutor(self.new_connection, self, self, self.save_post_process)
+            self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self, self, self.save_post_process)
             self.add_conn_executor.start()
 
     def save_post_process(self, conn_id, opened_item_record):
-        self.new_connection.id = conn_id
-        self.conn_saved.emit(self.new_connection, opened_item_record)
+        self.new_dialog_data.id = conn_id
+        self.conn_saved.emit(self.new_dialog_data, opened_item_record)
         self.close()
 
     def edit_post_process(self):
-        self.conn_changed.emit(self.new_connection, self.name_changed)
+        self.conn_changed.emit(self.new_dialog_data, self.name_changed)
         self.close()
-
-

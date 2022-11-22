@@ -7,7 +7,8 @@ from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE, SW
     REFRESH_ACTION, TEMPLATE_ACTION, GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, \
     SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, OPEN_CONN_ACTION, \
     CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
-    EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME
+    EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME, FOLDER_TYPE, NAME_AVAILABLE, \
+    NAME_EXISTS
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -42,6 +43,10 @@ class IconEnum(Enum):
     edit_conn_icon = EDIT_CONN_ACTION, ':/icon/exec.png'
     del_conn_icon = DEL_CONN_ACTION, ':/icon/exec.png'
 
+    # 名称校验 icon
+    name_available_icon = NAME_AVAILABLE, ':/icon/right.png'
+    name_unavailable_icon = NAME_EXISTS, ':/icon/wrong.png'
+
     # datasource type icon
     sql_ds_icon = SQL_DATASOURCE_TYPE, ':/icon/add.png'
     structure_ds_icon = STRUCTURE_DATASOURCE_TYPE, ':/icon/add.png'
@@ -59,6 +64,7 @@ class IconEnum(Enum):
     sql_mysql_col_icon = MYSQL_COL, ':/icon/column_icon.png'
 
     # structure datasource icon
+    folder_icon = FOLDER_TYPE, ':/icon/column_icon.png'
     json_type_icon = JSON_DISPLAY_NAME, ':/icon/exec.png'
 
 

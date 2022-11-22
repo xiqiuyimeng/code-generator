@@ -32,6 +32,7 @@ class ItemChangedWorker(ThreadWorkerABC):
             elif method == 'item_checked':
                 OpenedTreeItemSqlite().update(opened_item)
             elif method == 'close_item':
+                # sql树结构专用
                 OpenedTreeItemSqlite().batch_delete(opened_item)
             log.debug(f'{method}: {opened_item}')
 
@@ -74,5 +75,6 @@ class ItemChangedExecutor(ThreadExecutorABC):
         self.queue.put(('item_checked', opened_item))
 
     def close_item(self, item):
+        # sql树结构专用
         opened_ids = get_children_opened_ids(item)
         self.queue.put(('close_item', opened_ids))

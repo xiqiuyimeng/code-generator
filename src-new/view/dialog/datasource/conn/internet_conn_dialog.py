@@ -27,7 +27,7 @@ class InternetConnDialog(AbstractConnDialog):
         self.pwd_value: QLineEdit = ...
         super().__init__(*args)
 
-    def setup_conn_info_ui(self):
+    def setup_ds_content_info_ui(self):
         # 主体表单布局
         self.ds_info_layout = QFormLayout()
         # 主机地址
@@ -59,11 +59,11 @@ class InternetConnDialog(AbstractConnDialog):
         self.user_label.setText(USERNAME_TEXT)
         self.pwd_label.setText(PWD_TEXT)
 
-    def setup_conn_info_value_show(self):
-        self.host_value.setText(self.ds_info.conn_info_type.host)
-        self.port_value.setText(str(self.ds_info.conn_info_type.port))
-        self.user_value.setText(self.ds_info.conn_info_type.user)
-        self.pwd_value.setText(self.ds_info.conn_info_type.pwd)
+    def setup_echo_other_data(self):
+        self.host_value.setText(self.dialog_data.conn_info_type.host)
+        self.port_value.setText(str(self.dialog_data.conn_info_type.port))
+        self.user_value.setText(self.dialog_data.conn_info_type.user)
+        self.pwd_value.setText(self.dialog_data.conn_info_type.pwd)
 
     def collect_conn_info_input(self):
         host = self.host_value.text()
@@ -78,7 +78,7 @@ class InternetConnDialog(AbstractConnDialog):
 
     def collect_other_conn_info(self) -> tuple: ...
 
-    def setup_input_conn_info_limit_rule(self):
+    def setup_other_input_limit_rule(self):
         # 设置端口号只能输入数字
         self.port_value.setValidator(QIntValidator())
         # 设置最多可输入字符数

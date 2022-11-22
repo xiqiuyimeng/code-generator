@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
+from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE, LOCATION_TXT, CREATE_NEW_FOLDER
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from view.tree.tree_widget.structure_tree_widget import StructureTreeWidget
@@ -39,7 +39,7 @@ class AbstractTreeFrame(QFrame):
         self.header_layout.addWidget(self.tree_header_label)
 
         self.tree_locate_button = QPushButton(self)
-        self.tree_locate_button.setText('定位')
+        self.tree_locate_button.setText(LOCATION_TXT)
         # 设置比例
         self.header_layout.setStretch(0, 1)
         self.header_layout.addWidget(self.tree_locate_button)
@@ -70,7 +70,7 @@ class SqlTreeFrame(AbstractTreeFrame):
     def get_header_text(self) -> str:
         return SQL_DATASOURCE_TYPE
 
-    def get_tree_widget(self, window) -> AbstractTreeWidget:
+    def get_tree_widget(self, window) -> SqlTreeWidget:
         return SqlTreeWidget(self, window)
 
 
@@ -78,12 +78,20 @@ class StructureTreeFrame(AbstractTreeFrame):
     """结构体数据源列表frame"""
 
     def __init__(self, parent, window):
+        self.tree_widget: StructureTreeWidget = ...
         super().__init__(parent, window)
+
+        # 增加新建文件夹按钮
+        self.create_folder_button = QPushButton(self)
+        self.create_folder_button.setText(CREATE_NEW_FOLDER)
+        self.header_layout.insertWidget(1, self.create_folder_button)
+        self.create_folder_button.clicked.connect(self.tree_widget.add_folder)
+
         # 为了方便访问，树部件引用也挂到window上
         window.structure_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
         return STRUCTURE_DATASOURCE_TYPE
 
-    def get_tree_widget(self, window) -> AbstractTreeWidget:
+    def get_tree_widget(self, window) -> StructureTreeWidget:
         return StructureTreeWidget(self, window)

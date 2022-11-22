@@ -46,7 +46,7 @@ class SqlTreeWidget(AbstractTreeWidget):
     def init_conn_tree_items(self, conns):
         self.reopening_flag = True
         make_sql_conn_tree_items(conns, self)
-        self.init_conn_name_list(conns)
+        self.init_conn_name_dict(conns)
 
     def reopen_items(self, opened_items):
         """
@@ -104,7 +104,7 @@ class SqlTreeWidget(AbstractTreeWidget):
                 return item
             iterator = iterator.__iadd__(1)
 
-    def init_conn_name_list(self, conns):
+    def init_conn_name_dict(self, conns):
         self.conn_name_id_dict = dict(zip(map(lambda conn: conn.conn_name, conns), map(lambda conn: conn.id, conns)))
 
     def add_conn_name(self, conn_id, conn_name):

@@ -25,7 +25,7 @@ _date_ = '2020/7/6 11:34'
 def make_sql_tree_item(parent, name, icon, opened_item_record=None,
                        sql_conn=None, conn_type=None, checkbox=None):
     """
-    构造树的子项
+    构造sql树的子项
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
@@ -81,43 +81,6 @@ def show_conn_dialog(sql_type, tree_widget, conn_info, title, screen_rect):
 
     elif title == EDIT_CONN_DIALOG_TITLE:
         dialog.conn_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
-    dialog.exec()
-
-
-def add_struct_func(struct_type, tree_widget, screen_rect):
-    """
-    添加结构体，打开弹窗，接收输入，保存系统库
-    :param struct_type: 用来标识结构体数据源类型
-    :param tree_widget: 树对象
-    :param screen_rect: 主窗口大小
-    """
-    show_struct_dialog(struct_type, tree_widget, StructInfo(), ADD_STRUCT_DIALOG_TITLE, screen_rect)
-
-
-def edit_struct_func(struct_type, tree_widget, screen_rect, struct_info):
-    show_struct_dialog(struct_type, tree_widget, struct_info, EDIT_STRUCT_DIALOG_TITLE, screen_rect)
-
-
-def show_struct_dialog(struct_type, tree_widget, struct_info, title, screen_rect):
-    """
-    打开添加、编辑结构体子窗口
-    :param struct_type: 用来标识结构体数据源类型
-    :param tree_widget: 树对象
-    :param struct_info: Connection对象，若该对象有id值，则认为操作为编辑操作，
-        将在弹窗界面回显数据，若无数据，则为添加操作
-    :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
-    :param screen_rect: 主窗口大小
-    """
-    # 根据类型，动态获取对话框
-    dialog: AbstractStructDialog = globals()[get_struct_dialog(struct_type)](struct_info, title, screen_rect,
-                                                                             tree_widget.struct_name_id_dict)
-    # dialog = AbstractStructDialog(struct_info, title, screen_rect, dict())
-    # if title == ADD_CONN_DIALOG_TITLE:
-    #     dialog.struct_saved.connect(lambda conn, opened_conn_record:
-    #                                 add_conn_tree_item(tree_widget, conn, opened_conn_record))
-    #
-    # elif title == EDIT_CONN_DIALOG_TITLE:
-    #     dialog.struct_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
     dialog.exec()
 
 
@@ -228,3 +191,60 @@ def set_children_check_state(item, check_state, tree_widget, window):
         TableTreeNode(child, tree_widget, window).change_check_box(check_state)
         children.append(child.text(0))
     return children
+
+
+# ------------------------- 结构体使用方法 -------------------------#
+
+def add_struct_func(struct_type, tree_widget, screen_rect):
+    """
+    添加结构体，打开弹窗，接收输入，保存系统库
+    :param struct_type: 用来标识结构体数据源类型
+    :param tree_widget: 树对象
+    :param screen_rect: 主窗口大小
+    """
+    show_struct_dialog(struct_type, tree_widget, StructInfo(), ADD_STRUCT_DIALOG_TITLE, screen_rect)
+
+
+def edit_struct_func(struct_type, tree_widget, screen_rect, struct_info):
+    show_struct_dialog(struct_type, tree_widget, struct_info, EDIT_STRUCT_DIALOG_TITLE, screen_rect)
+
+
+def show_struct_dialog(struct_type, tree_widget, struct_info, title, screen_rect):
+    """
+    打开添加、编辑结构体子窗口
+    :param struct_type: 用来标识结构体数据源类型
+    :param tree_widget: 树对象
+    :param struct_info: Connection对象，若该对象有id值，则认为操作为编辑操作，
+        将在弹窗界面回显数据，若无数据，则为添加操作
+    :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
+    :param screen_rect: 主窗口大小
+    """
+    # 根据类型，动态获取对话框
+    dialog: AbstractStructDialog = globals()[get_struct_dialog(struct_type)](struct_info, title, screen_rect,
+                                                                             tree_widget.struct_name_id_dict)
+    # dialog = AbstractStructDialog(struct_info, title, screen_rect, dict())
+    # if title == ADD_CONN_DIALOG_TITLE:
+    #     dialog.struct_saved.connect(lambda conn, opened_conn_record:
+    #                                 add_conn_tree_item(tree_widget, conn, opened_conn_record))
+    #
+    # elif title == EDIT_CONN_DIALOG_TITLE:
+    #     dialog.struct_changed.connect(lambda conn: update_conn_tree_item(tree_widget, conn))
+    dialog.exec()
+
+
+def make_struct_tree_item(parent, name, icon, checkbox, opened_item_record=None):
+    """
+    构造结构体树的子项
+    :param parent: 要构造子项的父节点元素
+    :param name: 构造的子节点名称
+    :param icon: 图标，该元素的展示图标对象
+    :param opened_item_record: 打开记录表中的记录
+    :param checkbox: 构造的子节点的复选框
+    """
+    item = QTreeWidgetItem(parent)
+    item.setIcon(0, icon)
+    item.setText(0, name)
+    item.setCheckState(0, checkbox)
+    if opened_item_record:
+        set_item_opened_record(item, opened_item_record)
+    return item
