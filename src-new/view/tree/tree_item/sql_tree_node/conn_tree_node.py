@@ -9,17 +9,16 @@ from service.async_func.async_sql_conn_task import DelConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok, pop_question
-from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_item.tree_node_db import DBTreeNode
-from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, get_item_conn_type
-from view.tree.tree_item.tree_item_func import get_item_sql_conn, \
-    get_item_opened_record, set_item_no_change
+from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from view.tree.tree_item.tree_item_func import get_item_opened_record, set_item_no_change
+from view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
+from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
 
 
-class ConnTreeNode(AbstractTreeNode):
+class ConnTreeNode(AbstractSqlTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -175,16 +174,17 @@ class ConnTreeNode(AbstractTreeNode):
             editable = True
 
         if editable:
-            edit_conn_func(get_item_conn_type(self.item).display_name, self.tree_widget,
-                           self.window.geometry(), get_item_sql_conn(self.item))
+            opened_record = get_item_opened_record(self.item)
+            edit_conn_func(opened_record.data_type.display_name, self.tree_widget,
+                           self.window.geometry(), opened_record.parent_id)
 
     def del_conn(self):
-        conn = get_item_sql_conn(self.item)
+        opened_record = get_item_opened_record(self.item)
         # 在删除连接之后的连接项，应该对其进行重新排序
-        need_reorder_items, reorder_conns, reorder_items = self.reorder_conns()
-        self.del_conn_executor = DelConnExecutor(conn.id, conn.conn_name,
+        need_reorder_items, reorder_items = self.reorder_conns()
+        self.del_conn_executor = DelConnExecutor(opened_record.parent_id, opened_record.item_name,
                                                  self.item, self.window, self.del_conn_callback,
-                                                 need_reorder_items, reorder_conns, reorder_items)
+                                                 need_reorder_items, reorder_items)
         self.del_conn_executor.start()
 
     def reorder_conns(self):
@@ -192,14 +192,11 @@ class ConnTreeNode(AbstractTreeNode):
         index = conn_items.index(self.item)
         need_reorder_items = conn_items[index + 1:]
         if need_reorder_items:
-            reorder_conns = tuple(map(lambda x: get_item_sql_conn(x), need_reorder_items))
-            for reorder_conn in reorder_conns:
-                reorder_conn.item_order -= 1
             reorder_items = tuple(map(lambda x: get_item_opened_record(x), need_reorder_items))
             for reorder_item in reorder_items:
                 reorder_item.item_order -= 1
-            return need_reorder_items, reorder_conns, reorder_items
-        return None, None, None
+            return need_reorder_items, reorder_items
+        return None, None
 
     def del_conn_callback(self, need_reorder_items):
         self.worker_terminate()
@@ -208,7 +205,6 @@ class ConnTreeNode(AbstractTreeNode):
             [set_item_no_change(item, True) for item in need_reorder_items]
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
-        self.tree_widget.del_conn_name(self.conn_name)
 
     def worker_terminate(self):
         if self.open_conn_executor is not Ellipsis:

@@ -2,10 +2,17 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from constant.constant import JSON_TYPE, JSON_DISPLAY_NAME
+from constant.constant import JSON_TYPE, JSON_DISPLAY_NAME, FOLDER_TYPE, FOLDER_DISPLAY_NAME
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:06'
+
+
+def mapping_struct_type(struct_info):
+    for struct_type in StructTypeEnum:
+        if struct_type.value.type == struct_info.struct_type:
+            # 根据匹配到的类型，映射为具体的对象
+            struct_info.struct_type_info = struct_type.value
 
 
 def get_struct_type(display_name):
@@ -25,10 +32,16 @@ class StructType:
     type: int = field(init=False)
     # 展示名称，也用来标识icon类型
     display_name: str = field(init=False)
-    # 对应类型承载实际连接信息的实体类
-    type_class: str = field(init=False)
     # 对应类型的连接对话框
     type_dialog: str = field(init=False)
+
+
+class FolderTypeEnum(Enum):
+    # 默认的值，文件夹
+    folder_type = StructType()
+    folder_type.type = FOLDER_TYPE
+    folder_type.display_name = FOLDER_DISPLAY_NAME
+    folder_type.type_dialog = ...
 
 
 class StructTypeEnum(Enum):
@@ -36,6 +49,5 @@ class StructTypeEnum(Enum):
     json_type = StructType()
     json_type.type = JSON_TYPE
     json_type.display_name = JSON_DISPLAY_NAME
-    json_type.type_class = 'SqliteConn'
     json_type.type_dialog = 'JsonStructDialog'
 

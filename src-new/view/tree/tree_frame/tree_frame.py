@@ -2,10 +2,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE, LOCATION_TXT, CREATE_NEW_FOLDER
+from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, LOCATION_TXT, CREATE_NEW_FOLDER
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
-from view.tree.tree_widget.structure_tree_widget import StructureTreeWidget
+from view.tree.tree_widget.struct_tree_widget import StructTreeWidget
+from view.tree.tree_widget.tree_function import add_folder_func
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 18:01'
@@ -15,7 +16,7 @@ def get_tree_frame(current_frame_name, frame_parent, window):
     """根据当前的frame名称获取对应的树结构frame"""
     if current_frame_name == SQL_DATASOURCE_TYPE:
         return SqlTreeFrame(frame_parent, window)
-    elif current_frame_name == STRUCTURE_DATASOURCE_TYPE:
+    elif current_frame_name == STRUCT_DATASOURCE_TYPE:
         return StructureTreeFrame(frame_parent, window)
 
 
@@ -78,20 +79,21 @@ class StructureTreeFrame(AbstractTreeFrame):
     """结构体数据源列表frame"""
 
     def __init__(self, parent, window):
-        self.tree_widget: StructureTreeWidget = ...
+        self.tree_widget: StructTreeWidget = ...
         super().__init__(parent, window)
 
         # 增加新建文件夹按钮
         self.create_folder_button = QPushButton(self)
         self.create_folder_button.setText(CREATE_NEW_FOLDER)
         self.header_layout.insertWidget(1, self.create_folder_button)
-        self.create_folder_button.clicked.connect(self.tree_widget.add_folder)
+        self.create_folder_button.clicked.connect(
+            lambda: add_folder_func(window.geometry(), self.tree_widget))
 
         # 为了方便访问，树部件引用也挂到window上
         window.structure_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
-        return STRUCTURE_DATASOURCE_TYPE
+        return STRUCT_DATASOURCE_TYPE
 
-    def get_tree_widget(self, window) -> StructureTreeWidget:
-        return StructureTreeWidget(self, window)
+    def get_tree_widget(self, window) -> StructTreeWidget:
+        return StructTreeWidget(self, window)

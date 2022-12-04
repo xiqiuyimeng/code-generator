@@ -100,7 +100,6 @@ class SqliteBasic:
         self._delete_sql = f'delete from {self.table_name} {self._id_clause_sql}'
         self._select_sql = f'select * from {self.table_name}'
         self._select_count_sql = f'select count(*) as count from {self.table_name}'
-        self._select_id_sql = f'select max(id) as id from {self.table_name}'
         self._field_list_sql = f'PRAGMA table_info("{self.table_name}")'
         self._max_order_sql = f'select ifnull(max(item_order), 0) as max_order from {self.table_name}'
 
@@ -235,8 +234,7 @@ class SqliteBasic:
         """根据条件查询，根据不为空的属性作为条件进行查询"""
         rows = self._do_select(self._select_sql, select_obj, order_by, sort_order)
         # 映射为参数对象类
-        result = list(map(lambda x: select_obj.__class__(**x), rows.all()))
-        return result
+        return list(map(lambda x: select_obj.__class__(**x), rows.all()))
 
     def select_count(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，查询存在的记录数量"""

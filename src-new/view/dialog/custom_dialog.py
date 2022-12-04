@@ -27,9 +27,12 @@ class CustomDialog(DraggableDialog):
         self.save_button: QPushButton = ...
         self.cancel_button: QPushButton = ...
 
+        # 构建界面
         self.setup_ui()
-
-    def get_dialog_title(self) -> str: ...
+        # 连接信号
+        self.connect_signal()
+        # 后置处理
+        self.post_process()
 
     def setup_ui(self):
         # 计算窗口大小
@@ -48,6 +51,8 @@ class CustomDialog(DraggableDialog):
         self.frame.setObjectName("dialog_frame")
         self.dialog_layout.addWidget(self.frame)
         self.frame_layout = QVBoxLayout(self.frame)
+        # 创建空白label
+        self.placeholder_blank = QLabel(self.frame)
 
         # 标题
         self.setup_title_ui()
@@ -57,10 +62,6 @@ class CustomDialog(DraggableDialog):
         self.setup_button_ui()
         # 设置文本
         self.setup_label_text()
-        # 连接信号
-        self.connect_signal()
-        # 后置处理
-        self.post_process()
 
     def resize_dialog(self): ...
 

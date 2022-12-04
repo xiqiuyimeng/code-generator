@@ -6,13 +6,12 @@ from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog
 from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
     CHOOSE_STRUCT_FILE_TEXT
 from constant.icon_enum import get_icon
+from service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from service.system_storage.struct_content_sqlite import StructContent, StorageTypeEnum
 from service.system_storage.struct_sqlite import StructInfo
 from service.system_storage.struct_type import StructType
 from view.custom_widget.scrollable_widget import ScrollableTextEdit
 from view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
-from view.dialog.datasource.structure.choose_folder_dialog import ChooseFolderDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:46'
@@ -20,16 +19,18 @@ _date_ = '2022/11/11 16:46'
 
 class AbstractStructDialog(AbstractDsInfoDialog):
 
-    struct_saved = pyqtSignal(StructInfo, OpenedTreeItem)
-    # 第一个元素为修改后的结构体对象，第二个元素为名称是否变化
-    struct_changed = pyqtSignal(StructInfo, bool)
+    struct_saved = pyqtSignal(OpenedTreeItem)
+    struct_changed = pyqtSignal(str)
 
-    def __init__(self, struct_info: StructInfo, dialog_title, screen_rect, struct_name_id_dict):
+    def __init__(self, dialog_title, screen_rect, struct_name_list, struct_id,
+                 tree_widget, parent_folder_item):
+        self.tree_widget = tree_widget
+        # 父节点 opened item
+        self.parent_folder_item: OpenedTreeItem = parent_folder_item
         # 初始化一个新的结构体对象
         self.new_dialog_data: StructInfo = ...
         self.struct_type: StructType = self.get_struct_type()
         self.dialog_data: StructInfo = ...
-        self.struct_content: StructContent = ...
 
         self.struct_file_url_label: QLabel = ...
         self.struct_file_url_linedit: QLineEdit = ...
@@ -37,11 +38,14 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_text_label: QLabel = ...
         self.struct_text_input: ScrollableTextEdit = ...
 
-        self.choose_folder_dialog: ChooseFolderDialog = ...
+        self.read_file_executor: ReadFileExecutor = ...
+        self.add_struct_executor: AddStructExecutor = ...
+        self.edit_struct_executor: EditStructExecutor = ...
 
         # 如果是编辑，需要读取数据库中存储的实际的结构体信息，用来回显
 
-        super().__init__(struct_info, dialog_title, screen_rect, struct_name_id_dict)
+        super().__init__(dialog_title.format(self.struct_type.display_name), screen_rect,
+                         struct_name_list, struct_id)
 
         # 调整布局比例
         self.frame_layout.setStretch(0, 2)
@@ -78,7 +82,6 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.ds_info_layout.addRow(self.struct_text_label, self.struct_text_input)
 
     def setup_other_label_text(self):
-        self.title.setText(self.dialog_title.format(self.struct_type.display_name))
         self.name_label.setText(STRUCTURE_NAME_TEXT.format(self.struct_type.display_name))
         # 结构体信息
         self.struct_file_url_label.setText(STRUCTURE_FILE_URL_TEXT.format(self.struct_type.display_name))
@@ -86,30 +89,26 @@ class AbstractStructDialog(AbstractDsInfoDialog):
 
     def setup_echo_other_data(self):
         # 数据回显
-        if self.struct_content.storage_type:
-            self.struct_file_url_linedit.setText(self.struct_content.file_url)
-        self.struct_text_input.setPlainText(self.struct_content.content)
+        self.struct_file_url_linedit.setText(self.dialog_data.file_url)
+        self.struct_text_input.setPlainText(self.dialog_data.content)
 
     def button_available(self) -> bool:
-        return all((self.dialog_data.struct_name, self.struct_content.content)) and self.name_available
+        return all((self.new_dialog_data.struct_name, self.new_dialog_data.content)) and self.name_available
 
     def collect_input(self):
         self.new_dialog_data.struct_name = self.name_input.text()
-        self.collect_structure_info_input()
+        self.collect_structure_info()
 
-    def collect_structure_info_input(self):
+    def collect_structure_info(self):
         # 根据参数构建结构体信息对象
-        self.dialog_data = StructInfo()
-        self.dialog_data.struct_type = self.struct_type.display_name
-        self.dialog_data.struct_name = self.name_input.text()
-        self.struct_content = StructContent()
-        self.struct_content.content = self.struct_text_input.toPlainText()
+        self.new_dialog_data = StructInfo()
+        self.new_dialog_data.struct_type = self.struct_type.display_name
+        self.new_dialog_data.struct_name = self.name_input.text()
+        self.new_dialog_data.content = self.struct_text_input.toPlainText()
         file_url = self.struct_file_url_linedit.text()
-        self.struct_content.file_url = file_url
-        self.struct_content.storage_type = StorageTypeEnum.file.value \
-            if file_url else StorageTypeEnum.text.value
+        self.new_dialog_data.file_url = file_url
 
-    def connect_ds_other_signal(self):
+    def connect_child_signal(self):
         self.struct_file_action.triggered.connect(self.choose_file)
         self.struct_file_url_linedit.textEdited.connect(self.check_input)
         self.struct_text_input.textChanged.connect(self.check_input)
@@ -118,36 +117,40 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         file_url = QFileDialog.getOpenFileName(self, CHOOSE_STRUCT_FILE_TEXT, '/')
         if file_url[0]:
             self.struct_file_url_linedit.setText(file_url[0])
+            # 异步读取文件内容，回显到内容区域
+            self.read_file_executor = ReadFileExecutor(file_url[0], self, self, self.append_plain_text)
+            self.read_file_executor.start()
 
-    def save_ds_info(self):
-        # 打开保存文件夹框，选择父级文件夹
-        self.choose_folder_dialog = ChooseFolderDialog(self.parent_screen_rect)
-        self.choose_folder_dialog.exec()
-    #     self.new_connection.construct_conn_info()
-    #     # 存在id，说明是编辑
-    #     if self.ds_info.id:
-    #         if self.new_connection != self.ds_info:
-    #             self.new_connection.id = self.ds_info.id
-    #             self.name_changed = self.new_connection.conn_name != self.ds_info.conn_name
-    #             self.edit_conn_executor = EditConnExecutor(self.new_connection, self, self,
-    #                                                        self.edit_post_process, self.name_changed)
-    #             self.edit_conn_executor.start()
-    #         else:
-    #             # 没有更改任何信息
-    #             self.ds_info_no_change()
-    #     else:
-    #         # 新增操作
-    #         self.add_conn_executor = AddConnExecutor(self.new_connection, self, self, self.save_post_process)
-    #         self.add_conn_executor.start()
-    #
-    # def save_post_process(self, conn_id, opened_item_record):
-    #     self.new_connection.id = conn_id
-    #     self.conn_saved.emit(self.new_connection, opened_item_record)
-    #     self.close()
-    #
-    # def edit_post_process(self):
-    #     self.conn_changed.emit(self.new_connection, self.name_changed)
-    #     self.close()
+    def append_plain_text(self, index, text):
+        if index == 0:
+            self.struct_text_input.clear()
+        self.struct_text_input.appendPlainText(text)
+
+    def save_func(self):
+        # 存在id，说明是编辑
+        if self.dialog_data:
+            if self.new_dialog_data != self.dialog_data:
+                self.new_dialog_data.id = self.dialog_data.id
+                self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
+                self.edit_struct_executor = EditStructExecutor(self.new_connection, self, self,
+                                                           self.edit_post_process, self.name_changed)
+                self.edit_struct_executor.start()
+            else:
+                # 没有更改任何信息
+                self.ds_info_no_change()
+        else:
+            # 新增操作
+            self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
+                                                         self, self, self.save_post_process)
+            self.add_struct_executor.start()
+
+    def save_post_process(self, opened_item_record):
+        self.struct_saved.emit(opened_item_record)
+        self.close()
+
+    def edit_post_process(self):
+        self.struct_changed.emit(self.dialog_data.struct_name)
+        self.close()
 
 
 

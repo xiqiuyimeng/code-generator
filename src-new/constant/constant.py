@@ -26,15 +26,21 @@ DEFAULT_PORT = "3306"
 DEFAULT_USER = "root"
 
 ADD_STRUCT_DIALOG_TITLE = "添加{}数据源"
+ADD_STRUCT_TITLE = "添加数据源"
 EDIT_STRUCT_DIALOG_TITLE = "编辑{}数据源"
+EDIT_STRUCT_TITLE = "编辑数据源"
+DEL_STRUCT_TITLE = '删除数据源'
 STRUCTURE_NAME_TEXT = "{}数据源名称："
 STRUCTURE_FILE_URL_TEXT = "{}文件地址： "
 STRUCTURE_CONTENT_TEXT = "{}数据源内容："
 CHOOSE_STRUCT_FILE_TEXT = "选择文件"
-SAVE_STRUCT_TITLE = '保存数据源{}'
-SAVE_STRUCT_TO = '保存到：'
+SAVE_STRUCT_TITLE = '保存{}数据源'
+SAVE_STRUCT_TO = '保存到'
 CREATE_NEW_FOLDER = '新建文件夹'
 EDIT_FOLDER_NAME = '编辑文件夹名称'
+ADD_FOLDER_TITLE = '新建文件夹'
+EDIT_FOLDER_TITLE = '编辑文件夹'
+DEL_FOLDER_TITLE = '删除文件夹'
 
 # 按钮部分
 TEST_CONN_BTN_TEXT = "测试连接"
@@ -44,7 +50,7 @@ CANCEL_BTN_TEXT = "取消"
 
 # ---------- 操作数据源时提示语 start ---------- #
 SAVE_DS_INFO_TITLE = "保存数据源"
-DS_INFO_NO_CHANGE_PROMPT = "数据源信息无变化"
+NO_CHANGE_PROMPT = "信息无变化"
 # ---------- 操作数据源时提示语 end ---------- #
 
 
@@ -124,6 +130,12 @@ SELECT_ALL_FIELD_MENU = '全选 [{}] 表中所有字段'
 # 取消选择字段
 UNSELECT_FIELD_MENU = '取消选择字段'
 CLOSE_TABLE_TITLE = '关闭表'
+
+ADD_STRUCT_ACTION = '添加结构体'
+CREATE_NEW_FOLDER_ACTION = '新建文件夹'
+RENAME_FOLDER_ACTION = '重命名'
+DEL_FOLDER_ACTION = '删除'
+
 # ---------- 树节点右键菜单文字 end ---------- #
 
 # mysql查询数据库列表sql
@@ -452,7 +464,7 @@ TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引�
 TP_KEY_DESC = '模板中的关键词介绍'
 
 SQL_DATASOURCE_TYPE = 'sql数据源'
-STRUCTURE_DATASOURCE_TYPE = '结构体数据源'
+STRUCT_DATASOURCE_TYPE = '结构体数据源'
 
 STRUCTURE_TABLE_HEADER_BUTTON_TXT = '导入结构体数据'
 
@@ -473,6 +485,7 @@ MYSQL_COL = 'mysql_col'
 JSON_TYPE = 'json'
 JSON_DISPLAY_NAME = 'json'
 FOLDER_TYPE = 'folder'
+FOLDER_DISPLAY_NAME = 'folder'
 
 LOCATION_TXT = '定位'
 

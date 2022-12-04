@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
+from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
 from view.tab.tab_widget import TabWidget
 
 _author_ = 'luwt'
@@ -13,7 +13,7 @@ def get_tab_frame(current_frame_name, frame_parent, window):
     """根据当前的frame名称获取对应的tab frame"""
     if current_frame_name == SQL_DATASOURCE_TYPE:
         return SqlTabFrame(frame_parent, window)
-    elif current_frame_name == STRUCTURE_DATASOURCE_TYPE:
+    elif current_frame_name == STRUCT_DATASOURCE_TYPE:
         return StructureTabFrame(frame_parent, window)
 
 

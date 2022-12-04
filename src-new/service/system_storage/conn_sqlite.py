@@ -21,6 +21,7 @@ conn_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
+    'select_id_type': f'select id, conn_type from {table_name}',
 }
 
 
@@ -51,6 +52,10 @@ class ConnSqlite(SqliteBasic):
 
     def __init__(self):
         super().__init__(table_name, conn_sql_dict)
+
+    def get_conn_id_types(self):
+        rows = self._do_select(conn_sql_dict.get('select_id_type'), SqlConnection())
+        return list(map(lambda x: SqlConnection(**x), rows.all()))
 
     def check_name_available(self, sql_conn):
         """检查连接名称是否可用，名称必须唯一"""

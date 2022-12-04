@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
+from constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
 from view.box.message_box import pop_ok
 from view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
 from view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
@@ -18,14 +18,16 @@ def open_conn_dialog(sql_type_action, tree_widget, screen_rect):
     add_conn_func(sql_type_action.text(), tree_widget, screen_rect)
 
 
-def open_structure_dialog(struct_type_action, tree_widget, screen_rect):
+def open_structure_dialog(struct_type_action, tree_widget, screen_rect,
+                          parent_opened_item, parent_item):
     """
     打开添加结构体子窗口
     :param struct_type_action: 用来标识结构体数据源类型
     :param tree_widget: 树对象
     :param screen_rect: 父窗口大小
     """
-    add_struct_func(struct_type_action.text(), tree_widget, screen_rect)
+    add_struct_func(struct_type_action.text(), tree_widget, screen_rect,
+                    parent_opened_item, parent_item)
 
 
 def generate(main_window):
@@ -38,7 +40,7 @@ def generate(main_window):
         if main_window.current_ds_type.name == SQL_DATASOURCE_TYPE:
             confirm_selected_dialog = SqlConfirmSelectedDialog(selected_data, main_window.geometry())
             confirm_selected_dialog.exec()
-        elif main_window.current_ds_type.name == STRUCTURE_DATASOURCE_TYPE:
+        elif main_window.current_ds_type.name == STRUCT_DATASOURCE_TYPE:
             pass
 
 

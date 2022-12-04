@@ -5,15 +5,15 @@ from PyQt5.QtWidgets import QAction
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
 from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
-    set_item_opened_tab, get_item_sql_conn, get_item_opened_record, link_table_checkbox
+    set_item_opened_tab, get_item_opened_record, link_table_checkbox
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
 
 
-class TableTreeNode(AbstractTreeNode):
+class TableTreeNode(AbstractSqlTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -79,13 +79,12 @@ class TableTreeNode(AbstractTreeNode):
             check_state = self.item.checkState(0)
             if check_state == Qt.Checked:
                 # 如果是选中，添加选中数据
-                sql_conn = get_item_sql_conn(self.item.parent().parent())
                 add_data = {
                     'conn': get_item_opened_record(self.item.parent().parent()),
                     'db': get_item_opened_record(self.item.parent()),
                     'tb': get_item_opened_record(self.item)
                 }
-                self.tree_widget.tree_data.add_node(add_data, sql_conn)
+                self.tree_widget.tree_data.add_node(add_data)
             elif check_state == Qt.Unchecked:
                 # 如果是未选中，删除选中数据
                 del_data = {

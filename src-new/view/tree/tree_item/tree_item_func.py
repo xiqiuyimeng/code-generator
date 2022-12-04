@@ -35,24 +35,6 @@ def get_item_opened_tab(item):
     return item.data(2, Qt.UserRole)
 
 
-def get_item_sql_conn(item):
-    return item.data(3, Qt.UserRole)
-
-
-def set_item_sql_conn(item, sql_conn):
-    # 放入连接信息
-    item.setData(3, Qt.UserRole, sql_conn)
-
-
-def get_item_conn_type(item):
-    return item.data(4, Qt.UserRole)
-
-
-def set_item_conn_type(item, conn_type):
-    # 放入连接类型
-    item.setData(4, Qt.UserRole, conn_type)
-
-
 def link_table_checkbox(tree_item, check_state):
     # 联动表格复选框
     tab = get_item_opened_tab(tree_item)
@@ -74,3 +56,10 @@ def recursive_get_children_opened_items(parent_item):
             child_item = parent_item.child(index)
             yield get_item_opened_record(child_item)
             yield from recursive_get_children_opened_items(child_item)
+
+
+def get_children_items(parent_item):
+    children_items = list()
+    for idx in range(parent_item.childCount()):
+        children_items.append(parent_item.child(idx))
+    return children_items

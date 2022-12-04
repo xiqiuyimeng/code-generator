@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QWidget, QPushButton
 
-from constant.constant import STRUCTURE_TABLE_HEADER_BUTTON_TXT, SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
+from constant.constant import STRUCTURE_TABLE_HEADER_BUTTON_TXT, SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
 from view.table.table_widget import TableWidget
 
 _author_ = 'luwt'
@@ -13,7 +13,7 @@ def get_table_frame(current_frame_name, *args):
     """根据当前的frame名称获取对应的表结构frame"""
     if current_frame_name == SQL_DATASOURCE_TYPE:
         return SqlTableFrame(*args)
-    elif current_frame_name == STRUCTURE_DATASOURCE_TYPE:
+    elif current_frame_name == STRUCT_DATASOURCE_TYPE:
         return StructureTableFrame(*args)
 
 

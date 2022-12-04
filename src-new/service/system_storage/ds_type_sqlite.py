@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE
+from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
 from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
 
 _author_ = 'luwt'
@@ -39,8 +39,8 @@ sql_ds_dict = {
     'item_order': 1,
     'is_current': 1
 }
-structure_ds_dict = {
-    'name': STRUCTURE_DATASOURCE_TYPE,
+struct_ds_dict = {
+    'name': STRUCT_DATASOURCE_TYPE,
     'item_order': 2,
     'is_current': 0
 }
@@ -48,7 +48,7 @@ structure_ds_dict = {
 
 class DatasourceTypeEnum(Enum):
     sql_ds_type = DatasourceType(**sql_ds_dict)
-    structure_ds_type = DatasourceType(**structure_ds_dict)
+    struct_ds_type = DatasourceType(**struct_ds_dict)
 
 
 class DatasourceTypeSqlite(SqliteBasic):

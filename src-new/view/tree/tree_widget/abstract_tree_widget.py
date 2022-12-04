@@ -148,12 +148,8 @@ class AbstractTreeWidget(DisplayTreeWidget):
 
     def get_top_level_items(self):
         top_level_items = list()
-        iterator = QTreeWidgetItemIterator(self)
-        while iterator.value():
-            item = iterator.value()
-            if item.parent() is None:
-                top_level_items.append(item)
-            iterator = iterator.__iadd__(1)
+        for idx in range(self.topLevelItemCount()):
+            top_level_items.append(self.topLevelItem(idx))
         return top_level_items
 
     def set_tree_unchecked(self):

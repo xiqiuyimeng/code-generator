@@ -6,8 +6,8 @@ from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU,
     SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT
 from service.async_func.async_sql_ds_task import OpenDBExecutor
 from view.box.message_box import pop_fail, pop_question
-from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_item.tree_node_table import TableTreeNode
+from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
 from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
 from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 
@@ -15,7 +15,7 @@ _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
 
 
-class DBTreeNode(AbstractTreeNode):
+class DBTreeNode(AbstractSqlTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)

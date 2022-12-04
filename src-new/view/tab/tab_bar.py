@@ -7,7 +7,7 @@ from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TAB
     CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE
 from service.system_storage.ds_table_tab_sqlite import DsTableTab
 from view.box.message_box import pop_fail
-from view.tree.tree_item.context import get_tree_node
+from view.tree.tree_item.context import get_sql_tree_node
 from view.tree.tree_item.tree_item_func import set_item_opened_tab
 
 _author_ = 'luwt'
@@ -158,9 +158,9 @@ class TabBar(QTabBar):
         current_tab = self.parent.widget(index)
         # 项目初始化中，或正在打开tab页不处理
         if self.main_window.sql_tree_widget.reopening_flag \
-                or (current_tab and get_tree_node(current_tab.tree_item,
-                                                  self.main_window.sql_tree_widget,
-                                                  self.main_window).is_opening):
+                or (current_tab and get_sql_tree_node(current_tab.tree_item,
+                                                      self.main_window.sql_tree_widget,
+                                                      self.main_window).is_opening):
             return
         if current_tab:
             # 考虑处理tab顺序问题

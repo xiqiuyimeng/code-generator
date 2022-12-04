@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAction, QToolButton
 from constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
     TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
     HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, SQL_DATASOURCE_TYPE, \
-    STRUCTURE_DATASOURCE_TYPE
+    STRUCT_DATASOURCE_TYPE
 from constant.icon_enum import get_icon
 from service.system_storage.conn_type import ConnTypeEnum
 from service.system_storage.struct_type import StructTypeEnum
@@ -29,7 +29,7 @@ def add_ds_actions(parent_menu, main_window):
     # 根据当前的数据源类型，决定构建的action类型
     if main_window.current_ds_type.name == SQL_DATASOURCE_TYPE:
         add_sql_ds_actions(parent_menu, main_window)
-    elif main_window.current_ds_type.name == STRUCTURE_DATASOURCE_TYPE:
+    elif main_window.current_ds_type.name == STRUCT_DATASOURCE_TYPE:
         add_structure_ds_actions(parent_menu, main_window)
 
 
@@ -43,9 +43,10 @@ def add_sql_ds_actions(parent_menu, main_window):
         parent_menu.addAction(add_action)
 
 
-def add_structure_ds_actions(parent_menu, main_window):
+def add_structure_ds_actions(parent_menu, main_window, parent_opened_item=None, parent_item=None):
     parent_menu.triggered.connect(lambda action: open_structure_dialog(action, main_window.structure_tree_widget,
-                                                                       main_window.geometry()))
+                                                                       main_window.geometry(), parent_opened_item,
+                                                                       parent_item))
     for structure_type in StructTypeEnum:
         structure_type_name = structure_type.value.display_name
         add_action = QAction(get_icon(structure_type_name), structure_type_name, main_window)

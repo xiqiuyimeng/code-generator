@@ -2,7 +2,8 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional
 
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
@@ -30,7 +31,8 @@ opened_item_sql_dict = {
 @dataclass
 class OpenedTreeItem(BasicSqliteDTO):
 
-    # 名称，树第一层元素，名称应以节点名为准，这里不做冗余，以id关联
+    # 名称，对于sql数据源，是树的第一层元素，名称应以节点名为准，这里不做冗余，以id关联
+    # 对于结构体数据源，是树节点元素
     item_name: str = field(init=False, default=None)
     # 标识元素是否应该置为当前项
     is_current: int = field(init=False, default=None)
@@ -38,12 +40,16 @@ class OpenedTreeItem(BasicSqliteDTO):
     expanded: int = field(init=False, default=None)
     # 复选框状态，与qt复选框选中状态枚举保持一致
     checked: int = field(init=False, default=None)
-    # 父id，树第一层元素，指向对应外表id，其余子项，指向当前表父项id
+    # 父id，sql数据源树第一层元素，指向对应外表id，其余子项，指向当前表父项id
+    # 结构体数据源指向当前表父项id
     parent_id: int = field(init=False, default=None)
     # 元素在树中的级别
     level: int = field(init=False, default=None)
     # 数据源 name
     ds_type: str = field(init=False, default=None)
+    # 数据类型，用以区分数据源中的各种类型，例如 sql数据源中的 ConnType，
+    # 结构体数据源中的 StructType
+    data_type: dataclass = field(init=False, default=None, compare=False)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -87,7 +93,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_item.expanded = ExpandedEnum.expanded.value
         self.update(opened_item)
 
-    def add_opened_child_item(self, child_item_names, opened_item_id, child_level, ds_type):
+    def add_opened_child_item(self, child_item_names, opened_item_id, child_level, ds_type, data_type):
         is_current = CurrentEnum.not_current.value
         expanded = ExpandedEnum.collapsed.value
         opened_child_items = list()
@@ -101,6 +107,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
             opened_child_item.ds_type = ds_type
             opened_child_item.checked = CheckedEnum.unchecked.value
             opened_child_item.item_order = index
+            opened_child_item.data_type = data_type
             opened_child_items.append(opened_child_item)
         self.batch_insert(opened_child_items)
         return opened_child_items
@@ -130,7 +137,9 @@ class OpenedTreeItemSqlite(SqliteBasic):
             yield opened_items
             for opened_item in opened_items:
                 # 作为父元素，继续查询子元素
-                yield from self.recursive_get_children(opened_item.id, opened_item.level + 1, opened_item.ds_type)
+                yield from self.recursive_get_children(opened_item.id,
+                                                       opened_item.level + 1,
+                                                       opened_item.ds_type)
 
     def get_children(self, parent_id, level, ds_type):
         opened_param = OpenedTreeItem()
@@ -138,3 +147,36 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_param.level = level
         opened_param.parent_id = parent_id
         return self.select_by_order(opened_param)
+
+    def add_conn_opened_item(self, conn_id, conn_name, order):
+        conn_item = OpenedTreeItem()
+        conn_item.item_name = conn_name
+        conn_item.is_current = CurrentEnum.not_current.value
+        conn_item.expanded = ExpandedEnum.collapsed.value
+        conn_item.parent_id = conn_id
+        conn_item.level = SqlTreeItemLevel.conn_level.value
+        conn_item.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        # 顺序保持与连接一致
+        conn_item.item_order = order
+        self.insert(conn_item)
+        return conn_item
+
+    @transactional
+    def add_struct_opened_item(self, name, parent_id, level):
+        ds_type = DatasourceTypeEnum.struct_ds_type.value.name
+        opened_tree_item = OpenedTreeItem()
+        opened_tree_item.item_name = name
+        opened_tree_item.is_current = CurrentEnum.is_current.value
+        opened_tree_item.expanded = ExpandedEnum.collapsed.value
+        opened_tree_item.parent_id = parent_id
+        opened_tree_item.level = level
+        opened_tree_item.ds_type = ds_type
+        opened_tree_item.checked = CheckedEnum.unchecked.value
+        max_order_param = {
+            'ds_type': ds_type,
+            'level': level,
+            'parent_id': parent_id
+        }
+        opened_tree_item.item_order = self.get_max_order(max_order_param)
+        self.insert(opened_tree_item)
+        return opened_tree_item

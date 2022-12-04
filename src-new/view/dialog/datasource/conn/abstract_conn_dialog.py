@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QPushButton
 
 from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT
-from service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor
+from service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor, QueryConnInfoExecutor
 from service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import *
@@ -19,11 +19,11 @@ _date_ = '2022/5/29 17:55'
 class AbstractConnDialog(AbstractDsInfoDialog):
     """连接对话框抽象类，整体对话框结构应为四部分：标题区、连接名表单区、连接信息表单区、按钮区"""
 
-    conn_saved = pyqtSignal(SqlConnection, OpenedTreeItem)
-    # 第一个元素为修改后的连接对象，第二个元素为名称是否变化
-    conn_changed = pyqtSignal(SqlConnection, bool)
+    conn_saved = pyqtSignal(OpenedTreeItem)
+    # 第一个元素为修改后的连接名称
+    conn_changed = pyqtSignal(str)
 
-    def __init__(self, connection: SqlConnection, dialog_title, screen_rect, conn_name_id_dict):
+    def __init__(self, dialog_title, screen_rect, conn_name_list, conn_id):
         self.dialog_data: SqlConnection = ...
         self.new_dialog_data: SqlConnection = ...
         self.conn_type: ConnType = self.get_conn_type()
@@ -36,13 +36,11 @@ class AbstractConnDialog(AbstractDsInfoDialog):
         self.add_conn_executor: AddConnExecutor = ...
         self.edit_conn_executor: EditConnExecutor = ...
 
-        super().__init__(connection, dialog_title, screen_rect, conn_name_id_dict)
+        super().__init__(dialog_title.format(self.conn_type.display_name), screen_rect,
+                         conn_name_list, conn_id)
 
     def get_new_dialog_data(self):
         return SqlConnection()
-
-    def get_old_name(self) -> str:
-        return self.dialog_data.conn_name
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
@@ -56,7 +54,6 @@ class AbstractConnDialog(AbstractDsInfoDialog):
         self.button_layout.addWidget(self.test_conn_button, 0, 0, 1, 1)
 
     def setup_other_label_text(self):
-        self.title.setText(self.dialog_title.format(self.conn_type.display_name))
         self.name_label.setText(CONN_NAME_TEXT)
         # 连接信息
         self.setup_conn_info_label()
@@ -93,14 +90,20 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     def connect_conn_info_signal(self): ...
 
+    def get_read_storage_executor(self, callback):
+        return QueryConnInfoExecutor(self.dialog_data, callback, self, self)
+
+    def get_old_name(self) -> str:
+        return self.dialog_data.conn_name
+
     def test_connection(self):
-        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self, self)
+        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self.conn_type, self, self)
         self.test_conn_executor.start()
 
     def save_func(self):
         self.new_dialog_data.construct_conn_info()
-        # 存在id，说明是编辑
-        if self.dialog_data.id:
+        # 存在id，说明是编辑（当添加连接时， dialog_data = None, 当编辑时，读取数据库，dialog_data = SQLConnection）
+        if self.dialog_data:
             if self.new_dialog_data != self.dialog_data:
                 self.new_dialog_data.id = self.dialog_data.id
                 self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name
@@ -115,11 +118,10 @@ class AbstractConnDialog(AbstractDsInfoDialog):
             self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self, self, self.save_post_process)
             self.add_conn_executor.start()
 
-    def save_post_process(self, conn_id, opened_item_record):
-        self.new_dialog_data.id = conn_id
-        self.conn_saved.emit(self.new_dialog_data, opened_item_record)
+    def save_post_process(self, opened_item_record):
+        self.conn_saved.emit(opened_item_record)
         self.close()
 
     def edit_post_process(self):
-        self.conn_changed.emit(self.new_dialog_data, self.name_changed)
+        self.conn_changed.emit(self.new_dialog_data.conn_name)
         self.close()

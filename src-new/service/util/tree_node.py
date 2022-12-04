@@ -57,7 +57,7 @@ class TreeData:
         if parent_node.children:
             return parent_node.children.get(name)
 
-    def add_node(self, add_data, conn_data):
+    def add_node(self, add_data):
         """
         添加节点
         :param add_data: 要添加的数据
@@ -66,7 +66,14 @@ class TreeData:
                 'conn': test_conn: OpenedTreeItem,
                 'db': test_db: OpenedTreeItem,
                 'tb': test_tb: OpenedTreeItem,
-                'col': 'test_col',
+                'col': test_col: DsTableInfo,
+            }
+            2. 添加多列情况，用于选择整表的时候使用
+            add_data = {
+                'conn': test_conn: OpenedTreeItem,
+                'db': test_db: OpenedTreeItem,
+                'tb': test_tb: OpenedTreeItem,
+                'col': (test_col1: DsTableInfo, test_col2: DsTableInfo),
             }
             2. 添加单表或多个表，不存在同时添加多列情况
             add_data = {
@@ -74,17 +81,15 @@ class TreeData:
                 'db': test_db: OpenedTreeItem,
                 'tb': [test_tb1: OpenedTreeItem, test_tb2: OpenedTreeItem] or test_tb1: OpenedTreeItem
             }
-        :param conn_data: 连接信息，Connection
         """
         self._do_add_node(add_data, self._root_node, self._keys.__iter__())
-        self._add_conn_data(add_data.get(self._keys[0]).item_name, conn_data)
 
     def _do_add_node(self, add_data: dict, parent_node: TreeDataNode, keys_iter):
         cur_key = keys_iter.__next__()
         parent_node.child_type = cur_key
-        # 从添加数据中获取当前级别的名称
+        # 从添加数据中获取当前级别的数据
         node_data = add_data.get(cur_key)
-        if isinstance(node_data, list):
+        if isinstance(node_data, (list, tuple)):
             # 如果是list类型，此时一定是最后一次处理，所以不必获取创建的node
             [self._create_node(parent_node, child_node_data) for child_node_data in node_data]
         else:
@@ -188,11 +193,6 @@ class TreeData:
             child_name = child_data.col_name
         if parent_node.children.get(child_name):
             del parent_node.children[child_name]
-
-    def _add_conn_data(self, conn_name, data):
-        conn_node: TreeDataNode = self._get_node(self._root_node, conn_name)
-        if conn_node and conn_node.top_level_data is Ellipsis:
-            conn_node.top_level_data = data
 
     def clear_tree(self):
         self._root_node.children.clear()

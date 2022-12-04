@@ -3,12 +3,12 @@ from enum import Enum
 
 from PyQt5.QtGui import QIcon
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCTURE_DATASOURCE_TYPE, SWITCH_ACTION, ADD_DS_ACTION, \
+from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, SWITCH_ACTION, ADD_DS_ACTION, \
     REFRESH_ACTION, TEMPLATE_ACTION, GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, \
     SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, OPEN_CONN_ACTION, \
     CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
     EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME, FOLDER_TYPE, NAME_AVAILABLE, \
-    NAME_EXISTS
+    NAME_EXISTS, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, DEL_FOLDER_ACTION
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -49,7 +49,7 @@ class IconEnum(Enum):
 
     # datasource type icon
     sql_ds_icon = SQL_DATASOURCE_TYPE, ':/icon/add.png'
-    structure_ds_icon = STRUCTURE_DATASOURCE_TYPE, ':/icon/add.png'
+    structure_ds_icon = STRUCT_DATASOURCE_TYPE, ':/icon/add.png'
 
     # sql datasource icon
     # sqlite
@@ -66,6 +66,9 @@ class IconEnum(Enum):
     # structure datasource icon
     folder_icon = FOLDER_TYPE, ':/icon/column_icon.png'
     json_type_icon = JSON_DISPLAY_NAME, ':/icon/exec.png'
+    new_folder_icon = CREATE_NEW_FOLDER_ACTION, ':/icon/add.png'
+    rename_folder_icon = RENAME_FOLDER_ACTION, ':/icon/exec.png'
+    del_folder_icon = DEL_FOLDER_ACTION, ':/icon/remove.png'
 
 
 def get_icon_path(name):
