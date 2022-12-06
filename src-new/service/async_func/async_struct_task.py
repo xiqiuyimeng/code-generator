@@ -40,7 +40,9 @@ class AddStructWorker(ThreadWorkerABC):
         self.success_signal.emit(opened_struct)
 
     def do_exception(self, e: Exception):
-        log.exception('添加结构体失败')
+        err_msg = f'添加{self.struct_info.struct_type}失败'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class AddStructExecutor(LoadingMaskThreadExecutor):
@@ -51,13 +53,14 @@ class AddStructExecutor(LoadingMaskThreadExecutor):
         self.struct_info = struct_info
         self.parent_opened_item = parent_opened_item
         self.callback = callback
-        super().__init__(masked_widget, window, '保存结构体')
+        super().__init__(masked_widget, window, f'保存{struct_info.struct_type}')
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddStructWorker(self.struct_info, self.parent_opened_item)
 
     def success_post_process(self, *args):
-        pop_ok(f'[{self.struct_info.struct_name}]\n保存结构体成功', '保存结构体', self.window)
+        pop_ok(f'[{self.struct_info.struct_name}]\n保存{self.struct_info.struct_type}成功',
+               f'保存{self.struct_info.struct_type}', self.window)
         self.callback(*args)
 
 
@@ -96,26 +99,83 @@ class DelStructExecutor(IconMovieThreadExecutor):
 class EditStructWorker(ThreadWorkerABC):
     success_signal = pyqtSignal()
 
-    def __init__(self):
-        pass
+    def __init__(self, struct_info: StructInfo):
+        super().__init__()
+        self.struct_info = struct_info
 
+    @transactional
     def do_run(self):
-        pass
+        # 更新结构体
+        StructSqlite().update(self.struct_info)
+        # 更新打开记录
+        update_param = OpenedTreeItem()
+        update_param.id = self.struct_info.opened_item_id
+        update_param.item_name = self.struct_info.struct_name
+        OpenedTreeItemSqlite().update(update_param)
+        self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.exception('编辑结构体失败')
+        err_msg = f'修改{self.struct_info.struct_type}失败'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class EditStructExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self):
-        pass
+    def __init__(self, struct_info: StructInfo, masked_widget, window, callback):
+        self.struct_info = struct_info
+        self.callback = callback
+        super().__init__(masked_widget, window, f'修改{struct_info.struct_type}')
 
     def get_worker(self) -> ThreadWorkerABC:
-        return EditStructWorker()
+        return EditStructWorker(self.struct_info)
+
+    def success_post_process(self, *args):
+        pop_ok(f'[{self.struct_info.struct_name}]\n修改{self.struct_info.struct_type}成功',
+               f'修改{self.struct_info.struct_type}', self.window)
+        self.callback(*args)
 
 
 # ---------------------------------------- 编辑结构体 end ---------------------------------------- #
+
+# ---------------------------------------- 查询结构体 start ---------------------------------------- #
+
+class QueryStructWorker(ThreadWorkerABC):
+    success_signal = pyqtSignal(StructInfo)
+
+    def __init__(self, opened_struct_id):
+        super().__init__()
+        self.opened_struct_id = opened_struct_id
+
+    def do_run(self):
+        param = StructInfo()
+        param.opened_item_id = self.opened_struct_id
+        struct_list = StructSqlite().select(param)
+        if struct_list:
+            self.success_signal.emit(struct_list[0])
+        else:
+            self.success_signal.emit(param)
+
+    def do_exception(self, e: Exception):
+        err_msg = '查询结构体失败'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
+
+
+class QueryStructExecutor(LoadingMaskThreadExecutor):
+
+    def __init__(self, opened_struct_id, callback, masked_widget, window):
+        self.opened_struct_id = opened_struct_id
+        self.callback = callback
+        super().__init__(masked_widget, window, '查询结构体')
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return QueryStructWorker(self.opened_struct_id)
+
+    def success_post_process(self, *args):
+        self.callback(*args)
+
+# ---------------------------------------- 查询结构体 end ---------------------------------------- #
 
 
 # ---------------------------------------- 获取所有结构体 start ---------------------------------------- #
@@ -133,8 +193,7 @@ class ListStructWorker(ThreadWorkerABC):
     def do_run(self):
         folder_type = FolderTypeEnum.folder_type.value
         # 读取结构体具体信息
-        struct_param = StructInfo()
-        struct_info_list = StructSqlite().select(struct_param)
+        struct_info_list = StructSqlite().select_list()
         # 转换为dict，key：opened_item_id，value：struct info
         struct_opened_dict = dict(map(lambda x: (x.opened_item_id, x), struct_info_list))
 
@@ -302,9 +361,10 @@ class DelFolderExecutor(IconMovieThreadExecutor):
 class ReadFileWorker(ThreadWorkerABC):
     success_signal = pyqtSignal(int, str)
 
-    def __init__(self, file_url):
+    def __init__(self, file_url, struct_type):
         super().__init__()
         self.file_url = file_url
+        self.struct_type = struct_type
 
     def do_run(self):
         with open(self.file_url, 'r', encoding='utf-8') as f:
@@ -319,13 +379,14 @@ class ReadFileWorker(ThreadWorkerABC):
 
 class ReadFileExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, file_url, masked_widget, window, callback):
+    def __init__(self, file_url, struct_type, masked_widget, window, callback):
         self.file_url = file_url
+        self.struct_type = struct_type
         self.callback = callback
-        super().__init__(masked_widget, window, '读取文件')
+        super().__init__(masked_widget, window, f'读取{self.struct_type}文件')
 
     def get_worker(self) -> ThreadWorkerABC:
-        return ReadFileWorker(self.file_url)
+        return ReadFileWorker(self.file_url, self.struct_type)
 
     def success_post_process(self, *args):
         self.callback(*args)

@@ -166,7 +166,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         ds_type = DatasourceTypeEnum.struct_ds_type.value.name
         opened_tree_item = OpenedTreeItem()
         opened_tree_item.item_name = name
-        opened_tree_item.is_current = CurrentEnum.is_current.value
+        opened_tree_item.is_current = CurrentEnum.not_current.value
         opened_tree_item.expanded = ExpandedEnum.collapsed.value
         opened_tree_item.parent_id = parent_id
         opened_tree_item.level = level

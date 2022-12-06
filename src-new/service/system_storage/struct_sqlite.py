@@ -20,6 +20,7 @@ struct_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
+    'select_list': f'select opened_item_id, struct_type from {table_name}'
 }
 
 
@@ -47,3 +48,7 @@ class StructSqlite(SqliteBasic):
 
     def __init__(self):
         super().__init__(table_name, struct_sql_dict)
+
+    def select_list(self):
+        rows = self._do_select(struct_sql_dict.get('select_list'), StructInfo())
+        return list(map(lambda x: StructInfo(**x), rows.all()))

@@ -36,16 +36,18 @@ class FolderTreeNode(AbstractStructTreeNode):
         menu.addSeparator()
 
         # 重命名
-        menu.addAction(QAction(get_icon(RENAME_FOLDER_ACTION), RENAME_FOLDER_ACTION, menu))
+        menu.addAction(QAction(get_icon(RENAME_FOLDER_ACTION),
+                               RENAME_FOLDER_ACTION.format(self.item.text(0)), menu))
         # 删除
-        menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION), DEL_FOLDER_ACTION, menu))
+        menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION),
+                               DEL_FOLDER_ACTION.format(self.item.text(0)), menu))
 
     def handle_menu_func(self, func):
         # 新建文件夹
         if func == CREATE_NEW_FOLDER_ACTION:
             add_folder_func(self.window.geometry(), self.tree_widget)
         # 重命名
-        elif func == RENAME_FOLDER_ACTION:
+        elif func == RENAME_FOLDER_ACTION.format(self.item.text(0)):
             parent_item = self.item.parent()
             parent_opened_item = self.tree_widget.top_item \
                 if parent_item is None else get_item_opened_record(parent_item)
@@ -53,5 +55,5 @@ class FolderTreeNode(AbstractStructTreeNode):
             edit_folder_func(self.window.geometry(), self.tree_widget, parent_opened_item,
                              get_item_opened_record(self.item), parent_item)
         # 删除
-        elif func == DEL_FOLDER_ACTION:
+        elif func == DEL_FOLDER_ACTION.format(self.item.text(0)):
             pass

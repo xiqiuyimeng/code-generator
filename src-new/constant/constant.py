@@ -33,6 +33,7 @@ DEL_STRUCT_TITLE = '删除数据源'
 STRUCTURE_NAME_TEXT = "{}数据源名称："
 STRUCTURE_FILE_URL_TEXT = "{}文件地址： "
 STRUCTURE_CONTENT_TEXT = "{}数据源内容："
+PRETTY_STRUCT_TEXT = '美化{}'
 CHOOSE_STRUCT_FILE_TEXT = "选择文件"
 SAVE_STRUCT_TITLE = '保存{}数据源'
 SAVE_STRUCT_TO = '保存到'
@@ -131,10 +132,18 @@ SELECT_ALL_FIELD_MENU = '全选 [{}] 表中所有字段'
 UNSELECT_FIELD_MENU = '取消选择字段'
 CLOSE_TABLE_TITLE = '关闭表'
 
+"""关于结构体的右键菜单"""
+OPEN_STRUCT_ACTION = '打开[{}]'
+CLOSE_STRUCT_ACTION = '关闭[{}]'
+CANCEL_OPEN_STRUCT_ACTION = '取消打开[{}]'
+EDIT_STRUCT_ACTION = '编辑[{}]'
+DEL_STRUCT_ACTION = '删除[{}]'
+
+"""关于文件夹的右键菜单"""
 ADD_STRUCT_ACTION = '添加结构体'
 CREATE_NEW_FOLDER_ACTION = '新建文件夹'
-RENAME_FOLDER_ACTION = '重命名'
-DEL_FOLDER_ACTION = '删除'
+RENAME_FOLDER_ACTION = '重命名[{}]'
+DEL_FOLDER_ACTION = '删除[{}]'
 
 # ---------- 树节点右键菜单文字 end ---------- #
 

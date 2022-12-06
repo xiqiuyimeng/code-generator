@@ -8,7 +8,8 @@ from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, SWITC
     SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, OPEN_CONN_ACTION, \
     CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
     EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME, FOLDER_TYPE, NAME_AVAILABLE, \
-    NAME_EXISTS, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, DEL_FOLDER_ACTION
+    NAME_EXISTS, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, DEL_FOLDER_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
+    OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -34,6 +35,7 @@ class IconEnum(Enum):
     about_icon = ABOUT_ACTION, ':/icon/exec.png'
 
     # 右键菜单 icon
+    # sql
     open_conn_icon = OPEN_CONN_ACTION, ':/icon/exec.png'
     cancel_open_conn_icon = CANCEL_OPEN_CONN_ACTION, ':/icon/exec.png'
     close_conn_icon = CLOSE_CONN_ACTION, ':/icon/exec.png'
@@ -42,6 +44,12 @@ class IconEnum(Enum):
     add_conn_icon = ADD_CONN_ACTION, ':/icon/exec.png'
     edit_conn_icon = EDIT_CONN_ACTION, ':/icon/exec.png'
     del_conn_icon = DEL_CONN_ACTION, ':/icon/exec.png'
+    # struct
+    cancel_open_struct_icon = CANCEL_OPEN_STRUCT_ACTION, ':/icon/refresh.png'
+    open_struct_icon = OPEN_STRUCT_ACTION, ':/icon/exec.png'
+    close_struct_icon = CLOSE_STRUCT_ACTION, ':/icon/wrong.png'
+    edit_struct_icon = EDIT_STRUCT_ACTION, ':/icon/right.png'
+    del_struct_icon = DEL_STRUCT_ACTION, ':/icon/remove.png'
 
     # 名称校验 icon
     name_available_icon = NAME_AVAILABLE, ':/icon/right.png'

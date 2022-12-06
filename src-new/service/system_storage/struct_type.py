@@ -33,7 +33,11 @@ class StructType:
     # 展示名称，也用来标识icon类型
     display_name: str = field(init=False)
     # 对应类型的连接对话框
-    type_dialog: str = field(init=False)
+    type_dialog: str = field(init=False, default=None)
+    # 对应的美化器
+    beautifier_executor: str = field(init=False, default=None)
+    # 对应的内容解析器
+    parse_executor: str = field(init=False, default=None)
 
 
 class FolderTypeEnum(Enum):
@@ -41,7 +45,6 @@ class FolderTypeEnum(Enum):
     folder_type = StructType()
     folder_type.type = FOLDER_TYPE
     folder_type.display_name = FOLDER_DISPLAY_NAME
-    folder_type.type_dialog = ...
 
 
 class StructTypeEnum(Enum):
@@ -50,4 +53,6 @@ class StructTypeEnum(Enum):
     json_type.type = JSON_TYPE
     json_type.display_name = JSON_DISPLAY_NAME
     json_type.type_dialog = 'JsonStructDialog'
+    json_type.beautifier_executor = 'PrettyJsonExecutor'
+    json_type.parse_executor = 'OpenJsonExecutor'
 

@@ -195,12 +195,13 @@ def add_struct_func(struct_type, tree_widget, screen_rect, parent_opened_item, p
                        screen_rect, parent_opened_item, parent_item)
 
 
-def edit_struct_func(struct_type, tree_widget, screen_rect, struct_info):
-    show_struct_dialog(struct_type, tree_widget, struct_info, EDIT_STRUCT_DIALOG_TITLE, screen_rect, )
+def edit_struct_func(struct_type, tree_widget, screen_rect, opened_struct_id):
+    show_struct_dialog(struct_type, tree_widget, opened_struct_id, EDIT_STRUCT_DIALOG_TITLE,
+                       screen_rect, None, None)
 
 
 def get_struct_parent_item(tree_widget, parent_item):
-    # 如果父节点为空，说明是由工具栏或菜单栏调起，动态获取当前节点为父节点
+    # 如果父节点为空，动态获取当前节点为父节点
     if parent_item is None:
         cur_item = tree_widget.currentItem()
         # 如果当前节点不是文件夹类型，那么应该向上找一层
@@ -226,13 +227,13 @@ def do_get_struct_parent_item(tree_widget, parent_item):
     return parent_item, parent_opened_item
 
 
-def show_struct_dialog(struct_type, tree_widget, struct_id, title, screen_rect,
+def show_struct_dialog(struct_type, tree_widget, opened_struct_id, title, screen_rect,
                        parent_opened_item, parent_item):
     """
     打开添加、编辑结构体子窗口
     :param struct_type: 用来标识结构体数据源类型
     :param tree_widget: 树对象
-    :param struct_id: 结构体id值，若存在则认为操作为编辑操作，
+    :param opened_struct_id: 结构体对应打开记录的id值，若存在则认为操作为编辑操作，
         将在弹窗界面回显数据，若无数据，则为添加操作
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
     :param screen_rect: 主窗口大小
@@ -245,7 +246,7 @@ def show_struct_dialog(struct_type, tree_widget, struct_id, title, screen_rect,
     # 根据类型，动态获取对话框
     dialog: AbstractStructDialog = globals()[get_struct_dialog(struct_type)](title, screen_rect,
                                                                              exists_struct_name_list,
-                                                                             struct_id, tree_widget,
+                                                                             opened_struct_id, tree_widget,
                                                                              parent_opened_item)
     if title == ADD_STRUCT_DIALOG_TITLE:
         dialog.struct_saved.connect(lambda opened_struct_record: add_struct_tree_item(
@@ -338,12 +339,16 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     if tree_widget is parent:
         # 如果父节点是树本身，那么添加顶层节点
         tree_widget.addTopLevelItem(struct_item)
-    else:
+    elif not tree_widget.reopening_flag:
         # 展开父节点
         parent.setExpanded(True)
+    # 如果是结构体节点，置为当前项
+    if struct_type != FOLDER_TYPE:
+        tree_widget.setCurrentItem(struct_item)
 
 
 def update_struct_tree_item(tree_widget, item_name):
-    # 这里只需要刷新节点名称即可，opened item 对象在对话框中已经更新
     item = tree_widget.currentItem()
     item.setText(0, item_name)
+    opened_item = get_item_opened_record(item)
+    opened_item.item_name = item_name
