@@ -1,32 +1,30 @@
 # -*- coding: utf-8 -*-
-"""
-表格结构，大体与树结构类似
-"""
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QWidget, QHBoxLayout, QCheckBox
+from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QWidget, QHBoxLayout, QCheckBox
 
-from constant_.constant import TABLE_HEADER_LABELS
+from constant.constant import TABLE_HEADER_LABELS
+from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_info_sqlite import DsTableInfo
+from service.util.tree_node import TreeData
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
 from view.table.table_item import TableWidgetItem
 from view.table.table_item_delegate import ComboboxDelegate, TextInputDelegate
-from view.tree.tree_item.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
-_date_ = '2022/5/10 15:25'
+_date_ = '2022/12/6 15:50'
 
 
-class TableWidget(QTableWidget, ScrollableWidget):
+class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
-    def __init__(self, parent, cols):
+    def __init__(self, main_window, parent, cols):
         super().__init__(parent)
+        self.main_window = main_window
         self.cols = cols
         # 获取tab widget中的队列线程执行器
-        self.async_save_executor = self.parent().parent()\
-            .main_window.sql_tab_widget.async_save_executor
+        self.async_save_executor = self.get_async_save_executor()
         # 选中数据
-        self.tree_data = self.parent().parent().main_window.sql_tree_widget.tree_data
+        self.tree_data = self.get_tree_data()
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
@@ -35,6 +33,10 @@ class TableWidget(QTableWidget, ScrollableWidget):
         self.text_input_delegate = ...
         self.setup_ui()
         self.connect_signal()
+
+    def get_async_save_executor(self) -> AsyncSaveTabObjExecutor: ...
+
+    def get_tree_data(self) -> TreeData: ...
 
     def setup_ui(self):
         # 设置双击触发修改
@@ -111,34 +113,14 @@ class TableWidget(QTableWidget, ScrollableWidget):
         if checked_col_list:
             self.add_checked_data(checked_col_list)
 
-    def add_checked_data(self, cols):
-        add_data = {
-            'conn': get_item_opened_record(self.tree_item.parent().parent()),
-            'db': get_item_opened_record(self.tree_item.parent()),
-            'tb': get_item_opened_record(self.tree_item),
-            'col': cols,
-        }
-        self.tree_data.add_node(add_data)
+    def add_checked_data(self, cols): ...
 
-    def remove_checked_data(self, cols):
-        del_data = {
-            'conn': self.tree_item.parent().parent().text(0),
-            'db': self.tree_item.parent().text(0),
-            'tb': self.tree_item.text(0),
-            'col': cols,
-        }
-        self.tree_data.del_node(del_data, recursive_del=True)
+    def remove_checked_data(self, cols): ...
 
     def add_all_table_cols_checked(self):
         self.add_checked_data(self.cols)
 
-    def remove_all_table_checked(self):
-        del_data = {
-            'conn': self.tree_item.parent().parent().text(0),
-            'db': self.tree_item.parent().text(0),
-            'tb': self.tree_item.text(0)
-        }
-        self.tree_data.del_node(del_data, recursive_del=True)
+    def remove_all_table_checked(self): ...
 
     def make_item(self, text):
         item = TableWidgetItem(self)
@@ -175,42 +157,7 @@ class TableWidget(QTableWidget, ScrollableWidget):
             # 将列数据置为选中状态，保存数据
             self.save_data(row, 0, checked)
 
-    def save_data(self, row, col, data):
-        # 根据row找到对应的列信息数据
-        col_data = self.cols[row]
-        modify_col_data = DsTableInfo()
-        modify_col_data.id = col_data.id
-
-        if col == 0:
-            col_data.checked = data
-            modify_col_data.checked = data
-        elif col == 1:
-            col_data.col_name = data
-            modify_col_data.col_name = data
-        elif col == 2:
-            col_data.data_type = data
-            modify_col_data.data_type = data
-        elif col == 3:
-            col_data.full_data_type = data
-            modify_col_data.full_data_type = data
-        elif col == 4:
-            is_pk = 1 if data == '是' else 0
-            col_data.is_pk = is_pk
-            modify_col_data.is_pk = is_pk
-        elif col == 5:
-            col_data.col_comment = data
-            modify_col_data.col_comment = data
-
-        # 保存到树选中数据中，由于保存的列对象是从 self.cols中取的，
-        # 所以树中保存的列对象引用指向列表中对象，在数据变化时，无需手动同步
-        # 如果是选中，则为添加数据，否则为删除数据
-        if col_data.checked:
-            self.add_checked_data(col_data)
-        else:
-            self.remove_checked_data(col_data)
-
-        # 保存数据
-        self.async_save_executor.save_table_data(modify_col_data)
+    def save_data(self, row, col, data): ...
 
     def batch_update_check_state(self, check_state):
         modify_col_data_list = list()

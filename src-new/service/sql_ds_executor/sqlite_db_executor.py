@@ -4,7 +4,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from service.sql_ds_executor.db_executor import SqlDBExecutor
 from service.system_storage.conn_type import get_conn_type_by_type
-from service.system_storage.ds_table_info_sqlite import DsTableInfo, CheckedEnum
+from service.system_storage.ds_table_info_sqlite import DsTableInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -45,4 +45,5 @@ class SqliteDBExecutor(SqlDBExecutor):
         table_info.checked = CheckedEnum.unchecked.value
         table_info.col_comment = ''
         table_info.handle_data_type()
+        table_info.col_type = ColTypeEnum.col.value
         return table_info

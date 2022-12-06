@@ -14,7 +14,7 @@ def get_tab_frame(current_frame_name, frame_parent, window):
     if current_frame_name == SQL_DATASOURCE_TYPE:
         return SqlTabFrame(frame_parent, window)
     elif current_frame_name == STRUCT_DATASOURCE_TYPE:
-        return StructureTabFrame(frame_parent, window)
+        return StructTabFrame(frame_parent, window)
 
 
 class AbstractTabFrame(QFrame):
@@ -42,9 +42,9 @@ class SqlTabFrame(AbstractTabFrame):
         window.sql_tab_widget = self.tab_widget
 
 
-class StructureTabFrame(AbstractTabFrame):
+class StructTabFrame(AbstractTabFrame):
 
     def __init__(self, parent, window):
         super().__init__(parent, window)
         # 为了方便访问
-        window.structure_tab_widget = self.tab_widget
+        window.struct_tab_widget = self.tab_widget

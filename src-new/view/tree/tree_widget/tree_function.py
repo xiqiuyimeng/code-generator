@@ -204,6 +204,9 @@ def get_struct_parent_item(tree_widget, parent_item):
     # 如果父节点为空，动态获取当前节点为父节点
     if parent_item is None:
         cur_item = tree_widget.currentItem()
+        # 如果不存在当前项，那么取树本身
+        if cur_item is None:
+            return tree_widget, tree_widget.top_item
         # 如果当前节点不是文件夹类型，那么应该向上找一层
         if get_item_opened_record(cur_item).data_type != FolderTypeEnum.folder_type.value:
             return do_get_struct_parent_item(tree_widget, cur_item)

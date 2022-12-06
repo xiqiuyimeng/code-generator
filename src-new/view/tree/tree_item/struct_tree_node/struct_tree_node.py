@@ -5,8 +5,9 @@ from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN
     CLOSE_STRUCT_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.struct_executor import *
+from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, set_item_opened_tab
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
@@ -27,16 +28,36 @@ class StructTreeNode(AbstractStructTreeNode):
             self.opened_item = get_item_opened_record(self.item)
 
     def open_item(self):
-        super().open_item()
+        # 获取打开的tab
+        tab_widget = get_item_opened_tab(self.item)
+        # 如果存在打开的tab，展示到当前页
+        if tab_widget:
+            self.window.struct_tab_widget.setCurrentWidget(tab_widget)
+        else:
+            # 执行打开tab页, 设置正在打开中状态
+            self.is_opening = True
+            self.open_struct_executor = globals()[self.opened_item.data_type.parse_executor](
+                self.item, self.window, self.open_item_ui, self.open_item_fail)
+            self.open_struct_executor.start()
 
-    def open_item_ui(self, *args):
-        super().open_item_ui(*args)
+    def open_item_ui(self, table_tab):
+        tab = self.reopen_item(table_tab)
+        self.window.struct_tab_widget.setCurrentWidget(tab)
+        self.is_opening = False
 
     def open_item_fail(self):
-        super().open_item_fail()
+        self.is_opening = False
 
-    def reopen_item(self, opened_items):
-        super().reopen_item(opened_items)
+    def reopen_item(self, table_tab):
+        # 创建tab页
+        tab = TabTableUI(self.window, table_tab, self.item)
+        self.window.struct_tab_widget.addTab(tab, self.struct_name)
+        # 记录tab对象
+        set_item_opened_tab(self.item, tab)
+        # 连接表头复选框变化信号
+        # tab.table_frame.table_widget.table_header.header_check_state.connect(
+        #     lambda check_state: self.set_check_state(check_state))
+        return tab
 
     def close_item(self):
         super().close_item()
@@ -62,7 +83,7 @@ class StructTreeNode(AbstractStructTreeNode):
     def handle_menu_func(self, func):
         # 打开结构体
         if func == OPEN_STRUCT_ACTION.format(self.struct_name):
-            pass
+            self.open_item()
         # 取消打开结构体
         elif func == CANCEL_OPEN_STRUCT_ACTION.format(self.struct_name):
             pass

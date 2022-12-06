@@ -20,6 +20,6 @@ class TabTableUI(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.table_frame = get_table_frame(self.main_window.current_ds_type.name, self,
-                                           self.column_list, self.tree_item)
+        self.table_frame = get_table_frame(self.main_window.current_ds_type.name, self.main_window,
+                                           self, self.column_list, self.tree_item)
         self._layout.addWidget(self.table_frame)

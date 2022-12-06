@@ -21,7 +21,7 @@ class StructTreeWidget(AbstractTreeWidget):
         self.top_item.id = 0
 
     def do_open_tree_item(self, item):
-        super().do_open_tree_item(item)
+        get_struct_tree_node(item, self, self.main_window).open_item()
 
     def do_fill_menu(self, item, menu):
         get_struct_tree_node(item, self, self.main_window).do_fill_menu(menu)

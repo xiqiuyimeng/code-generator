@@ -20,7 +20,9 @@ ds_table_info_sql_dict = {
     col_comment char(200) default null,
     checked integer not null,
     parent_tab_id integer not null,
+    parent_id integer,
     item_order integer not null,
+    col_type char(20) not null,
     create_time datetime,
     update_time datetime
     );''',
@@ -34,6 +36,13 @@ class CheckedEnum(Enum):
     unchecked = 0
 
 
+class ColTypeEnum(Enum):
+
+    col = 'col'
+    obj = 'object'
+    array = 'array'
+
+
 @dataclass
 class DsTableInfo(BasicSqliteDTO):
 
@@ -44,13 +53,19 @@ class DsTableInfo(BasicSqliteDTO):
     # 完整数据类型 = 数据类型 + 字段长度
     full_data_type: str = field(init=False, default=None)
     # 是否是主键
-    is_pk: int = field(init=False, default=None)
+    is_pk: int = field(init=False, default=0)
     # 列注释
     col_comment: str = field(init=False, default=None)
     # 是否勾选，与qt中选中状态枚举保持一致
     checked: int = field(init=False, default=None)
     # 指向table_tab
     parent_tab_id: int = field(init=False, default=None)
+    # 父id，指向当前表中的父id
+    parent_id: int = field(init=False, default=0)
+    # 列类型：列，对象，数组
+    col_type: str = field(init=False, default=None)
+    # 非数据库字段，维持子项列表
+    children: list = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
