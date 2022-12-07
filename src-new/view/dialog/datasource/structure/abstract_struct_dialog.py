@@ -8,7 +8,7 @@ from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRU
 from constant.icon_enum import get_icon
 from service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor, \
     QueryStructExecutor
-from service.async_func.struct_executor import *
+from service.async_func.async_struct_executor import *
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from service.system_storage.struct_sqlite import StructInfo
 from service.system_storage.struct_type import StructType

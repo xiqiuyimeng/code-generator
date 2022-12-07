@@ -3,7 +3,7 @@ import json
 
 from PyQt5.QtCore import pyqtSignal
 
-from service.async_func.struct_executor.async_struct_act_task import PrettyStructWorker, PrettyStructExecutor, \
+from service.async_func.async_struct_executor.async_struct_executor import PrettyStructWorker, PrettyStructExecutor, \
     OpenStructWorker, OpenStructExecutor
 from service.system_storage.data_type import get_data_type
 from service.system_storage.ds_table_info_sqlite import DsTableInfo, ColTypeEnum
