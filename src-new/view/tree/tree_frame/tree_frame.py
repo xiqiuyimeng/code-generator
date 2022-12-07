@@ -90,7 +90,7 @@ class StructureTreeFrame(AbstractTreeFrame):
             lambda: add_folder_func(window.geometry(), self.tree_widget))
 
         # 为了方便访问，树部件引用也挂到window上
-        window.structure_tree_widget = self.tree_widget
+        window.struct_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
         return STRUCT_DATASOURCE_TYPE

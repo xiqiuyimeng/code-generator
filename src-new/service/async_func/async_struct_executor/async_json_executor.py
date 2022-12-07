@@ -35,7 +35,6 @@ class PrettyJsonExecutor(PrettyStructExecutor):
 # ---------------------------------------- 打开json结构体 start ---------------------------------------- #
 
 class OpenJsonWorker(OpenStructWorker):
-    success_signal = pyqtSignal(str)
 
     def parse(self):
         # 解析

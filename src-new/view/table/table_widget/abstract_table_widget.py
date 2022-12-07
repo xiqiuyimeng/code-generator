@@ -84,34 +84,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def show_tool_tip(self, model_index):
         self.setToolTip(model_index.data())
 
-    def fill_table(self):
-        """
-        将列名字段全数填充在表中，四列多行表
-        """
-        self.filling_table = True
-        checked_col_list = list()
-        # 填充数据
-        for i, col in enumerate(self.cols):
-            # 插入新的一行
-            self.insertRow(i)
-            # 设置checkbox在第一列
-            self.setCellWidget(i, 0, self.make_checkbox_num_item(i, col.checked))
-
-            if col.checked:
-                checked_col_list.append(col)
-
-            self.setItem(i, 1, self.make_item(col.col_name))
-            self.setItem(i, 2, self.make_item(col.data_type))
-            self.setItem(i, 3, self.make_item(col.full_data_type))
-            self.setItem(i, 4, self.make_item('是' if col.is_pk else '否'))
-            self.setItem(i, 5, self.make_item(col.col_comment))
-        # 设置表格根据内容调整
-        self.resizeRowsToContents()
-        self.filling_table = False
-
-        # 保存选中数据
-        if checked_col_list:
-            self.add_checked_data(checked_col_list)
+    def fill_table(self): ...
 
     def add_checked_data(self, cols): ...
 

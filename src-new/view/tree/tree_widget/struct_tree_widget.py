@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from service.async_func.async_struct_task import ListStructExecutor
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from service.util.tree_node import TreeData
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.context import get_struct_tree_node
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
@@ -16,6 +17,8 @@ class StructTreeWidget(AbstractTreeWidget):
     def __init__(self, parent, window):
         super().__init__(parent, window)
         self.list_struct_executor = ...
+        # 保存 struct tree 选中数据
+        self.tree_data = TreeData()
         self.top_item = OpenedTreeItem()
         self.top_item.level = -1
         self.top_item.id = 0

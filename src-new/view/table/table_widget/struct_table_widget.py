@@ -2,6 +2,7 @@
 """
 表格结构，大体与树结构类似
 """
+from PyQt5.QtWidgets import QWidget, QHBoxLayout
 
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_info_sqlite import DsTableInfo
@@ -41,6 +42,10 @@ class StructTableWidget(AbstractTableWidget):
             self.setItem(i, 3, self.make_item(col.full_data_type))
             self.setItem(i, 4, self.make_item('是' if col.is_pk else '否'))
             self.setItem(i, 5, self.make_item(col.col_comment))
+            # 如果当前项存在子项，那么增加子表格展示
+            if col.children:
+                self.setSpan(i, 0, 1, 6)
+                self.add_child_table(col.children)
         # 设置表格根据内容调整
         self.resizeRowsToContents()
         self.filling_table = False
@@ -48,6 +53,18 @@ class StructTableWidget(AbstractTableWidget):
         # 保存选中数据
         if checked_col_list:
             self.add_checked_data(checked_col_list)
+
+    def add_child_table(self, children_cols):
+        child_widget = QWidget()
+        child_widget.tree_item = self.tree_item
+        child_layout = QHBoxLayout()
+        child_widget.setLayout(child_layout)
+
+        child_table = StructTableWidget(self.main_window, child_widget, children_cols)
+        child_layout.addWidget(child_table)
+
+        self.setCellWidget(1, 0, child_widget)
+        self.resizeRowsToContents()
 
     def add_checked_data(self, cols): ...
 

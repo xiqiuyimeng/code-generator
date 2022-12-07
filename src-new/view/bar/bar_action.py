@@ -44,7 +44,7 @@ def add_sql_ds_actions(parent_menu, main_window):
 
 
 def add_structure_ds_actions(parent_menu, main_window, parent_opened_item=None, parent_item=None):
-    parent_menu.triggered.connect(lambda action: open_structure_dialog(action, main_window.structure_tree_widget,
+    parent_menu.triggered.connect(lambda action: open_structure_dialog(action, main_window.struct_tree_widget,
                                                                        main_window.geometry(), parent_opened_item,
                                                                        parent_item))
     for structure_type in StructTypeEnum:

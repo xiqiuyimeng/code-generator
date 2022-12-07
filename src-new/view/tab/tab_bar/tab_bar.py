@@ -134,14 +134,14 @@ class TabBar(QTabBar):
         for index in indexes:
             tab_widget = self.parent.widget(index)
             if tab_widget.tree_item.checkState(0) == Qt.PartiallyChecked:
-                partially_checked_tables.append(f'连接：{tab_widget.tree_item.parent().parent().text(0)} '
-                                                f'库：{tab_widget.tree_item.parent().text(0)} '
-                                                f'表：{tab_widget.tree_item.text(0)}')
+                partially_checked_tables.append(self.partially_checked_table_prompt(tab_widget))
         if partially_checked_tables:
             # 弹窗提示
             pop_fail(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format('\n'.join(partially_checked_tables)),
                      CLOSE_TABLE_TITLE, self.main_window)
         return not partially_checked_tables
+
+    def partially_checked_table_prompt(self, tab_widget) -> str: ...
 
     def remove_tab(self, index):
         # 获取tab table
@@ -156,18 +156,14 @@ class TabBar(QTabBar):
     def change_current(self, index):
         # 获取当前项
         current_tab = self.parent.widget(index)
-        # 项目初始化中，或正在打开tab页不处理
-        if self.main_window.sql_tree_widget.reopening_flag \
-                or (current_tab and get_sql_tree_node(current_tab.tree_item,
-                                                      self.main_window.sql_tree_widget,
-                                                      self.main_window).is_opening):
-            return
-        if current_tab:
+        if self.need_change_current(current_tab) and current_tab:
             # 考虑处理tab顺序问题
             if self.is_moving:
                 # 设置标志位，方便排序时判断使用
                 self.current_changed = True
             self.parent.async_save_executor.change_current(current_tab.table_tab)
+
+    def need_change_current(self, current_tab) -> bool: ...
 
     def sort_tab(self):
         """在拖拉tab页签，松开鼠标时触发，对最终状态的tab widget进行排序并保存"""
