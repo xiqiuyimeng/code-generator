@@ -62,12 +62,17 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 默认行号隐藏
         self.verticalHeader().setHidden(True)
 
+        self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
         # 设置第五列（是否是主键）combox代理项，在编辑时触发
         self.combox_delegate = ComboboxDelegate()
         self.setItemDelegateForColumn(4, self.combox_delegate)
         # 第六列设置代理项
         self.text_input_delegate = TextInputDelegate()
         self.setItemDelegateForColumn(5, self.text_input_delegate)
+
+        # 按像素滚动
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
     def connect_signal(self):
         self.itemChanged.connect(self.data_change)

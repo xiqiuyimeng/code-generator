@@ -28,24 +28,31 @@ class StructTableWidget(AbstractTableWidget):
         self.filling_table = True
         checked_col_list = list()
         # 填充数据
+        idx = 0
         for i, col in enumerate(self.cols):
             # 插入新的一行
-            self.insertRow(i)
+            self.insertRow(idx)
             # 设置checkbox在第一列
-            self.setCellWidget(i, 0, self.make_checkbox_num_item(i, col.checked))
+            self.setCellWidget(idx, 0, self.make_checkbox_num_item(i, col.checked))
 
             if col.checked:
                 checked_col_list.append(col)
 
-            self.setItem(i, 1, self.make_item(col.col_name))
-            self.setItem(i, 2, self.make_item(col.data_type))
-            self.setItem(i, 3, self.make_item(col.full_data_type))
-            self.setItem(i, 4, self.make_item('是' if col.is_pk else '否'))
-            self.setItem(i, 5, self.make_item(col.col_comment))
-            # 如果当前项存在子项，那么增加子表格展示
+            self.setItem(idx, 1, self.make_item(col.col_name))
+            self.setItem(idx, 2, self.make_item(col.data_type))
+            self.setItem(idx, 3, self.make_item(col.full_data_type))
+            self.setItem(idx, 4, self.make_item('是' if col.is_pk else '否'))
+            self.setItem(idx, 5, self.make_item(col.col_comment))
+            self.viewport().update()
+            # 如果当前项存在子项，那么在下一行增加子表格展示
             if col.children:
-                self.setSpan(i, 0, 1, 6)
-                self.add_child_table(col.children)
+                # 将索引加1
+                idx += 1
+                self.insertRow(idx)
+                self.setSpan(idx, 0, 1, 6)
+                self.add_child_table(col.children, idx)
+            # 索引加1，进行下一行填充
+            idx += 1
         # 设置表格根据内容调整
         self.resizeRowsToContents()
         self.filling_table = False
@@ -54,17 +61,19 @@ class StructTableWidget(AbstractTableWidget):
         if checked_col_list:
             self.add_checked_data(checked_col_list)
 
-    def add_child_table(self, children_cols):
+    def add_child_table(self, children_cols, row_index):
         child_widget = QWidget()
+        # 维护树节点引用，方便子表格使用
         child_widget.tree_item = self.tree_item
         child_layout = QHBoxLayout()
         child_widget.setLayout(child_layout)
-
+        # 创建子表格
         child_table = StructTableWidget(self.main_window, child_widget, children_cols)
         child_layout.addWidget(child_table)
 
-        self.setCellWidget(1, 0, child_widget)
-        self.resizeRowsToContents()
+        child_table.fill_table()
+
+        self.setCellWidget(row_index, 0, child_widget)
 
     def add_checked_data(self, cols): ...
 
