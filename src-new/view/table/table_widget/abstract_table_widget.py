@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QWidget, QHBoxLayout, QCheckBox
 
-from constant.constant import TABLE_HEADER_LABELS
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QWidget, QHBoxLayout, QCheckBox, QToolButton
+
+from constant.constant import TABLE_HEADER_LABELS, EXPAND_CHILD_TABLE, COLLAPSE_CHILD_TABLE
+from constant.icon_enum import get_icon
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_info_sqlite import DsTableInfo
 from service.util.tree_node import TreeData
@@ -54,7 +56,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 设置表头字段
         self.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
         # 设置表头列宽度，第一列全选列
-        self.horizontalHeader().resizeSection(0, 60)
+        self.horizontalHeader().resizeSection(0, 80)
         # 第二列字段列，根据大小自动调整宽度
         self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         # 最后备注列拉伸到最大
@@ -105,27 +107,68 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         item.setText(text)
         return item
 
-    def make_checkbox_num_item(self, i, check_state):
+    def make_checkbox_num_item(self, row_index, col_data):
         table_check_widget = QWidget()
         check_layout = QHBoxLayout(table_check_widget)
 
         check_box = QCheckBox()
         check_layout.addWidget(check_box)
+        # 如果存在子项，就添加一个展开按钮，连接打开子表方法
+        if col_data.children:
+            add_child_table_button = QToolButton()
+            add_child_table_button.setIcon(get_icon(EXPAND_CHILD_TABLE))
+            add_child_table_button.clicked.connect(
+                lambda: self.add_child_table_func(col_data, row_index, add_child_table_button))
+
+            check_layout.addWidget(add_child_table_button)
+
         # 设置布局的左间距变小，主要是为了与表头的复选框对齐
         check_layout.setContentsMargins(4, check_layout.contentsMargins().top(),
                                         check_layout.contentsMargins().right(),
                                         check_layout.contentsMargins().bottom())
 
         # 设置checkbox状态
-        check_box.setText(str(i + 1))
-        if check_state:
+        check_box.setText(str(row_index + 1))
+        if col_data.checked:
             check_box.setCheckState(Qt.Checked)
         # 点击时需要保存数据，并联动表头复选框
-        check_box.clicked.connect(lambda checked: self.click_row_checkbox(checked, i))
+        check_box.clicked.connect(lambda checked: self.click_row_checkbox(checked, row_index))
 
         # 收集复选框
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
+
+    def add_child_table_func(self, col_data, row_index, button):
+        # 当前行之前的行（列数据列表）
+        before_rows = self.cols[:row_index]
+        # 当前行之前的行，存在的子表数
+        child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
+        # 新的子表，需要在当前行下，新插入一行放入子表，
+        # 下一行的索引 = 当前行索引 + 当前行之前，已经插入的新行 + 1
+        row_index += 1 + child_tables
+        # 如果表格已经显示，再次点击应该隐藏子表
+        if col_data.expanded:
+            button.setIcon(get_icon(EXPAND_CHILD_TABLE))
+            self.hideRow(row_index)
+            col_data.expanded = 0
+        else:
+            button.setIcon(get_icon(COLLAPSE_CHILD_TABLE))
+            col_data.expanded = 1
+            # 如果存在子表，但是被隐藏了，展示即可，否则应该创建表
+            if col_data.has_child_table:
+                self.showRow(row_index)
+            else:
+                # 还没有创建过子表，创建一个新的子表
+                # 首先插入新行
+                self.insertRow(row_index)
+                # 为了美观，将新行单元格所有列合并
+                self.setSpan(row_index, 0, 1, 6)
+                child_table = self.add_child_table(col_data.children, row_index)
+                self.setCellWidget(row_index, 0, child_table)
+                # 标记当前列数据，已经存在子表
+                col_data.has_child_table = 1
+
+    def add_child_table(self, children_cols, row_index) -> QWidget: ...
 
     def click_row_checkbox(self, checked, row):
         # 联动表头

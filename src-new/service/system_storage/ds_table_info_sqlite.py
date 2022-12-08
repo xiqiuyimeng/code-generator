@@ -23,6 +23,7 @@ ds_table_info_sql_dict = {
     parent_id integer,
     item_order integer not null,
     col_type char(20) not null,
+    expanded integer not null,
     create_time datetime,
     update_time datetime
     );''',
@@ -64,6 +65,10 @@ class DsTableInfo(BasicSqliteDTO):
     parent_id: int = field(init=False, default=0)
     # 列类型：列，对象，数组
     col_type: str = field(init=False, default=None)
+    # 是否展开，用于存在子表的情况下，默认为0，未展开
+    expanded: int = field(init=False, default=0)
+    # 是否在页面已经创建了子表，用于页面展示交互
+    has_child_table: int = field(init=False, default=0)
     # 非数据库字段，维持子项列表
     children: list = field(init=False, default=None)
 

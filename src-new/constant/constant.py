@@ -139,6 +139,9 @@ CANCEL_OPEN_STRUCT_ACTION = '取消打开[{}]'
 EDIT_STRUCT_ACTION = '编辑[{}]'
 DEL_STRUCT_ACTION = '删除[{}]'
 
+EXPAND_CHILD_TABLE = '展开子表'
+COLLAPSE_CHILD_TABLE = '折叠子表'
+
 """关于文件夹的右键菜单"""
 ADD_STRUCT_ACTION = '添加结构体'
 CREATE_NEW_FOLDER_ACTION = '新建文件夹'

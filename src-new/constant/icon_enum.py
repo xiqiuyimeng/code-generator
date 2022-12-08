@@ -9,7 +9,8 @@ from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, SWITC
     CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
     EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME, FOLDER_TYPE, NAME_AVAILABLE, \
     NAME_EXISTS, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, DEL_FOLDER_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
-    OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION
+    OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, EXPAND_CHILD_TABLE, \
+    COLLAPSE_CHILD_TABLE
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -50,6 +51,10 @@ class IconEnum(Enum):
     close_struct_icon = CLOSE_STRUCT_ACTION, ':/icon/wrong.png'
     edit_struct_icon = EDIT_STRUCT_ACTION, ':/icon/right.png'
     del_struct_icon = DEL_STRUCT_ACTION, ':/icon/remove.png'
+
+    # table
+    expand_child_table_icon = EXPAND_CHILD_TABLE, ':/icon/add.png'
+    collapse_child_table_icon = COLLAPSE_CHILD_TABLE, ':/icon/remove.png'
 
     # 名称校验 icon
     name_available_icon = NAME_AVAILABLE, ':/icon/right.png'

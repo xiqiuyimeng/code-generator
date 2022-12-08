@@ -31,7 +31,7 @@ class SqlTableWidget(AbstractTableWidget):
             # 插入新的一行
             self.insertRow(i)
             # 设置checkbox在第一列
-            self.setCellWidget(i, 0, self.make_checkbox_num_item(i, col.checked))
+            self.setCellWidget(i, 0, self.make_checkbox_num_item(i, col))
 
             if col.checked:
                 checked_col_list.append(col)
