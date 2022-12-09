@@ -37,6 +37,7 @@ class AddConnWorker(ThreadWorkerABC):
         opened_conn = OpenedTreeItemSqlite().add_conn_opened_item(self.connection.id,
                                                                   self.connection.conn_name,
                                                                   self.connection.item_order)
+        opened_conn.data_type = get_conn_type_by_type(self.connection.conn_type)
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit(opened_conn)
 

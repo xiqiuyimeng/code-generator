@@ -80,17 +80,17 @@ class TableTreeNode(AbstractSqlTreeNode):
             if check_state == Qt.Checked:
                 # 如果是选中，添加选中数据
                 add_data = {
-                    'conn': get_item_opened_record(self.item.parent().parent()),
-                    'db': get_item_opened_record(self.item.parent()),
-                    'tb': get_item_opened_record(self.item)
+                    0: get_item_opened_record(self.item.parent().parent()),
+                    1: get_item_opened_record(self.item.parent()),
+                    2: get_item_opened_record(self.item)
                 }
                 self.tree_widget.tree_data.add_node(add_data)
             elif check_state == Qt.Unchecked:
                 # 如果是未选中，删除选中数据
                 del_data = {
-                    'conn': self.item.parent().parent().text(0),
-                    'db': self.item.parent().text(0),
-                    'tb': self.item.text(0)
+                    0: get_item_opened_record(self.item.parent().parent()).id,
+                    1: get_item_opened_record(self.item.parent()).id,
+                    2: get_item_opened_record(self.item).id
                 }
                 self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
 

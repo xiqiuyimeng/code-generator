@@ -8,7 +8,7 @@
     可以在mousePressEvent事件中设置标志位，表明在点击，在itemChanged信号槽函数中判断是否点击，在clicked信号槽函数中重置标志位，
     实现点击复选框触发事件
 """
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator
 
@@ -32,6 +32,9 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
 
 
 class AbstractTreeWidget(DisplayTreeWidget):
+
+    # 定义信号，发送点击复选框的树节点和选中状态：全选、部分选、未选择
+    item_checkbox_clicked = pyqtSignal(QTreeWidgetItem, int)
 
     def __init__(self, parent, window):
         super().__init__(parent)

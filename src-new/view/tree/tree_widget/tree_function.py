@@ -16,6 +16,7 @@ from view.dialog.datasource.conn import *
 from view.dialog.datasource.folder.folder_dialog import FolderDialog
 from view.dialog.datasource.structure import *
 from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
+from view.tree.tree_item.tree_item import TreeWidgetItem
 from view.tree.tree_item.tree_item_func import set_item_opened_record, \
     get_item_opened_record, get_children_items
 
@@ -23,7 +24,7 @@ _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
 
 
-def make_sql_tree_item(parent, name, icon, opened_item_record=None, checkbox=None):
+def make_sql_tree_item(tree_widget, parent, name, icon, opened_item_record=None, checkbox=None):
     """
     构造sql树的子项
     :param parent: 要构造子项的父节点元素
@@ -32,7 +33,26 @@ def make_sql_tree_item(parent, name, icon, opened_item_record=None, checkbox=Non
     :param opened_item_record: 打开记录表中的记录
     :param checkbox: 构造的子节点的复选框
     """
-    item = QTreeWidgetItem(parent)
+    item = TreeWidgetItem(tree_widget, parent)
+    item.setIcon(0, icon)
+    item.setText(0, name)
+    if opened_item_record:
+        set_item_opened_record(item, opened_item_record)
+    if checkbox is not None:
+        item.setCheckState(0, checkbox)
+    return item
+
+
+def make_display_tree_item(parent, name, icon, opened_item_record=None, checkbox=None):
+    """
+    构造sql树的子项
+    :param parent: 要构造子项的父节点元素
+    :param name: 构造的子节点名称
+    :param icon: 图标，该元素的展示图标对象
+    :param opened_item_record: 打开记录表中的记录
+    :param checkbox: 构造的子节点的复选框
+    """
+    item = TreeWidgetItem(parent)
     item.setIcon(0, icon)
     item.setText(0, name)
     if opened_item_record:
@@ -86,7 +106,8 @@ def add_conn_tree_item(tree_widget, opened_conn_record):
     """
     conn_type = opened_conn_record.data_type
     conn_icon = get_icon(conn_type.display_name)
-    conn_item = make_sql_tree_item(tree_widget, opened_conn_record.item_name, conn_icon, opened_conn_record)
+    conn_item = make_sql_tree_item(tree_widget, tree_widget, opened_conn_record.item_name,
+                                   conn_icon, opened_conn_record)
     # 添加顶层节点
     tree_widget.addTopLevelItem(conn_item)
     # 设置当前项
@@ -136,9 +157,9 @@ def make_table_items(parent_item, opened_table_items, tree_data: TreeData):
     # 如果表已选中，添加到选中数据集合中
     if checked_tables:
         tb_data = {
-            'conn': get_item_opened_record(parent_item.parent()),
-            'db': get_item_opened_record(parent_item),
-            'tb': checked_table_opened_items
+            0: get_item_opened_record(parent_item.parent()),
+            1: get_item_opened_record(parent_item),
+            2: checked_table_opened_items
         }
         tree_data.add_node(tb_data)
 
@@ -319,7 +340,7 @@ def make_struct_tree_item(parent, name, icon, checkbox, opened_item_record):
     :param opened_item_record: 打开记录表中的记录
     :param checkbox: 构造的子节点的复选框
     """
-    item = QTreeWidgetItem(parent)
+    item = TreeWidgetItem(parent)
     item.setIcon(0, icon)
     item.setText(0, name)
     item.setCheckState(0, checkbox)

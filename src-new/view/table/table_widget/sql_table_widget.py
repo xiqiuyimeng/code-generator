@@ -51,27 +51,27 @@ class SqlTableWidget(AbstractTableWidget):
 
     def add_checked_data(self, cols):
         add_data = {
-            'conn': get_item_opened_record(self.tree_item.parent().parent()),
-            'db': get_item_opened_record(self.tree_item.parent()),
-            'tb': get_item_opened_record(self.tree_item),
-            'col': cols,
+            0: get_item_opened_record(self.tree_item.parent().parent()),
+            1: get_item_opened_record(self.tree_item.parent()),
+            2: get_item_opened_record(self.tree_item),
+            3: cols,
         }
         self.tree_data.add_node(add_data)
 
-    def remove_checked_data(self, cols):
+    def remove_checked_data(self, col):
         del_data = {
-            'conn': self.tree_item.parent().parent().text(0),
-            'db': self.tree_item.parent().text(0),
-            'tb': self.tree_item.text(0),
-            'col': cols,
+            0: get_item_opened_record(self.tree_item.parent().parent()).id,
+            1: get_item_opened_record(self.tree_item.parent()).id,
+            2: get_item_opened_record(self.tree_item).id,
+            3: col.id,
         }
         self.tree_data.del_node(del_data, recursive_del=True)
 
     def remove_all_table_checked(self):
         del_data = {
-            'conn': self.tree_item.parent().parent().text(0),
-            'db': self.tree_item.parent().text(0),
-            'tb': self.tree_item.text(0)
+            0: get_item_opened_record(self.tree_item.parent().parent()).id,
+            1: get_item_opened_record(self.tree_item.parent()).id,
+            2: get_item_opened_record(self.tree_item).id,
         }
         self.tree_data.del_node(del_data, recursive_del=True)
 
