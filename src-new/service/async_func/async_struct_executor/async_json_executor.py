@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from service.async_func.async_struct_executor.async_struct_executor import PrettyStructWorker, PrettyStructExecutor, \
     OpenStructWorker, OpenStructExecutor
 from service.system_storage.data_type import get_data_type
-from service.system_storage.ds_table_info_sqlite import DsTableInfo, ColTypeEnum
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, ColTypeEnum
 from view.tree.tree_item.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
@@ -82,7 +82,7 @@ class OpenJsonWorker(OpenStructWorker):
             self.table_info_sqlite.insert(col_info)
 
     def assemble_table_info(self, name, value, parent_id):
-        col_info = DsTableInfo(init=True)
+        col_info = DsTableColInfo(init=True)
         col_info.col_name = name
         col_info.checked = self.opened_table_item.checked
         # 获取变量值的数据类型映射值

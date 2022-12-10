@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QWidge
 from constant.constant import TABLE_HEADER_LABELS, EXPAND_CHILD_TABLE, COLLAPSE_CHILD_TABLE
 from constant.icon_enum import get_icon
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
-from service.system_storage.ds_table_info_sqlite import DsTableInfo
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.util.tree_node import TreeData
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
@@ -184,7 +184,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         modify_col_data_list = list()
         for col in self.cols:
             col.checked = check_state
-            modify_col_data = DsTableInfo()
+            modify_col_data = DsTableColInfo()
             modify_col_data.id = col.id
             modify_col_data.checked = check_state
             modify_col_data_list.append(modify_col_data)

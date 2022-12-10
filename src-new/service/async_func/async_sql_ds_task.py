@@ -8,7 +8,7 @@ from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from service.sql_ds_executor import *
 from service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
-from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem
@@ -210,7 +210,7 @@ class OpenTBWorker(ConnWorkerABC):
         # 存储tab信息
         table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
         # 存储列信息
-        DsTableInfoSqlite().add_table(columns, table_tab.id, self.check_state)
+        DsTableColInfoSqlite().add_table(columns, table_tab.id, self.check_state)
         table_tab.col_list = columns
         return table_tab
 

@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
-from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.sqlite_abc import transactional
 from service.system_storage.struct_sqlite import StructInfo, StructSqlite
@@ -58,7 +58,7 @@ class OpenStructWorker(ThreadWorkerABC):
     def __init__(self, opened_table_item):
         super().__init__()
         self.opened_table_item = opened_table_item
-        self.table_info_sqlite = DsTableInfoSqlite()
+        self.table_info_sqlite = DsTableColInfoSqlite()
         self.struct_info = ...
         self.table_tab_id = ...
 

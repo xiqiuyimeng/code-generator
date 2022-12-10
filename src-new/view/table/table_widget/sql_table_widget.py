@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
-from service.system_storage.ds_table_info_sqlite import DsTableInfo
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.util.tree_node import TreeData
 from view.table.table_widget.abstract_table_widget import AbstractTableWidget
 from view.tree.tree_item.tree_item_func import get_item_opened_record
@@ -76,7 +76,7 @@ class SqlTableWidget(AbstractTableWidget):
     def save_data(self, row, col, data):
         # 根据row找到对应的列信息数据
         col_data = self.cols[row]
-        modify_col_data = DsTableInfo()
+        modify_col_data = DsTableColInfo()
         modify_col_data.id = col_data.id
 
         if col == 0:

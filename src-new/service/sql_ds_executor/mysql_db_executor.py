@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from service.sql_ds_executor.db_executor import InternetDBExecutor
-from service.system_storage.ds_table_info_sqlite import DsTableInfo, CheckedEnum, ColTypeEnum
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -15,7 +15,7 @@ class MySqlDBExecutor(InternetDBExecutor):
         return 'mysql+pymysql'
 
     def convert_tb_data(self, db_record):
-        table_info = DsTableInfo()
+        table_info = DsTableColInfo()
         table_info.col_name = db_record.get('Field')
         table_info.full_data_type = db_record.get('Type')
         table_info.is_pk = db_record.get('Key') == 'PRI'

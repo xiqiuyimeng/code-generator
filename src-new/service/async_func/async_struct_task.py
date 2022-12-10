@@ -5,6 +5,8 @@ from PyQt5.QtCore import pyqtSignal
 from constant.constant import ADD_FOLDER_TITLE, EDIT_FOLDER_TITLE
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
+from service.system_storage.ds_table_tab_sqlite import DsTableTab, DsTableTabSqlite
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem
 from service.system_storage.sqlite_abc import transactional
@@ -211,7 +213,16 @@ class ListStructWorker(ThreadWorkerABC):
             self.opened_items_signal.emit(children)
 
         # 读取tab信息
+        self.get_tab_cols()
         log.info('获取所有结构体成功')
+
+    def get_tab_cols(self):
+        tab_param = DsTableTab()
+        tab_param.ds_type = DatasourceTypeEnum.struct_ds_type.value.name
+        tab_list = DsTableTabSqlite().select_by_order(tab_param)
+        for tab in tab_list:
+            tab.col_list = DsTableColInfoSqlite().recursive_get_children(tab.id, 0)
+        self.tab_info_signal.emit(tab_list)
 
     def do_finally(self):
         self.success_signal.emit()

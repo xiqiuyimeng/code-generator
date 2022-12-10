@@ -9,7 +9,7 @@ from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
 from service.system_storage.conn_type import get_conn_type_by_type
-from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite, DsTableInfo
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
@@ -230,9 +230,9 @@ class ListConnWorker(ThreadWorkerABC):
         tab_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
         tab_list = DsTableTabSqlite().select_by_order(tab_param)
         for tab in tab_list:
-            col_param = DsTableInfo()
+            col_param = DsTableColInfo()
             col_param.parent_tab_id = tab.id
-            tab.col_list = DsTableInfoSqlite().select_by_order(col_param)
+            tab.col_list = DsTableColInfoSqlite().select_by_order(col_param)
         self.tab_info_signal.emit(tab_list)
 
     def do_exception(self, e: Exception):

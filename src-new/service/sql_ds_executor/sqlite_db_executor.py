@@ -4,7 +4,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from service.sql_ds_executor.db_executor import SqlDBExecutor
 from service.system_storage.conn_type import get_conn_type_by_type
-from service.system_storage.ds_table_info_sqlite import DsTableInfo, CheckedEnum, ColTypeEnum
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -38,7 +38,7 @@ class SqliteDBExecutor(SqlDBExecutor):
         return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
 
     def convert_tb_data(self, db_record):
-        table_info = DsTableInfo()
+        table_info = DsTableColInfo()
         table_info.col_name = db_record.get('name')
         table_info.full_data_type = db_record.get('type')
         table_info.is_pk = db_record.get('pk')

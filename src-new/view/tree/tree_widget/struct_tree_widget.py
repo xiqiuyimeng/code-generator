@@ -4,6 +4,7 @@ from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from service.util.tree_node import TreeData
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.context import get_struct_tree_node
+from view.tree.tree_item.tree_item_func import get_item_opened_tab
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.tree_function import add_struct_tree_item
 
@@ -66,12 +67,12 @@ class StructTreeWidget(AbstractTreeWidget):
         for opened_tab in opened_tabs:
             # 找到表节点
             item = self.get_item_by_opened_id(opened_tab.parent_opened_id)
-            # get_tree_node(item, self, self.main_window).reopen_item(opened_tab)
-            # tab = get_item_opened_tab(item)
-            # if opened_tab.is_current:
-            #     current_tab = tab
+            get_struct_tree_node(item, self, self.main_window).reopen_item(opened_tab)
+            tab = get_item_opened_tab(item)
+            if opened_tab.is_current:
+                current_tab = tab
         # 将当前页置为当前
-        self.main_window.sql_tab_widget.setCurrentWidget(current_tab)
+        self.main_window.struct_tab_widget.setCurrentWidget(current_tab)
 
     def reopen_end(self):
         # 找出当前项，选中

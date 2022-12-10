@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
-from service.system_storage.ds_table_info_sqlite import DsTableInfo
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
 from logger.log import logger as log
 
@@ -37,7 +37,7 @@ class DsTableTab(BasicSqliteDTO):
     # 数据源类型
     ds_type: str = field(init=False, default=None)
     # col_list
-    col_list: List[DsTableInfo] = field(init=False, default=None)
+    col_list: List[DsTableColInfo] = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():

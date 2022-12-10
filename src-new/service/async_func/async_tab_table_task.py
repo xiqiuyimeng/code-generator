@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
-from service.system_storage.ds_table_info_sqlite import DsTableInfoSqlite, DsTableInfo
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
 
 _author_ = 'luwt'
@@ -24,15 +24,15 @@ class TabChangedWorker(ThreadWorkerABC):
             method, data = self.queue.get()
             if method == 'remove_tab':
                 DsTableTabSqlite().remove_tab(data)
-                DsTableInfoSqlite().delete_by_parent_tab_id(data.id)
+                DsTableColInfoSqlite().delete_by_parent_tab_id(data.id)
             elif method == 'change_current':
                 DsTableTabSqlite().change_current(data)
             elif method == 'sort_order':
                 DsTableTabSqlite().batch_update(data)
             elif method == 'save_table_data':
-                DsTableInfoSqlite().update(data)
+                DsTableColInfoSqlite().update(data)
             elif method == 'batch_save_data':
-                DsTableInfoSqlite().batch_update(data)
+                DsTableColInfoSqlite().batch_update(data)
             log.debug(f'{method}: {data}')
 
     def do_exception(self, e: Exception):
@@ -57,7 +57,7 @@ class AsyncSaveTabObjExecutor(ThreadExecutorABC):
     def sort_order(self, tabs):
         self.queue.put(('sort_order', tabs))
 
-    def save_table_data(self, modify_data: DsTableInfo):
+    def save_table_data(self, modify_data: DsTableColInfo):
         self.queue.put(('save_table_data', modify_data))
 
     def batch_save_data(self, data):

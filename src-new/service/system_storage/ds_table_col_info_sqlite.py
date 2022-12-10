@@ -8,9 +8,9 @@ from logger.log import logger as log
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:32'
 
-table_name = 'ds_table_info'
+table_name = 'ds_table_col_info'
 
-ds_table_info_sql_dict = {
+ds_table_col_info_sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     col_name char(50) not null,
@@ -45,7 +45,7 @@ class ColTypeEnum(Enum):
 
 
 @dataclass
-class DsTableInfo(BasicSqliteDTO):
+class DsTableColInfo(BasicSqliteDTO):
 
     # 列名
     col_name: str = field(init=False, default=None)
@@ -87,10 +87,10 @@ class DsTableInfo(BasicSqliteDTO):
         self.expanded = 0
 
 
-class DsTableInfoSqlite(SqliteBasic):
+class DsTableColInfoSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, ds_table_info_sql_dict)
+        super().__init__(table_name, ds_table_col_info_sql_dict)
 
     def add_table(self, columns, parent_tab_id, check_state):
         for index, column in enumerate(columns, start=1):
@@ -101,6 +101,20 @@ class DsTableInfoSqlite(SqliteBasic):
 
     @staticmethod
     def delete_by_parent_tab_id(parent_tab_id):
-        delete_sql = f"{ds_table_info_sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
+        delete_sql = f"{ds_table_col_info_sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
         get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")
+
+    def recursive_get_children(self, parent_tab_id, parent_id):
+        cols = self.get_children(parent_tab_id, parent_id)
+        if cols:
+            for col in cols:
+                # 作为父元素，继续查询子元素
+                col.children = self.recursive_get_children(parent_tab_id, col.id)
+        return cols
+
+    def get_children(self, parent_tab_id, parent_id):
+        col_param = DsTableColInfo()
+        col_param.parent_tab_id = parent_tab_id
+        col_param.parent_id = parent_id
+        return self.select_by_order(col_param)

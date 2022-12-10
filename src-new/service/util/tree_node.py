@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from service.system_storage.ds_table_info_sqlite import DsTableInfo
+from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 
 _author_ = 'luwt'
@@ -105,7 +105,7 @@ class TreeData:
     def _create_node(self, parent_node, node_data):
         node_name = ...
         # 列对象将以 DsTableInfo 对象的形式传入，所以需要将名称和数据分开处理
-        if isinstance(node_data, DsTableInfo):
+        if isinstance(node_data, DsTableColInfo):
             node_name = node_data.col_name
         elif isinstance(node_data, OpenedTreeItem):
             node_name = node_data.item_name
