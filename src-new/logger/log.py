@@ -28,13 +28,13 @@ logger.add(
     log_filename,
     format=log_format,
     level="DEBUG",
-    rotation="10mb",
+    rotation="100 MB",
 )
 # 定义错误日志文件输出样式
 logger.add(
     error_log_filename,
     format=log_format,
     level="ERROR",
-    rotation="10mb"
+    rotation="100 MB"
 )
 

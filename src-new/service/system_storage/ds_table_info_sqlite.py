@@ -14,8 +14,8 @@ ds_table_info_sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     col_name char(50) not null,
-    data_type char(20) not null,
-    full_data_type char(20) not null,
+    data_type char(50) not null,
+    full_data_type char(50) not null,
     is_pk integer not null,
     col_comment char(200) default null,
     checked integer not null,
