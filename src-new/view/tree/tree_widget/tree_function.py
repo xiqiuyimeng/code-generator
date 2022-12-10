@@ -52,7 +52,7 @@ def make_display_tree_item(parent, name, icon, opened_item_record=None, checkbox
     :param opened_item_record: 打开记录表中的记录
     :param checkbox: 构造的子节点的复选框
     """
-    item = TreeWidgetItem(parent)
+    item = QTreeWidgetItem(parent)
     item.setIcon(0, icon)
     item.setText(0, name)
     if opened_item_record:
@@ -132,24 +132,24 @@ def make_conn_tree_items(opened_items, parent):
     """
     for opened_item in opened_items:
         conn_icon = get_icon(opened_item.data_type.display_name)
-        item = make_sql_tree_item(parent, opened_item.item_name, conn_icon, opened_item)
+        item = make_sql_tree_item(parent, parent, opened_item.item_name, conn_icon, opened_item)
         # 添加顶层节点
         parent.addTopLevelItem(item)
 
 
-def make_db_items(parent_item, opened_db_items):
+def make_db_items(tree_widget, parent_item, opened_db_items):
     """构建数据库层叶子节点"""
     for opened_db_item in opened_db_items:
         icon = get_icon(opened_db_item.data_type.db_icon_name)
-        make_sql_tree_item(parent_item, opened_db_item.item_name, icon, opened_db_item)
+        make_sql_tree_item(tree_widget, parent_item, opened_db_item.item_name, icon, opened_db_item)
 
 
-def make_table_items(parent_item, opened_table_items, tree_data: TreeData):
+def make_table_items(tree_widget, parent_item, opened_table_items, tree_data: TreeData):
     """构建数据表层叶子节点"""
     checked_tables, checked_table_opened_items = list(), list()
     for opened_table_item in opened_table_items:
         icon = get_icon(opened_table_item.data_type.tb_icon_name)
-        make_sql_tree_item(parent_item, opened_table_item.item_name,
+        make_sql_tree_item(tree_widget, parent_item, opened_table_item.item_name,
                            icon, opened_table_item, checkbox=opened_table_item.checked)
         if opened_table_item.checked:
             checked_tables.append(opened_table_item.item_name)
@@ -194,13 +194,12 @@ def set_children_check_state(item, check_state, tree_widget, window):
     :param tree_widget: 树
     :param window: 主窗体
     """
-    children = list()
     for index in range(item.childCount()):
         child = item.child(index)
-        child.setCheckState(0, check_state)
-        TableTreeNode(child, tree_widget, window).change_check_box(check_state)
-        children.append(child.text(0))
-    return children
+        # 当子项复选框状态不一致时，再处理
+        if child.checkState(0) != check_state:
+            child.setCheckState(0, check_state)
+            TableTreeNode(child, tree_widget, window).change_check_box(check_state)
 
 
 # ------------------------- 结构体使用方法 -------------------------#
@@ -331,7 +330,7 @@ def show_folder_dialog(screen_rect, tree_widget, parent_opened_item, dialog_titl
     folder_dialog.exec()
 
 
-def make_struct_tree_item(parent, name, icon, checkbox, opened_item_record):
+def make_struct_tree_item(tree_widget, parent, name, icon, checkbox, opened_item_record):
     """
     构造结构体树的子项
     :param parent: 要构造子项的父节点元素
@@ -340,7 +339,7 @@ def make_struct_tree_item(parent, name, icon, checkbox, opened_item_record):
     :param opened_item_record: 打开记录表中的记录
     :param checkbox: 构造的子节点的复选框
     """
-    item = TreeWidgetItem(parent)
+    item = TreeWidgetItem(tree_widget, parent)
     item.setIcon(0, icon)
     item.setText(0, name)
     item.setCheckState(0, checkbox)
@@ -357,7 +356,7 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     :param struct_type: 结构体类型，文件夹或具体结构体，以此确定icon
     """
     icon = get_icon(struct_type)
-    struct_item = make_struct_tree_item(parent, opened_item_record.item_name,
+    struct_item = make_struct_tree_item(tree_widget, parent, opened_item_record.item_name,
                                         icon, opened_item_record.checked, opened_item_record)
     struct_item.setExpanded(opened_item_record.expanded)
     if tree_widget is parent:

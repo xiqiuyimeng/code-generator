@@ -18,8 +18,7 @@ class TableTreeNode(AbstractSqlTreeNode):
     def __init__(self, *args):
         super().__init__(*args)
         self.table_name = self.item.text(0)
-        if not hasattr(self, 'open_tb_executor'):
-            self.open_tb_executor: OpenTBExecutor = ...
+        self.open_tb_executor: OpenTBExecutor = ...
 
     def open_item(self):
         # 获取打开的tab
@@ -92,7 +91,7 @@ class TableTreeNode(AbstractSqlTreeNode):
                     1: get_item_opened_record(self.item.parent()).id,
                     2: get_item_opened_record(self.item).id
                 }
-                self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
+                self.tree_widget.tree_data.del_node(del_data)
 
     def set_check_state(self, check_state):
         self.item.setCheckState(0, check_state)
@@ -115,6 +114,16 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 关闭表
         elif func == CLOSE_TABLE_MENU.format(self.table_name):
             self.close_item()
+
+    def close_tab_callback(self):
+        # 如果选中了数据，那么清空列数据，提供给tab bar调用，在关闭tab时调用
+        if self.item.checkState(0):
+            del_data = {
+                0: get_item_opened_record(self.item.parent().parent()).id,
+                1: get_item_opened_record(self.item.parent()).id,
+                2: get_item_opened_record(self.item).id
+            }
+            self.tree_widget.tree_data.clear_node_children(del_data)
 
     def worker_terminate(self):
         if self.open_tb_executor is not Ellipsis:

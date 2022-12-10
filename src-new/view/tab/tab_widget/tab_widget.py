@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTabWidget
 
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
@@ -13,11 +12,6 @@ _date_ = '2022/10/9 17:37'
 
 
 class TabWidget(QTabWidget):
-
-    # 当前至少存在一个tab
-    opened_tab_signal = pyqtSignal()
-    # 清除所有tab
-    clear_tabs_signal = pyqtSignal()
 
     def __init__(self, parent, main_window):
         super().__init__(parent=parent)

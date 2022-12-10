@@ -10,8 +10,7 @@ class AbstractSqlTreeNode(AbstractTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        if not hasattr(self, 'is_opening'):
-            self.is_opening = False
+        self.is_opening = False
 
     def open_item(self): ...
 

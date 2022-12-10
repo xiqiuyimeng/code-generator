@@ -8,9 +8,9 @@ _date_ = '2022/12/2 11:36'
 class AbstractTreeNode:
 
     def __new__(cls, item: QTreeWidgetItem, tree_widget, window):
-        if not hasattr(item, 'node'):
-            item.node = object.__new__(cls)
-        return item.node
+        if not hasattr(item, 'tree_node'):
+            item.tree_node = object.__new__(cls)
+        return item.tree_node
 
     def __init__(self, item: QTreeWidgetItem, tree_widget, window):
         self.item = item

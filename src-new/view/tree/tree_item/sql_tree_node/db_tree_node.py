@@ -20,8 +20,7 @@ class DBTreeNode(AbstractSqlTreeNode):
     def __init__(self, *args):
         super().__init__(*args)
         self.db_name = self.item.text(0)
-        if not hasattr(self, 'open_db_executor'):
-            self.open_db_executor: OpenDBExecutor = ...
+        self.open_db_executor: OpenDBExecutor = ...
 
     def open_item(self):
         if not self.item.childCount():
@@ -34,7 +33,7 @@ class DBTreeNode(AbstractSqlTreeNode):
     def open_item_ui(self, opened_table_items):
         self.is_opening = False
         if opened_table_items:
-            make_table_items(self.item, opened_table_items, self.tree_widget.tree_data)
+            make_table_items(self.tree_widget, self.item, opened_table_items, self.tree_widget.tree_data)
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:
@@ -45,7 +44,7 @@ class DBTreeNode(AbstractSqlTreeNode):
 
     def reopen_item(self, opened_items):
         # 打开库下的表节点
-        make_table_items(self.item, opened_items, self.tree_widget.tree_data)
+        make_table_items(self.tree_widget, self.item, opened_items, self.tree_widget.tree_data)
         opened_item_record = get_item_opened_record(self.item)
         self.item.setExpanded(opened_item_record.expanded)
         if opened_item_record.is_current:
@@ -62,7 +61,7 @@ class DBTreeNode(AbstractSqlTreeNode):
         if db_data_node:
             if pop_question(CLOSE_DB_PROMPT, CLOSE_DB_MENU, self.window):
                 # 删除选中数据
-                self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
+                self.tree_widget.tree_data.del_node(del_data)
             else:
                 return
         index_list = self.get_tab_indexes()

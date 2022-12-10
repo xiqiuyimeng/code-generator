@@ -24,6 +24,8 @@ def get_sql_tree_node(item, tree_widget, window) -> AbstractSqlTreeNode:
     目前树的根节点为空，所以可以根据这一特性发现当前节点的层级，
     从而返回相应的实例
     """
+    if hasattr(item, 'tree_node'):
+        return item.tree_node
     # 如果父级为空，那么则为连接
     if item.parent() is None:
         return ConnTreeNode(item, tree_widget, window)
@@ -37,6 +39,8 @@ def get_struct_tree_node(item, tree_widget, window) -> AbstractStructTreeNode:
     """
     获取结构体树节点对象，结构体树节点分为两种：文件夹节点、结构体节点
     """
+    if hasattr(item, 'tree_node'):
+        return item.tree_node
     opened_item_record = get_item_opened_record(item)
     # 如果是文件夹，那么返回文件夹节点对象，否则返回结构体节点对象
     if opened_item_record.data_type == FolderTypeEnum.folder_type.value:

@@ -82,7 +82,7 @@ class OpenJsonWorker(OpenStructWorker):
             self.table_info_sqlite.insert(col_info)
 
     def assemble_table_info(self, name, value, parent_id):
-        col_info = DsTableInfo()
+        col_info = DsTableInfo(init=True)
         col_info.col_name = name
         col_info.checked = self.opened_table_item.checked
         # 获取变量值的数据类型映射值

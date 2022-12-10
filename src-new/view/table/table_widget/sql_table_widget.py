@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-表格结构，大体与树结构类似
-"""
+
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_info_sqlite import DsTableInfo
 from service.util.tree_node import TreeData
@@ -65,7 +63,7 @@ class SqlTableWidget(AbstractTableWidget):
             2: get_item_opened_record(self.tree_item).id,
             3: col.id,
         }
-        self.tree_data.del_node(del_data, recursive_del=True)
+        self.tree_data.del_node(del_data)
 
     def remove_all_table_checked(self):
         del_data = {
@@ -73,7 +71,7 @@ class SqlTableWidget(AbstractTableWidget):
             1: get_item_opened_record(self.tree_item.parent()).id,
             2: get_item_opened_record(self.tree_item).id,
         }
-        self.tree_data.del_node(del_data, recursive_del=True)
+        self.tree_data.del_node(del_data)
 
     def save_data(self, row, col, data):
         # 根据row找到对应的列信息数据

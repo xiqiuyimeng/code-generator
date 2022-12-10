@@ -7,7 +7,6 @@ from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TAB
     CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE
 from service.system_storage.ds_table_tab_sqlite import DsTableTab
 from view.box.message_box import pop_fail
-from view.tree.tree_item.context import get_sql_tree_node
 from view.tree.tree_item.tree_item_func import set_item_opened_tab
 
 _author_ = 'luwt'
@@ -111,22 +110,22 @@ class TabBar(QTabBar):
     def close_all_tabs(self):
         index_list = range(0, self.count())
         # 删除所有tab
-        [self.remove_tab(idx) for idx in reversed(index_list)
-         if self.table_allow_close(index_list)]
+        if self.table_allow_close(index_list):
+            [self.remove_tab(idx) for idx in reversed(index_list)]
 
     def close_tabs_to_left(self, index):
         # 左侧的index
         left_index_list = range(0, index)
         # 关闭标签页左边所有tab
-        [self.remove_tab(idx) for idx in reversed(left_index_list)
-         if self.table_allow_close(left_index_list)]
+        if self.table_allow_close(left_index_list):
+            [self.remove_tab(idx) for idx in reversed(left_index_list)]
 
     def close_tabs_to_right(self, index):
         # 右侧的index
         right_index_list = range(index + 1, self.count())
         # 关闭标签页右边所有tab
-        [self.remove_tab(idx) for idx in reversed(right_index_list)
-         if self.table_allow_close(right_index_list)]
+        if self.table_allow_close(right_index_list):
+            [self.remove_tab(idx) for idx in reversed(right_index_list)]
 
     def table_allow_close(self, indexes):
         """根据索引，检查表是否都可以关闭，检查规则是：是否存在部分选中的表，如果部分选中则不可关闭"""
@@ -152,6 +151,8 @@ class TabBar(QTabBar):
         self.parent.removeTab(index)
         table_tab = tab_widget.table_tab
         self.remove_tab_signal.emit(table_tab)
+        # 清除选中数据，调用item node清除数据
+        tab_widget.tree_item.tree_node.close_tab_callback()
 
     def change_current(self, index):
         # 获取当前项

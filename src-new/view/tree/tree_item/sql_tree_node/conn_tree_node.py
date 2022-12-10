@@ -23,14 +23,10 @@ class ConnTreeNode(AbstractSqlTreeNode):
     def __init__(self, *args):
         super().__init__(*args)
         self.conn_name = self.item.text(0)
-        if not hasattr(self, 'open_conn_executor'):
-            self.open_conn_executor: OpenConnExecutor = ...
-        if not hasattr(self, 'test_conn_executor'):
-            self.test_conn_executor: TestConnIconMovieExecutor = ...
-        if not hasattr(self, 'del_conn_executor'):
-            self.del_conn_executor: DelConnExecutor = ...
-        if not hasattr(self, 'is_testing'):
-            self.is_testing = False
+        self.open_conn_executor: OpenConnExecutor = ...
+        self.test_conn_executor: TestConnIconMovieExecutor = ...
+        self.del_conn_executor: DelConnExecutor = ...
+        self.is_testing = False
 
     def open_item(self):
         if not self.is_opening and not self.item.childCount():
@@ -43,7 +39,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def open_item_ui(self, opened_db_items):
         self.is_opening = False
-        make_db_items(self.item, opened_db_items)
+        make_db_items(self.tree_widget, self.item, opened_db_items)
         self.item.setExpanded(True)
         self.tree_widget.set_selected_focus(self.item)
 
@@ -52,7 +48,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def reopen_item(self, opened_items):
         # 打开连接下的库节点
-        make_db_items(self.item, opened_items)
+        make_db_items(self.tree_widget, self.item, opened_items)
         opened_item_record = get_item_opened_record(self.item)
         self.item.setExpanded(opened_item_record.expanded)
         if opened_item_record.is_current:
@@ -66,7 +62,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
         if conn_data_node:
             if pop_question(CLOSE_CONN_PROMPT, CLOSE_CONN_ACTION, self.window):
                 # 删除选中数据
-                self.tree_widget.tree_data.del_node(del_data, recursive_del=True)
+                self.tree_widget.tree_data.del_node(del_data)
             else:
                 return
         if self.item.childCount():

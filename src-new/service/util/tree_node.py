@@ -25,9 +25,6 @@ class TreeDataNode:
 
 class TreeData:
 
-    # 添加节点数据和删除节点数据都是字典类型，按_keys顺序匹配层次
-    _keys = ('conn', 'db', 'tb', 'col')
-
     def __new__(cls, *args, **kwargs):
         if not hasattr(TreeData, '_instance'):
             TreeData._instance = object.__new__(cls)
@@ -60,7 +57,7 @@ class TreeData:
                 yield from self._iterate_node(current_node)
 
     @staticmethod
-    def _get_node(parent_node: TreeDataNode, node_id):
+    def _get_child_node(parent_node: TreeDataNode, node_id):
         if parent_node.children:
             return parent_node.children.get(node_id)
 
@@ -77,16 +74,16 @@ class TreeData:
             }
             2. 添加多列情况，用于选择整表的时候使用
             add_data = {
-                'conn': test_conn: OpenedTreeItem,
-                'db': test_db: OpenedTreeItem,
-                'tb': test_tb: OpenedTreeItem,
-                'col': (test_col1: DsTableInfo, test_col2: DsTableInfo),
+                0: test_conn: OpenedTreeItem,
+                1: test_db: OpenedTreeItem,
+                2: test_tb: OpenedTreeItem,
+                3: (test_col1: DsTableInfo, test_col2: DsTableInfo),
             }
             2. 添加单表或多个表，不存在同时添加多列情况
             add_data = {
-                'conn': test_conn: OpenedTreeItem,
-                'db': test_db: OpenedTreeItem,
-                'tb': [test_tb1: OpenedTreeItem, test_tb2: OpenedTreeItem] or test_tb1: OpenedTreeItem
+                0: test_conn: OpenedTreeItem,
+                1: test_db: OpenedTreeItem,
+                2: [test_tb1: OpenedTreeItem, test_tb2: OpenedTreeItem] or test_tb1: OpenedTreeItem
             }
         """
         self._do_add_node(add_data, self._root_node, self._root_node.item_level + 1)
@@ -113,7 +110,7 @@ class TreeData:
         elif isinstance(node_data, OpenedTreeItem):
             node_name = node_data.item_name
         # 查询node是否存在
-        node = self._get_node(parent_node, node_data.id)
+        node = self._get_child_node(parent_node, node_data.id)
         # 如果node不存在，创建
         if not node:
             node = TreeDataNode(parent_node)
@@ -142,25 +139,16 @@ class TreeData:
         2. 删除多列情况，一般场景是， 表已经选择了一部分列，再次进行全选，那么需要将之前选中列全部删除，
                 并不进行递归删除，保留表，这样视为表全选
             del_data = {
-                'conn': 'test_conn',
-                'db': 'test_db',
-                'tb': "test_tb",
-                'col': '['test_col', 'test_col2']
+                0: 1: opened_conn_id,
+                1: 23: opened_db_id,
+                2: 31: opened_tb_id,
+                3: [2: col_id, 3: col_id]
             }
         3. 删除单表或多表
             del_data = {
-                'conn': 'test_conn',
-                'db': 'test_db',
-                'tb': ['test_tb1', 'test_tb2']  or 'test_tb1'
-            }
-        4. 删除库
-            del_data = {
-                'conn': 'test_conn',
-                'db': ['test_db1', 'test_db2']  or 'test_db'
-            }
-        5. 删除连接
-            del_data = {
-                'conn': 'test_conn'
+                0: 1: opened_conn_id,
+                1: 23: opened_db_id,
+                2: [31: opened_tb_id, 32: opened_tb_id]  or 31: opened_tb_id
             }
         """
         self._do_del_node(del_data, self._root_node, self._root_node.item_level + 1, recursive_del)
@@ -169,7 +157,10 @@ class TreeData:
         # 找出要删的数据
         node_id = del_data.get(item_level)
         # 找到当前级别的node
-        node = self._get_node(parent_node, node_id if isinstance(node_id, int) else node_id[0])
+        node = self._get_child_node(parent_node, node_id if isinstance(node_id, int) else node_id[0])
+        # 如果节点不存在，直接结束
+        if not node:
+            return
 
         # 首先，如果当前节点不是最后一级，递归到最后一级，再进行删除逻辑处理
         if item_level < max(del_data):
@@ -178,31 +169,9 @@ class TreeData:
         # 如果当前节点是最后一级，直接删除
         if item_level is max(del_data):
             self._remove_node(parent_node, node_id)
-        # 如果不是最后一级，并且没有子项，也需要递归删除，那么删除节点
-        elif not parent_node.children and recursive_del:
+        # 如果当前节点不是最后一级，并且没有子项，也需要递归删除，那么删除节点
+        elif not node.children and recursive_del:
             self._remove_node(parent_node, node_id)
-
-        # if isinstance(node_id, int):
-        #     self._remove_node(parent_node, node_id)
-        # # 如果是多个id，直接删除
-        # elif isinstance(node_id, list):
-        #     [self._remove_node(parent_node, child_node) for child_node in node_data
-        #      if self._get_node(parent_node, child_node)]
-        # elif isinstance(node_data, str):
-        #     # 单个名称，递归操作，找出node
-        #     child_node = self._get_node(parent_node, node_data)
-        #     if not child_node:
-        #         return
-        #     # 如果是删除元素的最后一项，直接进行删除
-        #     if cur_key == tuple(del_data.keys())[-1]:
-        #         self._remove_node(parent_node, node_data)
-        #     else:
-        #         # 如果不是删除元素的最后一项，继续
-        #         if child_node.children:
-        #             self._do_del_node(del_data, child_node, keys_iter, recursive_del)
-        #         # 如果没有子元素并且指定递归删除，进行删除
-        #         if not child_node.children and recursive_del:
-        #             self._remove_node(parent_node, node_data)
 
     def _remove_node(self, parent_node, node_id):
         # 如果node id是单个id，直接删除，否则视为list，循环删除
@@ -219,13 +188,17 @@ class TreeData:
     def clear_tree(self):
         self._root_node.children.clear()
 
+    def clear_node_children(self, node_data: dict):
+        node = self.get_node(node_data)
+        node.children.clear()
+
     def get_node(self, node_data: dict):
         return self._do_get_node(node_data, self._root_node, self._root_node.item_level + 1)
 
     def _do_get_node(self, node_data: dict, parent_node: TreeDataNode, item_level):
         node_id = node_data.get(item_level)
         if node_id:
-            node = self._get_node(parent_node, node_id)
+            node = self._get_child_node(parent_node, node_id)
             # 遍历到最后一个结束
             if item_level == max(node_data):
                 return node

@@ -32,8 +32,8 @@ class StructTreeWidget(AbstractTreeWidget):
     def do_handle_right_menu_func(self, item, func_name):
         get_struct_tree_node(item, self, self.main_window).handle_menu_func(func_name)
 
-    def do_handle_item_change(self, item):
-        super().do_handle_item_change(item)
+    def do_handle_checkbox_changed(self, item):
+        super().do_handle_checkbox_changed(item)
 
     def reopen_tree(self):
         # 如果还没初始化过，再执行初始化

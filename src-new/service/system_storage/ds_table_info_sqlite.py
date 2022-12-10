@@ -23,7 +23,7 @@ ds_table_info_sql_dict = {
     parent_id integer,
     item_order integer not null,
     col_type char(20) not null,
-    expanded integer not null,
+    expanded integer,
     create_time datetime,
     update_time datetime
     );''',
@@ -54,7 +54,7 @@ class DsTableInfo(BasicSqliteDTO):
     # 完整数据类型 = 数据类型 + 字段长度
     full_data_type: str = field(init=False, default=None)
     # 是否是主键
-    is_pk: int = field(init=False, default=0)
+    is_pk: int = field(init=False, default=None)
     # 列注释
     col_comment: str = field(init=False, default=None)
     # 是否勾选，与qt中选中状态枚举保持一致
@@ -62,12 +62,12 @@ class DsTableInfo(BasicSqliteDTO):
     # 指向table_tab
     parent_tab_id: int = field(init=False, default=None)
     # 父id，指向当前表中的父id
-    parent_id: int = field(init=False, default=0)
+    parent_id: int = field(init=False, default=None)
     # 列类型：列，对象，数组
     col_type: str = field(init=False, default=None)
-    # 是否展开，用于存在子表的情况下，默认为0，未展开
-    expanded: int = field(init=False, default=0)
-    # 是否在页面已经创建了子表，用于页面展示交互
+    # 是否展开，用于存在子表的情况下，0，未展开 1，展开
+    expanded: int = field(init=False, default=None)
+    # 非数据库字段，是否在页面已经创建了子表，用于页面展示交互
     has_child_table: int = field(init=False, default=0)
     # 非数据库字段，维持子项列表
     children: list = field(init=False, default=None)
@@ -75,9 +75,16 @@ class DsTableInfo(BasicSqliteDTO):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+        if kwargs.get('init'):
+            self.init_value()
 
     def handle_data_type(self):
         self.data_type = self.full_data_type.split("(")[0]
+
+    def init_value(self):
+        self.is_pk = 0
+        self.parent_id = 0
+        self.expanded = 0
 
 
 class DsTableInfoSqlite(SqliteBasic):

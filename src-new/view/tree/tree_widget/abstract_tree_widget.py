@@ -5,8 +5,9 @@
 经测试发现，在矩形四角处似乎有问题，由于复选框圆角问题，导致圆角外坐标判断正确，却不能触发复选框点击状态变化，可能导致逻辑bug
 所以根据树节点点击且导致复选框改变的需求，经过测试发现相关事件与信号的顺序为：
     mousePressEvent 按鼠标事件触发 -> mouseReleaseEvent 鼠标释放事件触发 -> itemChanged信号 -> clicked信号
-    可以在mousePressEvent事件中设置标志位，表明在点击，在itemChanged信号槽函数中判断是否点击，在clicked信号槽函数中重置标志位，
-    实现点击复选框触发事件
+    可以在mousePressEvent事件中设置标志位，表明事件类型是鼠标点击事件，
+    而在itemChanged信号发出时，会触发树节点的 setData 方法，所以可以根据是否点击和数据变化，判断复选框是否点击，
+    在clicked信号槽函数中重置标志位，实现点击复选框功能
 """
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QCursor
@@ -33,8 +34,8 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
 
 class AbstractTreeWidget(DisplayTreeWidget):
 
-    # 定义信号，发送点击复选框的树节点和选中状态：全选、部分选、未选择
-    item_checkbox_clicked = pyqtSignal(QTreeWidgetItem, int)
+    # 定义信号，发送点击复选框的树节点
+    item_checkbox_clicked = pyqtSignal(QTreeWidgetItem)
 
     def __init__(self, parent, window):
         super().__init__(parent)
@@ -63,7 +64,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
         self.customContextMenuRequested.connect(self.handle_right_mouse_clicked)
         # 主要为了实现监听复选框点击
         self.itemClicked.connect(self.handle_item_clicked)
-        self.itemChanged.connect(self.handle_item_change)
+        self.item_checkbox_clicked.connect(self.handle_checkbox_changed)
         # 展开折叠信号
         self.itemCollapsed.connect(self.handle_item_collapsed)
         self.itemExpanded.connect(self.handle_item_expanded)
@@ -91,11 +92,12 @@ class AbstractTreeWidget(DisplayTreeWidget):
         # 鼠标左键点击结束事件，将标志位置位False
         self.item_clicked = False
 
-    def handle_item_change(self, item: QTreeWidgetItem):
+    def handle_checkbox_changed(self, item: QTreeWidgetItem):
         # 事件信号顺序是：mousePressEvent 按鼠标事件触发 -> mouseReleaseEvent 鼠标释放事件触发
         # -> itemChanged信号 -> clicked信号
-        if self.item_clicked:
-            self.do_handle_item_change(item)
+        # 而在itemChanged信号发出时，会触发树节点的 setData方法，
+        # 所以可以根据是否点击和数据变化，判断复选框是否点击
+        self.do_handle_checkbox_changed(item)
 
     def handle_item_collapsed(self, item):
         if not self.reopening_flag:
@@ -178,7 +180,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
 
     def do_handle_right_menu_func(self, item, func_name): ...
 
-    def do_handle_item_change(self, item): ...
+    def do_handle_checkbox_changed(self, item): ...
 
     def reopen_tree(self): ...
 

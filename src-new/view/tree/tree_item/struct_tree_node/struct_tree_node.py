@@ -19,13 +19,10 @@ class StructTreeNode(AbstractStructTreeNode):
     def __init__(self, *args):
         super().__init__(*args)
         self.struct_name = self.item.text(0)
-        if not hasattr(self, 'open_struct_executor'):
-            self.open_struct_executor: OpenStructExecutor = ...
-        if not hasattr(self, 'is_opening'):
-            self.is_opening = False
+        self.open_struct_executor: OpenStructExecutor = ...
+        self.is_opening = False
         # 打开数据是不会变的
-        if not hasattr(self, 'opened_item'):
-            self.opened_item = get_item_opened_record(self.item)
+        self.opened_item = get_item_opened_record(self.item)
 
     def open_item(self):
         # 获取打开的tab
@@ -97,6 +94,15 @@ class StructTreeNode(AbstractStructTreeNode):
         # 删除结构体
         elif func == DEL_STRUCT_ACTION.format(self.struct_name):
             pass
+
+    def close_tab_callback(self):
+        # 清空列数据，提供给tab bar调用，在关闭tab时调用
+        del_data = {
+            # 0: get_item_opened_record(self.item.parent().parent()).id,
+            # 1: get_item_opened_record(self.item.parent()).id,
+            # 2: get_item_opened_record(self.item).id
+        }
+        self.tree_widget.tree_data.clear_node_children(del_data)
 
     def worker_terminate(self):
         super().worker_terminate()
