@@ -76,22 +76,17 @@ class TableTreeNode(AbstractSqlTreeNode):
         tab = get_item_opened_tab(self.item)
         if not tab:
             check_state = self.item.checkState(0)
+            add_del_data = {
+                0: get_item_opened_record(self.item.parent().parent()),
+                1: get_item_opened_record(self.item.parent()),
+                2: get_item_opened_record(self.item)
+            }
             if check_state == Qt.Checked:
                 # 如果是选中，添加选中数据
-                add_data = {
-                    0: get_item_opened_record(self.item.parent().parent()),
-                    1: get_item_opened_record(self.item.parent()),
-                    2: get_item_opened_record(self.item)
-                }
-                self.tree_widget.tree_data.add_node(add_data)
+                self.tree_widget.tree_data.add_node(add_del_data)
             elif check_state == Qt.Unchecked:
                 # 如果是未选中，删除选中数据
-                del_data = {
-                    0: get_item_opened_record(self.item.parent().parent()).id,
-                    1: get_item_opened_record(self.item.parent()).id,
-                    2: get_item_opened_record(self.item).id
-                }
-                self.tree_widget.tree_data.del_node(del_data)
+                self.tree_widget.tree_data.del_node(add_del_data)
 
     def set_check_state(self, check_state):
         self.item.setCheckState(0, check_state)
@@ -119,9 +114,9 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 如果选中了数据，那么清空列数据，提供给tab bar调用，在关闭tab时调用
         if self.item.checkState(0):
             del_data = {
-                0: get_item_opened_record(self.item.parent().parent()).id,
-                1: get_item_opened_record(self.item.parent()).id,
-                2: get_item_opened_record(self.item).id
+                0: get_item_opened_record(self.item.parent().parent()),
+                1: get_item_opened_record(self.item.parent()),
+                2: get_item_opened_record(self.item)
             }
             self.tree_widget.tree_data.clear_node_children(del_data)
 

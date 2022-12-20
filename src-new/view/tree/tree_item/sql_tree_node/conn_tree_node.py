@@ -56,7 +56,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def close_item(self):
         # 判断是否有选中数据
-        del_data = {0: get_item_opened_record(self.item).id}
+        del_data = {0: get_item_opened_record(self.item)}
         conn_data_node = self.tree_widget.tree_data.get_node(del_data)
         # 如果能找到选中数据，提示应先清空
         if conn_data_node:

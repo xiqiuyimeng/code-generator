@@ -91,7 +91,38 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def show_tool_tip(self, model_index):
         self.setToolTip(model_index.data())
 
-    def fill_table(self): ...
+    def fill_table(self):
+        """
+        将列名字段全数填充在表中，四列多行表
+        """
+        self.filling_table = True
+        checked_col_list = list()
+        # 填充数据
+        for i, col in enumerate(self.cols):
+            # 插入新的一行
+            self.insertRow(i)
+            # 设置checkbox在第一列
+            self.setCellWidget(i, 0, self.make_checkbox_num_item(i, col))
+
+            if col.checked:
+                checked_col_list.append(col)
+
+            self.setItem(i, 1, self.make_item(col.col_name))
+            self.setItem(i, 2, self.make_item(col.data_type))
+            self.setItem(i, 3, self.make_item(col.full_data_type))
+            self.setItem(i, 4, self.make_item('是' if col.is_pk else '否'))
+            self.setItem(i, 5, self.make_item(col.col_comment if col.col_comment else ''))
+
+        # 填充完主表格后，进行子表格处理，这样分开处理比较简单，
+        # 如果在创建主表格的同时进行子表格插入，那么循环的索引和实际的表格行数将存在偏差
+        [self.add_child_table_func(col, i, reopen=True) for i, col in enumerate(self.cols) if col.expanded]
+        # 设置表格根据内容调整
+        self.resizeRowsToContents()
+        self.filling_table = False
+
+        # 保存选中数据
+        if checked_col_list:
+            self.add_checked_data(checked_col_list)
 
     def add_checked_data(self, cols): ...
 
@@ -118,9 +149,11 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
             add_child_table_button = QToolButton()
             add_child_table_button.setIcon(get_icon(EXPAND_CHILD_TABLE))
             add_child_table_button.clicked.connect(
-                lambda: self.add_child_table_func(col_data, row_index, add_child_table_button))
+                lambda: self.add_child_table_func(col_data, row_index))
 
             check_layout.addWidget(add_child_table_button)
+            # 增加引用，方便槽函数调用
+            table_check_widget.add_child_table_button = add_child_table_button
 
         # 设置布局的左间距变小，主要是为了与表头的复选框对齐
         check_layout.setContentsMargins(4, check_layout.contentsMargins().top(),
@@ -138,37 +171,49 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
 
-    def add_child_table_func(self, col_data, row_index, button):
+    def add_child_table_func(self, col_data, row_index, reopen=False):
         # 当前行之前的行（列数据列表）
         before_rows = self.cols[:row_index]
         # 当前行之前的行，存在的子表数
         child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
+        # 获取添加子表格的 button，这里必须使用当前的实际行数获取部件，不能直接用创建表格时的行数计算，因为可能前面行会增加
+        button = self.cellWidget(row_index + child_tables, 0).__getattribute__('add_child_table_button')
         # 新的子表，需要在当前行下，新插入一行放入子表，
         # 下一行的索引 = 当前行索引 + 当前行之前，已经插入的新行 + 1
         row_index += 1 + child_tables
-        # 如果表格已经显示，再次点击应该隐藏子表
-        if col_data.expanded:
-            button.setIcon(get_icon(EXPAND_CHILD_TABLE))
-            self.hideRow(row_index)
-            col_data.expanded = 0
-        else:
+        # 如果是重新打开表，渲染界面，那么直接插入新的字表
+        if reopen:
+            self.add_child_table(row_index, col_data)
             button.setIcon(get_icon(COLLAPSE_CHILD_TABLE))
-            col_data.expanded = 1
-            # 如果存在子表，但是被隐藏了，展示即可，否则应该创建表
-            if col_data.has_child_table:
-                self.showRow(row_index)
+        else:
+            # 如果表格已经显示，再次点击应该隐藏子表
+            if col_data.expanded:
+                button.setIcon(get_icon(EXPAND_CHILD_TABLE))
+                self.hideRow(row_index)
+                col_data.expanded = 0
             else:
-                # 还没有创建过子表，创建一个新的子表
-                # 首先插入新行
-                self.insertRow(row_index)
-                # 为了美观，将新行单元格所有列合并
-                self.setSpan(row_index, 0, 1, 6)
-                child_table = self.add_child_table(col_data.children, row_index)
-                self.setCellWidget(row_index, 0, child_table)
-                # 标记当前列数据，已经存在子表
-                col_data.has_child_table = 1
+                button.setIcon(get_icon(COLLAPSE_CHILD_TABLE))
+                col_data.expanded = 1
+                # 如果存在子表，但是被隐藏了，展示即可，否则应该创建表
+                if col_data.has_child_table:
+                    self.showRow(row_index)
+                else:
+                    self.add_child_table(row_index, col_data)
+            # 保存数据
+            self.update_col_expanded(col_data)
 
-    def add_child_table(self, children_cols, row_index) -> QWidget: ...
+    def add_child_table(self, row_index, col_data):
+        # 还没有创建过子表，创建一个新的子表
+        # 首先插入新行
+        self.insertRow(row_index)
+        # 为了美观，将新行单元格所有列合并
+        self.setSpan(row_index, 0, 1, 6)
+        child_table = self.do_add_child_table(col_data.children, row_index)
+        self.setCellWidget(row_index, 0, child_table)
+        # 标记当前列数据，已经存在子表
+        col_data.has_child_table = 1
+
+    def do_add_child_table(self, children_cols, row_index) -> QWidget: ...
 
     def click_row_checkbox(self, checked, row):
         # 联动表头
@@ -195,3 +240,6 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
             self.remove_all_table_checked()
         elif check_state == Qt.Checked:
             self.add_all_table_cols_checked()
+
+    def update_col_expanded(self, col):
+        self.async_save_executor.update_col_expanded(col)

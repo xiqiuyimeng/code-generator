@@ -43,6 +43,7 @@ class SqliteDBExecutor(SqlDBExecutor):
         table_info.full_data_type = db_record.get('type')
         table_info.is_pk = db_record.get('pk')
         table_info.checked = CheckedEnum.unchecked.value
+        # sqlite 没有注释
         table_info.col_comment = ''
         table_info.handle_data_type()
         table_info.col_type = ColTypeEnum.col.value
