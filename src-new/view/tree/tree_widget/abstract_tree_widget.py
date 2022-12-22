@@ -11,7 +11,7 @@
 """
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator
+from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator, QAbstractItemView
 
 from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
@@ -30,6 +30,10 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
         self.headerItem().setHidden(True)
         # 统一设置图标大小
         self.setIconSize(QSize(40, 30))
+
+        # 按像素滚动
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
 
 class AbstractTreeWidget(DisplayTreeWidget):

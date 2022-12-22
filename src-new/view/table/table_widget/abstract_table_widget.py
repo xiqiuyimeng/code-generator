@@ -75,6 +75,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
         # 按像素滚动
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
     def connect_signal(self):
         self.itemChanged.connect(self.data_change)
