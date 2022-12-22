@@ -83,7 +83,7 @@ class StructTreeNode(AbstractStructTreeNode):
             self.open_item()
         # 取消打开结构体
         elif func == CANCEL_OPEN_STRUCT_ACTION.format(self.struct_name):
-            pass
+            self.open_struct_executor.worker_terminate(self.open_item_fail)
         # 关闭结构体
         elif func == CLOSE_STRUCT_ACTION.format(self.struct_name):
             pass
@@ -105,4 +105,5 @@ class StructTreeNode(AbstractStructTreeNode):
         self.tree_widget.tree_data.clear_node_children(del_data)
 
     def worker_terminate(self):
-        super().worker_terminate()
+        if self.open_struct_executor is not Ellipsis:
+            self.open_struct_executor.worker_terminate()
