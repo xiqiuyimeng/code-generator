@@ -29,9 +29,12 @@ class StructTableWidget(AbstractTableWidget):
         child_widget.setLayout(child_layout)
         # 创建子表格
         child_table = StructTableWidget(self.main_window, child_widget, children_cols)
+        child_widget.child_table = child_table
         child_layout.addWidget(child_table)
 
         child_table.fill_table()
+
+        child_table.parent_table = self
         return child_widget
 
     def add_checked_data(self, cols): ...

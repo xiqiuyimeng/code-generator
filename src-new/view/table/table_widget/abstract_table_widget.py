@@ -30,6 +30,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
+        self.parent_table: AbstractTableWidget = ...
         # 保存代理引用，否则将会被垃圾回收
         self.combox_delegate = ...
         self.text_input_delegate = ...
@@ -63,8 +64,6 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.horizontalHeader().setStretchLastSection(True)
         # 默认行号隐藏
         self.verticalHeader().setHidden(True)
-
-        self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
         # 设置第五列（是否是主键）combox代理项，在编辑时触发
         self.combox_delegate = ComboboxDelegate()
@@ -114,11 +113,12 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
             self.setItem(i, 4, self.make_item('是' if col.is_pk else '否'))
             self.setItem(i, 5, self.make_item(col.col_comment if col.col_comment else ''))
 
+            # 根据当前行内容调整行大小
+            self.resizeRowToContents(i)
+
         # 填充完主表格后，进行子表格处理，这样分开处理比较简单，
         # 如果在创建主表格的同时进行子表格插入，那么循环的索引和实际的表格行数将存在偏差
         [self.add_child_table_func(col, i, reopen=True) for i, col in enumerate(self.cols) if col.expanded]
-        # 设置表格根据内容调整
-        self.resizeRowsToContents()
         self.filling_table = False
 
         # 保存选中数据
@@ -202,6 +202,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
                     self.add_child_table(row_index, col_data)
             # 保存数据
             self.update_col_expanded(col_data)
+        self.resize_child_table_row(row_index)
 
     def add_child_table(self, row_index, col_data):
         # 还没有创建过子表，创建一个新的子表
@@ -209,10 +210,28 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.insertRow(row_index)
         # 为了美观，将新行单元格所有列合并
         self.setSpan(row_index, 0, 1, 6)
-        child_table = self.do_add_child_table(col_data.children, row_index)
-        self.setCellWidget(row_index, 0, child_table)
+        child_table_widget = self.do_add_child_table(col_data.children, row_index)
+        self.setCellWidget(row_index, 0, child_table_widget)
         # 标记当前列数据，已经存在子表
         col_data.has_child_table = 1
+
+    def resize_child_table_row(self, row_index):
+        child_table_widget = self.cellWidget(row_index, 0)
+        child_table: AbstractTableWidget = child_table_widget.child_table
+        # 子表的所有行的高度 = 所有未隐藏行的高度之和
+        child_table_row_height = 0
+        for row in range(child_table.rowCount()):
+            if not child_table.isRowHidden(row):
+                child_table_row_height += child_table.rowHeight(row)
+        # 当前子表所在行行高 = 子表所有行的高度 + 子表表头高度 x 2 （主要是为了美观，所以拉大距离）
+        self.setRowHeight(row_index, child_table_row_height + (child_table.table_header.height() << 1))
+
+        # 如果当前表也是个子表，那么当前表行大小变化，可能会引起当前表的父表行大小变化，所以调用父表，重新计算行大小
+        if self.parent_table is not Ellipsis:
+            for row in range(self.parent_table.rowCount()):
+                table_cell_widget = self.parent_table.cellWidget(row, 0)
+                if hasattr(table_cell_widget, 'child_table') and table_cell_widget.child_table is self:
+                    self.parent_table.resize_child_table_row(row)
 
     def do_add_child_table(self, children_cols, row_index) -> QWidget: ...
 
