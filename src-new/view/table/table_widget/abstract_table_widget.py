@@ -19,7 +19,7 @@ _date_ = '2022/12/6 15:50'
 
 class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
-    def __init__(self, main_window, parent, cols):
+    def __init__(self, main_window, parent, cols, parent_table=None, parent_col=None):
         super().__init__(parent)
         self.main_window = main_window
         self.cols = cols
@@ -30,7 +30,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
-        self.parent_table: AbstractTableWidget = ...
+        self.parent_table: AbstractTableWidget = parent_table
+        self.parent_col: DsTableColInfo = parent_col
         # 保存代理引用，否则将会被垃圾回收
         self.combox_delegate = ...
         self.text_input_delegate = ...
@@ -210,7 +211,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.insertRow(row_index)
         # 为了美观，将新行单元格所有列合并
         self.setSpan(row_index, 0, 1, 6)
-        child_table_widget = self.do_add_child_table(col_data.children, row_index)
+        child_table_widget = self.do_add_child_table(col_data, row_index)
         self.setCellWidget(row_index, 0, child_table_widget)
         # 标记当前列数据，已经存在子表
         col_data.has_child_table = 1
@@ -227,13 +228,13 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.setRowHeight(row_index, child_table_row_height + (child_table.table_header.height() << 1))
 
         # 如果当前表也是个子表，那么当前表行大小变化，可能会引起当前表的父表行大小变化，所以调用父表，重新计算行大小
-        if self.parent_table is not Ellipsis:
+        if self.parent_table:
             for row in range(self.parent_table.rowCount()):
                 table_cell_widget = self.parent_table.cellWidget(row, 0)
                 if hasattr(table_cell_widget, 'child_table') and table_cell_widget.child_table is self:
                     self.parent_table.resize_child_table_row(row)
 
-    def do_add_child_table(self, children_cols, row_index) -> QWidget: ...
+    def do_add_child_table(self, col_data, row_index) -> QWidget: ...
 
     def click_row_checkbox(self, checked, row):
         # 联动表头
@@ -243,7 +244,42 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
             # 将列数据置为选中状态，保存数据
             self.save_data(row, 0, checked)
 
-    def save_data(self, row, col, data): ...
+    def save_data(self, row, col, data):
+        # 根据row找到对应的列信息数据
+        col_data = self.cols[row]
+        modify_col_data = DsTableColInfo()
+        modify_col_data.id = col_data.id
+
+        if col == 0:
+            col_data.checked = data
+            modify_col_data.checked = data
+        elif col == 1:
+            col_data.col_name = data
+            modify_col_data.col_name = data
+        elif col == 2:
+            col_data.data_type = data
+            modify_col_data.data_type = data
+        elif col == 3:
+            col_data.full_data_type = data
+            modify_col_data.full_data_type = data
+        elif col == 4:
+            is_pk = 1 if data == '是' else 0
+            col_data.is_pk = is_pk
+            modify_col_data.is_pk = is_pk
+        elif col == 5:
+            col_data.col_comment = data
+            modify_col_data.col_comment = data
+
+        # 保存到树选中数据中，由于保存的列对象是从 self.cols中取的，
+        # 所以树中保存的列对象引用指向列表中对象，在数据变化时，无需手动同步
+        # 如果是选中，则为添加数据，否则为删除数据
+        if col_data.checked:
+            self.add_checked_data(col_data)
+        else:
+            self.remove_checked_data(col_data)
+
+        # 保存数据
+        self.async_save_executor.save_table_data(modify_col_data)
 
     def batch_update_check_state(self, check_state):
         modify_col_data_list = list()

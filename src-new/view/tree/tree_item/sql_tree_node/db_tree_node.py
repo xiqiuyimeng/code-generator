@@ -9,7 +9,7 @@ from view.box.message_box import pop_fail, pop_question
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
 from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -52,10 +52,7 @@ class DBTreeNode(AbstractSqlTreeNode):
 
     def close_item(self):
         # 判断是否有选中数据
-        del_data = {
-            0: get_item_opened_record(self.item.parent()),
-            1: get_item_opened_record(self.item)
-        }
+        del_data = get_add_del_data(self.item)
         db_data_node = self.tree_widget.tree_data.get_node(del_data)
         # 如果能找到选中数据，提示应先清空
         if db_data_node:

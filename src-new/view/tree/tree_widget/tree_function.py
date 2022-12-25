@@ -18,7 +18,7 @@ from view.dialog.datasource.structure import *
 from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
 from view.tree.tree_item.tree_item import TreeWidgetItem
 from view.tree.tree_item.tree_item_func import set_item_opened_record, \
-    get_item_opened_record, get_children_items
+    get_item_opened_record, get_children_items, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
@@ -156,11 +156,8 @@ def make_table_items(tree_widget, parent_item, opened_table_items, tree_data: Tr
             checked_table_opened_items.append(opened_table_item)
     # 如果表已选中，添加到选中数据集合中
     if checked_tables:
-        tb_data = {
-            0: get_item_opened_record(parent_item.parent()),
-            1: get_item_opened_record(parent_item),
-            2: checked_table_opened_items
-        }
+        tb_data = get_add_del_data(parent_item)
+        tb_data[max(tb_data) + 1] = checked_table_opened_items
         tree_data.add_node(tb_data)
 
 

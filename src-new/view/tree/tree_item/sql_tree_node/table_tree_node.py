@@ -7,7 +7,7 @@ from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
-    set_item_opened_tab, get_item_opened_record, link_table_checkbox
+    set_item_opened_tab, get_item_opened_record, link_table_checkbox, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -76,11 +76,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         tab = get_item_opened_tab(self.item)
         if not tab:
             check_state = self.item.checkState(0)
-            add_del_data = {
-                0: get_item_opened_record(self.item.parent().parent()),
-                1: get_item_opened_record(self.item.parent()),
-                2: get_item_opened_record(self.item)
-            }
+            add_del_data = get_add_del_data(self.item)
             if check_state == Qt.Checked:
                 # 如果是选中，添加选中数据
                 self.tree_widget.tree_data.add_node(add_del_data)

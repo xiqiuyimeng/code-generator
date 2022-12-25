@@ -63,3 +63,16 @@ def get_children_items(parent_item):
     for idx in range(parent_item.childCount()):
         children_items.append(parent_item.child(idx))
     return children_items
+
+
+def get_add_del_data(item):
+    add_del_data = dict()
+    recursive_get_add_del_data(item, add_del_data)
+    return add_del_data
+
+
+def recursive_get_add_del_data(item, data_dict):
+    if item.parent():
+        recursive_get_add_del_data(item.parent(), data_dict)
+    opened_record = get_item_opened_record(item)
+    data_dict[opened_record.level] = opened_record
