@@ -10,7 +10,7 @@ from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, SWITC
     EDIT_CONN_ACTION, DEL_CONN_ACTION, SQLITE_COL, MYSQL_COL, JSON_DISPLAY_NAME, FOLDER_TYPE, NAME_AVAILABLE, \
     NAME_EXISTS, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, DEL_FOLDER_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
     OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, EXPAND_CHILD_TABLE, \
-    COLLAPSE_CHILD_TABLE
+    COLLAPSE_CHILD_TABLE, STRUCT_COL_ICON
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -77,8 +77,9 @@ class IconEnum(Enum):
     sql_mysql_col_icon = MYSQL_COL, ':/icon/column_icon.png'
 
     # structure datasource icon
-    folder_icon = FOLDER_TYPE, ':/icon/column_icon.png'
+    folder_icon = FOLDER_TYPE, ':/icon/template.png'
     json_type_icon = JSON_DISPLAY_NAME, ':/icon/exec.png'
+    struct_col_icon = STRUCT_COL_ICON, ':/icon/column_icon.png'
     new_folder_icon = CREATE_NEW_FOLDER_ACTION, ':/icon/add.png'
     rename_folder_icon = RENAME_FOLDER_ACTION, ':/icon/exec.png'
     del_folder_icon = DEL_FOLDER_ACTION, ':/icon/remove.png'

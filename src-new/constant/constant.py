@@ -498,6 +498,7 @@ JSON_TYPE = 'json'
 JSON_DISPLAY_NAME = 'json'
 FOLDER_TYPE = 'folder'
 FOLDER_DISPLAY_NAME = 'folder'
+STRUCT_COL_ICON = 'struct_col_icon'
 
 LOCATION_TXT = '定位'
 

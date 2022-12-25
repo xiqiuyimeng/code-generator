@@ -8,6 +8,7 @@ from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.util.tree_node import TreeData
 from view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from view.tree.tree_item.tree_item_func import get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
@@ -35,10 +36,24 @@ class StructTableWidget(AbstractTableWidget):
         child_table.fill_table()
         return child_widget
 
-    def add_checked_data(self, cols):
-        pass
+    def get_add_del_col_data(self, add_del_data, table: AbstractTableWidget, checked_cols):
+        if table.parent_col and table.parent_col.checked:
+            self.get_add_del_col_data(add_del_data, table.parent_table, table.parent_col)
+        add_del_data[max(add_del_data) + 1] = checked_cols
 
-    def remove_checked_data(self, cols): ...
+    def add_checked_data(self, cols):
+        # 首先获取树节点层次数据
+        add_data = get_add_del_data(self.tree_item)
+        # 获取表层次数据
+        self.get_add_del_col_data(add_data, self, cols)
+        self.tree_data.add_node(add_data)
+
+    def remove_checked_data(self, cols):
+        # 首先获取树节点层次数据
+        del_data = get_add_del_data(self.tree_item)
+        # 获取表层次数据
+        self.get_add_del_col_data(del_data, self, cols)
+        self.tree_data.del_node(del_data)
 
     def remove_all_table_checked(self): ...
 

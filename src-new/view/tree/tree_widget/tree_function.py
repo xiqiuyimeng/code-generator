@@ -146,16 +146,15 @@ def make_db_items(tree_widget, parent_item, opened_db_items):
 
 def make_table_items(tree_widget, parent_item, opened_table_items, tree_data: TreeData):
     """构建数据表层叶子节点"""
-    checked_tables, checked_table_opened_items = list(), list()
+    checked_table_opened_items = list()
     for opened_table_item in opened_table_items:
         icon = get_icon(opened_table_item.data_type.tb_icon_name)
         make_sql_tree_item(tree_widget, parent_item, opened_table_item.item_name,
                            icon, opened_table_item, checkbox=opened_table_item.checked)
         if opened_table_item.checked:
-            checked_tables.append(opened_table_item.item_name)
             checked_table_opened_items.append(opened_table_item)
     # 如果表已选中，添加到选中数据集合中
-    if checked_tables:
+    if checked_table_opened_items:
         tb_data = get_add_del_data(parent_item)
         tb_data[max(tb_data) + 1] = checked_table_opened_items
         tree_data.add_node(tb_data)
