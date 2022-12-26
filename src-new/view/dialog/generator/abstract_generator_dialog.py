@@ -53,12 +53,13 @@ class AbstractGeneratorDialog(DraggableDialog):
 class AbstractDisplaySelectedDialog(AbstractGeneratorDialog):
 
     def __init__(self, *args):
-        super().__init__(*args)
         self.frame_layout = ...
         self.header_label = ...
         self.display_tree_widget = ...
         self.reselect_button: QPushButton = ...
         self.choose_template_button: QPushButton = ...
+        self.button_blank: QLabel = ...
+        super().__init__(*args)
 
     def setup_main_frame(self):
         # 主体：标题、展示树结构
@@ -84,10 +85,13 @@ class AbstractDisplaySelectedDialog(AbstractGeneratorDialog):
         self.reselect_button.setObjectName('reselect_button')
         self.button_layout.addWidget(self.reselect_button, 0, 0, 1, 1)
 
+        self.button_blank = QLabel()
+        self.button_layout.addWidget(self.button_blank, 0, 1, 1, 2)
+
         self.choose_template_button = QPushButton()
         self.choose_template_button.setText('选择模板')
         self.choose_template_button.setObjectName('choose_template_button')
-        self.button_layout.addWidget(self.choose_template_button, 0, 1, 1, 1)
+        self.button_layout.addWidget(self.choose_template_button, 0, 3, 1, 1)
 
     def connect_signal(self):
         self.reselect_button.clicked.connect(self.close)
