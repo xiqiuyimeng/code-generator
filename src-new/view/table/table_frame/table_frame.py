@@ -45,9 +45,6 @@ class AbstractTableFrame(QFrame):
         self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.table_widget)
 
-        # 设置表头复选框状态，与树节点状态同步
-        self.table_widget.table_header.set_header_checked(self.tree_item.checkState(0))
-
         self.table_widget.fill_table()
 
     def get_header_label_text(self) -> str: ...

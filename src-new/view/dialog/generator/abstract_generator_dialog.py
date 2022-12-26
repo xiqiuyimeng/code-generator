@@ -2,6 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QGridLayout, QPushButton, QLabel
 
+from constant.constant import RESELECT_TXT, CHOOSE_TEMPLATE_TXT
 from view.custom_widget.draggable_widget import DraggableDialog
 from view.tree.tree_widget.abstract_tree_widget import DisplayTreeWidget
 
@@ -81,7 +82,7 @@ class AbstractDisplaySelectedDialog(AbstractGeneratorDialog):
     def setup_button_layout(self):
         # 按钮区：返回修改、选择模板
         self.reselect_button = QPushButton()
-        self.reselect_button.setText('返回修改')
+        self.reselect_button.setText(RESELECT_TXT)
         self.reselect_button.setObjectName('reselect_button')
         self.button_layout.addWidget(self.reselect_button, 0, 0, 1, 1)
 
@@ -89,7 +90,7 @@ class AbstractDisplaySelectedDialog(AbstractGeneratorDialog):
         self.button_layout.addWidget(self.button_blank, 0, 1, 1, 2)
 
         self.choose_template_button = QPushButton()
-        self.choose_template_button.setText('选择模板')
+        self.choose_template_button.setText(CHOOSE_TEMPLATE_TXT)
         self.choose_template_button.setObjectName('choose_template_button')
         self.button_layout.addWidget(self.choose_template_button, 0, 3, 1, 1)
 

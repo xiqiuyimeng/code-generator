@@ -119,7 +119,15 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
         # 填充完主表格后，进行子表格处理，这样分开处理比较简单，
         # 如果在创建主表格的同时进行子表格插入，那么循环的索引和实际的表格行数将存在偏差
-        [self.add_child_table_func(col, i, reopen=True) for i, col in enumerate(self.cols) if col.expanded]
+        for i, col in enumerate(self.cols):
+            if not col.expanded and col.checked:
+                # 填充表格后，统一设置checkbox状态，之所以在这里设置，而不是在创建复选框时设置，是因为需要考虑到复选框变化信号槽触发时机，
+                # 如果在创建复选框时设置，那么将触发复选框变化信号槽函数，对表头状态进行设置，而此时并未完全创建所有复选框，会导致表头状态错误；
+                # 这里只处理没有子表的情况，因为子表会自动触发父行复选框状态变化
+                self.table_header.checkbox_list[i].setCheckState(Qt.Checked)
+            elif col.expanded:
+                self.add_child_table_func(col, i, reopen=True)
+
         self.filling_table = False
 
         # 保存选中数据
@@ -162,13 +170,9 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
                                         check_layout.contentsMargins().right(),
                                         check_layout.contentsMargins().bottom())
 
-        # 设置checkbox状态
         check_box.setText(str(row_index + 1))
-        if col_data.checked:
-            check_box.setCheckState(Qt.Checked)
-        # 点击时需要保存数据，并联动表头复选框
-        check_box.clicked.connect(lambda checked: self.click_row_checkbox(checked, row_index))
-
+        # 复选框变化时，联动表头复选框
+        check_box.stateChanged.connect(lambda checked: self.click_row_checkbox(checked, row_index))
         # 收集复选框
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
@@ -239,6 +243,13 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def click_row_checkbox(self, checked, row):
         # 联动表头
         self.table_header.link_header_checked()
+        # 当前行之前的行（列数据列表）
+        before_rows = self.cols[:row]
+        # 当前行之前的行，存在的子表数
+        child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
+        if self.cols[row].has_child_table:
+            child_table = self.cellWidget(row + child_tables, 0).child_table
+            child_table.table_header.change_state(checked)
         # 选中一行数据
         if not self.filling_table:
             # 将列数据置为选中状态，保存数据
