@@ -5,7 +5,6 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout
 
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.util.tree_node import TreeData
 from view.table.table_widget.abstract_table_widget import AbstractTableWidget
 from view.tree.tree_item.tree_item_func import get_add_del_data

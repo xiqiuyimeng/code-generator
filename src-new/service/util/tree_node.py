@@ -26,14 +26,11 @@ class TreeDataNode:
 
 class TreeData:
 
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(TreeData, '_instance'):
-            TreeData._instance = object.__new__(cls)
-            TreeData._instance._root_node = TreeDataNode(None)
-            TreeData._instance._root_node.node_name = 'root'
-            # 根节点级别为0
-            TreeData._instance._root_node.item_level = -1
-        return TreeData._instance
+    def __init__(self):
+        self._root_node = TreeDataNode(None)
+        self._root_node.node_name = 'root'
+        # 根节点级别为-1
+        self._root_node.item_level = -1
 
     def __bool__(self):
         return bool(self._root_node.children)
