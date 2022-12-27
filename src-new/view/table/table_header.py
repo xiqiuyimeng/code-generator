@@ -71,10 +71,12 @@ class CheckBoxHeader(QHeaderView):
         if check_state == Qt.Checked:
             # 将所有的复选框都设为勾选状态
             for checkbox in self.checkbox_list:
-                checkbox.setCheckState(Qt.Checked)
+                if checkbox.checkState() != Qt.Checked:
+                    checkbox.setCheckState(Qt.Checked)
         elif check_state == Qt.Unchecked:
             for checkbox in self.checkbox_list:
-                checkbox.setCheckState(Qt.Unchecked)
+                if checkbox.checkState() != Qt.Unchecked:
+                    checkbox.setCheckState(Qt.Unchecked)
 
     def set_header_checked(self, check_state):
         if check_state == Qt.Unchecked:

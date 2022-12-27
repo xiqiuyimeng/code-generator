@@ -248,8 +248,11 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 当前行之前的行，存在的子表数
         child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
         if self.cols[row].has_child_table:
-            child_table = self.cellWidget(row + child_tables, 0).child_table
-            child_table.table_header.change_state(checked)
+            # 子表所在行 = 行数 + 当前行之前存在的子表数 + 1
+            child_table = self.cellWidget(row + child_tables + 1, 0).child_table
+            child_table.table_header.change_header_state(checked)
+            # 批量处理数据保存
+            child_table.batch_update_check_state(checked)
         # 选中一行数据
         if not self.filling_table:
             # 将列数据置为选中状态，保存数据
@@ -295,11 +298,14 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def batch_update_check_state(self, check_state):
         modify_col_data_list = list()
         for col in self.cols:
-            col.checked = check_state
-            modify_col_data = DsTableColInfo()
-            modify_col_data.id = col.id
-            modify_col_data.checked = check_state
-            modify_col_data_list.append(modify_col_data)
+            if col.checked != check_state:
+                col.checked = check_state
+                modify_col_data = DsTableColInfo()
+                modify_col_data.id = col.id
+                modify_col_data.checked = check_state
+                modify_col_data_list.append(modify_col_data)
+        if not modify_col_data_list:
+            return
         # 保存数据
         self.async_save_executor.batch_save_data(modify_col_data_list)
         # 批量选中数据或取消选中
