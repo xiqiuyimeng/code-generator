@@ -93,7 +93,7 @@ class CheckBoxHeader(QHeaderView):
             self.updateSection(0)
 
     def change_header_state(self, check_state):
-        # 由树节点调用，当点击树节点复选框时，联动表复选框
+        # 1.由树节点调用，当点击树节点复选框时，联动表复选框，2.点击子表所在父行复选框，触发子表复选框变化
         self.set_header_checked(check_state)
         self.change_state(check_state)
 

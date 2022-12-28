@@ -32,7 +32,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.filling_table = False
         self.parent_table: AbstractTableWidget = parent_table
         self.parent_col: DsTableColInfo = parent_col
-        # 保存代理引用，否则将会被垃圾回收
+        # 保存代理引用
         self.combox_delegate = ...
         self.text_input_delegate = ...
         self.setup_ui()
@@ -125,6 +125,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
                 # 如果在创建复选框时设置，那么将触发复选框变化信号槽函数，对表头状态进行设置，而此时并未完全创建所有复选框，会导致表头状态错误；
                 # 这里只处理没有子表的情况，因为子表会自动触发父行复选框状态变化
                 self.table_header.checkbox_list[i].setCheckState(Qt.Checked)
+                # 联动表头
+                self.table_header.link_header_checked()
             elif col.expanded:
                 self.add_child_table_func(col, i, reopen=True)
 
@@ -171,8 +173,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
                                         check_layout.contentsMargins().bottom())
 
         check_box.setText(str(row_index + 1))
-        # 复选框变化时，联动表头复选框
-        check_box.stateChanged.connect(lambda checked: self.click_row_checkbox(checked, row_index))
+        # 复选框点击变化时，联动表头复选框
+        check_box.clicked.connect(lambda: self.click_row_checkbox(check_box.checkState(), row_index))
         # 收集复选框
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
@@ -241,6 +243,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def do_add_child_table(self, col_data, row_index) -> QWidget: ...
 
     def click_row_checkbox(self, checked, row):
+        # 将列数据置为选中状态，保存数据
+        self.save_data(row, 0, checked)
         # 联动表头
         self.table_header.link_header_checked()
         # 当前行之前的行（列数据列表）
@@ -253,10 +257,6 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
             child_table.table_header.change_header_state(checked)
             # 批量处理数据保存
             child_table.batch_update_check_state(checked)
-        # 选中一行数据
-        if not self.filling_table:
-            # 将列数据置为选中状态，保存数据
-            self.save_data(row, 0, checked)
 
     def save_data(self, row, col, data):
         # 根据row找到对应的列信息数据
