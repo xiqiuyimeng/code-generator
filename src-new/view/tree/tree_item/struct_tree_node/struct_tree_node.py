@@ -7,7 +7,8 @@ from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor import *
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, set_item_opened_tab
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, set_item_opened_tab, \
+    link_table_checkbox
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
@@ -52,15 +53,16 @@ class StructTreeNode(AbstractStructTreeNode):
         # 记录tab对象
         set_item_opened_tab(self.item, tab)
         # 连接表头复选框变化信号
-        # tab.table_frame.table_widget.table_header.header_check_state.connect(
-        #     lambda check_state: self.set_check_state(check_state))
+        tab.table_frame.table_widget.table_header.header_check_state.connect(
+            lambda check_state: self.set_check_state(check_state))
         return tab
 
     def close_item(self):
         super().close_item()
 
     def change_check_box(self, check_state):
-        super().change_check_box(check_state)
+        # 联动表格内的复选框
+        link_table_checkbox(self.item, check_state)
 
     def do_fill_menu(self, menu):
         # 打开
@@ -103,6 +105,10 @@ class StructTreeNode(AbstractStructTreeNode):
             # 2: get_item_opened_record(self.item).id
         }
         self.tree_widget.tree_data.clear_node_children(del_data)
+
+    def set_check_state(self, check_state):
+        self.item.setCheckState(0, check_state)
+        # self.save_check_state()
 
     def worker_terminate(self):
         if self.open_struct_executor is not Ellipsis:
