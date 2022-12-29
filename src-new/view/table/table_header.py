@@ -99,13 +99,20 @@ class CheckBoxHeader(QHeaderView):
 
     def link_header_checked(self):
         # 判断列表中所有项的选中状态，以决定表头复选框状态
-        checked_list = list(filter(lambda x: x.checkState() == Qt.Checked, self.checkbox_list))
+        len_checked_list = len(list(filter(lambda x: x.checkState() == Qt.Checked, self.checkbox_list)))
+        len_partially_checked_list = len(list(filter(
+            lambda x: x.checkState() == Qt.PartiallyChecked, self.checkbox_list)))
+        len_checkbox = len(self.checkbox_list)
         check_state = Qt.Unchecked
-        if len(checked_list) == len(self.checkbox_list):
+        if len_checked_list == len_checkbox:
             check_state = Qt.Checked
-        elif len(checked_list) == 0:
-            check_state = Qt.Unchecked
-        elif len(checked_list) < len(self.checkbox_list):
+        elif len_checked_list == 0:
+            # 如果没有全选复选框，存在部分选中复选框，那么应该为部分选中状态，否则为未选中
+            if len_partially_checked_list:
+                check_state = Qt.PartiallyChecked
+            else:
+                check_state = Qt.Unchecked
+        elif len_checked_list < len_checkbox:
             check_state = Qt.PartiallyChecked
         self.set_header_checked(check_state)
         # 发射当前选中状态信号

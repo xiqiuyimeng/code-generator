@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QWidget, QHBoxLayout, QCheckBox, QToolButton
+from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QWidget, QHBoxLayout, QToolButton
 
 from constant.constant import TABLE_HEADER_LABELS, EXPAND_CHILD_TABLE, COLLAPSE_CHILD_TABLE
 from constant.icon_enum import get_icon
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.util.tree_node import TreeData
+from view.custom_widget.check_box import CheckBox
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
 from view.table.table_item import TableWidgetItem
@@ -154,7 +155,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         table_check_widget = QWidget()
         check_layout = QHBoxLayout(table_check_widget)
 
-        check_box = QCheckBox()
+        check_box = CheckBox()
         check_layout.addWidget(check_box)
         # 如果存在子项，就添加一个展开按钮，连接打开子表方法
         if col_data.children:
@@ -173,8 +174,12 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
                                         check_layout.contentsMargins().bottom())
 
         check_box.setText(str(row_index + 1))
-        # 复选框点击变化时，联动表头复选框
-        check_box.clicked.connect(lambda: self.click_row_checkbox(check_box.checkState(), row_index))
+        # 复选框点击变化事件
+        check_box.click_state_changed.connect(lambda check_state:
+                                              self.click_row_checkbox(check_state, row_index))
+        # 复选框非点击情况下，复选框状态变化信号
+        check_box.not_click_state_changed.connect(lambda check_state:
+                                                  self.checkbox_state_changed(check_state, row_index))
         # 收集复选框
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
@@ -245,6 +250,10 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def click_row_checkbox(self, checked, row):
         # 将列数据置为选中状态，保存数据
         self.save_data(row, 0, checked)
+        # 复选框状态变化触发事件
+        self.checkbox_state_changed(checked, row)
+
+    def checkbox_state_changed(self, checked, row):
         # 联动表头
         self.table_header.link_header_checked()
         # 当前行之前的行（列数据列表）
