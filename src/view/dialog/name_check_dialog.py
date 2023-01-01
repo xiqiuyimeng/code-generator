@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
 
 from constant.constant import NAME_AVAILABLE, NAME_EXISTS, NO_CHANGE_PROMPT
 from constant.icon_enum import get_icon
-from read_qrc.read_file import read_qss
 from service.async_func.async_task_abc import LoadingMaskThreadExecutor
+from service.read_qrc.read_config import read_qss
 from service.system_storage.sqlite_abc import BasicSqliteDTO
 from view.box.message_box import pop_ok
 from view.dialog.custom_dialog import CustomDialog
