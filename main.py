@@ -1,33 +1,31 @@
-﻿# -*- coding: utf-8 -*-
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
+# -*- coding: utf-8 -*-
 import ctypes
-from src.main_window.generator_gui import MainWindow
-from src.read_qrc.read_file import read_qss, read_template
-from src.sys.sys_info_storage.template_sqlite import TemplateSqlite
-from static import image_rc
+
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 
 import sys
-
+from service.read_qrc.read_config import read_qss
+from view.window.main_window import MainWindow
+from logger.log import logger as log
+from static import image_rc
+import src.loading_window
 
 _author_ = 'luwt'
-_date_ = '2020/6/15 17:20'
+_date_ = '2022/5/11 10:33'
 
 
 if __name__ == "__main__":
+    log.info("**********生成器启动**********")
     app = QtWidgets.QApplication(sys.argv)
     splash = QtWidgets.QSplashScreen(
-        QtGui.QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
     )
-    splash.showMessage("加载中...", QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom)
+    splash.showMessage("加载中...", Qt.AlignHCenter | Qt.AlignBottom)
     # 显示启动界面
     splash.show()
     QtWidgets.qApp.processEvents()
-    template = TemplateSqlite().get_templates(tp_type=0)
-    # 如果默认模板不存在，则初始化
-    if not template:
-        # 初始化模板文件
-        TemplateSqlite().init_template(read_template())
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())
@@ -38,5 +36,5 @@ if __name__ == "__main__":
     ui.show()
     splash.finish(ui)
     app.exec_()
-    ui.close_conn()
+    log.info("**********生成器退出**********\n")
     sys.exit()
