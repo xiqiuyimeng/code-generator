@@ -53,7 +53,7 @@ class StructTreeNode(AbstractStructTreeNode):
         # 记录tab对象
         set_item_opened_tab(self.item, tab)
         # 连接表头复选框变化信号
-        tab.table_frame.table_widget.table_header.header_check_state.connect(
+        tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
             lambda check_state: self.set_check_state(check_state))
         return tab
 

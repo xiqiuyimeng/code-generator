@@ -31,6 +31,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
+        # 进行批量处理的时候，标志位置为true，不再触发单行复选框的处理逻辑
+        self.batch_operating = False
         self.parent_table: AbstractTableWidget = parent_table
         self.parent_col: DsTableColInfo = parent_col
         # 保存代理引用
@@ -52,7 +54,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 表格设置为6列
         self.setColumnCount(6)
         # 实例化自定义表头
-        self.table_header = CheckBoxHeader(parent=self)
+        self.table_header = CheckBoxHeader(parent=self, batch_callback=self.set_batch_operating)
         self.table_header.setObjectName("table_header")
         # 设置表头
         self.setHorizontalHeader(self.table_header)
@@ -79,23 +81,38 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
     def connect_signal(self):
-        self.itemChanged.connect(self.data_change)
         # 需要开启鼠标追踪，才能实现tooltip
         self.setMouseTracking(True)
         self.entered.connect(self.show_tool_tip)
+        # 单行数据变化时，触发
+        self.itemChanged.connect(self.data_change)
+        # 连接表头复选框点击信号
+        self.table_header.header_clicked.connect(self.batch_deal_checked)
 
     def data_change(self, item):
         # 数据变化时触发
-        if not self.filling_table:
+        if self.get_allow_checkbox_emit_signal():
             # 保存数据
             self.save_data(item.row(), item.column(), item.text())
+
+    def batch_deal_checked(self, check_state):
+        # 调用批量处理方法保存数据
+        self.batch_update_check_state(check_state)
+        # 检查每一行是否有子表，如果存在子表，联动子表复选框
+        [self.link_child_table_checked(check_state, row) for row in range(len(self.cols))]
+
+    def set_batch_operating(self, flag):
+        self.batch_operating = flag
+
+    def get_allow_checkbox_emit_signal(self):
+        return not (self.filling_table or self.batch_operating)
 
     def show_tool_tip(self, model_index):
         self.setToolTip(model_index.data())
 
     def fill_table(self):
         """
-        将列名字段全数填充在表中，四列多行表
+        根据列数据构建表格
         """
         self.filling_table = True
         checked_col_list = list()
@@ -155,7 +172,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         table_check_widget = QWidget()
         check_layout = QHBoxLayout(table_check_widget)
 
-        check_box = CheckBox()
+        check_box = CheckBox(allow_emit_signal=self.get_allow_checkbox_emit_signal)
         check_layout.addWidget(check_box)
         # 如果存在子项，就添加一个展开按钮，连接打开子表方法
         if col_data.children:
@@ -178,8 +195,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         check_box.click_state_changed.connect(lambda check_state:
                                               self.click_row_checkbox(check_state, row_index))
         # 复选框非点击情况下，复选框状态变化信号
-        check_box.not_click_state_changed.connect(lambda check_state:
-                                                  self.checkbox_state_changed(check_state, row_index))
+        check_box.not_click_state_changed.connect(lambda check_state: self.checkbox_state_changed())
         # 收集复选框
         self.table_header.checkbox_list.append(check_box)
         return table_check_widget
@@ -250,22 +266,26 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def click_row_checkbox(self, checked, row):
         # 将列数据置为选中状态，保存数据
         self.save_data(row, 0, checked)
-        # 复选框状态变化触发事件
-        self.checkbox_state_changed(checked, row)
-
-    def checkbox_state_changed(self, checked, row):
         # 联动表头
         self.table_header.link_header_checked()
-        # 当前行之前的行（列数据列表）
-        before_rows = self.cols[:row]
-        # 当前行之前的行，存在的子表数
-        child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
+        self.link_child_table_checked(checked, row)
+
+    def checkbox_state_changed(self):
+        # 联动表头，该方法仅在由子表变化，导致父行变化，联动父表的表头事件
+        self.table_header.link_header_checked()
+
+    def link_child_table_checked(self, checked, row):
+        """当前行复选框变化时，如果存在子表，应该联动子表的复选框"""
         if self.cols[row].has_child_table:
+            # 当前行之前的行（列数据列表）
+            before_rows = self.cols[:row]
+            # 当前行之前的行，存在的子表数
+            child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
             # 子表所在行 = 行数 + 当前行之前存在的子表数 + 1
             child_table = self.cellWidget(row + child_tables + 1, 0).child_table
             child_table.table_header.change_header_state(checked)
-            # 批量处理数据保存
-            child_table.batch_update_check_state(checked)
+            # 批量处理
+            child_table.batch_deal_checked(checked)
 
     def save_data(self, row, col, data):
         # 根据row找到对应的列信息数据

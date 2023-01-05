@@ -9,8 +9,10 @@ import sys
 from service.read_qrc.read_config import read_qss
 from view.window.main_window import MainWindow
 from logger.log import logger as log
+# 引入静态资源
 from static import image_rc
-import src.loading_window
+# 引入pyinstaller打包使用的过渡图程序，打包的时候需要放开
+# import src.loading_window
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:33'

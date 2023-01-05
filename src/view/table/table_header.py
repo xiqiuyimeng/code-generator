@@ -10,26 +10,28 @@ class CheckBoxHeader(QHeaderView):
     """自定义复选框表头类"""
 
     # 自定义 表头复选框状态
-    header_check_state = pyqtSignal(int)
+    header_check_state_changed = pyqtSignal(int)
+    header_clicked = pyqtSignal(int)
     # 这4个变量控制列头复选框的样式，位置以及大小
     _x_offset = 3
     _y_offset = 0
     _width = 20
     _height = 20
 
-    def __init__(self, orientation=Qt.Horizontal, parent=None):
+    def __init__(self, orientation=Qt.Horizontal, parent=None, batch_callback=None):
         super(CheckBoxHeader, self).__init__(orientation, parent)
         # 标识未选中状态
         self.check_state = Qt.Unchecked
         # 用来放所有复选框
         self.checkbox_list = list()
+        self.batch_callback = batch_callback
 
     def paintSection(self, painter, rect, index):
         painter.save()
         super(CheckBoxHeader, self).paintSection(painter, rect, index)
         painter.restore()
 
-        self._y_offset = int((rect.height() - self._width) / 2)
+        self._y_offset = int((rect.height() - self._width) >> 1)
 
         if index == 0:
             option = QStyleOptionButton()
@@ -56,17 +58,19 @@ class CheckBoxHeader(QHeaderView):
                 # 如果之前的状态是选中，点击后应该是未选中
                 elif self.check_state == Qt.Checked:
                     self.check_state = Qt.Unchecked
-                    # 当用户点击了行表头复选框，发射 自定义信号 header_check_state
-                self.header_check_state.emit(self.check_state)
+                # 将表格的所有行复选框状态变更为表头复选框状态
                 self.change_state(self.check_state)
-                # 调用表格控件中批量保存复选框数据方法
-                self.parent().batch_update_check_state(self.check_state)
-
+                # 当用户点击了行表头复选框，发射表头点击信号 header_clicked
+                self.header_clicked.emit(self.check_state)
+                self.header_check_state_changed.emit(self.check_state)
                 self.updateSection(0)
         super(CheckBoxHeader, self).mousePressEvent(event)
 
     # 仅仅作为修改所有单元格复选框状态的方法，不作为槽方法
     def change_state(self, check_state):
+        # 如果设置了批量处理回调，那么设置正在批量处理标志位
+        if self.batch_callback:
+            self.batch_callback(True)
         # 如果行表头复选框为勾选状态
         if check_state == Qt.Checked:
             # 将所有的复选框都设为勾选状态
@@ -77,6 +81,8 @@ class CheckBoxHeader(QHeaderView):
             for checkbox in self.checkbox_list:
                 if checkbox.checkState() != Qt.Unchecked:
                     checkbox.setCheckState(Qt.Unchecked)
+        if self.batch_callback:
+            self.batch_callback(False)
 
     def set_header_checked(self, check_state):
         if check_state == Qt.Unchecked:
@@ -116,5 +122,5 @@ class CheckBoxHeader(QHeaderView):
             check_state = Qt.PartiallyChecked
         self.set_header_checked(check_state)
         # 发射当前选中状态信号
-        self.header_check_state.emit(check_state)
+        self.header_check_state_changed.emit(check_state)
 

@@ -33,7 +33,7 @@ class StructTableWidget(AbstractTableWidget):
         child_layout.addWidget(child_table)
 
         # 连接表头信号，当子表表头变化时，应该触发父表对应行复选框变化
-        child_table.table_header.header_check_state.connect(
+        child_table.table_header.header_check_state_changed.connect(
             lambda check_state: self.change_parent_col_check_state(check_state, col_data))
 
         child_table.fill_table()
@@ -42,7 +42,7 @@ class StructTableWidget(AbstractTableWidget):
     def change_parent_col_check_state(self, check_state, col_data):
         # 获取子表在父表中的实际行索引，当前行之前的行（列数据列表）
         row_index = self.cols.index(col_data)
-        # 设置列复选框状态
+        # 设置列复选框状态，设置状态后，将触发checkbox的信号：not_click_state_changed，从而触发父表表头变化
         self.table_header.checkbox_list[row_index].setCheckState(check_state)
 
     def get_add_del_col_data(self, add_del_data, table: AbstractTableWidget, checked_cols):
