@@ -145,6 +145,8 @@ COLLAPSE_CHILD_TABLE = '折叠子表'
 """关于文件夹的右键菜单"""
 ADD_STRUCT_ACTION = '添加结构体'
 CREATE_NEW_FOLDER_ACTION = '新建文件夹'
+SELECT_ALL_ACTION = '全选所有节点'
+UNSELECT_ACTION = '取消选择节点'
 RENAME_FOLDER_ACTION = '重命名[{}]'
 DEL_FOLDER_ACTION = '删除[{}]'
 

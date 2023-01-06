@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
-    DEL_FOLDER_ACTION
+    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION
 from constant.icon_enum import get_icon
 from view.bar.bar_action import add_structure_ds_actions
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
@@ -33,6 +34,17 @@ class FolderTreeNode(AbstractStructTreeNode):
 
         # 新建文件夹
         menu.addAction(QAction(get_icon(CREATE_NEW_FOLDER_ACTION), CREATE_NEW_FOLDER_ACTION, menu))
+
+        # 如果当前节点复选框状态为全选，菜单应该增加取消全选
+        if self.item.checkState(0) == Qt.Checked:
+            menu.addAction(QAction(UNSELECT_ACTION, menu))
+        elif self.item.checkState(0) == Qt.PartiallyChecked:
+            # 如果当前节点复选框状态为部分选择，菜单应该增加全选和取消全选
+            menu.addAction(QAction(SELECT_ALL_ACTION, menu))
+            menu.addAction(QAction(UNSELECT_ACTION, menu))
+        else:
+            # 如果当前节点复选框状态为未选择，菜单应该增加全选
+            menu.addAction(QAction(SELECT_ALL_ACTION, menu))
         menu.addSeparator()
 
         # 重命名
@@ -46,6 +58,14 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 新建文件夹
         if func == CREATE_NEW_FOLDER_ACTION:
             add_folder_func(self.window.geometry(), self.tree_widget)
+        # 全选
+        elif func == SELECT_ALL_ACTION:
+            self.item.setCheckState(0, Qt.Checked)
+            self.tree_widget.handle_checkbox_changed(self.item)
+        # 取消全选
+        elif func == UNSELECT_ACTION:
+            self.item.setCheckState(0, Qt.Unchecked)
+            self.tree_widget.handle_checkbox_changed(self.item)
         # 重命名
         elif func == RENAME_FOLDER_ACTION.format(self.item.text(0)):
             parent_item = self.item.parent()
