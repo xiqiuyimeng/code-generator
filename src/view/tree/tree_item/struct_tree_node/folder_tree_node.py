@@ -20,7 +20,7 @@ class FolderTreeNode(AbstractStructTreeNode):
             add_struct_tree_item(self.tree_widget, self.item, opened_item, opened_item.data_type.display_name)
 
     def change_check_box(self, check_state):
-        super().change_check_box(check_state)
+        self.tree_widget.item_changed_executor.item_checked(self.item)
 
     def do_fill_menu(self, menu):
         # 添加结构体需要有二级菜单

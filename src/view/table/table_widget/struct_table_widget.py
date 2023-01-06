@@ -67,3 +67,10 @@ class StructTableWidget(AbstractTableWidget):
     def remove_all_table_checked(self):
         self.remove_checked_data(self.cols)
 
+    def update_checked_data(self, col_data):
+        # 首先获取树节点层次数据
+        update_data = get_add_del_data(self.tree_item)
+        # 获取表层次数据
+        self.get_add_del_col_data(update_data, self, col_data)
+        self.tree_data.update_node_name(update_data)
+

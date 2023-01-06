@@ -8,8 +8,8 @@ from service.async_func.async_sql_ds_task import OpenDBExecutor
 from view.box.message_box import pop_fail, pop_question
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
-from view.tree.tree_widget.tree_function import make_table_items, check_table_status, set_children_check_state
 from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, get_add_del_data
+from view.tree.tree_widget.tree_function import make_table_items, check_table_status
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -120,11 +120,10 @@ class DBTreeNode(AbstractSqlTreeNode):
             self.close_item()
         # 全选所有表
         elif func == SELECT_ALL_TB_MENU:
-            set_children_check_state(self.item, Qt.Checked, self.tree_widget, self.window)
-            # 再添加
+            self.tree_widget.handle_child_item_checked(self.item, Qt.Checked)
         # 取消全选所有表
         elif func == UNSELECT_TB_MENU:
-            set_children_check_state(self.item, Qt.Unchecked, self.tree_widget, self.window)
+            self.tree_widget.handle_child_item_checked(self.item, Qt.Unchecked)
 
     def worker_terminate(self):
         if self.open_db_executor is not Ellipsis:

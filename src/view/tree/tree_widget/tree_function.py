@@ -15,7 +15,6 @@ from service.util.tree_node import TreeData
 from view.dialog.datasource.conn import *
 from view.dialog.datasource.folder.folder_dialog import FolderDialog
 from view.dialog.datasource.structure import *
-from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
 from view.tree.tree_item.tree_item import TreeWidgetItem
 from view.tree.tree_item.tree_item_func import set_item_opened_record, \
     get_item_opened_record, get_children_items, get_add_del_data
@@ -180,22 +179,6 @@ def check_table_status(parent):
         elif len(check_set) == 1 and check_set.pop() == Qt.Checked:
             all_checked = True
     return all_checked, parted_checked
-
-
-def set_children_check_state(item, check_state, tree_widget, window):
-    """
-    将当前节点下所有项的复选框统一改为一个状态，并返回子元素名称列表
-    :param item: 当前点击的树节点元素
-    :param check_state: 复选框状态
-    :param tree_widget: 树
-    :param window: 主窗体
-    """
-    for index in range(item.childCount()):
-        child = item.child(index)
-        # 当子项复选框状态不一致时，再处理
-        if child.checkState(0) != check_state:
-            child.setCheckState(0, check_state)
-            TableTreeNode(child, tree_widget, window).change_check_box(check_state)
 
 
 # ------------------------- 结构体使用方法 -------------------------#
@@ -371,3 +354,7 @@ def update_struct_tree_item(tree_widget, item_name):
     item.setText(0, item_name)
     opened_item = get_item_opened_record(item)
     opened_item.item_name = item_name
+    # 如果节点是选中或部分选中状态，更新选中数据中的名称
+    if item.checkState(0):
+        update_data = get_add_del_data(item)
+        tree_widget.tree_data.update_node_name(update_data)

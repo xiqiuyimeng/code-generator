@@ -206,3 +206,11 @@ class TreeData:
                 return node
             if node:
                 return self._do_get_node(node_data, node, item_level + 1)
+
+    def update_node_name(self, update_data):
+        """更新指定节点的名称"""
+        node = self.get_node(update_data)
+        if isinstance(node.data, DsTableColInfo):
+            node.node_name = node.data.col_name
+        elif isinstance(node.data, OpenedTreeItem):
+            node.node_name = node.data.item_name

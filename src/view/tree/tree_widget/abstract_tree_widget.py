@@ -102,6 +102,21 @@ class AbstractTreeWidget(DisplayTreeWidget):
         # 而在itemChanged信号发出时，会触发树节点的 setData方法，
         # 所以可以根据是否点击和数据变化，判断复选框是否点击
         self.do_handle_checkbox_changed(item)
+        check_state = item.checkState(0)
+        self.handle_child_item_checked(item, check_state)
+
+    def handle_child_item_checked(self, item, check_state):
+        # 之所以不直接使用 item.checkState(0)，而使用参数传递的形式，
+        # 是为了避免当前节点没有设置复选框，但是又需要将子节点复选框状态统一修改时使用
+        # 如果存在子元素，应该将子元素复选框状态同步修改
+        if item.childCount():
+            for i in range(item.childCount()):
+                child_item = item.child(i)
+                # 如果复选框状态相同，跳过
+                if child_item.checkState(0) == check_state:
+                    continue
+                child_item.setCheckState(0, check_state)
+                self.handle_checkbox_changed(child_item)
 
     def handle_item_collapsed(self, item):
         if not self.reopening_flag:

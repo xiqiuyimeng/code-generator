@@ -30,3 +30,8 @@ class SqlTableWidget(AbstractTableWidget):
     def remove_all_table_checked(self):
         del_data = get_add_del_data(self.tree_item)
         self.tree_data.del_node(del_data)
+
+    def update_checked_data(self, col_data):
+        update_data = get_add_del_data(self.tree_item)
+        update_data[max(update_data) + 1] = col_data
+        self.tree_data.update_node_name(update_data)

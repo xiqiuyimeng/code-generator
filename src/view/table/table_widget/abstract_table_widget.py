@@ -163,6 +163,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
     def remove_all_table_checked(self): ...
 
+    def update_checked_data(self, col_data): ...
+
     def make_item(self, text):
         item = TableWidgetItem(self)
         item.setText(text)
@@ -296,9 +298,22 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         if col == 0:
             col_data.checked = data
             modify_col_data.checked = data
+
+            # 保存到树选中数据中，由于保存的列对象是从 self.cols中取的，
+            # 所以树中保存的列对象引用指向列表中对象，在数据变化时，无需手动同步
+            # 如果是选中，则为添加数据，否则为删除数据
+            # 当复选框状态变化时，再处理添加或删除选中数据
+            if col_data.checked:
+                self.add_checked_data(col_data)
+            else:
+                self.remove_checked_data(col_data)
         elif col == 1:
             col_data.col_name = data
             modify_col_data.col_name = data
+
+            # 当名称变化时，需要同步更新选中数据
+            if col_data.checked:
+                self.update_checked_data(col_data)
         elif col == 2:
             col_data.data_type = data
             modify_col_data.data_type = data
@@ -312,14 +327,6 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         elif col == 5:
             col_data.col_comment = data
             modify_col_data.col_comment = data
-
-        # 保存到树选中数据中，由于保存的列对象是从 self.cols中取的，
-        # 所以树中保存的列对象引用指向列表中对象，在数据变化时，无需手动同步
-        # 如果是选中，则为添加数据，否则为删除数据
-        if col_data.checked:
-            self.add_checked_data(col_data)
-        else:
-            self.remove_checked_data(col_data)
 
         # 保存数据
         self.async_save_executor.save_table_data(modify_col_data)
