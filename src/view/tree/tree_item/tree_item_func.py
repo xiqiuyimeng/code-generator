@@ -76,3 +76,18 @@ def recursive_get_add_del_data(item, data_dict):
         recursive_get_add_del_data(item.parent(), data_dict)
     opened_record = get_item_opened_record(item)
     data_dict[opened_record.level] = opened_record
+
+
+def save_tree_data(item, tree_data):
+    # 如果表已打开，选中数据处理委托给表复选框处理，
+    # 表格未打开，那么执行树节点选中数据处理
+    tab = get_item_opened_tab(item)
+    if not tab:
+        check_state = item.checkState(0)
+        add_del_data = get_add_del_data(item)
+        if check_state == Qt.Checked:
+            # 如果是选中，添加选中数据
+            tree_data.add_node(add_del_data)
+        elif check_state == Qt.Unchecked:
+            # 如果是未选中，删除选中数据
+            tree_data.del_node(add_del_data)

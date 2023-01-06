@@ -9,8 +9,9 @@ _date_ = '2022/5/10 15:12'
 class CheckBoxHeader(QHeaderView):
     """自定义复选框表头类"""
 
-    # 自定义 表头复选框状态
+    # 自定义 表头复选框状态变化信号，主要用于向上传递选中状态，例如子表表头变化，传递给父表
     header_check_state_changed = pyqtSignal(int)
+    # 点击表头复选框信号
     header_clicked = pyqtSignal(int)
     # 这4个变量控制列头复选框的样式，位置以及大小
     _x_offset = 3

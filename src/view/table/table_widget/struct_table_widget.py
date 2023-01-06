@@ -64,5 +64,6 @@ class StructTableWidget(AbstractTableWidget):
         self.get_add_del_col_data(del_data, self, cols)
         self.tree_data.del_node(del_data)
 
-    def remove_all_table_checked(self): ...
+    def remove_all_table_checked(self):
+        self.remove_checked_data(self.cols)
 

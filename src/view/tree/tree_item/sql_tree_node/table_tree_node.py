@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
@@ -7,7 +6,7 @@ from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
-    set_item_opened_tab, get_item_opened_record, link_table_checkbox, get_add_del_data
+    set_item_opened_tab, link_table_checkbox, save_tree_data, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -68,23 +67,11 @@ class TableTreeNode(AbstractSqlTreeNode):
 
     def save_check_state(self):
         # 保存选中数据
-        self.save_tree_data()
+        save_tree_data(self.item, self.tree_widget.tree_data)
         self.tree_widget.item_changed_executor.item_checked(self.item)
 
-    def save_tree_data(self):
-        # 如果表已打开，选中数据处理委托给表复选框处理
-        tab = get_item_opened_tab(self.item)
-        if not tab:
-            check_state = self.item.checkState(0)
-            add_del_data = get_add_del_data(self.item)
-            if check_state == Qt.Checked:
-                # 如果是选中，添加选中数据
-                self.tree_widget.tree_data.add_node(add_del_data)
-            elif check_state == Qt.Unchecked:
-                # 如果是未选中，删除选中数据
-                self.tree_widget.tree_data.del_node(add_del_data)
-
     def set_check_state(self, check_state):
+        # 当表格表头变化，联动当前节点表头复选框变化
         self.item.setCheckState(0, check_state)
         self.save_check_state()
 
@@ -109,11 +96,7 @@ class TableTreeNode(AbstractSqlTreeNode):
     def close_tab_callback(self):
         # 如果选中了数据，那么清空列数据，提供给tab bar调用，在关闭tab时调用
         if self.item.checkState(0):
-            del_data = {
-                0: get_item_opened_record(self.item.parent().parent()),
-                1: get_item_opened_record(self.item.parent()),
-                2: get_item_opened_record(self.item)
-            }
+            del_data = get_add_del_data(self.item)
             self.tree_widget.tree_data.clear_node_children(del_data)
 
     def worker_terminate(self):

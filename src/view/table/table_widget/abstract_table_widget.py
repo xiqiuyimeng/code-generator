@@ -86,7 +86,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.entered.connect(self.show_tool_tip)
         # 单行数据变化时，触发
         self.itemChanged.connect(self.data_change)
-        # 连接表头复选框点击信号
+        # 连接表头复选框点击信号，向下传递选中状态，例如父表表头选中，对应子表表头也应选中
         self.table_header.header_clicked.connect(self.batch_deal_checked)
 
     def data_change(self, item):
@@ -143,10 +143,10 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
                 # 如果在创建复选框时设置，那么将触发复选框变化信号槽函数，对表头状态进行设置，而此时并未完全创建所有复选框，会导致表头状态错误；
                 # 这里只处理没有子表的情况，因为子表会自动触发父行复选框状态变化
                 self.table_header.checkbox_list[i].setCheckState(Qt.Checked)
-                # 联动表头
-                self.table_header.link_header_checked()
             elif col.expanded:
                 self.add_child_table_func(col, i, reopen=True)
+        # 联动表头
+        self.table_header.link_header_checked()
 
         self.filling_table = False
 
@@ -194,7 +194,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 复选框点击变化事件
         check_box.click_state_changed.connect(lambda check_state:
                                               self.click_row_checkbox(check_state, row_index))
-        # 复选框非点击情况下，复选框状态变化信号
+        # 复选框非点击情况下（子表表头变化，导致父表所在行复选框变化），复选框状态变化信号
         check_box.not_click_state_changed.connect(lambda check_state: self.checkbox_state_changed())
         # 收集复选框
         self.table_header.checkbox_list.append(check_box)
