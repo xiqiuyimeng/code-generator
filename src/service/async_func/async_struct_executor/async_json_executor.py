@@ -51,6 +51,9 @@ class OpenJsonWorker(OpenStructWorker):
                 col_info.col_type = ColTypeEnum.obj.value
                 self.table_info_sqlite.insert(col_info)
                 col_info.children = self.do_parse(value, col_info.id)
+                # 在子元素中维护一个父元素的指针
+                for child in col_info.children:
+                    child.parent_col = col_info
             elif isinstance(value, list):
                 self.parse_array(value, col_info)
             else:
@@ -72,6 +75,9 @@ class OpenJsonWorker(OpenStructWorker):
             self.table_info_sqlite.insert(col_info)
             # 只有在字典类型的时候，才指定子元素列表
             col_info.children = self.do_parse(value_obj, col_info.id)
+            # 在子元素中维护一个父元素的指针
+            for child in col_info.children:
+                child.parent_col = col_info
         elif isinstance(value_obj, list):
             # 如果是list类型，继续解析，对于列表类型，那么无需指定子元素列表，
             # 因为对于json来说，只有k v结构，才应被当做一条列信息对待，

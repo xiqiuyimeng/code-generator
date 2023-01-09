@@ -221,7 +221,7 @@ class ListStructWorker(ThreadWorkerABC):
         tab_param.ds_type = DatasourceTypeEnum.struct_ds_type.value.name
         tab_list = DsTableTabSqlite().select_by_order(tab_param)
         for tab in tab_list:
-            tab.col_list = DsTableColInfoSqlite().recursive_get_children(tab.id, 0)
+            tab.col_list = DsTableColInfoSqlite().get_tab_cols(tab.id)
         self.tab_info_signal.emit(tab_list)
 
     def do_finally(self):

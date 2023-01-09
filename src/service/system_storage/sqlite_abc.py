@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from dataclasses import dataclass, field, asdict
-import threading
-from datetime import datetime
 import os
+import threading
+from dataclasses import dataclass, field
+from datetime import datetime
 
 import records
 from sqlalchemy.pool import SingletonThreadPool
@@ -118,12 +118,10 @@ class SqliteBasic:
         """新增记录方法，根据约定，id由数据库管理，创建时间、更新时间传入当前时间"""
         insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        insert_dict = asdict(insert_obj)
+        # 过滤掉不合法的field
+        insert_dict = self.filter_illegal_field(insert_obj)
         if insert_dict:
             insert_dict.pop('id')
-
-            # 过滤掉不合法的field
-            self.filter_illegal_field(insert_dict)
 
             field_str = ", ".join(insert_dict.keys())
             value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict.keys())))
@@ -141,12 +139,10 @@ class SqliteBasic:
         for insert_obj in insert_objs:
             insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        insert_dict_list = list(map(lambda x: asdict(x), insert_objs))
+        insert_dict_list = list(map(lambda x: self.filter_illegal_field(x), insert_objs))
 
         for insert_dict in insert_dict_list:
             insert_dict.pop('id')
-            # 过滤掉不合法的field
-            self.filter_illegal_field(insert_dict)
 
         field_str = ", ".join(insert_dict_list[0].keys())
         value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict_list[0].keys())))
@@ -173,11 +169,8 @@ class SqliteBasic:
     def update(self, update_obj: BasicSqliteDTO):
         """更新记录方法，根据id更新，创建时间不修改，更新时间传入当前时间"""
         update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        update_dict = asdict(update_obj)
+        update_dict = self.filter_illegal_field(update_obj)
         update_dict.pop('create_time')
-
-        # 过滤掉不合法的field
-        self.filter_illegal_field(update_dict)
 
         # 只更新除id以外不为空的属性
         update_field_list = list(map(lambda x: x[0],
@@ -201,12 +194,10 @@ class SqliteBasic:
         update_dict_list = list()
         for update_obj in update_objs:
             update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            update_dict = asdict(update_obj)
+            update_dict = self.filter_illegal_field(update_obj)
             update_dict.pop('create_time')
             update_dict_list.append(update_dict)
 
-            # 过滤掉不合法的field
-            self.filter_illegal_field(update_dict)
         # 只更新除id以外不为空的属性
         update_field_list = list(map(lambda x: x[0],
                                      filter(lambda x: x[1] is not None and x[0] != 'id', update_dict_list[0].items())))
@@ -244,10 +235,8 @@ class SqliteBasic:
     def _do_select(self, sql, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，查询存在的记录数量"""
         select_sql = sql
-        select_dict = asdict(select_obj)
-
         # 过滤掉不合法的field
-        self.filter_illegal_field(select_dict)
+        select_dict = self.filter_illegal_field(select_obj)
 
         select_field_list = list(map(lambda x: x[0], filter(lambda x: x[1] is not None, select_dict.items())))
         select_value_dict = dict()
@@ -265,10 +254,13 @@ class SqliteBasic:
         log.info(f'查询[{self.table_name}]参数 ==> {select_value_dict}')
         return get_db_conn().query(select_sql, **select_value_dict)
 
-    def filter_illegal_field(self, operation_dict):
+    def filter_illegal_field(self, data):
         # 过滤掉不合法的field
-        illegal_field_list = operation_dict.keys() - self.get_field_list()
-        [operation_dict.pop(k) for k in illegal_field_list]
+        legal_fields_dict = dict()
+        for db_field in self.get_field_list():
+            if hasattr(data, db_field):
+                legal_fields_dict[db_field] = getattr(data, db_field)
+        return legal_fields_dict
 
     def get_max_order(self, condition_dict=None):
         max_order_sql = self._max_order_sql

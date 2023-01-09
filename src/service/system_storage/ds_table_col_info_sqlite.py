@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 from enum import Enum
+from itertools import groupby
 
 from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
 from logger.log import logger as log
@@ -71,6 +72,8 @@ class DsTableColInfo(BasicSqliteDTO):
     has_child_table: int = field(init=False, default=0)
     # 非数据库字段，维持子项列表
     children: list = field(init=False, default=None)
+    # 非数据库字段，指向父列数据
+    parent_col: dataclass = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -105,16 +108,31 @@ class DsTableColInfoSqlite(SqliteBasic):
         get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")
 
-    def recursive_get_children(self, parent_tab_id, parent_id):
-        cols = self.get_children(parent_tab_id, parent_id)
-        if cols:
-            for col in cols:
-                # 作为父元素，继续查询子元素
-                col.children = self.recursive_get_children(parent_tab_id, col.id)
-        return cols
+    def get_tab_cols(self, parent_tab_id):
+        # 获取当前tab页下所有列数据
+        cols = self._get_table_cols(parent_tab_id)
+        # 列数据按照 parent_id 分组
+        cols_parent_id_group = groupby(sorted(cols, key=lambda x: x.parent_id), key=lambda x: x.parent_id)
+        cols_parent_id_dict = dict(map(lambda x: (x[0], list(x[1])), cols_parent_id_group))
 
-    def get_children(self, parent_tab_id, parent_id):
+        # 找到所有父id对应的列数据，由于没有id为0的元素，所以这里会自动过滤掉父id为0，只会匹配其他有意义的父id
+        parent_id_cols = filter(lambda x: x.id in cols_parent_id_dict.keys(), cols)
+        parent_col_dict = dict(map(lambda x: (x.id, x), parent_id_cols))
+
+        # 获取顶级节点数据，即 parent_id = 0
+        top_cols = cols_parent_id_dict.get(0)
+        top_cols.sort(key=lambda x: x.item_order)
+        for col_id, col_data in parent_col_dict.items():
+            # 赋值子集合
+            children = cols_parent_id_dict.get(col_id)
+            children.sort(key=lambda x: x.item_order)
+            col_data.children = children
+            # 在子元素中维持一个指向父元素的指针
+            for child_col in children:
+                child_col.parent_col = col_data
+        return top_cols
+
+    def _get_table_cols(self, parent_tab_id):
         col_param = DsTableColInfo()
         col_param.parent_tab_id = parent_tab_id
-        col_param.parent_id = parent_id
         return self.select_by_order(col_param)

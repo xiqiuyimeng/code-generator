@@ -20,7 +20,7 @@ _date_ = '2022/12/6 15:50'
 
 class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
-    def __init__(self, main_window, parent, cols, parent_table=None, parent_col=None):
+    def __init__(self, main_window, parent, cols, parent_table=None):
         super().__init__(parent)
         self.main_window = main_window
         self.cols = cols
@@ -34,7 +34,6 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 进行批量处理的时候，标志位置为true，不再触发单行复选框的处理逻辑
         self.batch_operating = False
         self.parent_table: AbstractTableWidget = parent_table
-        self.parent_col: DsTableColInfo = parent_col
         # 保存代理引用
         self.combox_delegate = ...
         self.text_input_delegate = ...
@@ -97,7 +96,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
     def batch_deal_checked(self, check_state):
         # 调用批量处理方法保存数据
-        self.batch_update_check_state(check_state)
+        self.batch_update_check_state(self.cols, check_state)
         # 检查每一行是否有子表，如果存在子表，联动子表复选框
         [self.link_child_table_checked(check_state, row) for row in range(len(self.cols))]
 
@@ -153,15 +152,21 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 保存选中数据
         if checked_col_list:
             self.add_checked_data(checked_col_list)
+            # 在重新填充表格时，需要考虑一种情况：之前已经选中但是未展示的子表，也应该添加到选中数据中
+            self.add_children_checked_data(checked_col_list)
+
+    def add_children_checked_data(self, checked_col_list):
+        for checked_col in checked_col_list:
+            # 如果存在子项，但是不存在子表，将数据选中
+            if checked_col.children and not checked_col.has_child_table:
+                self.add_checked_data(checked_col.children)
+                self.add_children_checked_data(checked_col.children)
 
     def add_checked_data(self, cols): ...
 
     def remove_checked_data(self, cols): ...
 
-    def add_all_table_cols_checked(self):
-        self.add_checked_data(self.cols)
-
-    def remove_all_table_checked(self): ...
+    def remove_all_table_checked(self, cols): ...
 
     def update_checked_data(self, col_data): ...
 
@@ -288,6 +293,9 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
             child_table.table_header.change_header_state(checked)
             # 批量处理
             child_table.batch_deal_checked(checked)
+        # 当前列数据如果存在子项并且还没有创建子表，应该同步子项选中状态并保存
+        elif not self.cols[row].has_child_table and self.cols[row].children:
+            self.batch_update_check_state(self.cols[row].children, checked)
 
     def save_data(self, row, col, data):
         # 根据row找到对应的列信息数据
@@ -331,9 +339,9 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 保存数据
         self.async_save_executor.save_table_data(modify_col_data)
 
-    def batch_update_check_state(self, check_state):
+    def batch_update_check_state(self, cols, check_state):
         modify_col_data_list = list()
-        for col in self.cols:
+        for col in cols:
             if col.checked != check_state:
                 col.checked = check_state
                 modify_col_data = DsTableColInfo()
@@ -346,9 +354,9 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.async_save_executor.batch_save_data(modify_col_data_list)
         # 批量选中数据或取消选中
         if check_state == Qt.Unchecked:
-            self.remove_all_table_checked()
+            self.remove_all_table_checked(cols)
         elif check_state == Qt.Checked:
-            self.add_all_table_cols_checked()
+            self.add_checked_data(cols)
 
     def update_col_expanded(self, col):
         self.async_save_executor.update_col_expanded(col)

@@ -27,7 +27,8 @@ class SqlTableWidget(AbstractTableWidget):
         del_data[max(del_data) + 1] = col
         self.tree_data.del_node(del_data)
 
-    def remove_all_table_checked(self):
+    def remove_all_table_checked(self, cols):
+        # 对于sql数据源表来说，不需要使用列，移除所有选中列，等于取消选中表，所以直接操作表即可
         del_data = get_add_del_data(self.tree_item)
         self.tree_data.del_node(del_data)
 
