@@ -11,10 +11,11 @@ class AbstractStructTreeNode(AbstractTreeNode):
 
     def set_check_state(self, *args): ...
 
-    def link_parent_node(self):
+    def link_parent_node(self, parent_item=None):
         # 联动父节点变化
-        if self.item.parent():
-            parent_node = self.item.parent().tree_node
+        parent_item = parent_item if parent_item else self.item.parent()
+        if parent_item:
+            parent_node = parent_item.tree_node
             parent_node.set_check_state()
 
     def get_need_reorder_items(self):

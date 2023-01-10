@@ -191,7 +191,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.worker_terminate()
         # 禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
         item_idx = self.tree_widget.indexOfTopLevelItem(self.item)
-        if self.tree_widget.topLevelItemCount() > item_idx:
+        if self.tree_widget.topLevelItemCount() - 1 > item_idx:
             set_item_no_change(self.tree_widget.topLevelItem(item_idx + 1), True)
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))

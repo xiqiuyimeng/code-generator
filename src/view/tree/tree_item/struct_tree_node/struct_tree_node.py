@@ -135,14 +135,16 @@ class StructTreeNode(AbstractStructTreeNode):
     def del_struct_callback(self):
         self.worker_terminate()
         # 删除节点，禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
-        if self.item.parent():
+        parent_item = self.item.parent()
+        if parent_item:
             item_idx = self.item.parent().indexOfChild(self.item)
-            if self.item.parent().childCount() > item_idx:
+            if self.item.parent().childCount() - 1 > item_idx:
                 set_item_no_change(self.item.parent().child(item_idx + 1), True)
             self.item.parent().removeChild(self.item)
+            self.tree_widget.link_parent_node(self.item, parent_item)
         else:
             item_idx = self.tree_widget.indexOfTopLevelItem(self.item)
-            if self.tree_widget.topLevelItemCount() > item_idx:
+            if self.tree_widget.topLevelItemCount() - 1 > item_idx:
                 set_item_no_change(self.tree_widget.topLevelItem(item_idx + 1), True)
             self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
 
