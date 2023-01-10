@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
+from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
 from service.system_storage.struct_type import mapping_struct_type
+from logger.log import logger as log
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:49'
@@ -20,7 +21,8 @@ struct_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'select_list': f'select opened_item_id, struct_type from {table_name}'
+    'select_list': f'select opened_item_id, struct_type from {table_name}',
+    'delete_by_opened_item_id': f'delete from {table_name} where opened_item_id = '
 }
 
 
@@ -52,3 +54,9 @@ class StructSqlite(SqliteBasic):
     def select_list(self):
         rows = self._do_select(struct_sql_dict.get('select_list'), StructInfo())
         return list(map(lambda x: StructInfo(**x), rows.all()))
+
+    def delete_by_opened_item_id(self, opened_item_id):
+        sql = f"{struct_sql_dict.get('delete_by_opened_item_id')}{opened_item_id}"
+        get_db_conn().query(sql)
+        log.info(f'删除[{self.table_name}]语句 ==> {sql}')
+

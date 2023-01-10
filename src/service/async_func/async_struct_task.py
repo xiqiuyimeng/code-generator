@@ -2,7 +2,7 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from constant.constant import ADD_FOLDER_TITLE, EDIT_FOLDER_TITLE
+from constant.constant import ADD_FOLDER_TITLE, EDIT_FOLDER_TITLE, DEL_STRUCT_TITLE
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
@@ -74,23 +74,48 @@ class AddStructExecutor(LoadingMaskThreadExecutor):
 class DelStructWorker(ThreadWorkerABC):
     success_signal = pyqtSignal()
 
-    def __init__(self):
-        pass
+    def __init__(self, opened_item, reorder_items):
+        super().__init__()
+        self.opened_item = opened_item
+        self.reorder_items = reorder_items
 
+    @transactional
     def do_run(self):
-        pass
+        # 删除结构体
+        StructSqlite().delete_by_opened_item_id(self.opened_item.id)
+        # 删除opened item 记录
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_tree_item_sqlite.delete(self.opened_item.id)
+        # 重新排序需要排序的 opened item
+        update_opened_items = list()
+        for opened_item in self.reorder_items:
+            reorder_item = OpenedTreeItem()
+            reorder_item.id = opened_item.id
+            reorder_item.item_order = opened_item.item_order
+            update_opened_items.append(reorder_item)
+        opened_tree_item_sqlite.batch_update(update_opened_items)
+        log.info(f'{self.opened_item.item_name}删除成功')
+        self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.exception('删除结构体失败')
+        err_msg = f'[{self.opened_item.item_name}]删除失败'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class DelStructExecutor(IconMovieThreadExecutor):
 
-    def __init__(self):
-        pass
+    def __init__(self, item, opened_item, reorder_items, callback, window):
+        self.opened_item = opened_item
+        self.reorder_items = reorder_items
+        self.callback = callback
+        super().__init__(item, window, DEL_STRUCT_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelStructWorker()
+        return DelStructWorker(self.opened_item, self.reorder_items)
+    
+    def success_post_process(self, *args):
+        self.callback()
 
 
 # ---------------------------------------- 删除结构体 end ---------------------------------------- #

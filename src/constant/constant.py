@@ -150,6 +150,10 @@ UNSELECT_ACTION = '取消选择节点'
 RENAME_FOLDER_ACTION = '重命名[{}]'
 DEL_FOLDER_ACTION = '删除[{}]'
 
+"""操作结构体提示语"""
+EDIT_STRUCT_PROMPT = '编辑结构体需要先关闭结构体，是否继续？'
+DEL_STRUCT_PROMPT = '是否要删除结构体？'
+
 # ---------- 树节点右键菜单文字 end ---------- #
 
 # mysql查询数据库列表sql

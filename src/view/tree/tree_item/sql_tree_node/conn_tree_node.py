@@ -49,9 +49,8 @@ class ConnTreeNode(AbstractSqlTreeNode):
     def reopen_item(self, opened_items):
         # 打开连接下的库节点
         make_db_items(self.tree_widget, self.item, opened_items)
-        opened_item_record = get_item_opened_record(self.item)
-        self.item.setExpanded(opened_item_record.expanded)
-        if opened_item_record.is_current:
+        self.item.setExpanded(self.opened_item.expanded)
+        if self.opened_item.is_current:
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
@@ -168,20 +167,17 @@ class ConnTreeNode(AbstractSqlTreeNode):
             editable = True
 
         if editable:
-            opened_record = get_item_opened_record(self.item)
-            edit_conn_func(opened_record.data_type.display_name, self.tree_widget,
-                           self.window.geometry(), opened_record.parent_id)
+            edit_conn_func(self.opened_item.data_type.display_name, self.tree_widget,
+                           self.window.geometry(), self.opened_item.parent_id)
 
     def del_conn(self):
-        opened_record = get_item_opened_record(self.item)
         # 在删除连接之后的连接项，应该对其进行重新排序
-        need_reorder_items, reorder_items = self.reorder_conns()
-        self.del_conn_executor = DelConnExecutor(opened_record.parent_id, opened_record.item_name,
-                                                 self.item, self.window, self.del_conn_callback,
-                                                 need_reorder_items, reorder_items)
+        reorder_items = self.get_need_reorder_items()
+        self.del_conn_executor = DelConnExecutor(self.opened_item.parent_id, self.opened_item.item_name,
+                                                 self.item, self.window, self.del_conn_callback, reorder_items)
         self.del_conn_executor.start()
 
-    def reorder_conns(self):
+    def get_need_reorder_items(self):
         conn_items = self.tree_widget.get_top_level_items()
         index = conn_items.index(self.item)
         need_reorder_items = conn_items[index + 1:]
@@ -189,14 +185,14 @@ class ConnTreeNode(AbstractSqlTreeNode):
             reorder_items = tuple(map(lambda x: get_item_opened_record(x), need_reorder_items))
             for reorder_item in reorder_items:
                 reorder_item.item_order -= 1
-            return need_reorder_items, reorder_items
-        return None, None
+            return reorder_items
 
-    def del_conn_callback(self, need_reorder_items):
+    def del_conn_callback(self):
         self.worker_terminate()
-        # 给需要排序的这些连接节点，增加标志位，不再触发节点改变事件
-        if need_reorder_items:
-            [set_item_no_change(item, True) for item in need_reorder_items]
+        # 禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
+        item_idx = self.tree_widget.indexOfTopLevelItem(self.item)
+        if self.tree_widget.topLevelItemCount() > item_idx:
+            set_item_no_change(self.tree_widget.topLevelItem(item_idx + 1), True)
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
 

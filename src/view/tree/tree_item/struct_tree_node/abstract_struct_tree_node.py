@@ -1,28 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from view.tree.tree_item.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:32'
 
 
 class AbstractStructTreeNode(AbstractTreeNode):
-
-    def open_item(self): ...
-
-    def open_item_ui(self, *args): ...
-
-    def open_item_fail(self): ...
-
-    def reopen_item(self, opened_items): ...
-
-    def close_item(self): ...
-
-    def change_check_box(self, check_state, clicked): ...
-
-    def do_fill_menu(self, menu): ...
-
-    def handle_menu_func(self, func): ...
 
     def set_check_state(self, *args): ...
 
@@ -32,4 +17,27 @@ class AbstractStructTreeNode(AbstractTreeNode):
             parent_node = self.item.parent().tree_node
             parent_node.set_check_state()
 
-    def worker_terminate(self): ...
+    def get_need_reorder_items(self):
+        """当前节点之后的节点需要调整顺序"""
+        reorder_opened_items = list()
+        reorder_flag = False
+        if self.item.parent():
+            for idx in range(self.item.parent().childCount()):
+                item = self.item.parent().child(idx)
+                if item is self.item:
+                    reorder_flag = True
+                if reorder_flag:
+                    opened_item = get_item_opened_record(item)
+                    opened_item.item_order -= 1
+                    reorder_opened_items.append(opened_item)
+        else:
+            # 获取顶层节点
+            top_items = self.tree_widget.get_top_level_items()
+            for item in top_items:
+                if item is self.item:
+                    reorder_flag = True
+                if reorder_flag:
+                    opened_item = get_item_opened_record(item)
+                    opened_item.item_order -= 1
+                    reorder_opened_items.append(opened_item)
+        return reorder_opened_items

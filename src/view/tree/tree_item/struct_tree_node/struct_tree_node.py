@@ -2,13 +2,15 @@
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, OPEN_STRUCT_ACTION, \
-    CLOSE_STRUCT_ACTION
+    CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT
 from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor import *
+from service.async_func.async_struct_task import DelStructExecutor
+from view.box.message_box import pop_question
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, set_item_opened_tab, \
-    link_table_checkbox, save_tree_data, get_add_del_data
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, set_item_opened_tab, \
+    link_table_checkbox, save_tree_data, get_add_del_data, set_item_no_change
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
@@ -21,9 +23,8 @@ class StructTreeNode(AbstractStructTreeNode):
         super().__init__(*args)
         self.struct_name = self.item.text(0)
         self.open_struct_executor: OpenStructExecutor = ...
+        self.del_struct_executor: DelStructExecutor = ...
         self.is_opening = False
-        # 打开数据是不会变的
-        self.opened_item = get_item_opened_record(self.item)
 
     def open_item(self):
         # 获取打开的tab
@@ -58,7 +59,14 @@ class StructTreeNode(AbstractStructTreeNode):
         return tab
 
     def close_item(self):
-        super().close_item()
+        tab = get_item_opened_tab(self.item)
+        if tab:
+            index = self.window.struct_tab_widget.indexOf(tab)
+            tab_bar = self.window.struct_tab_widget.tab_bar
+            if tab_bar.table_allow_close((index,)):
+                # 删除tab
+                tab_bar.remove_tab(index)
+        return True
 
     def change_check_box(self, check_state, clicked):
         # 保存复选框状态变化
@@ -73,7 +81,7 @@ class StructTreeNode(AbstractStructTreeNode):
         # 打开
         open_struct_action = CANCEL_OPEN_STRUCT_ACTION \
             if self.is_opening else OPEN_STRUCT_ACTION \
-            if not self.item.childCount() else CLOSE_STRUCT_ACTION
+            if not get_item_opened_tab(self.item) else CLOSE_STRUCT_ACTION
         menu.addAction(QAction(get_icon(open_struct_action), open_struct_action.format(self.struct_name), menu))
         menu.addSeparator()
 
@@ -93,14 +101,50 @@ class StructTreeNode(AbstractStructTreeNode):
             self.open_struct_executor.worker_terminate(self.open_item_fail)
         # 关闭结构体
         elif func == CLOSE_STRUCT_ACTION.format(self.struct_name):
-            pass
+            self.close_item()
         # 编辑结构体
         elif func == EDIT_STRUCT_ACTION.format(self.struct_name):
-            edit_struct_func(self.opened_item.data_type.display_name, self.tree_widget,
-                             self.window.geometry(), self.opened_item.id)
+            self.edit_struct()
         # 删除结构体
         elif func == DEL_STRUCT_ACTION.format(self.struct_name):
-            pass
+            if pop_question(DEL_STRUCT_PROMPT, DEL_STRUCT_ACTION.format(self.struct_name), self.window) \
+                    and self.close_item():
+                self.del_struct()
+
+    def edit_struct(self):
+        # 如果结构体已经打开，先关闭，再进行编辑
+        editable = False
+        if get_item_opened_tab(self.item):
+            if pop_question(EDIT_STRUCT_PROMPT, EDIT_STRUCT_ACTION.format(self.struct_name), self.window) \
+                    and self.close_item():
+                editable = True
+        else:
+            editable = True
+
+        if editable:
+            edit_struct_func(self.opened_item.data_type.display_name, self.tree_widget,
+                             self.window.geometry(), self.opened_item.id)
+
+    def del_struct(self):
+        # 删除结构体后，应该对同级别的其他项进行重排序
+        reorder_items = self.get_need_reorder_items()
+        self.del_struct_executor = DelStructExecutor(self.item, self.opened_item, reorder_items,
+                                                     self.del_struct_callback, self.window)
+        self.del_struct_executor.start()
+
+    def del_struct_callback(self):
+        self.worker_terminate()
+        # 删除节点，禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
+        if self.item.parent():
+            item_idx = self.item.parent().indexOfChild(self.item)
+            if self.item.parent().childCount() > item_idx:
+                set_item_no_change(self.item.parent().child(item_idx + 1), True)
+            self.item.parent().removeChild(self.item)
+        else:
+            item_idx = self.tree_widget.indexOfTopLevelItem(self.item)
+            if self.tree_widget.topLevelItemCount() > item_idx:
+                set_item_no_change(self.tree_widget.topLevelItem(item_idx + 1), True)
+            self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
 
     def close_tab_callback(self):
         # 清空列数据，提供给tab bar调用，在关闭tab时调用

@@ -87,4 +87,7 @@ class StructTreeWidget(AbstractTreeWidget):
     def get_current_tab(self) -> TabTableUI:
         return self.main_window.struct_tab_widget.currentWidget()
 
+    def link_parent_node(self, item):
+        get_struct_tree_node(item, self, self.main_window).link_parent_node()
+
 

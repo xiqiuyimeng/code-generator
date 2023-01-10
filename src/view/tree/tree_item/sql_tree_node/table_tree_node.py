@@ -59,7 +59,7 @@ class TableTreeNode(AbstractSqlTreeNode):
                 # 删除tab
                 tab_bar.remove_tab(index)
 
-    def change_check_box(self, check_state):
+    def change_check_box(self, check_state, clicked):
         # 保存复选框状态变化
         self.save_check_state()
         # 联动表格内的复选框

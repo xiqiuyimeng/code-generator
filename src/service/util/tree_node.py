@@ -192,7 +192,8 @@ class TreeData:
 
     def clear_node_children(self, node_data: dict):
         node = self.get_node(node_data)
-        node.children.clear()
+        if node:
+            node.children.clear()
 
     def get_node(self, node_data: dict):
         return self._do_get_node(node_data, self._root_node, self._root_node.item_level + 1)

@@ -8,7 +8,7 @@ from service.async_func.async_sql_ds_task import OpenDBExecutor
 from view.box.message_box import pop_fail, pop_question
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab, get_add_del_data
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, get_add_del_data
 from view.tree.tree_widget.tree_function import make_table_items, check_table_status
 
 _author_ = 'luwt'
@@ -45,9 +45,8 @@ class DBTreeNode(AbstractSqlTreeNode):
     def reopen_item(self, opened_items):
         # 打开库下的表节点
         make_table_items(self.tree_widget, self.item, opened_items, self.tree_widget.tree_data)
-        opened_item_record = get_item_opened_record(self.item)
-        self.item.setExpanded(opened_item_record.expanded)
-        if opened_item_record.is_current:
+        self.item.setExpanded(self.opened_item.expanded)
+        if self.opened_item.is_current:
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):

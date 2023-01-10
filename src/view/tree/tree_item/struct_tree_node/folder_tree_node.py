@@ -7,7 +7,6 @@ from constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDE
 from constant.icon_enum import get_icon
 from view.bar.bar_action import add_structure_ds_actions
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record
 from view.tree.tree_widget.tree_function import add_folder_func, edit_folder_func, add_struct_tree_item
 
 _author_ = 'luwt'
@@ -31,7 +30,7 @@ class FolderTreeNode(AbstractStructTreeNode):
         add_struct_menu = QMenu(ADD_STRUCT_ACTION, menu)
         add_struct_menu.setIcon(get_icon(ADD_DS_ACTION))
         # 二级菜单
-        add_structure_ds_actions(add_struct_menu, self.window, get_item_opened_record(self.item), self.item)
+        add_structure_ds_actions(add_struct_menu, self.window, self.opened_item, self.item)
         menu.addMenu(add_struct_menu)
         menu.addSeparator()
 
@@ -73,10 +72,10 @@ class FolderTreeNode(AbstractStructTreeNode):
         elif func == RENAME_FOLDER_ACTION.format(self.item.text(0)):
             parent_item = self.item.parent()
             parent_opened_item = self.tree_widget.top_item \
-                if parent_item is None else get_item_opened_record(parent_item)
+                if parent_item is None else parent_item.tree_node.opened_item
             # 打开重命名文件夹对话框
             edit_folder_func(self.window.geometry(), self.tree_widget, parent_opened_item,
-                             get_item_opened_record(self.item), parent_item)
+                             self.opened_item, parent_item)
         # 删除
         elif func == DEL_FOLDER_ACTION.format(self.item.text(0)):
             pass

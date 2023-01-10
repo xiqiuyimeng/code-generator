@@ -91,4 +91,4 @@ class SqlTreeWidget(AbstractTreeWidget):
         get_sql_tree_node(item, self, self.main_window).handle_menu_func(func_name)
 
     def do_handle_checkbox_changed(self, item, clicked):
-        get_sql_tree_node(item, self, self.main_window).change_check_box(item.checkState(0))
+        get_sql_tree_node(item, self, self.main_window).change_check_box(item.checkState(0), clicked)

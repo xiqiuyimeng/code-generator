@@ -102,18 +102,17 @@ class DelConnWorker(ThreadWorkerABC):
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}\n{e}')
+        err_msg = f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class DelConnExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, conn_id, conn_name, item, window, callback,
-                 need_reorder_items, reorder_items):
+    def __init__(self, conn_id, conn_name, item, window, callback, reorder_items):
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.callback = callback
-        self.need_reorder_items = need_reorder_items
         self.reorder_items = reorder_items
         super().__init__(item, window, DEL_CONN_TITLE)
 
@@ -126,7 +125,7 @@ class DelConnExecutor(IconMovieThreadExecutor):
         return DelConnWorker(self.conn_id, self.conn_name, self.reorder_items, delete_opened_ids)
 
     def success_post_process(self, *args):
-        self.callback(self.need_reorder_items)
+        self.callback()
 
 
 # ---------------------------------------- 删除连接 end ---------------------------------------- #

@@ -347,6 +347,8 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     # 如果是结构体节点，置为当前项
     if struct_type != FOLDER_TYPE:
         tree_widget.setCurrentItem(struct_item)
+    # 由于添加新的项以后，可能导致父节点复选框状态变化，所以需要联动父节点
+    tree_widget.link_parent_node(struct_item)
 
 
 def update_struct_tree_item(tree_widget, item_name):
