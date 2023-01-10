@@ -20,8 +20,11 @@ class FolderTreeNode(AbstractStructTreeNode):
         for opened_item in opened_items:
             add_struct_tree_item(self.tree_widget, self.item, opened_item, opened_item.data_type.display_name)
 
-    def change_check_box(self, check_state):
+    def change_check_box(self, check_state, clicked):
         self.tree_widget.item_changed_executor.item_checked(self.item)
+        # 如果是点击，联动父节点变化
+        if clicked:
+            self.link_parent_node()
 
     def do_fill_menu(self, menu):
         # 添加结构体需要有二级菜单
@@ -61,11 +64,11 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 全选
         elif func == SELECT_ALL_ACTION:
             self.item.setCheckState(0, Qt.Checked)
-            self.tree_widget.handle_checkbox_changed(self.item)
+            self.tree_widget.handle_checkbox_changed(self.item, clicked=False)
         # 取消全选
         elif func == UNSELECT_ACTION:
             self.item.setCheckState(0, Qt.Unchecked)
-            self.tree_widget.handle_checkbox_changed(self.item)
+            self.tree_widget.handle_checkbox_changed(self.item, clicked=False)
         # 重命名
         elif func == RENAME_FOLDER_ACTION.format(self.item.text(0)):
             parent_item = self.item.parent()
@@ -77,3 +80,18 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 删除
         elif func == DEL_FOLDER_ACTION.format(self.item.text(0)):
             pass
+
+    def set_check_state(self):
+        # 对于文件夹节点而言，由下而上联动复选框，需要考虑当前节点状态，以及应该向上传递的状态
+        check_state = self.calculate_check_state()
+        self.item.setCheckState(0, check_state)
+        self.change_check_box(check_state, False)
+        self.link_parent_node()
+
+    def calculate_check_state(self):
+        # 如果子元素全选，那么应该返回全选，如果子元素全未选，应该返回未选择，否则返回部分选择
+        check_set = set(map(lambda x: self.item.child(x).checkState(0), range(self.item.childCount())))
+        if len(check_set) == 1:
+            return check_set.pop()
+        else:
+            return Qt.PartiallyChecked

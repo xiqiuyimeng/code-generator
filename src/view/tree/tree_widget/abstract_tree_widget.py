@@ -46,6 +46,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
         self.main_window = window
         # item 是否正在被鼠标左键点击
         self.item_clicked = False
+        self.clicked_item = ...
         # 是否正在重新打开中，重新打开的过程，会创建子节点，并设置展开状态等，影响部分信号槽
         self.reopening_flag = False
         self.connect_signal()
@@ -57,6 +58,8 @@ class AbstractTreeWidget(DisplayTreeWidget):
         if e.button() == Qt.LeftButton:
             # 判断是左键点击，将标志位置位True
             self.item_clicked = True
+            # 获取点击的项
+            self.clicked_item = self.itemAt(e.pos())
         super().mousePressEvent(e)
 
     def connect_signal(self):
@@ -95,13 +98,14 @@ class AbstractTreeWidget(DisplayTreeWidget):
     def handle_item_clicked(self):
         # 鼠标左键点击结束事件，将标志位置位False
         self.item_clicked = False
+        self.clicked_item = ...
 
-    def handle_checkbox_changed(self, item: QTreeWidgetItem):
+    def handle_checkbox_changed(self, item: QTreeWidgetItem, clicked=True):
         # 事件信号顺序是：mousePressEvent 按鼠标事件触发 -> mouseReleaseEvent 鼠标释放事件触发
         # -> itemChanged信号 -> clicked信号
         # 而在itemChanged信号发出时，会触发树节点的 setData方法，
         # 所以可以根据是否点击和数据变化，判断复选框是否点击
-        self.do_handle_checkbox_changed(item)
+        self.do_handle_checkbox_changed(item, clicked)
         check_state = item.checkState(0)
         self.handle_child_item_checked(item, check_state)
 
@@ -116,7 +120,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
                 if child_item.checkState(0) == check_state:
                     continue
                 child_item.setCheckState(0, check_state)
-                self.handle_checkbox_changed(child_item)
+                self.handle_checkbox_changed(child_item, clicked=False)
 
     def handle_item_collapsed(self, item):
         if not self.reopening_flag:
@@ -199,7 +203,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
 
     def do_handle_right_menu_func(self, item, func_name): ...
 
-    def do_handle_checkbox_changed(self, item): ...
+    def do_handle_checkbox_changed(self, item, clicked): ...
 
     def reopen_tree(self): ...
 

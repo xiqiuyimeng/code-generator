@@ -16,8 +16,10 @@ class TreeWidgetItem(QTreeWidgetItem):
         self.tree = tree
 
     def setData(self, column: int, role: int, value):
-        # 当树节点点击，且值已经改变，发送信号
+        # 当前树节点点击，且值已经改变，发送信号
         check_change = self.tree.item_clicked \
+                       and self.tree.clicked_item is not Ellipsis \
+                       and self.tree.clicked_item is self \
                        and column == 0 \
                        and role == Qt.CheckStateRole \
                        and self.checkState(0) != value

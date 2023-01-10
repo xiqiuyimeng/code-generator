@@ -60,11 +60,14 @@ class StructTreeNode(AbstractStructTreeNode):
     def close_item(self):
         super().close_item()
 
-    def change_check_box(self, check_state):
+    def change_check_box(self, check_state, clicked):
         # 保存复选框状态变化
         self.save_check_state()
         # 联动表格内的复选框
         link_table_checkbox(self.item, check_state)
+        # 如果是点击，联动父节点变化
+        if clicked:
+            self.link_parent_node()
 
     def do_fill_menu(self, menu):
         # 打开
@@ -106,8 +109,11 @@ class StructTreeNode(AbstractStructTreeNode):
             self.tree_widget.tree_data.clear_node_children(del_data)
 
     def set_check_state(self, check_state):
+        # 结构体表头复选框联动方法
         self.item.setCheckState(0, check_state)
         self.save_check_state()
+        # 联动父节点变化
+        self.link_parent_node()
 
     def save_check_state(self):
         # 保存选中数据
