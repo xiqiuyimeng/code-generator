@@ -42,8 +42,9 @@ class AddConnWorker(ThreadWorkerABC):
         self.success_signal.emit(opened_conn)
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
+        err_msg = f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class AddConnExecutor(LoadingMaskThreadExecutor):
@@ -162,8 +163,9 @@ class EditConnWorker(ThreadWorkerABC):
             opened_tree_item_sqlite.update(opened_conn_tree_item)
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}\n{e}')
+        err_msg = f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
@@ -235,8 +237,9 @@ class ListConnWorker(ThreadWorkerABC):
         self.tab_info_signal.emit(tab_list)
 
     def do_exception(self, e: Exception):
-        log.exception(LIST_ALL_CONN_FAIL_PROMPT)
-        self.error_signal.emit(f'{LIST_ALL_CONN_FAIL_PROMPT}\n{e}')
+        err_msg = LIST_ALL_CONN_FAIL_PROMPT
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
@@ -282,8 +285,9 @@ class QueryConnInfoWorker(ThreadWorkerABC):
         self.success_signal.emit(conn_list[0])
 
     def do_exception(self, e: Exception):
-        log.exception("查询连接信息失败")
-        self.error_signal.emit(f'查询连接信息失败\n{e}')
+        err_msg = f'查询连接信息失败，连接id：{self.conn_id}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class QueryConnInfoExecutor(LoadingMaskThreadExecutor):

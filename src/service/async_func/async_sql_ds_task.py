@@ -66,9 +66,9 @@ class TestConnWorker(ConnWorkerABC):
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.conn_opened_item.item_name}]{TEST_CONN_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.conn_opened_item.item_name}]{TEST_CONN_FAIL_PROMPT}\n'
-                               f'{e.orig.original_exception.strerror}')
+        err_msg = f'[{self.conn_opened_item.item_name}]{TEST_CONN_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
@@ -123,9 +123,9 @@ class OpenConnWorker(ConnWorkerABC):
                                                              ds_type, self.conn_opened_item.data_type)
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.conn_opened_item.item_name}]{OPEN_CONN_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.conn_opened_item.item_name}]{OPEN_CONN_FAIL_PROMPT}\n'
-                               f'{e.orig.original_exception.strerror}')
+        err_msg = f'[{self.conn_opened_item.item_name}]{OPEN_CONN_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
@@ -168,8 +168,9 @@ class OpenDBWorker(ConnWorkerABC):
                                                              ds_type, self.conn_opened_item.data_type)
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}\n{e}')
+        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
@@ -215,9 +216,9 @@ class OpenTBWorker(ConnWorkerABC):
         return table_tab
 
     def do_exception(self, e: Exception):
-        log.exception(f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}')
-        self.error_signal.emit(f'[{self.conn_opened_item.item_name}][{self.db_name}]'
-                               f'[{self.tb_name}]{OPEN_TB_FAIL_PROMPT}\n{e}')
+        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class OpenTBExecutor(SqlDSIconMovieThreadExecutor):

@@ -37,7 +37,7 @@ class ItemChangedWorker(ThreadWorkerABC):
             log.debug(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):
-        log.exception('更改树节点状态异常')
+        log.exception(f'更改树节点状态异常\n{e}')
 
 
 class ItemChangedExecutor(ThreadExecutorABC):
