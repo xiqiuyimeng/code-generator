@@ -4,6 +4,7 @@ import json
 from dataclasses import dataclass, field
 
 from service.system_storage.conn_type import mapping_conn_type
+from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
 from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 
 _author_ = 'luwt'
@@ -17,11 +18,13 @@ conn_sql_dict = {
     conn_name char(50) not null,
     conn_type char(30) not null,
     conn_info text,
-    item_order integer not null,
     create_time datetime,
     update_time datetime
     );''',
-    'select_id_type': f'select id, conn_type from {table_name}',
+    'select_id_type': f'select conn.id, conn.conn_type '
+                      f'from {table_name} conn, {OpenedTreeItemSqlite().table_name} opened_item '
+                      f'where conn.id = opened_item.parent_id and opened_item.level = 0 '
+                      f'order by opened_item.item_order',
 }
 
 
@@ -61,7 +64,3 @@ class ConnSqlite(SqliteBasic):
         """检查连接名称是否可用，名称必须唯一"""
         result = self.select_count(sql_conn)
         return result == 0
-
-    def add_conn(self, sql_conn: SqlConnection):
-        sql_conn.item_order = self.get_max_order()
-        self.insert(sql_conn)

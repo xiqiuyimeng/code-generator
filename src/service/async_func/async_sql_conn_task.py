@@ -32,11 +32,10 @@ class AddConnWorker(ThreadWorkerABC):
 
     @transactional
     def do_run(self):
-        ConnSqlite().add_conn(self.connection)
+        ConnSqlite().insert(self.connection)
         # 历史记录中的连接id
         opened_conn = OpenedTreeItemSqlite().add_conn_opened_item(self.connection.id,
-                                                                  self.connection.conn_name,
-                                                                  self.connection.item_order)
+                                                                  self.connection.conn_name)
         opened_conn.data_type = get_conn_type_by_type(self.connection.conn_type)
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit(opened_conn)
@@ -88,17 +87,7 @@ class DelConnWorker(ThreadWorkerABC):
         opened_tree_item_sqlite.batch_delete(self.delete_opened_ids)
         # 对被影响到的连接项进行重排序
         if self.reorder_items:
-            reorder_conns = list()
-            for item in self.reorder_items:
-                conn = SqlConnection()
-                conn.id = item.parent_id
-                conn.item_order = item.item_order
-                reorder_conns.append(conn)
-            conn_sqlite.batch_update(reorder_conns)
-            self.reorder_items[0].is_current = 1
-            for item in self.reorder_items[1:]:
-                item.is_current = 0
-            opened_tree_item_sqlite.batch_update(self.reorder_items)
+            opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
@@ -205,16 +194,18 @@ class ListConnWorker(ThreadWorkerABC):
 
     def do_run(self):
         self.start_signal.emit()
-        # 首选读取存储的连接信息
+        # 首选读取存储的连接，这里需要连表 opened_tree_item_sqlite 获取连接的顺序
         connections = ConnSqlite().get_conn_id_types()
 
         # 查询 OpenedItem
         level = SqlTreeItemLevel.conn_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
         for conn in connections:
             conn_type = get_conn_type_by_type(conn.conn_type)
             # 深度优先查找
-            children_generator = OpenedTreeItemSqlite().recursive_get_children(conn.id, level, ds_type)
+            children_generator = opened_tree_item_sqlite.recursive_get_children(conn.id, level, ds_type)
             for children in children_generator:
                 for child in children:
                     child.data_type = conn_type

@@ -148,7 +148,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_param.parent_id = parent_id
         return self.select_by_order(opened_param)
 
-    def add_conn_opened_item(self, conn_id, conn_name, order):
+    def add_conn_opened_item(self, conn_id, conn_name):
         conn_item = OpenedTreeItem()
         conn_item.item_name = conn_name
         conn_item.is_current = CurrentEnum.not_current.value
@@ -156,8 +156,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         conn_item.parent_id = conn_id
         conn_item.level = SqlTreeItemLevel.conn_level.value
         conn_item.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        # 顺序保持与连接一致
-        conn_item.item_order = order
+        conn_item.item_order = self.get_max_order()
         self.insert(conn_item)
         return conn_item
 
@@ -180,3 +179,12 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_tree_item.item_order = self.get_max_order(max_order_param)
         self.insert(opened_tree_item)
         return opened_tree_item
+
+    def reorder_opened_items(self, reorder_items):
+        update_opened_items = list()
+        for opened_item in reorder_items:
+            reorder_item = OpenedTreeItem()
+            reorder_item.id = opened_item.id
+            reorder_item.item_order = opened_item.item_order
+            update_opened_items.append(reorder_item)
+        self.batch_update(update_opened_items)

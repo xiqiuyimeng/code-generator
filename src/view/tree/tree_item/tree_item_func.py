@@ -14,25 +14,13 @@ def get_item_opened_record(item):
     return item.data(0, Qt.UserRole)
 
 
-def set_item_no_change(item, changed):
-    # 放入节点是否无变化的标志位，以便禁止一些场景下的节点改变信号事件
-    item.setData(1, Qt.UserRole, changed)
-
-
-def get_item_no_change(item):
-    # 无变化的标志位，只使用一次就可以了，所以应该在获取的时候，即重置
-    data = item.data(1, Qt.UserRole)
-    set_item_no_change(item, None)
-    return data
-
-
 def set_item_opened_tab(item, tab_widget):
     # 放入打开的tab_widget
-    item.setData(2, Qt.UserRole, tab_widget)
+    item.setData(1, Qt.UserRole, tab_widget)
 
 
 def get_item_opened_tab(item):
-    return item.data(2, Qt.UserRole)
+    return item.data(1, Qt.UserRole)
 
 
 def link_table_checkbox(tree_item, check_state):

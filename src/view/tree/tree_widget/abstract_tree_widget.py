@@ -17,7 +17,7 @@ from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_no_change, link_table_checkbox
+from view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
@@ -133,7 +133,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
             self.item_changed_executor.item_expanded(item)
 
     def handle_current_item_changed(self, current_item):
-        if current_item and not self.reopening_flag and not get_item_no_change(current_item):
+        if current_item and not self.reopening_flag:
             self.item_changed_executor.current_item_changed(current_item)
 
     def handle_right_menu_func(self, action):

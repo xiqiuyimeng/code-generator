@@ -10,7 +10,7 @@ from view.box.message_box import pop_question
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, set_item_opened_tab, \
-    link_table_checkbox, save_tree_data, get_add_del_data, set_item_no_change
+    link_table_checkbox, save_tree_data, get_add_del_data
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
@@ -137,15 +137,9 @@ class StructTreeNode(AbstractStructTreeNode):
         # 删除节点，禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
         parent_item = self.item.parent()
         if parent_item:
-            item_idx = self.item.parent().indexOfChild(self.item)
-            if self.item.parent().childCount() - 1 > item_idx:
-                set_item_no_change(self.item.parent().child(item_idx + 1), True)
             self.item.parent().removeChild(self.item)
             self.tree_widget.link_parent_node(self.item, parent_item)
         else:
-            item_idx = self.tree_widget.indexOfTopLevelItem(self.item)
-            if self.tree_widget.topLevelItemCount() - 1 > item_idx:
-                set_item_no_change(self.tree_widget.topLevelItem(item_idx + 1), True)
             self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
 
     def close_tab_callback(self):

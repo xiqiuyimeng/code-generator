@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSta
 from constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
 from constant.icon_enum import get_icon
 from service.async_func.async_ds_type_task import InitDsTypeExecutor, SwitchDsTypeExecutor
-from service.async_func.async_system_task.system_operation_queue import SystemOperationQueue
 from service.system_storage.ds_type_sqlite import DatasourceType
 from service.util.ds_type_util import get_current_datasource_type
 from view.bar.menubar import Menubar
@@ -42,9 +41,6 @@ class MainWindow(QMainWindow):
         self.datasource_types = ...
         self.current_ds_type = ...
         self.init_ds_type_executor = ...
-
-        # 保存操作记录的队列
-        self.operation_queue = SystemOperationQueue()
 
         self.setup_ui()
 

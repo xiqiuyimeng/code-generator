@@ -83,17 +83,11 @@ class DelStructWorker(ThreadWorkerABC):
     def do_run(self):
         # 删除结构体
         StructSqlite().delete_by_opened_item_id(self.opened_item.id)
-        # 删除opened item 记录
+        # 删除 opened item 记录
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         opened_tree_item_sqlite.delete(self.opened_item.id)
         # 重新排序需要排序的 opened item
-        update_opened_items = list()
-        for opened_item in self.reorder_items:
-            reorder_item = OpenedTreeItem()
-            reorder_item.id = opened_item.id
-            reorder_item.item_order = opened_item.item_order
-            update_opened_items.append(reorder_item)
-        opened_tree_item_sqlite.batch_update(update_opened_items)
+        opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
         log.info(f'{self.opened_item.item_name}删除成功')
         self.success_signal.emit()
 
@@ -372,7 +366,10 @@ class DelFolderWorker(ThreadWorkerABC):
     def __init__(self):
         super().__init__()
 
+    @transactional
     def do_run(self):
+        # 删除结构体
+        # 删除 opened item 记录
         while True:
             pass
 
