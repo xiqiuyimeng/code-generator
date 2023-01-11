@@ -348,7 +348,12 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     if struct_type != FOLDER_TYPE:
         tree_widget.setCurrentItem(struct_item)
     # 由于添加新的项以后，可能导致父节点复选框状态变化，所以需要联动父节点
-    tree_widget.link_parent_node(struct_item)
+    if not tree_widget.reopening_flag:
+        tree_widget.link_parent_node(struct_item)
+    # 如果节点是选中状态，添加到选中数据中
+    if opened_item_record.checked:
+        add_data = get_add_del_data(struct_item)
+        tree_widget.tree_data.add_node(add_data)
 
 
 def update_struct_tree_item(tree_widget, item_name):
