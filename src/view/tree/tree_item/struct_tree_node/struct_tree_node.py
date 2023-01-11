@@ -136,6 +136,10 @@ class StructTreeNode(AbstractStructTreeNode):
         self.worker_terminate()
         # 删除节点，禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
         parent_item = self.item.parent()
+        # 同步删除选中数据
+        if self.item.checkState(0):
+            del_data = get_add_del_data(self.item)
+            self.tree_widget.tree_data.del_node(del_data)
         if parent_item:
             self.item.parent().removeChild(self.item)
             self.tree_widget.link_parent_node(self.item, parent_item)

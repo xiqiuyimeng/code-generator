@@ -88,6 +88,9 @@ class FolderTreeNode(AbstractStructTreeNode):
         self.link_parent_node()
 
     def calculate_check_state(self):
+        # 如果不存在子元素，那么应该返回未选择
+        if self.item.childCount() == 0:
+            return Qt.Unchecked
         # 如果子元素全选，那么应该返回全选，如果子元素全未选，应该返回未选择，否则返回部分选择
         check_set = set(map(lambda x: self.item.child(x).checkState(0), range(self.item.childCount())))
         if len(check_set) == 1:
