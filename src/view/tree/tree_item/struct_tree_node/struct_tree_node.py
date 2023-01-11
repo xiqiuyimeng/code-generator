@@ -134,7 +134,6 @@ class StructTreeNode(AbstractStructTreeNode):
 
     def del_struct_callback(self):
         self.worker_terminate()
-        # 删除节点，禁止变化的连接节点，增加标志位，不再触发节点改变事件（删除当前节点以后，只有其后的第一个节点会触发改变事件）
         parent_item = self.item.parent()
         # 同步删除选中数据
         if self.item.checkState(0):

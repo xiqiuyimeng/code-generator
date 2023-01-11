@@ -62,7 +62,7 @@ class DBTreeNode(AbstractSqlTreeNode):
                 return
         index_list = self.get_tab_indexes()
         # 首先处理tab
-        [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
+        [self.window.sql_tab_widget.tab_bar.remove_tab(index, False) for index in index_list if index_list]
         # 再处理子节点线程和引用
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)

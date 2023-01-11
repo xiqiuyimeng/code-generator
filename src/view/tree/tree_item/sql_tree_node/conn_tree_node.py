@@ -67,7 +67,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
         if self.item.childCount():
             index_list = self.get_tab_indexes()
             # 首先处理tab
-            [self.window.sql_tab_widget.tab_bar.remove_tab(index) for index in index_list if index_list]
+            [self.window.sql_tab_widget.tab_bar.remove_tab(index, False) for index in index_list if index_list]
             # 遍历子元素，停止线程
             for i in range(self.item.childCount()):
                 child_item = self.item.child(i)
