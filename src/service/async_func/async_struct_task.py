@@ -13,6 +13,7 @@ from service.system_storage.sqlite_abc import transactional
 from service.system_storage.struct_sqlite import StructSqlite, StructInfo
 from service.system_storage.struct_type import FolderTypeEnum, get_struct_type
 from view.box.message_box import pop_ok
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_children_opened_ids
 
 _author_ = 'luwt'
 _date_ = '2022/11/21 13:03'
@@ -363,27 +364,58 @@ class EditFolderExecutor(LoadingMaskThreadExecutor):
 class DelFolderWorker(ThreadWorkerABC):
     success_signal = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, folder_name, delete_opened_ids, reorder_items, tab_ids):
         super().__init__()
+        self.folder_name = folder_name
+        self.delete_opened_ids = delete_opened_ids
+        self.reorder_items = reorder_items
+        self.tab_ids = tab_ids
 
     @transactional
     def do_run(self):
-        # 删除文件夹
+        # 删除当前文件夹下所有结构体，包括当前文件夹
+        StructSqlite().delete_by_opened_item_ids(self.delete_opened_ids)
         # 删除 opened item 记录
-        while True:
-            pass
+        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_tree_item_sqlite.batch_delete(self.delete_opened_ids)
+        # 对被影响到的连接项进行重排序
+        if self.reorder_items:
+            opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
+        if self.tab_ids:
+            # 删除tab
+            DsTableTabSqlite().batch_delete(self.tab_ids)
+            # 删除 数据列信息
+            DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
+        self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        log.exception('删除文件夹失败')
+        err_msg = f'删除文件夹 [{self.folder_name}] 失败'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
 
 class DelFolderExecutor(IconMovieThreadExecutor):
 
-    def __init__(self):
-        super().__init__(None, None)
+    def __init__(self, folder_name, reorder_items, tab_indexes,
+                 tab_ids, callback, item, window):
+        self.folder_name = folder_name
+        self.reorder_items = reorder_items
+        self.tab_indexes = tab_indexes
+        self.tab_ids = tab_ids
+        self.callback = callback
+        super().__init__(item, window, '删除文件夹')
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelFolderWorker()
+        # 获取要删除的节点对象
+        opened_record = get_item_opened_record(self.item)
+        # 获取子节点所有id
+        delete_opened_ids = get_children_opened_ids(self.item)
+        delete_opened_ids.append(opened_record.id)
+        return DelFolderWorker(self.folder_name, delete_opened_ids,
+                               self.reorder_items, self.tab_ids)
+
+    def success_post_process(self, *args):
+        self.callback(self.tab_indexes)
 
 
 # ---------------------------------------- 删除结构体文件夹 end ---------------------------------------- #

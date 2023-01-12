@@ -22,7 +22,8 @@ struct_sql_dict = {
     update_time datetime
     );''',
     'select_list': f'select opened_item_id, struct_type from {table_name}',
-    'delete_by_opened_item_id': f'delete from {table_name} where opened_item_id = '
+    'delete_by_opened_item_id': f'delete from {table_name} where opened_item_id = ',
+    'delete_by_opened_item_ids': f'delete from {table_name} where opened_item_id in ',
 }
 
 
@@ -57,6 +58,12 @@ class StructSqlite(SqliteBasic):
 
     def delete_by_opened_item_id(self, opened_item_id):
         sql = f"{struct_sql_dict.get('delete_by_opened_item_id')}{opened_item_id}"
+        get_db_conn().query(sql)
+        log.info(f'删除[{self.table_name}]语句 ==> {sql}')
+
+    def delete_by_opened_item_ids(self, opened_item_ids):
+        opened_item_id_list = ", ".join(map(lambda x: str(x), opened_item_ids))
+        sql = f"{struct_sql_dict.get('delete_by_opened_item_ids')}({opened_item_id_list})"
         get_db_conn().query(sql)
         log.info(f'删除[{self.table_name}]语句 ==> {sql}')
 

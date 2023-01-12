@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:32'
@@ -42,3 +42,19 @@ class AbstractStructTreeNode(AbstractTreeNode):
                     opened_item.item_order -= 1
                     reorder_opened_items.append(opened_item)
         return reorder_opened_items
+
+    def del_callback(self):
+        parent_item = self.item.parent()
+        # 同步删除选中数据
+        if self.item.checkState(0):
+            del_data = get_add_del_data(self.item)
+            self.tree_widget.tree_data.del_node(del_data)
+        if parent_item:
+            self.item.parent().removeChild(self.item)
+            # 联动父节点选中状态
+            self.tree_widget.link_parent_node(self.item, parent_item)
+            # 最后处理下父节点的展开状态
+            if not parent_item.childCount():
+                parent_item.setExpanded(False)
+        else:
+            self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))

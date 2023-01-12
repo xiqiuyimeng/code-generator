@@ -94,7 +94,7 @@ class OpenStructExecutor(IconMovieThreadExecutor):
         self.item = item
         self.callback = callback
         self.fail_callback = fail_callback
-        super().__init__(item, window, f'打开{self.item.text(0)}')
+        super().__init__(item, window, '打开结构体')
 
     def success_post_process(self, *args):
         self.callback(*args)

@@ -150,6 +150,7 @@ class TabBar(QTabBar):
         # 删除tab
         self.parent.removeTab(index)
         table_tab = tab_widget.table_tab
+        # 由更高层的树节点来调用时，只移除界面中的 tab 对象即可，无需发射其他信号
         if allow_emit_remove_signal:
             self.remove_tab_signal.emit(table_tab)
         # 清除选中数据，调用item node清除数据

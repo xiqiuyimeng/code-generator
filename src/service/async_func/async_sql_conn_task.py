@@ -105,7 +105,8 @@ class DelConnWorker(ThreadWorkerABC):
 
 class DelConnExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, conn_id, conn_name, reorder_items, tab_indexes, tab_ids, callback, item, window):
+    def __init__(self, conn_id, conn_name, reorder_items,
+                 tab_indexes, tab_ids, callback, item, window):
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.reorder_items = reorder_items
@@ -345,7 +346,7 @@ class CloseConnExecutor(IconMovieThreadExecutor):
         self.tab_ids = tab_ids
         self.close_for_edit = close_for_edit
         self.callback = callback
-        super().__init__(item, window, f'关闭连接 {conn_name}')
+        super().__init__(item, window, '关闭连接')
 
     def get_worker(self) -> ThreadWorkerABC:
         return CloseConnDBWorker(f'关闭连接 [{self.conn_name}] 失败', self.child_opened_ids, self.tab_ids)
@@ -367,7 +368,7 @@ class CloseDBExecutor(IconMovieThreadExecutor):
         self.tab_indexes = tab_indexes
         self.tab_ids = tab_ids
         self.callback = callback
-        super().__init__(item, window, f'关闭数据库 {db_name}')
+        super().__init__(item, window, '关闭数据库')
 
     def get_worker(self) -> ThreadWorkerABC:
         return CloseConnDBWorker(f'关闭数据库 [{self.db_name}] 失败', self.child_opened_ids, self.tab_ids)

@@ -66,6 +66,8 @@ class StructTreeNode(AbstractStructTreeNode):
             if tab_bar.table_allow_close((index,)):
                 # 删除tab
                 tab_bar.remove_tab(index)
+            else:
+                return
         return True
 
     def change_check_box(self, check_state, clicked):
@@ -134,16 +136,7 @@ class StructTreeNode(AbstractStructTreeNode):
 
     def del_struct_callback(self):
         self.worker_terminate()
-        parent_item = self.item.parent()
-        # 同步删除选中数据
-        if self.item.checkState(0):
-            del_data = get_add_del_data(self.item)
-            self.tree_widget.tree_data.del_node(del_data)
-        if parent_item:
-            self.item.parent().removeChild(self.item)
-            self.tree_widget.link_parent_node(self.item, parent_item)
-        else:
-            self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
+        self.del_callback()
 
     def close_tab_callback(self):
         # 清空列数据，提供给tab bar调用，在关闭tab时调用
