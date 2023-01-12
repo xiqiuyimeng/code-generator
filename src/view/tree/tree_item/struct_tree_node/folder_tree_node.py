@@ -15,6 +15,10 @@ _date_ = '2022/12/2 12:08'
 
 class FolderTreeNode(AbstractStructTreeNode):
 
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.item_name = self.item.text(0)
+
     def reopen_item(self, opened_items):
         for opened_item in opened_items:
             add_struct_tree_item(self.tree_widget, self.item, opened_item, opened_item.data_type.display_name)
@@ -51,10 +55,10 @@ class FolderTreeNode(AbstractStructTreeNode):
 
         # 重命名
         menu.addAction(QAction(get_icon(RENAME_FOLDER_ACTION),
-                               RENAME_FOLDER_ACTION.format(self.item.text(0)), menu))
+                               RENAME_FOLDER_ACTION.format(self.item_name), menu))
         # 删除
         menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION),
-                               DEL_FOLDER_ACTION.format(self.item.text(0)), menu))
+                               DEL_FOLDER_ACTION.format(self.item_name), menu))
 
     def handle_menu_func(self, func):
         # 新建文件夹
@@ -69,7 +73,7 @@ class FolderTreeNode(AbstractStructTreeNode):
             self.item.setCheckState(0, Qt.Unchecked)
             self.tree_widget.handle_checkbox_changed(self.item, clicked=False)
         # 重命名
-        elif func == RENAME_FOLDER_ACTION.format(self.item.text(0)):
+        elif func == RENAME_FOLDER_ACTION.format(self.item_name):
             parent_item = self.item.parent()
             parent_opened_item = self.tree_widget.top_item \
                 if parent_item is None else parent_item.tree_node.opened_item
@@ -77,8 +81,8 @@ class FolderTreeNode(AbstractStructTreeNode):
             edit_folder_func(self.window.geometry(), self.tree_widget, parent_opened_item,
                              self.opened_item, parent_item)
         # 删除
-        elif func == DEL_FOLDER_ACTION.format(self.item.text(0)):
-            pass
+        elif func == DEL_FOLDER_ACTION.format(self.item_name):
+            self.del_folder()
 
     def set_check_state(self):
         # 对于文件夹节点而言，由下而上联动复选框，需要考虑当前节点状态，以及应该向上传递的状态
@@ -97,3 +101,5 @@ class FolderTreeNode(AbstractStructTreeNode):
             return check_set.pop()
         else:
             return Qt.PartiallyChecked
+
+    def del_folder(self): ...

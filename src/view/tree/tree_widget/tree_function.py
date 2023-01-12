@@ -123,6 +123,8 @@ def update_conn_tree_item(tree_widget, conn_name):
     item.setText(0, conn_name)
     opened_record = get_item_opened_record(item)
     opened_record.item_name = conn_name
+    # 这里需要同步更新下 tree_node 对象中的 conn_name，否则 tree_node 对象中取到的就是原来的连接名
+    item.tree_node.conn_name = conn_name
 
 
 def make_conn_tree_items(opened_items, parent):
@@ -365,3 +367,5 @@ def update_struct_tree_item(tree_widget, item_name):
     if item.checkState(0):
         update_data = get_add_del_data(item)
         tree_widget.tree_data.update_node_name(update_data)
+    # 同sql连接节点，这里也需要同步更新下 tree_node 对象中的 结构体名称
+    item.tree_node.item_name = item_name

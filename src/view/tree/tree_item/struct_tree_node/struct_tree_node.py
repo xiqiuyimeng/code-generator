@@ -21,7 +21,7 @@ class StructTreeNode(AbstractStructTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.struct_name = self.item.text(0)
+        self.item_name = self.item.text(0)
         self.open_struct_executor: OpenStructExecutor = ...
         self.del_struct_executor: DelStructExecutor = ...
         self.is_opening = False
@@ -50,7 +50,7 @@ class StructTreeNode(AbstractStructTreeNode):
     def reopen_item(self, table_tab):
         # 创建tab页
         tab = TabTableUI(self.window, table_tab, self.item)
-        self.window.struct_tab_widget.addTab(tab, self.struct_name)
+        self.window.struct_tab_widget.addTab(tab, self.item_name)
         # 记录tab对象
         set_item_opened_tab(self.item, tab)
         # 连接表头复选框变化信号
@@ -82,32 +82,32 @@ class StructTreeNode(AbstractStructTreeNode):
         open_struct_action = CANCEL_OPEN_STRUCT_ACTION \
             if self.is_opening else OPEN_STRUCT_ACTION \
             if not get_item_opened_tab(self.item) else CLOSE_STRUCT_ACTION
-        menu.addAction(QAction(get_icon(open_struct_action), open_struct_action.format(self.struct_name), menu))
+        menu.addAction(QAction(get_icon(open_struct_action), open_struct_action.format(self.item_name), menu))
         menu.addSeparator()
 
         # 编辑
         menu.addAction(QAction(get_icon(EDIT_STRUCT_ACTION),
-                               EDIT_STRUCT_ACTION.format(self.struct_name), menu))
+                               EDIT_STRUCT_ACTION.format(self.item_name), menu))
         # 删除
         menu.addAction(QAction(get_icon(DEL_STRUCT_ACTION),
-                               DEL_STRUCT_ACTION.format(self.struct_name), menu))
+                               DEL_STRUCT_ACTION.format(self.item_name), menu))
 
     def handle_menu_func(self, func):
         # 打开结构体
-        if func == OPEN_STRUCT_ACTION.format(self.struct_name):
+        if func == OPEN_STRUCT_ACTION.format(self.item_name):
             self.open_item()
         # 取消打开结构体
-        elif func == CANCEL_OPEN_STRUCT_ACTION.format(self.struct_name):
+        elif func == CANCEL_OPEN_STRUCT_ACTION.format(self.item_name):
             self.open_struct_executor.worker_terminate(self.open_item_fail)
         # 关闭结构体
-        elif func == CLOSE_STRUCT_ACTION.format(self.struct_name):
+        elif func == CLOSE_STRUCT_ACTION.format(self.item_name):
             self.close_item()
         # 编辑结构体
-        elif func == EDIT_STRUCT_ACTION.format(self.struct_name):
+        elif func == EDIT_STRUCT_ACTION.format(self.item_name):
             self.edit_struct()
         # 删除结构体
-        elif func == DEL_STRUCT_ACTION.format(self.struct_name):
-            if pop_question(DEL_STRUCT_PROMPT, DEL_STRUCT_ACTION.format(self.struct_name), self.window) \
+        elif func == DEL_STRUCT_ACTION.format(self.item_name):
+            if pop_question(DEL_STRUCT_PROMPT, DEL_STRUCT_ACTION.format(self.item_name), self.window) \
                     and self.close_item():
                 self.del_struct()
 
@@ -115,7 +115,7 @@ class StructTreeNode(AbstractStructTreeNode):
         # 如果结构体已经打开，先关闭，再进行编辑
         editable = False
         if get_item_opened_tab(self.item):
-            if pop_question(EDIT_STRUCT_PROMPT, EDIT_STRUCT_ACTION.format(self.struct_name), self.window) \
+            if pop_question(EDIT_STRUCT_PROMPT, EDIT_STRUCT_ACTION.format(self.item_name), self.window) \
                     and self.close_item():
                 editable = True
         else:
