@@ -29,7 +29,7 @@ def get_struct_dialog(display_name):
 @dataclass
 class StructType:
 
-    type: int = field(init=False)
+    type: str = field(init=False)
     # 展示名称，也用来标识icon类型
     display_name: str = field(init=False)
     # 对应类型的连接对话框

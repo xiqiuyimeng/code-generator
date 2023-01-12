@@ -153,6 +153,7 @@ DEL_FOLDER_ACTION = '删除[{}]'
 """操作结构体提示语"""
 EDIT_STRUCT_PROMPT = '编辑结构体需要先关闭结构体，是否继续？'
 DEL_STRUCT_PROMPT = '是否要删除结构体？'
+DEL_FOLDER_PROMPT = '是否要删除文件夹？'
 
 # ---------- 树节点右键菜单文字 end ---------- #
 

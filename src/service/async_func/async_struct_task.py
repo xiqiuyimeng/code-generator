@@ -368,7 +368,7 @@ class DelFolderWorker(ThreadWorkerABC):
 
     @transactional
     def do_run(self):
-        # 删除结构体
+        # 删除文件夹
         # 删除 opened item 记录
         while True:
             pass

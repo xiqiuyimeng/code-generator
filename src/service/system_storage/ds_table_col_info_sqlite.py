@@ -29,6 +29,7 @@ ds_table_col_info_sql_dict = {
     update_time datetime
     );''',
     'delete_by_parent_tab_id': f'delete from {table_name} where parent_tab_id = ',
+    'delete_by_parent_tab_ids': f'delete from {table_name} where parent_tab_id in ',
 }
 
 
@@ -105,6 +106,13 @@ class DsTableColInfoSqlite(SqliteBasic):
     @staticmethod
     def delete_by_parent_tab_id(parent_tab_id):
         delete_sql = f"{ds_table_col_info_sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
+        get_db_conn().query(delete_sql)
+        log.info(f"删除{table_name}语句 ==> {delete_sql}")
+
+    @staticmethod
+    def delete_by_parent_tab_ids(parent_tab_ids):
+        parent_tab_id_list = ", ".join(map(lambda x: str(x), parent_tab_ids))
+        delete_sql = f"{ds_table_col_info_sql_dict.get('delete_by_parent_tab_ids')}({parent_tab_id_list})"
         get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")
 

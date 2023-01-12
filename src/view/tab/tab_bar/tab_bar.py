@@ -142,7 +142,7 @@ class TabBar(QTabBar):
 
     def partially_checked_table_prompt(self, tab_widget) -> str: ...
 
-    def remove_tab(self, index, batch_clear_checked=True):
+    def remove_tab(self, index, batch_clear_checked=True, allow_emit_remove_signal=True):
         # 获取tab table
         tab_widget = self.parent.widget(index)
         # 删除tab widget在树节点中的引用
@@ -150,7 +150,8 @@ class TabBar(QTabBar):
         # 删除tab
         self.parent.removeTab(index)
         table_tab = tab_widget.table_tab
-        self.remove_tab_signal.emit(table_tab)
+        if allow_emit_remove_signal:
+            self.remove_tab_signal.emit(table_tab)
         # 清除选中数据，调用item node清除数据
         if batch_clear_checked:
             tab_widget.tree_item.tree_node.close_tab_callback()

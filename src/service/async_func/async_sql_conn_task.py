@@ -71,23 +71,29 @@ class AddConnExecutor(LoadingMaskThreadExecutor):
 class DelConnWorker(ThreadWorkerABC):
     success_signal = pyqtSignal()
 
-    def __init__(self, conn_id, conn_name, reorder_items, delete_opened_ids):
+    def __init__(self, conn_id, conn_name, reorder_items, delete_opened_ids, tab_ids):
         super().__init__()
         self.conn_id = conn_id
         self.conn_name = conn_name
         self.reorder_items = reorder_items
         self.delete_opened_ids = delete_opened_ids
+        self.tab_ids = tab_ids
 
     @transactional
     def do_run(self):
-        conn_sqlite = ConnSqlite()
-        conn_sqlite.delete(self.conn_id)
+        # 删除连接
+        ConnSqlite().delete(self.conn_id)
         # 根据连接id，删除打开记录表中的记录
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         opened_tree_item_sqlite.batch_delete(self.delete_opened_ids)
         # 对被影响到的连接项进行重排序
         if self.reorder_items:
             opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
+        if self.tab_ids:
+            # 删除tab
+            DsTableTabSqlite().batch_delete(self.tab_ids)
+            # 删除 数据列信息
+            DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
@@ -99,11 +105,13 @@ class DelConnWorker(ThreadWorkerABC):
 
 class DelConnExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, conn_id, conn_name, item, window, callback, reorder_items):
+    def __init__(self, conn_id, conn_name, reorder_items, tab_indexes, tab_ids, callback, item, window):
         self.conn_id = conn_id
         self.conn_name = conn_name
-        self.callback = callback
         self.reorder_items = reorder_items
+        self.tab_indexes = tab_indexes
+        self.tab_ids = tab_ids
+        self.callback = callback
         super().__init__(item, window, DEL_CONN_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
@@ -112,10 +120,11 @@ class DelConnExecutor(IconMovieThreadExecutor):
         # 获取子节点所有id
         delete_opened_ids = get_children_opened_ids(self.item)
         delete_opened_ids.append(conn_opened_record.id)
-        return DelConnWorker(self.conn_id, self.conn_name, self.reorder_items, delete_opened_ids)
+        return DelConnWorker(self.conn_id, self.conn_name, self.reorder_items,
+                             delete_opened_ids, self.tab_ids)
 
     def success_post_process(self, *args):
-        self.callback()
+        self.callback(self.tab_indexes)
 
 
 # ---------------------------------------- 删除连接 end ---------------------------------------- #
@@ -296,3 +305,74 @@ class QueryConnInfoExecutor(LoadingMaskThreadExecutor):
 
 
 # ---------------------------------------- 获取连接信息 end ---------------------------------------- #
+
+# ---------------------------------------- 关闭连接 start ---------------------------------------- #
+
+class CloseConnDBWorker(ThreadWorkerABC):
+    success_signal = pyqtSignal()
+
+    def __init__(self, err_msg, child_opened_ids, tab_ids):
+        super().__init__()
+        self.err_msg = err_msg
+        self.child_opened_ids = child_opened_ids
+        self.tab_ids = tab_ids
+
+    @transactional
+    def do_run(self):
+        # 首先删除 opened item 表
+        OpenedTreeItemSqlite().batch_delete(self.child_opened_ids)
+        if self.tab_ids:
+            # 删除tab
+            DsTableTabSqlite().batch_delete(self.tab_ids)
+            # 删除 数据列信息
+            DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
+        self.success_signal.emit()
+
+    def do_exception(self, e: Exception):
+        log.exception(self.err_msg)
+        self.error_signal.emit(f'{self.error_signal}\n{e}')
+
+
+class CloseConnExecutor(IconMovieThreadExecutor):
+
+    def __init__(self, conn_id, conn_name, child_opened_ids,
+                 tab_indexes, tab_ids, close_for_edit, item,
+                 window, callback):
+        self.conn_id = conn_id
+        self.conn_name = conn_name
+        self.child_opened_ids = child_opened_ids
+        self.tab_indexes = tab_indexes
+        self.tab_ids = tab_ids
+        self.close_for_edit = close_for_edit
+        self.callback = callback
+        super().__init__(item, window, f'关闭连接 {conn_name}')
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return CloseConnDBWorker(f'关闭连接 [{self.conn_name}] 失败', self.child_opened_ids, self.tab_ids)
+
+    def success_post_process(self, *args):
+        self.callback(self.tab_indexes, self.close_for_edit)
+
+# ---------------------------------------- 关闭连接 end ---------------------------------------- #
+
+
+# ---------------------------------------- 关闭数据库 start ---------------------------------------- #
+
+class CloseDBExecutor(IconMovieThreadExecutor):
+
+    def __init__(self, db_name, child_opened_ids, tab_indexes,
+                 tab_ids, item, window, callback):
+        self.db_name = db_name
+        self.child_opened_ids = child_opened_ids
+        self.tab_indexes = tab_indexes
+        self.tab_ids = tab_ids
+        self.callback = callback
+        super().__init__(item, window, f'关闭数据库 {db_name}')
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return CloseConnDBWorker(f'关闭数据库 [{self.db_name}] 失败', self.child_opened_ids, self.tab_ids)
+
+    def success_post_process(self, *args):
+        self.callback(self.tab_indexes)
+
+# ---------------------------------------- 关闭数据库 end ---------------------------------------- #

@@ -5,13 +5,13 @@ from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_C
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
     ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT
 from constant.icon_enum import get_icon
-from service.async_func.async_sql_conn_task import DelConnExecutor
+from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok, pop_question
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids
 from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func
 
 _author_ = 'luwt'
@@ -26,6 +26,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.open_conn_executor: OpenConnExecutor = ...
         self.test_conn_executor: TestConnIconMovieExecutor = ...
         self.del_conn_executor: DelConnExecutor = ...
+        self.close_conn_executor: CloseConnExecutor = ...
         self.is_testing = False
 
     def open_item(self):
@@ -53,43 +54,59 @@ class ConnTreeNode(AbstractSqlTreeNode):
         if self.opened_item.is_current:
             self.tree_widget.set_selected_focus(self.item)
 
-    def close_item(self):
+    def close_item(self, close_for_edit=False):
         # 判断是否有选中数据
         del_data = get_add_del_data(self.item)
         conn_data_node = self.tree_widget.tree_data.get_node(del_data)
-        # 如果能找到选中数据，提示应先清空
+        # 如果能找到选中数据，提示将会清空数据，是否继续
         if conn_data_node:
-            if pop_question(CLOSE_CONN_PROMPT, CLOSE_CONN_ACTION, self.window):
-                # 删除选中数据
-                self.tree_widget.tree_data.del_node(del_data)
-            else:
+            if not pop_question(CLOSE_CONN_PROMPT, CLOSE_CONN_ACTION.format(self.conn_name), self.window):
                 return
-        if self.item.childCount():
-            index_list = self.get_tab_indexes()
-            # 首先处理tab
-            [self.window.sql_tab_widget.tab_bar.remove_tab(index, False) for index in index_list if index_list]
-            # 遍历子元素，停止线程
-            for i in range(self.item.childCount()):
-                child_item = self.item.child(i)
-                if child_item.childCount():
-                    child_node = DBTreeNode(child_item, self.tree_widget, self.window)
-                    # 将线程停止
-                    child_node.worker_terminate()
-            # 删除连接下的节点
-            self.tree_widget.item_changed_executor.close_item(self.item)
-            self.item.takeChildren()
-            self.item.setExpanded(False)
-        return True
 
-    def get_tab_indexes(self):
-        index_list = list()
+        # 关闭连接
+        tab_indexes, tab_ids = self.get_tab_indexes_and_ids()
+        opened_record = get_item_opened_record(self.item)
+        child_opened_ids = get_children_opened_ids(self.item)
+        self.close_conn_executor = CloseConnExecutor(opened_record.parent_id, self.conn_name,
+                                                     child_opened_ids, tab_indexes, tab_ids,
+                                                     close_for_edit, self.item, self.window,
+                                                     self.close_conn_callback)
+        self.close_conn_executor.start()
+
+    def close_conn_callback(self, tab_indexes, close_for_edit):
+        self.do_close_conn_callback(tab_indexes)
+        # 删除连接下的节点
+        self.item.takeChildren()
+        self.item.setExpanded(False)
+        # 如果是针对于在编辑时关闭连接，那么下一步需要调用编辑方法
+        if close_for_edit:
+            self.edit_conn()
+
+    def do_close_conn_callback(self, tab_indexes):
+        # 首先删除选中数据
+        del_data = get_add_del_data(self.item)
+        self.tree_widget.tree_data.del_node(del_data)
+        # 移除界面中属于当前连接的tab页
+        if tab_indexes:
+            [self.window.sql_tab_widget.tab_bar.remove_tab(index, False, False) for index in tab_indexes]
+        # 停止子节点线程
+        for i in range(self.item.childCount()):
+            child_item = self.item.child(i)
+            if child_item.childCount():
+                child_node = DBTreeNode(child_item, self.tree_widget, self.window)
+                # 将线程停止
+                child_node.worker_terminate()
+
+    def get_tab_indexes_and_ids(self):
+        tab_indexes, tab_ids = list(), list()
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
             child_node = DBTreeNode(child_item, self.tree_widget, self.window)
-            child_tab_index_list = child_node.get_tab_indexes()
-            index_list.extend(child_tab_index_list)
-        index_list.sort(reverse=True)
-        return index_list
+            child_tab_index_list, child_tab_ids = child_node.get_tab_indexes_and_ids()
+            tab_indexes.extend(child_tab_index_list)
+            tab_ids.extend(child_tab_ids)
+        tab_indexes.sort(reverse=True)
+        return tab_indexes, tab_ids
 
     def do_fill_menu(self, menu: QMenu):
         # 添加连接需要有二级菜单
@@ -149,32 +166,27 @@ class ConnTreeNode(AbstractSqlTreeNode):
             self.test_conn_executor.worker_terminate(self.test_conn_fail)
         # 编辑连接
         elif func == EDIT_CONN_ACTION.format(self.conn_name):
-            self.edit_conn()
+            if self.item.childCount():
+                if pop_question(EDIT_CONN_PROMPT, EDIT_CONN_ACTION.format(self.conn_name), self.window):
+                    self.close_item(close_for_edit=True)
+            else:
+                self.edit_conn()
         # 删除连接
         elif func == DEL_CONN_ACTION.format(self.conn_name):
-            if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.conn_name), self.window) \
-                    and self.close_item():
+            if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.conn_name), self.window):
                 self.del_conn()
 
     def edit_conn(self):
-        # 如果连接已打开，必须先关闭，再编辑
-        editable = False
-        if self.item.childCount():
-            if pop_question(EDIT_CONN_PROMPT, EDIT_CONN_ACTION.format(self.conn_name), self.window) \
-                    and self.close_item():
-                editable = True
-        else:
-            editable = True
-
-        if editable:
-            edit_conn_func(self.opened_item.data_type.display_name, self.tree_widget,
-                           self.window.geometry(), self.opened_item.parent_id)
+        edit_conn_func(self.opened_item.data_type.display_name, self.tree_widget,
+                       self.window.geometry(), self.opened_item.parent_id)
 
     def del_conn(self):
         # 在删除连接之后的连接项，应该对其进行重新排序
         reorder_items = self.get_need_reorder_items()
+        tab_indexes, tab_ids = self.get_tab_indexes_and_ids()
         self.del_conn_executor = DelConnExecutor(self.opened_item.parent_id, self.opened_item.item_name,
-                                                 self.item, self.window, self.del_conn_callback, reorder_items)
+                                                 reorder_items, tab_indexes, tab_ids,
+                                                 self.del_conn_callback, self.item, self.window)
         self.del_conn_executor.start()
 
     def get_need_reorder_items(self):
@@ -187,7 +199,8 @@ class ConnTreeNode(AbstractSqlTreeNode):
                 reorder_item.item_order -= 1
             return reorder_items
 
-    def del_conn_callback(self):
+    def del_conn_callback(self, tab_indexes):
+        self.do_close_conn_callback(tab_indexes)
         self.worker_terminate()
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
