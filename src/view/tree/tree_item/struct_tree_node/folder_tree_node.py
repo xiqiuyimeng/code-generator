@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
-    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE
+    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_struct_task import DelFolderExecutor
 from view.bar.bar_action import add_structure_ds_actions
@@ -65,6 +65,10 @@ class FolderTreeNode(AbstractStructTreeNode):
         menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION),
                                DEL_FOLDER_ACTION.format(self.item_name), menu))
 
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}[{self.item_name}]', menu))
+
     def handle_menu_func(self, func):
         # 新建文件夹
         if func == CREATE_NEW_FOLDER_ACTION:
@@ -89,6 +93,9 @@ class FolderTreeNode(AbstractStructTreeNode):
         elif func == DEL_FOLDER_ACTION.format(self.item_name):
             if pop_question(DEL_FOLDER_PROMPT, DEL_FOLDER_ACTION.format(self.item_name), self.window):
                 self.del_folder()
+        # 刷新
+        elif func == REFRESH_ACTION.format(self.item_name):
+            self.refresh()
 
     def set_check_state(self):
         # 对于文件夹节点而言，由下而上联动复选框，需要考虑当前节点状态，以及应该向上传递的状态
@@ -152,3 +159,5 @@ class FolderTreeNode(AbstractStructTreeNode):
                 tab_indexes.append(self.window.struct_tab_widget.indexOf(tab))
                 tab_ids.append(tab.table_tab.id)
             self.get_child_tab_indexes_and_ids(child_item, tab_indexes, tab_ids)
+
+    def refresh(self): ...

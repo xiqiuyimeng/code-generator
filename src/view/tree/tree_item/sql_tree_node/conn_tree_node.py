@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
-    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT
+    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
@@ -135,6 +135,10 @@ class ConnTreeNode(AbstractSqlTreeNode):
         # 删除连接
         menu.addAction(QAction(get_icon(DEL_CONN_ACTION), DEL_CONN_ACTION.format(self.conn_name), menu))
 
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}连接[{self.conn_name}]', menu))
+
     def test_conn(self):
         self.is_testing = True
         self.test_conn_executor = TestConnIconMovieExecutor(self.item, self.window,
@@ -175,6 +179,9 @@ class ConnTreeNode(AbstractSqlTreeNode):
         elif func == DEL_CONN_ACTION.format(self.conn_name):
             if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.conn_name), self.window):
                 self.del_conn()
+        # 刷新
+        elif func == REFRESH_ACTION.format(self.conn_name):
+            self.refresh()
 
     def edit_conn(self):
         edit_conn_func(self.opened_item.data_type.display_name, self.tree_widget,
@@ -204,6 +211,8 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.worker_terminate()
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
+
+    def refresh(self): ...
 
     def worker_terminate(self):
         if self.open_conn_executor is not Ellipsis:

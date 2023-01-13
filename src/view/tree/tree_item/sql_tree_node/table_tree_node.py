@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QAction
 
-from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU
+from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION
+from constant.icon_enum import get_icon
 from service.async_func.async_sql_ds_task import OpenTBExecutor
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
@@ -82,6 +83,10 @@ class TableTreeNode(AbstractSqlTreeNode):
 
         menu.addAction(QAction(open_menu_name.format(self.table_name), menu))
 
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}表[{self.table_name}]', menu))
+
     def handle_menu_func(self, func):
         # 打开表
         if func == OPEN_TABLE_MENU.format(self.table_name):
@@ -92,12 +97,17 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 关闭表
         elif func == CLOSE_TABLE_MENU.format(self.table_name):
             self.close_item()
+        # 刷新
+        elif func == REFRESH_ACTION.format(self.table_name):
+            self.refresh()
 
     def close_tab_callback(self):
         # 如果选中了数据，那么清空列数据，提供给tab bar调用，在关闭tab时调用
         if self.item.checkState(0):
             del_data = get_add_del_data(self.item)
             self.tree_widget.tree_data.clear_node_children(del_data)
+
+    def refresh(self): ...
 
     def worker_terminate(self):
         if self.open_tb_executor is not Ellipsis:

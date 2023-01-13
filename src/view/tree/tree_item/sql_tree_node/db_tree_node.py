@@ -3,7 +3,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
-    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT
+    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION
+from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import CloseDBExecutor
 from service.async_func.async_sql_ds_task import OpenDBExecutor
 from view.box.message_box import pop_fail, pop_question
@@ -115,6 +116,10 @@ class DBTreeNode(AbstractSqlTreeNode):
         else:
             menu.addAction(QAction(OPEN_DB_MENU.format(self.db_name), menu))
 
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}数据库[{self.db_name}]', menu))
+
     def handle_menu_func(self, func):
         # 打开数据库
         if func == OPEN_DB_MENU.format(self.db_name):
@@ -131,6 +136,11 @@ class DBTreeNode(AbstractSqlTreeNode):
         # 取消全选所有表
         elif func == UNSELECT_TB_MENU:
             self.tree_widget.handle_child_item_checked(self.item, Qt.Unchecked)
+        # 刷新
+        elif func == REFRESH_ACTION.format(self.db_name):
+            self.refresh()
+
+    def refresh(self): ...
 
     def worker_terminate(self):
         if self.open_db_executor is not Ellipsis:

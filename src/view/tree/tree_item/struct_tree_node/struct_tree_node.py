@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, OPEN_STRUCT_ACTION, \
-    CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT
+    CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor import *
 from service.async_func.async_struct_task import DelStructExecutor
@@ -93,6 +93,9 @@ class StructTreeNode(AbstractStructTreeNode):
         # 删除
         menu.addAction(QAction(get_icon(DEL_STRUCT_ACTION),
                                DEL_STRUCT_ACTION.format(self.item_name), menu))
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}结构体[{self.item_name}]', menu))
 
     def handle_menu_func(self, func):
         # 打开结构体
@@ -112,6 +115,9 @@ class StructTreeNode(AbstractStructTreeNode):
             if pop_question(DEL_STRUCT_PROMPT, DEL_STRUCT_ACTION.format(self.item_name), self.window) \
                     and self.close_item():
                 self.del_struct()
+        # 刷新
+        elif func == REFRESH_ACTION.format(self.item_name):
+            self.refresh()
 
     def edit_struct(self):
         # 如果结构体已经打开，先关闭，再进行编辑
@@ -154,3 +160,5 @@ class StructTreeNode(AbstractStructTreeNode):
     def worker_terminate(self):
         if self.open_struct_executor is not Ellipsis:
             self.open_struct_executor.worker_terminate()
+
+    def refresh(self): ...
