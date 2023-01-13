@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, save_tree_data
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:32'
@@ -10,6 +10,11 @@ _date_ = '2022/12/2 11:32'
 class AbstractStructTreeNode(AbstractTreeNode):
 
     def set_check_state(self, *args): ...
+
+    def save_check_state(self):
+        # 保存选中数据
+        save_tree_data(self.item, self.tree_widget.tree_data)
+        self.tree_widget.item_changed_executor.item_checked(self.item)
 
     def link_parent_node(self, parent_item=None):
         # 联动父节点变化

@@ -151,11 +151,6 @@ class StructTreeNode(AbstractStructTreeNode):
         # 联动父节点变化
         self.link_parent_node()
 
-    def save_check_state(self):
-        # 保存选中数据
-        save_tree_data(self.item, self.tree_widget.tree_data)
-        self.tree_widget.item_changed_executor.item_checked(self.item)
-
     def worker_terminate(self):
         if self.open_struct_executor is not Ellipsis:
             self.open_struct_executor.worker_terminate()

@@ -28,7 +28,8 @@ class FolderTreeNode(AbstractStructTreeNode):
             add_struct_tree_item(self.tree_widget, self.item, opened_item, opened_item.data_type.display_name)
 
     def change_check_box(self, check_state, clicked):
-        self.tree_widget.item_changed_executor.item_checked(self.item)
+        # 保存数据
+        self.save_check_state()
         # 如果是点击，联动父节点变化
         if clicked:
             self.link_parent_node()
