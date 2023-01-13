@@ -76,11 +76,29 @@ class OpenStructWorker(ThreadWorkerABC):
             # 解析转化
             column_list = self.parse()
             table_tab.col_list = column_list
+            # 保存列信息
+            self.save_cols(column_list, parent_id=0)
             self.success_signal.emit(table_tab)
         else:
             self.success_signal.emit(DsTableTab())
 
     def parse(self) -> list: ...
+
+    def save_cols(self, column_list, parent_id):
+        # 保存解析后的列数据，首先处理当前的列数据，再考虑子集合
+        # 处理当前列数据的 parent_id，item_order，parent_tab_id，checked
+        for idx, column in enumerate(column_list, start=1):
+            column.parent_id = parent_id
+            column.item_order = idx
+            column.parent_tab_id = self.table_tab_id
+            # 选中状态与树节点保持一致
+            column.checked = self.opened_table_item.checked
+        self.table_info_sqlite.batch_insert(column_list)
+
+        # 考虑存在子集合的情况
+        for col_info in column_list:
+            if col_info.children:
+                self.save_cols(col_info.children, col_info.id)
 
     def do_exception(self, e: Exception):
         err_msg = f'打开{self.opened_table_item.item_name}失败'
