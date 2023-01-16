@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+import threading
+
 from PyQt5.QtCore import QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QMovie, QIcon
 
+from exception.exception import ThreadStopException
+from service.system_storage.sqlite_abc import set_thread_terminate
 from view.box.message_box import pop_fail
 from view.custom_widget.loading_widget import LoadingMaskWidget
 
@@ -15,17 +19,23 @@ _date_ = '2022/5/10 16:46'
 class ThreadWorkerABC(QThread):
     """异步工作任务基类，定义最基本工作流程"""
 
-    success_signal: pyqtSignal = ...
+    success_signal = pyqtSignal()
     error_signal = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
+        # 标识是否在进行 数据库相关任务
+        self.modifying_db_task = False
+        self.thread_id = ...
 
     def run(self):
         try:
+            self.thread_id = threading.get_ident()
             self.do_run()
         except Exception as e:
-            self.do_exception(e)
+            # 如果是自定义的停止线程异常，那么不需要处理异常，其他异常再进行异常处理
+            if not isinstance(e, ThreadStopException):
+                self.do_exception(e)
         finally:
             self.do_finally()
 
@@ -69,15 +79,18 @@ class ThreadExecutorABC(QObject):
 
     def worker_terminate(self, terminate_callback=None):
         if self.worker.isRunning():
-            self.worker.terminate()
-        self.worker_quit()
+            # 如果线程正在处理数据库操作，那么应当抛出异常，使线程中的事务回滚，不产生脏数据
+            if self.worker.modifying_db_task:
+                # 修改线程内使用连接的标志位，抛出异常，使线程任务结束
+                set_thread_terminate(self.worker.thread_id, True)
+            else:
+                # 如果是普通任务，那么直接停止线程
+                self.worker.terminate()
+                self.worker.wait()
         # 停止后，首先调用回调函数
         if terminate_callback:
             terminate_callback()
         self.post_process()
-
-    def worker_quit(self):
-        self.worker.wait()
 
     def pre_process(self):
         """前置处理，异步任务开始前的一些准备工作"""

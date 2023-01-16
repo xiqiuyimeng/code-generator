@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from queue import Queue
 
-from PyQt5.QtCore import pyqtSignal
-
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, ExpandedEnum, OpenedTreeItemSqlite, \
@@ -14,7 +12,6 @@ _date_ = '2022/10/3 10:10'
 
 
 class ItemChangedWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, queue: Queue):
         super().__init__()

@@ -73,7 +73,6 @@ class AddStructExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 删除结构体 start ---------------------------------------- #
 
 class DelStructWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, opened_item, reorder_items):
         super().__init__()
@@ -119,7 +118,6 @@ class DelStructExecutor(IconMovieThreadExecutor):
 # ---------------------------------------- 编辑结构体 start ---------------------------------------- #
 
 class EditStructWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, struct_info: StructInfo):
         super().__init__()
@@ -210,8 +208,6 @@ class ListStructWorker(ThreadWorkerABC):
     # tab页表信息查询结果
     tab_info_signal = pyqtSignal(list)
 
-    success_signal = pyqtSignal()
-
     def do_run(self):
         folder_type = FolderTypeEnum.folder_type.value
         # 读取结构体具体信息
@@ -245,6 +241,7 @@ class ListStructWorker(ThreadWorkerABC):
         self.tab_info_signal.emit(tab_list)
 
     def do_finally(self):
+        # 结束信号
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
@@ -325,7 +322,6 @@ class AddFolderExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 编辑结构体文件夹 start ---------------------------------------- #
 
 class EditFolderWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, folder_item):
         super().__init__()
@@ -362,7 +358,6 @@ class EditFolderExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 删除结构体文件夹 start ---------------------------------------- #
 
 class DelFolderWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, folder_name, delete_opened_ids, reorder_items, tab_ids):
         super().__init__()

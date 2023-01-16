@@ -8,6 +8,7 @@ import records
 from sqlalchemy.pool import SingletonThreadPool
 
 from constant.constant import SYS_DB_PATH
+from exception.exception import ThreadStopException
 from logger.log import logger as log
 
 _author_ = 'luwt'
@@ -73,7 +74,18 @@ def transactional(f):
     return do_transaction
 
 
+def allow_thread_running():
+    if thread_id_db_dict.get(f'{threading.get_ident()}-terminate'):
+        raise ThreadStopException('线程结束')
+
+
+def set_thread_terminate(thread_id, thread_terminate):
+    thread_id_db_dict[f'{thread_id}-terminate'] = thread_terminate
+
+
 def get_db_conn():
+    # 首先检查是否可以继续执行
+    allow_thread_running()
     # 如果从缓存中取不到，则获取一个新的对象
     current_thread_db = thread_id_db_dict.get(threading.get_ident())
     return current_thread_db if current_thread_db else get_db()

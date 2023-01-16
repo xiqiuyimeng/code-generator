@@ -58,7 +58,6 @@ class ConnWorkerABC(ThreadWorkerABC):
 # ---------------------------------------- 测试连接 start ---------------------------------------- #
 
 class TestConnWorker(ConnWorkerABC):
-    success_signal = pyqtSignal()
 
     def do_executor_func(self, executor):
         executor.test_conn()
@@ -107,10 +106,13 @@ class OpenConnWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor: SqlDBExecutor):
         db_names = executor.open_conn()
+        self.modifying_db_task = True
         db_opened_items = self.save_opened_items(db_names)
+        self.modifying_db_task = False
         self.success_signal.emit(db_opened_items)
         log.info(f'[{self.conn_opened_item.item_name}]{OPEN_CONN_SUCCESS_PROMPT} ==> {db_names}')
 
+    @transactional
     def save_opened_items(self, db_names):
         log.info(f"保存打开连接[{self.conn_opened_item.item_name}]下的库名列表")
         # 更新连接节点为展开状态，当前项
@@ -152,10 +154,13 @@ class OpenDBWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor: SqlDBExecutor):
         tb_names = executor.open_db(self.db_name)
+        self.modifying_db_task = True
         tb_opened_items = self.save_opened_items(tb_names)
+        self.modifying_db_task = False
         self.success_signal.emit(tb_opened_items)
         log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT} ==> {tb_names}')
 
+    @transactional
     def save_opened_items(self, tb_names):
         log.info(f"保存打开库[{self.db_name}]下的表名列表")
         # 更新库节点
@@ -208,10 +213,12 @@ class OpenTBWorker(ConnWorkerABC):
     @transactional
     def save_opened_items(self, columns):
         log.info(f"保存打开表[{self.db_name}][{self.tb_name}]下的列信息")
+        self.modifying_db_task = True
         # 存储tab信息
         table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
         # 存储列信息
         DsTableColInfoSqlite().add_table(columns, table_tab.id, self.check_state)
+        self.modifying_db_task = False
         table_tab.col_list = columns
         return table_tab
 

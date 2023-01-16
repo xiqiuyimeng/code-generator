@@ -69,6 +69,7 @@ class OpenStructWorker(ThreadWorkerABC):
         param.opened_item_id = self.opened_table_item.id
         struct_list = StructSqlite().select(param)
         if struct_list:
+            self.modifying_db_task = True
             self.struct_info = struct_list[0]
             # 存储tab信息
             table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
@@ -78,6 +79,7 @@ class OpenStructWorker(ThreadWorkerABC):
             table_tab.col_list = column_list
             # 保存列信息
             self.save_cols(column_list, parent_id=0)
+            self.modifying_db_task = False
             self.success_signal.emit(table_tab)
         else:
             self.success_signal.emit(DsTableTab())

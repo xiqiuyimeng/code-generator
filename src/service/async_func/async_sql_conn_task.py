@@ -69,7 +69,6 @@ class AddConnExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 删除连接 start ---------------------------------------- #
 
 class DelConnWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, conn_id, conn_name, reorder_items, delete_opened_ids, tab_ids):
         super().__init__()
@@ -134,7 +133,6 @@ class DelConnExecutor(IconMovieThreadExecutor):
 # ---------------------------------------- 编辑连接 start ---------------------------------------- #
 
 class EditConnWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, connection: SqlConnection, name_changed: bool):
         super().__init__()
@@ -196,8 +194,6 @@ class ListConnWorker(ThreadWorkerABC):
     opened_items_signal = pyqtSignal(list)
     # tab页表信息查询结果
     tab_info_signal = pyqtSignal(list)
-    # 结束信号
-    success_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -225,6 +221,7 @@ class ListConnWorker(ThreadWorkerABC):
         log.info(LIST_ALL_CONN_SUCCESS_PROMPT)
 
     def do_finally(self):
+        # 结束信号
         self.success_signal.emit()
 
     def get_tab_cols(self):
@@ -310,7 +307,6 @@ class QueryConnInfoExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 关闭连接 start ---------------------------------------- #
 
 class CloseConnDBWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal()
 
     def __init__(self, err_msg, child_opened_ids, tab_ids):
         super().__init__()
