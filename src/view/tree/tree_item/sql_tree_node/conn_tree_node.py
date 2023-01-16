@@ -137,7 +137,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}连接[{self.conn_name}]', menu))
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}连接 [{self.conn_name}]', menu))
 
     def test_conn(self):
         self.is_testing = True

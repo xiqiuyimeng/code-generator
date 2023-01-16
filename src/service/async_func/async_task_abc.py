@@ -145,3 +145,14 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
     def post_process(self):
         self.movie.stop()
         self.item.setIcon(0, self.icon)
+
+
+# ----------------------- icon movie and loading mask thread worker manager ABC -----------------------
+
+class IconMovieLoadingMaskThreadExecutor(IconMovieThreadExecutor, LoadingMaskThreadExecutor):
+    """支持使用多个动画，用于树节点icon movie + 其他部件（多个部件）的 masked widget"""
+
+    def __init__(self, item, masked_widget, *args):
+
+        super().__init__(*args)
+

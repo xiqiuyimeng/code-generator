@@ -21,7 +21,6 @@ class StructTreeNode(AbstractStructTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.item_name = self.item.text(0)
         self.open_struct_executor: OpenStructExecutor = ...
         self.del_struct_executor: DelStructExecutor = ...
         self.is_opening = False
@@ -93,9 +92,7 @@ class StructTreeNode(AbstractStructTreeNode):
         # 删除
         menu.addAction(QAction(get_icon(DEL_STRUCT_ACTION),
                                DEL_STRUCT_ACTION.format(self.item_name), menu))
-        # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}结构体[{self.item_name}]', menu))
+        super().do_fill_menu(menu)
 
     def handle_menu_func(self, func):
         # 打开结构体

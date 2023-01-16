@@ -84,6 +84,8 @@ OPEN_DB_FAIL_PROMPT = "打开数据库失败"
 OPEN_TB_TITLE = "打开数据表"
 OPEN_TB_SUCCESS_PROMPT = "打开数据表成功"
 OPEN_TB_FAIL_PROMPT = "打开数据表失败"
+REFRESH_TB_SUCCESS_PROMPT = "刷新数据表成功"
+REFRESH_TB_FAIL_PROMPT = "刷新数据表失败"
 NO_TBS_PROMPT = "连接[{}]数据库[{}]下没有表！"
 # ---------- 操作数据库时提示语 end ---------- #
 

@@ -20,6 +20,7 @@ class AbstractTreeNode:
         self.item = item
         self.tree_widget = tree_widget
         self.window = window
+        self.is_refreshing = False
 
     def open_item(self): ...
 

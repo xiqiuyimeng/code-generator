@@ -20,7 +20,6 @@ class FolderTreeNode(AbstractStructTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.item_name = self.item.text(0)
         self.del_folder_executor: DelFolderExecutor = ...
 
     def reopen_item(self, opened_items):
@@ -64,10 +63,7 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 删除
         menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION),
                                DEL_FOLDER_ACTION.format(self.item_name), menu))
-
-        # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}[{self.item_name}]', menu))
+        super().do_fill_menu(menu)
 
     def handle_menu_func(self, func):
         # 新建文件夹
