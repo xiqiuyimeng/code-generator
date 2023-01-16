@@ -17,6 +17,8 @@ _date_ = '2022/5/11 10:25'
 db_name = os.path.join(SYS_DB_PATH, f'generator_db')
 table_field_dict = dict()
 thread_id_db_dict = dict()
+# 批量操作数据库时，参数个数上限
+batch_operate_count = 100
 
 
 @dataclass
@@ -91,6 +93,18 @@ def get_db_conn():
     return current_thread_db if current_thread_db else get_db()
 
 
+def batch_operate(batch_params, batch_func):
+    # 如果批量操作数量过多，应该分批来执行，每批100个元素
+    if len(batch_params) > batch_operate_count:
+        start, end = 0, batch_operate_count
+        while start < len(batch_params):
+            batch_func(batch_params[start: end])
+            start += batch_operate_count
+            end += batch_operate_count
+    else:
+        batch_func(batch_params)
+
+
 class SqliteBasic:
 
     def __init__(self, table_name, sql_dict):
@@ -147,6 +161,9 @@ class SqliteBasic:
             insert_obj.id = id_record.id
 
     def batch_insert(self, insert_objs):
+        batch_operate(insert_objs, self._batch_insert)
+
+    def _batch_insert(self, insert_objs):
         """批量插入"""
         for insert_obj in insert_objs:
             insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -174,6 +191,9 @@ class SqliteBasic:
         get_db_conn().query(self._delete_sql, **{"id": obj_id})
 
     def batch_delete(self, obj_ids):
+        batch_operate(obj_ids, self._batch_delete)
+
+    def _batch_delete(self, obj_ids):
         log.info(f'批量删除[{self.table_name}]语句 ==> {self._delete_sql}')
         log.info(f'批量删除[{self.table_name}]参数 ==> {obj_ids}')
         get_db_conn().bulk_query(self._delete_sql, list(map(lambda x: {'id': x}, obj_ids)))
@@ -202,6 +222,9 @@ class SqliteBasic:
             get_db_conn().query(update_sql, **update_val_dict)
 
     def batch_update(self, update_objs):
+        batch_operate(update_objs, self._batch_update)
+
+    def _batch_update(self, update_objs):
         """批量更新"""
         update_dict_list = list()
         for update_obj in update_objs:
