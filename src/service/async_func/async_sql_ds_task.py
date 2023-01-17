@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 
 from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
     OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, OPEN_DB_TITLE, \
-    OPEN_TB_TITLE, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT
+    OPEN_TB_TITLE, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT, \
+    REFRESH_TB_TITLE
+from exception.exception import BusinessException
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     IconMovieLoadingMaskThreadExecutor
@@ -15,7 +17,7 @@ from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem
 from service.system_storage.sqlite_abc import transactional
 from view.box.message_box import pop_ok
-from view.tree.tree_item.tree_item_func import get_item_opened_record
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/5/31 19:05'
@@ -68,7 +70,7 @@ class TestConnWorker(ConnWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}]{TEST_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
@@ -128,7 +130,7 @@ class OpenConnWorker(ConnWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}]{OPEN_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
@@ -155,9 +157,11 @@ class OpenDBWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor: SqlDBExecutor):
         tb_names = executor.open_db(self.db_name)
-        self.modifying_db_task = True
-        tb_opened_items = self.save_opened_items(tb_names)
-        self.modifying_db_task = False
+        tb_opened_items = list()
+        if tb_names:
+            self.modifying_db_task = True
+            tb_opened_items = self.save_opened_items(tb_names)
+            self.modifying_db_task = False
         self.success_signal.emit(tb_opened_items)
         log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT} ==> {tb_names}')
 
@@ -176,7 +180,7 @@ class OpenDBWorker(ConnWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
@@ -226,9 +230,12 @@ class OpenTBWorker(ConnWorkerABC):
         return table_tab
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]{self.open_tb_fail_prompt}'
+        err_msg = self.get_err_msg()
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+
+    def get_err_msg(self):
+        return f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]{self.open_tb_fail_prompt}'
 
 
 class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
@@ -248,30 +255,46 @@ class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
 
 class RefreshTBWorker(OpenTBWorker):
 
-    def __init__(self, *args):
+    def __init__(self, tab, *args):
         super().__init__(*args)
         self.refresh_tb_success_prompt = REFRESH_TB_SUCCESS_PROMPT
         self.refresh_tb_fail_prompt = REFRESH_TB_FAIL_PROMPT
+        self.tab = tab
 
     @transactional
     def do_executor_func(self, executor: SqlDBExecutor):
-        # 首先调用打开表方法，获取新的数据
-        columns = executor.open_tb(self.db_name, self.tb_name)
-        # 如果获取成功，删除本地数据
-        # 保存新的数据，并发射信号
-        table_tab = super().save_opened_items(columns)
-        log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]'
-                 f'{self.refresh_tb_success_prompt} ==> {columns}')
-        self.success_signal.emit(table_tab)
+        # 首先检查表本身是否存在
+        executor.check_tb(self.db_name, self.tb_name)
+        # 如果表之前u已经打开，尝试获取新的列数据
+        if self.tab:
+            columns = executor.open_tb(self.db_name, self.tb_name, check=False)
+            # 获取成功后，删除原数据
+            self.modifying_db_task = True
+            DsTableTabSqlite().remove_tab(self.tab)
+            DsTableColInfoSqlite().delete_by_parent_tab_id(self.tab.id)
+            # 保存新的数据，并发射信号
+            # 默认数据应为未选中情况
+            self.check_state = Qt.Unchecked
+            table_tab = super().save_opened_items(columns)
+            log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]'
+                     f'{self.refresh_tb_success_prompt} ==> {columns}')
+            self.success_signal.emit(table_tab)
+        else:
+            self.success_signal.emit(DsTableTab())
+
+    def get_err_msg(self):
+        return f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]{self.refresh_tb_fail_prompt}'
 
 
 class RefreshTBExecutor(IconMovieLoadingMaskThreadExecutor):
 
-    def __init__(self, item, window, success_callback, fail_callback):
-        super().__init__(item, window, window, OPEN_TB_TITLE)
+    def __init__(self, item, masked_window, window, success_callback, fail_callback):
+        super().__init__(item, masked_window, success_callback, fail_callback, window, REFRESH_TB_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return RefreshTBWorker(get_item_opened_record(self.item.parent().parent()),
+        tab = get_item_opened_tab(self.item)
+        return RefreshTBWorker(tab.table_tab if tab else None,
+                               get_item_opened_record(self.item.parent().parent()),
                                self.item.parent().text(0), self.item.text(0),
                                get_item_opened_record(self.item), self.item.checkState(0))
 

@@ -114,9 +114,9 @@ class LoadingMaskThreadExecutor(ThreadExecutorABC):
     """使用遮罩层作为任务开始时前置动作的调度器"""
 
     def __init__(self, masked_widget, *args):
-        self.movie = QMovie(":/gif/loading.gif")
+        self.loading_movie = QMovie(":/gif/loading.gif")
         self.masked_widget = masked_widget
-        self.loading_mask = LoadingMaskWidget(self.masked_widget, self.movie)
+        self.loading_mask = LoadingMaskWidget(self.masked_widget, self.loading_movie)
         super().__init__(*args)
 
     def pre_process(self):
@@ -134,16 +134,16 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 
     def __init__(self, item, *args):
         self.item = item
-        self.movie = QMovie(":/gif/loading_simple.gif")
+        self.icon_movie = QMovie(":/gif/loading_simple.gif")
         self.icon = self.item.icon(0)
         super().__init__(*args)
 
     def pre_process(self):
-        self.movie.start()
-        self.movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self.movie.currentPixmap())))
+        self.icon_movie.start()
+        self.icon_movie.frameChanged.connect(lambda: self.item.setIcon(0, QIcon(self.icon_movie.currentPixmap())))
 
     def post_process(self):
-        self.movie.stop()
+        self.icon_movie.stop()
         self.item.setIcon(0, self.icon)
 
 
@@ -152,7 +152,23 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 class IconMovieLoadingMaskThreadExecutor(IconMovieThreadExecutor, LoadingMaskThreadExecutor):
     """支持使用多个动画，用于树节点icon movie + 其他部件（多个部件）的 masked widget"""
 
-    def __init__(self, item, masked_widget, *args):
+    def __init__(self, item, masked_widget, success_callback, fail_callback, window, error_box_title):
+        self.success_callback = success_callback
+        self.fail_callback = fail_callback
+        super().__init__(item, masked_widget, window, error_box_title)
 
-        super().__init__(*args)
+    def pre_process(self):
+        super().pre_process()
+        super(IconMovieThreadExecutor, self).pre_process()
+
+    def post_process(self):
+        super().post_process()
+        super(IconMovieThreadExecutor, self).post_process()
+
+    def success_post_process(self, *args):
+        self.success_callback(*args)
+
+    def fail(self, error_msg):
+        self.post_process()
+        self.fail_callback(error_msg, self.error_box_title)
 

@@ -43,7 +43,7 @@ class AddConnWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class AddConnExecutor(LoadingMaskThreadExecutor):
@@ -99,7 +99,7 @@ class DelConnWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class DelConnExecutor(IconMovieThreadExecutor):
@@ -162,7 +162,7 @@ class EditConnWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
@@ -237,7 +237,7 @@ class ListConnWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = LIST_ALL_CONN_FAIL_PROMPT
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
@@ -285,7 +285,7 @@ class QueryConnInfoWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'查询连接信息失败，连接id：{self.conn_id}'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class QueryConnInfoExecutor(LoadingMaskThreadExecutor):
@@ -327,7 +327,7 @@ class CloseConnDBWorker(ThreadWorkerABC):
 
     def do_exception(self, e: Exception):
         log.exception(self.err_msg)
-        self.error_signal.emit(f'{self.error_signal}\n{e}')
+        self.error_signal.emit(f'{self.error_signal}\n{e.args[0]}')
 
 
 class CloseConnExecutor(IconMovieThreadExecutor):

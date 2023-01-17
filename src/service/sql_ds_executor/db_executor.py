@@ -27,9 +27,13 @@ class SqlDBExecutor:
 
     def open_conn(self): ...
 
-    def open_db(self, db): ...
+    def open_db(self, db, check=True): ...
 
-    def open_tb(self, db, tb): ...
+    def check_db(self, db): ...
+
+    def open_tb(self, db, tb, check=True): ...
+
+    def check_tb(self, db, tb): ...
 
     def get_sql_connect_url(self) -> str: ...
 
@@ -51,18 +55,30 @@ class InternetDBExecutor(SqlDBExecutor):
         db_records = self.get_data(query_db_sql)
         return tuple(map(lambda x: map(lambda y: y, x.values()).__next__(), db_records.as_dict(ordered=True)))
 
-    def open_db(self, db):
-        self.db.query(f'use {db};')
+    def open_db(self, db, check=True):
+        if check:
+            self.check_db(db)
+        self.change_db(db)
         query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql
         db_records = self.get_data(query_tb_sql)
         return tuple(map(lambda x: map(lambda y: y, x.values()).__next__(), db_records.as_dict(ordered=True)))
 
-    def open_tb(self, db, tb):
-        self.db.query(f'use {db};')
+    def open_tb(self, db, tb, check=True):
+        if check:
+            self.check_tb(db, tb)
         query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(tb)
         db_records = self.get_data(query_col_sql)
         return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
 
     def get_dialect_driver(self) -> str: ...
+
+    def change_db(self, db): ...
+
+    def check_tb(self, db, tb):
+        self.check_db(db)
+        self.change_db(db)
+        self.do_check_tb(tb)
+
+    def do_check_tb(self, tb): ...
 
     def convert_tb_data(self, db_record): ...

@@ -27,12 +27,12 @@ class SqliteDBExecutor(SqlDBExecutor):
         db_records = self.get_data(query_db_sql)
         return tuple(map(lambda x: x.get('name'), db_records.as_dict(ordered=True)))
 
-    def open_db(self, db):
+    def open_db(self, db, check=True):
         query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql
         db_records = self.get_data(query_tb_sql)
         return tuple(map(lambda x: x.get('tbl_name'), db_records.as_dict(ordered=True)))
 
-    def open_tb(self, db, tb):
+    def open_tb(self, db, tb, check=True):
         query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(tb)
         db_records = self.get_data(query_col_sql)
         return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))

@@ -23,3 +23,8 @@ class TabTableUI(QWidget):
         self.table_frame = get_table_frame(self.main_window.current_ds_type.name, self.main_window,
                                            self, self.column_list, self.tree_item)
         self._layout.addWidget(self.table_frame)
+
+    def refresh_ui(self, table_tab):
+        self.table_tab = table_tab
+        self.column_list = table_tab.col_list
+        self.table_frame.refresh_ui(self.column_list)

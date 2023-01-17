@@ -4,7 +4,7 @@ _author_ = 'luwt'
 _date_ = '2023/1/17 9:33'
 
 
-# 每个表最大id字典
+# 每个表id生成器字典
 table_id_generator_dict = dict()
 
 

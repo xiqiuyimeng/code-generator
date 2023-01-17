@@ -159,7 +159,7 @@ class SqliteBasic:
         insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         # 分配id
-        insert_obj.id = get_id(self.table_name, 1)
+        insert_obj.id = get_id(self.table_name, 1)[0]
         # 过滤掉不合法的field
         insert_dict = self.filter_illegal_field(insert_obj)
 

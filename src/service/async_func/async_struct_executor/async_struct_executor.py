@@ -32,7 +32,7 @@ class PrettyStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'美化{self.struct_type}数据失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class PrettyStructExecutor(LoadingMaskThreadExecutor):
@@ -105,7 +105,7 @@ class OpenStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'打开{self.opened_table_item.item_name}失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class OpenStructExecutor(IconMovieThreadExecutor):

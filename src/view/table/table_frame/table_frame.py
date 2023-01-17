@@ -25,6 +25,7 @@ class AbstractTableFrame(QFrame):
     def __init__(self, main_window, parent, column_list, tree_item):
         super().__init__(parent)
         self.main_window = main_window
+        self.column_list = column_list
         self.tree_item = tree_item
         self.setFrameShape(QFrame.StyledPanel)
         self.setFrameShadow(QFrame.Raised)
@@ -40,16 +41,25 @@ class AbstractTableFrame(QFrame):
         self._layout = QVBoxLayout(self)
         self._layout.addWidget(self.table_header_label)
 
-        self.table_widget = self.get_table_widget(column_list)
+        self.table_widget = ...
+        self.add_table()
+
+    def get_header_label_text(self) -> str: ...
+
+    def get_table_widget(self) -> AbstractTableWidget: ...
+
+    def refresh_ui(self, column_list):
+        self.column_list = column_list
+        self._layout.removeWidget(self.table_widget)
+        self.add_table()
+
+    def add_table(self):
+        self.table_widget = self.get_table_widget()
         self.table_widget.setObjectName('table_widget')
         self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.table_widget)
 
         self.table_widget.fill_table()
-
-    def get_header_label_text(self) -> str: ...
-
-    def get_table_widget(self, column_list) -> AbstractTableWidget: ...
 
 
 class SqlTableFrame(AbstractTableFrame):
@@ -60,8 +70,8 @@ class SqlTableFrame(AbstractTableFrame):
                f'当前数据库：{self.tree_item.parent().text(0)}\n' \
                f'当前数据表：{self.tree_item.text(0)}'
 
-    def get_table_widget(self, column_list) -> AbstractTableWidget:
-        return SqlTableWidget(self.main_window, self, column_list)
+    def get_table_widget(self) -> AbstractTableWidget:
+        return SqlTableWidget(self.main_window, self, self.column_list)
 
 
 class StructTableFrame(AbstractTableFrame):
@@ -70,8 +80,8 @@ class StructTableFrame(AbstractTableFrame):
     def get_header_label_text(self) -> str:
         return f'当前结构体：{self.tree_item.text(0)}'
 
-    def get_table_widget(self, column_list) -> AbstractTableWidget:
-        return StructTableWidget(self.main_window, self, column_list)
+    def get_table_widget(self) -> AbstractTableWidget:
+        return StructTableWidget(self.main_window, self, self.column_list)
 
 
 

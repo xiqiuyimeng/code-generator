@@ -84,6 +84,7 @@ OPEN_DB_FAIL_PROMPT = "打开数据库失败"
 OPEN_TB_TITLE = "打开数据表"
 OPEN_TB_SUCCESS_PROMPT = "打开数据表成功"
 OPEN_TB_FAIL_PROMPT = "打开数据表失败"
+REFRESH_TB_TITLE = '刷新数据表'
 REFRESH_TB_SUCCESS_PROMPT = "刷新数据表成功"
 REFRESH_TB_FAIL_PROMPT = "刷新数据表失败"
 NO_TBS_PROMPT = "连接[{}]数据库[{}]下没有表！"
@@ -160,9 +161,9 @@ DEL_FOLDER_PROMPT = '是否要删除文件夹？'
 # ---------- 树节点右键菜单文字 end ---------- #
 
 # mysql查询数据库列表sql
-MYSQL_QUERY_DB_SQL = 'show databases;'
+MYSQL_QUERY_DB_SQL = 'show databases'
 # mysql查询数据库中的表名sql
-MYSQL_QUERY_TB_SQL = 'show tables;'
+MYSQL_QUERY_TB_SQL = 'show tables'
 # mysql查询数据库表的列名sql
 MYSQL_QUERY_COL_SQL = "show full columns from {};"
 

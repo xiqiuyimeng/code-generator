@@ -2,8 +2,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
-from constant.constant import NO_TBS_PROMPT, OPEN_TB_TITLE, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
-    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION
+from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
+    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import CloseDBExecutor
 from service.async_func.async_sql_ds_task import OpenDBExecutor
@@ -40,7 +40,7 @@ class DBTreeNode(AbstractSqlTreeNode):
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:
-            pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name), OPEN_TB_TITLE, self.window)
+            pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name), OPEN_DB_TITLE, self.window)
 
     def open_item_fail(self):
         self.is_opening = False

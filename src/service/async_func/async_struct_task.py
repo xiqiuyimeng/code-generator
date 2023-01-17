@@ -45,7 +45,7 @@ class AddStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'添加{self.struct_info.struct_type}失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class AddStructExecutor(LoadingMaskThreadExecutor):
@@ -94,7 +94,7 @@ class DelStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'[{self.opened_item.item_name}]删除失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class DelStructExecutor(IconMovieThreadExecutor):
@@ -137,7 +137,7 @@ class EditStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'修改{self.struct_info.struct_type}失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class EditStructExecutor(LoadingMaskThreadExecutor):
@@ -179,7 +179,7 @@ class QueryStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = '查询结构体失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class QueryStructExecutor(LoadingMaskThreadExecutor):
@@ -247,7 +247,7 @@ class ListStructWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = '获取所有结构体失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class ListStructExecutor(LoadingMaskThreadExecutor):
@@ -296,7 +296,7 @@ class AddFolderWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         error_msg = f'[{self.folder_name}]\n添加文件夹失败'
         log.exception(error_msg)
-        self.error_signal.emit(f'{error_msg}\n{e}')
+        self.error_signal.emit(f'{error_msg}\n{e.args[0]}')
 
 
 class AddFolderExecutor(LoadingMaskThreadExecutor):
@@ -334,7 +334,7 @@ class EditFolderWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         error_msg = f'[{self.folder_item.item_name}]\n编辑文件夹失败'
         log.exception(error_msg)
-        self.error_signal.emit(f'{error_msg}\n{e}')
+        self.error_signal.emit(f'{error_msg}\n{e.args[0]}')
 
 
 class EditFolderExecutor(LoadingMaskThreadExecutor):
@@ -386,7 +386,7 @@ class DelFolderWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'删除文件夹 [{self.folder_name}] 失败'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class DelFolderExecutor(IconMovieThreadExecutor):
@@ -434,7 +434,7 @@ class ReadFileWorker(ThreadWorkerABC):
     def do_exception(self, e: Exception):
         err_msg = f'读取文件失败：[{self.file_url}]'
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e}')
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
 class ReadFileExecutor(LoadingMaskThreadExecutor):

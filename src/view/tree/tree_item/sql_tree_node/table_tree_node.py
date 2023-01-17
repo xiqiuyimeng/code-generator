@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
+from view.box.message_box import pop_fail, pop_question
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
@@ -99,7 +101,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         elif func == CLOSE_TABLE_MENU.format(self.table_name):
             self.close_item()
         # 刷新
-        elif func == REFRESH_ACTION.format(self.table_name):
+        elif func == f'{REFRESH_ACTION}表[{self.table_name}]':
             self.refresh()
 
     def close_tab_callback(self):
@@ -110,8 +112,39 @@ class TableTreeNode(AbstractSqlTreeNode):
 
     def refresh(self):
         # 刷新表
-        self.refresh_tb_executor = RefreshTBExecutor()
+        self.refresh_tb_executor = RefreshTBExecutor(self.item, get_item_opened_tab(self.item), self.window,
+                                                     self.refresh_success, self.refresh_fail)
         self.refresh_tb_executor.start()
+
+    def refresh_success(self, table_tab):
+        if table_tab:
+            # 开始刷新tab页面
+            tab = get_item_opened_tab(self.item)
+            tab.refresh_ui(table_tab)
+            # 连接表头复选框变化信号
+            tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
+                lambda check_state: self.set_check_state(check_state))
+        # 将当前项置为非选中
+        self.item.setCheckState(0, Qt.Unchecked)
+        self.tree_widget.item_changed_executor.item_checked(self.item)
+        # 清空选中数据
+        del_data = get_add_del_data(self.item)
+        self.tree_widget.tree_data.del_node(del_data)
+
+    def refresh_fail(self, error_msg, error_title):
+        # 询问是否清除本地缓存数据
+        if pop_question(error_msg + '\n是否清空本地数据？', error_title, self.window):
+            # 清空数据
+            self.close_item()
+            # 清空选中数据
+            del_data = get_add_del_data(self.item)
+            self.tree_widget.tree_data.del_node(del_data)
+            # 删除当前元素
+            parent_item = self.item.parent()
+            parent_item.removeChild(self.item)
+            # 如果上级节点没有子节点，将状态置为收起
+            if not parent_item.childCount():
+                parent_item.setExpanded(False)
 
     def worker_terminate(self):
         if self.open_tb_executor is not Ellipsis:

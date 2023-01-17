@@ -11,7 +11,7 @@ _date_ = '2022/11/11 16:49'
 table_name = 'struct_info'
 
 struct_sql_dict = {
-    'create': f'''create table  if not exists {table_name}
+    'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     opened_item_id integer not null,
     struct_name char(50) not null,

@@ -11,7 +11,7 @@ _date_ = '2022/10/2 9:31'
 table_name = 'opened_tree_item'
 
 opened_item_sql_dict = {
-    'create': f'''create table  if not exists {table_name}
+    'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     item_name char(100) default null,
     is_current integer not null,

@@ -13,7 +13,7 @@ _date_ = '2022/5/11 10:26'
 table_name = 'sql_connection'
 
 conn_sql_dict = {
-    'create': f'''create table  if not exists {table_name}
+    'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     conn_name char(50) not null,
     conn_type char(30) not null,
