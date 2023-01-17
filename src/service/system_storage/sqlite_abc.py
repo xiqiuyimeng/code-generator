@@ -10,6 +10,7 @@ from sqlalchemy.pool import SingletonThreadPool
 from constant.constant import SYS_DB_PATH
 from exception.exception import ThreadStopException
 from logger.log import logger as log
+from service.util.db_id_generator import update_id_generator, get_id
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
@@ -19,6 +20,8 @@ table_field_dict = dict()
 thread_id_db_dict = dict()
 # 批量操作数据库时，参数个数上限
 batch_operate_count = 100
+# 查询sqlite sequence 的sql
+sqlite_sequence_sql = f'select * from sqlite_sequence'
 
 
 @dataclass
@@ -105,6 +108,11 @@ def batch_operate(batch_params, batch_func):
         batch_func(batch_params)
 
 
+def get_sqlite_sequence():
+    db_record = get_db_conn().query(sqlite_sequence_sql)
+    return db_record.as_dict()
+
+
 class SqliteBasic:
 
     def __init__(self, table_name, sql_dict):
@@ -117,6 +125,7 @@ class SqliteBasic:
         """
         self.table_name = table_name
         self._create_table_sql = sql_dict.get('create')
+        self._check_table_sql = f'PRAGMA table_info (\'{self.table_name}\')'
         self._create_table()
 
         # 常用的增删改查sql
@@ -130,7 +139,12 @@ class SqliteBasic:
         self._max_order_sql = f'select ifnull(max(item_order), 0) as max_order from {self.table_name}'
 
     def _create_table(self):
-        get_db_conn().query(self._create_table_sql)
+        check_success = get_db_conn().query(self._check_table_sql).all()
+        if not check_success:
+            # 如果表不存在，需要重新创建
+            get_db_conn().query(self._create_table_sql)
+            # 创建完成后，需要同步更新id生成器
+            update_id_generator(self.table_name)
 
     def get_field_list(self):
         field_list = table_field_dict.get(self.table_name)
@@ -144,11 +158,12 @@ class SqliteBasic:
         """新增记录方法，根据约定，id由数据库管理，创建时间、更新时间传入当前时间"""
         insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # 分配id
+        insert_obj.id = get_id(self.table_name, 1)
         # 过滤掉不合法的field
         insert_dict = self.filter_illegal_field(insert_obj)
-        if insert_dict:
-            insert_dict.pop('id')
 
+        if insert_dict:
             field_str = ", ".join(insert_dict.keys())
             value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict.keys())))
             insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
@@ -156,22 +171,19 @@ class SqliteBasic:
             log.info(f'插入[{self.table_name}]参数 ==> {insert_dict}')
 
             get_db_conn().query(insert_sql, **insert_dict)
-            # 查询id
-            id_record = self.select(insert_obj)[0]
-            insert_obj.id = id_record.id
 
     def batch_insert(self, insert_objs):
         batch_operate(insert_objs, self._batch_insert)
 
     def _batch_insert(self, insert_objs):
         """批量插入"""
-        for insert_obj in insert_objs:
+        id_list = get_id(self.table_name, len(insert_objs))
+        for idx, insert_obj in enumerate(insert_objs):
             insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # 分配id
+            insert_obj.id = id_list[idx]
         insert_dict_list = list(map(lambda x: self.filter_illegal_field(x), insert_objs))
-
-        for insert_dict in insert_dict_list:
-            insert_dict.pop('id')
 
         field_str = ", ".join(insert_dict_list[0].keys())
         value_placeholder_str = ", ".join(list(map(lambda x: f':{x}', insert_dict_list[0].keys())))
@@ -180,10 +192,6 @@ class SqliteBasic:
         log.info(f'批量插入[{self.table_name}]参数 ==> {insert_dict_list}')
 
         get_db_conn().bulk_query(insert_sql, insert_dict_list)
-        # 查询id
-        for insert_obj in insert_objs:
-            id_record = self.select(insert_obj)[0]
-            insert_obj.id = id_record.id
 
     def delete(self, obj_id):
         log.info(f'删除[{self.table_name}]语句 ==> {self._delete_sql}')

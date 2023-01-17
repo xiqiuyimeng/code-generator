@@ -2,7 +2,8 @@
 from PyQt5.QtCore import pyqtSignal
 
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from service.system_storage.sqlite_abc import transactional
+from service.system_storage.sqlite_abc import transactional, get_sqlite_sequence
+from service.util.db_id_generator import init_id_generator
 from service.util.ds_type_util import get_current_datasource_type
 from service.system_storage.ds_type_sqlite import DatasourceTypeSqlite, DatasourceType, DatasourceTypeEnum
 
@@ -31,6 +32,8 @@ class InitDsTypeWorker(ThreadWorkerABC):
         # 如果不能查到数据，或数据不正确，都应重新初始化
         if not ds_types or not get_current_datasource_type(ds_types):
             return self.init_ds_types()
+        # 初始化id生成器
+        init_id_generator(get_sqlite_sequence)
         return ds_types
 
     def init_ds_types(self):
