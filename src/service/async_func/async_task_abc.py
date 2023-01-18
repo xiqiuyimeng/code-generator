@@ -7,7 +7,7 @@ from PyQt5.QtGui import QMovie, QIcon
 from exception.exception import ThreadStopException
 from service.system_storage.sqlite_abc import set_thread_terminate
 from view.box.message_box import pop_fail
-from view.custom_widget.loading_widget import LoadingMaskWidget
+from view.custom_widget.loading_widget import LoadingMaskWidget, RefreshLoadingMaskWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 16:46'
@@ -126,6 +126,22 @@ class LoadingMaskThreadExecutor(ThreadExecutorABC):
         self.loading_mask.stop()
 
 
+class RefreshLoadingMaskThreadExecutor(ThreadExecutorABC):
+    """使用遮罩层作为任务开始时前置动作的调度器（目前只适用于刷新时，遮挡tab页）"""
+
+    def __init__(self, masked_widget, window, error_box_title):
+        self.loading_movie = QMovie(":/gif/loading.gif")
+        self.masked_widget = masked_widget
+        self.loading_mask = RefreshLoadingMaskWidget(window, self.masked_widget, self.loading_movie)
+        super().__init__(window, error_box_title)
+
+    def pre_process(self):
+        self.loading_mask.start()
+
+    def post_process(self):
+        self.loading_mask.stop()
+
+
 # ----------------------- icon movie thread worker manager ABC -----------------------
 
 
@@ -149,7 +165,7 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 
 # ----------------------- icon movie and loading mask thread worker manager ABC -----------------------
 
-class IconMovieLoadingMaskThreadExecutor(IconMovieThreadExecutor, LoadingMaskThreadExecutor):
+class IconMovieLoadingMaskThreadExecutor(IconMovieThreadExecutor, RefreshLoadingMaskThreadExecutor):
     """支持使用多个动画，用于树节点icon movie + 其他部件（多个部件）的 masked widget"""
 
     def __init__(self, item, masked_widget, success_callback, fail_callback, window, error_box_title):
