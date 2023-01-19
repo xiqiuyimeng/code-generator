@@ -171,14 +171,21 @@ class IconMovieLoadingMaskThreadExecutor(IconMovieThreadExecutor, RefreshLoading
     def __init__(self, item, masked_widget, success_callback, fail_callback, window, error_box_title):
         self.success_callback = success_callback
         self.fail_callback = fail_callback
+        self.tab_widget = masked_widget.parent().parent()
+        self.tab_index = self.tab_widget.indexOf(masked_widget)
+        self.tab_icon = self.tab_widget.tabIcon(self.tab_index)
         super().__init__(item, masked_widget, window, error_box_title)
 
     def pre_process(self):
         super().pre_process()
+        # 给tab页标签栏增加动画
+        self.icon_movie.frameChanged.connect(lambda: self.tab_widget.setTabIcon(self.tab_index, self.item.icon(0)))
         super(IconMovieThreadExecutor, self).pre_process()
 
     def post_process(self):
         super().post_process()
+        # 动画结束时，将tab栏 icon 还原
+        self.tab_widget.setTabIcon(self.tab_index, self.tab_icon)
         super(IconMovieThreadExecutor, self).post_process()
 
     def success_post_process(self, *args):
