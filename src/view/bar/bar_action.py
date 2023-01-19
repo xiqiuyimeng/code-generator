@@ -9,7 +9,7 @@ from constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACT
 from constant.icon_enum import get_icon
 from service.system_storage.conn_type import ConnTypeEnum
 from service.system_storage.struct_type import StructTypeEnum
-from view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog
+from view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -66,6 +66,7 @@ def add_tool_button(action_name, action_tip):
 def add_refresh_action(main_window):
     refresh_action = QAction(get_icon(REFRESH_ACTION), REFRESH_ACTION, main_window)
     refresh_action.setStatusTip(REFRESH_ACTION_TIP)
+    refresh_action.triggered.connect(lambda: refresh(main_window))
     return refresh_action
 
 

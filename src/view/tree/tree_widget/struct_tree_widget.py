@@ -90,4 +90,7 @@ class StructTreeWidget(AbstractTreeWidget):
     def link_parent_node(self, item, parent_item=None):
         get_struct_tree_node(item, self, self.main_window).link_parent_node(parent_item)
 
+    def make_tree_node(self, item):
+        get_struct_tree_node(item, self, self.main_window)
+
 

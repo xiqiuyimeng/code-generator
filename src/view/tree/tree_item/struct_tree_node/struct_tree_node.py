@@ -10,7 +10,7 @@ from view.box.message_box import pop_question
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, set_item_opened_tab, \
-    link_table_checkbox, save_tree_data, get_add_del_data
+    link_table_checkbox, get_add_del_data
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'

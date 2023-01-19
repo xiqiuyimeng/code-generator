@@ -26,9 +26,18 @@ def open_structure_dialog(struct_type_action, tree_widget, screen_rect,
     :param struct_type_action: 用来标识结构体数据源类型
     :param tree_widget: 树对象
     :param screen_rect: 父窗口大小
+    :param parent_opened_item
+    :param parent_item
     """
     add_struct_func(struct_type_action.text(), tree_widget, screen_rect,
                     parent_opened_item, parent_item)
+
+
+def refresh(main_window):
+    # 找出当前节点
+    item = main_window.central_widget.tree_frame.tree_widget.currentItem()
+    if item:
+        item.tree_node.refresh()
 
 
 def generate(main_window):

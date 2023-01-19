@@ -111,6 +111,8 @@ def add_conn_tree_item(tree_widget, opened_conn_record):
     tree_widget.addTopLevelItem(conn_item)
     # 设置当前项
     tree_widget.set_selected_focus(conn_item)
+    # 创建 tree node 对象
+    tree_widget.make_tree_node(conn_item)
 
 
 def update_conn_tree_item(tree_widget, conn_name):
@@ -191,6 +193,8 @@ def add_struct_func(struct_type, tree_widget, screen_rect, parent_opened_item, p
     :param struct_type: 用来标识结构体数据源类型
     :param tree_widget: 树对象
     :param screen_rect: 主窗口大小
+    :param parent_opened_item 上级节点的打开记录
+    :param parent_item 上级节点
     """
     show_struct_dialog(struct_type, tree_widget, None, ADD_STRUCT_DIALOG_TITLE,
                        screen_rect, parent_opened_item, parent_item)
@@ -241,6 +245,8 @@ def show_struct_dialog(struct_type, tree_widget, opened_struct_id, title, screen
         将在弹窗界面回显数据，若无数据，则为添加操作
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
     :param screen_rect: 主窗口大小
+    :param parent_opened_item 上级节点的打开记录
+    :param parent_item 上级节点
     """
     # 动态智能获取父节点，父节点打开记录项
     if parent_item is None:
@@ -314,6 +320,7 @@ def show_folder_dialog(screen_rect, tree_widget, parent_opened_item, dialog_titl
 def make_struct_tree_item(tree_widget, parent, name, icon, checkbox, opened_item_record):
     """
     构造结构体树的子项
+    :param tree_widget: 树组件
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
@@ -356,6 +363,8 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     if opened_item_record.checked:
         add_data = get_add_del_data(struct_item)
         tree_widget.tree_data.add_node(add_data)
+    # 创建 tree node 对象
+    tree_widget.make_tree_node(struct_item)
 
 
 def update_struct_tree_item(tree_widget, item_name):
