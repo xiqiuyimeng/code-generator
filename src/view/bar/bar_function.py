@@ -37,7 +37,7 @@ def refresh(main_window):
     # 找出当前节点
     item = main_window.central_widget.tree_frame.tree_widget.currentItem()
     if item:
-        item.tree_node.refresh()
+        main_window.central_widget.tree_frame.tree_widget.refresh(item)
 
 
 def generate(main_window):

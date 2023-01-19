@@ -111,8 +111,6 @@ def add_conn_tree_item(tree_widget, opened_conn_record):
     tree_widget.addTopLevelItem(conn_item)
     # 设置当前项
     tree_widget.set_selected_focus(conn_item)
-    # 创建 tree node 对象
-    tree_widget.make_tree_node(conn_item)
 
 
 def update_conn_tree_item(tree_widget, conn_name):
@@ -363,8 +361,6 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     if opened_item_record.checked:
         add_data = get_add_del_data(struct_item)
         tree_widget.tree_data.add_node(add_data)
-    # 创建 tree node 对象
-    tree_widget.make_tree_node(struct_item)
 
 
 def update_struct_tree_item(tree_widget, item_name):

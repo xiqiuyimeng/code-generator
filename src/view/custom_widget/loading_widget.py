@@ -64,6 +64,13 @@ class RefreshLoadingMaskWidget(LoadingMaskWidget):
         self.main_window.installEventFilter(self)
         self.move(self.parent().mapToGlobal(self.parent().pos()))
 
+    def start(self):
+        self.movie.start()
+        if self.parent().isHidden():
+            self.hide()
+        else:
+            self.show()
+
     def stop(self):
         super().stop()
         self.parent().removeEventFilter(self)
