@@ -111,6 +111,9 @@ class TableTreeNode(AbstractSqlTreeNode):
             self.tree_widget.tree_data.clear_node_children(del_data)
 
     def refresh(self):
+        if self.is_refreshing:
+            return
+        self.is_refreshing = True
         # 刷新表
         self.refresh_tb_executor = RefreshTBExecutor(self.item, get_item_opened_tab(self.item), self.window,
                                                      self.refresh_success, self.refresh_fail)
@@ -130,21 +133,21 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 清空选中数据
         del_data = get_add_del_data(self.item)
         self.tree_widget.tree_data.del_node(del_data)
+        self.is_refreshing = False
 
-    def refresh_fail(self, error_msg, error_title):
-        # 询问是否清除本地缓存数据
-        if pop_question(error_msg + '\n是否清空本地数据？', error_title, self.window):
-            # 清空数据
-            self.close_item()
-            # 清空选中数据
-            del_data = get_add_del_data(self.item)
-            self.tree_widget.tree_data.del_node(del_data)
-            # 删除当前元素
-            parent_item = self.item.parent()
-            parent_item.removeChild(self.item)
-            # 如果上级节点没有子节点，将状态置为收起
-            if not parent_item.childCount():
-                parent_item.setExpanded(False)
+    def refresh_fail(self):
+        # 清空数据
+        self.close_item()
+        # 清空选中数据
+        del_data = get_add_del_data(self.item)
+        self.tree_widget.tree_data.del_node(del_data)
+        # 删除当前元素
+        parent_item = self.item.parent()
+        parent_item.removeChild(self.item)
+        # 如果上级节点没有子节点，将状态置为收起
+        if not parent_item.childCount():
+            parent_item.setExpanded(False)
+        self.is_refreshing = False
 
     def worker_terminate(self):
         if self.open_tb_executor is not Ellipsis:

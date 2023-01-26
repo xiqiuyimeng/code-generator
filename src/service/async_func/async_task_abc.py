@@ -191,7 +191,6 @@ class IconMovieLoadingMaskThreadExecutor(IconMovieThreadExecutor, RefreshLoading
     def success_post_process(self, *args):
         self.success_callback(*args)
 
-    def fail(self, error_msg):
-        self.post_process()
-        self.fail_callback(error_msg, self.error_box_title)
+    def fail_post_process(self):
+        self.fail_callback()
 

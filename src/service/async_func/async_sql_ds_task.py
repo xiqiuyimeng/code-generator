@@ -267,17 +267,18 @@ class RefreshTBWorker(OpenTBWorker):
         # 如果表之前u已经打开，尝试获取新的列数据
         if self.tab:
             columns = executor.open_tb(self.db_name, self.tb_name, check=False)
+            self.tab.col_list = columns
             # 获取成功后，删除原数据
             self.modifying_db_task = True
-            DsTableTabSqlite().remove_tab(self.tab)
+            DsTableTabSqlite().update(self.tab)
             DsTableColInfoSqlite().delete_by_parent_tab_id(self.tab.id)
             # 保存新的数据，并发射信号
             # 默认数据应为未选中情况
-            self.check_state = Qt.Unchecked
-            table_tab = super().save_opened_items(columns)
+            DsTableColInfoSqlite().add_table(columns, self.tab.id, Qt.Unchecked)
+            self.modifying_db_task = False
             log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]'
                      f'{self.refresh_tb_success_prompt} ==> {columns}')
-            self.success_signal.emit(table_tab)
+            self.success_signal.emit(self.tab)
         else:
             self.success_signal.emit(DsTableTab())
 

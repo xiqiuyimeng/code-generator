@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
 
@@ -51,6 +52,7 @@ class AbstractTableFrame(QFrame):
     def refresh_ui(self, column_list):
         self.column_list = column_list
         self._layout.removeWidget(self.table_widget)
+        sip.delete(self.table_widget)
         self.add_table()
 
     def add_table(self):
