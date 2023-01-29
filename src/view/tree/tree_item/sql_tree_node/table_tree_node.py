@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QAction
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
-from view.box.message_box import pop_fail, pop_question
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
@@ -115,7 +114,7 @@ class TableTreeNode(AbstractSqlTreeNode):
             return
         self.is_refreshing = True
         # 刷新表
-        self.refresh_tb_executor = RefreshTBExecutor(self.item, get_item_opened_tab(self.item), self.window,
+        self.refresh_tb_executor = RefreshTBExecutor(self.item, self.window,
                                                      self.refresh_success, self.refresh_fail)
         self.refresh_tb_executor.start()
 
