@@ -166,15 +166,19 @@ class DBTreeNode(AbstractSqlTreeNode):
         for delete_item_record in delete_items:
             del_item = self.tree_widget.get_item_by_opened_id(delete_item_record.id)
             del_tab = get_item_opened_tab(del_item)
-            del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
-            # 删除tab，清除对应数据由槽函数处理
-            self.window.sql_tab_widget.tab_bar.remove_tab(del_tab_index, False)
+            if del_tab:
+                del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
+                # 删除tab，清除对应数据由槽函数处理
+                self.window.sql_tab_widget.tab_bar.remove_tab(del_tab_index, False)
             # 删除树节点
             self.item.removeChild(del_item)
         # 处理需要更新的元素
         for exists_item_record in exists_items:
             update_item = self.tree_widget.get_item_by_opened_id(exists_item_record.id)
             set_item_opened_record(update_item, exists_item_record)
+            # 只停止没有打开tab表的节点动画
+            if not get_item_opened_tab(update_item):
+                self.refresh_db_executor.stop_one_movie(update_item)
         # 最后处理需要插入的节点元素
         icon = get_icon(get_item_opened_record(self.item).data_type.tb_icon_name)
         for new_item_record in new_items:
@@ -187,6 +191,8 @@ class DBTreeNode(AbstractSqlTreeNode):
         # 刷新tab页面
         item = self.tree_widget.get_item_by_opened_id(table_tab.parent_opened_id)
         item.tree_node.refresh_success(table_tab)
+        # 刷新完成，停止tab动画
+        self.refresh_db_executor.stop_one_movie(item)
 
     def refresh_success(self):
         self.is_refreshing = False

@@ -207,26 +207,19 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
     def pre_process(self):
         # 开启动画
         self.icon_movie.start()
+        self.icon_movie.frameChanged.connect(lambda: self.start_movie(QIcon(self.icon_movie.currentPixmap())))
+
+    def start_movie(self, current_icon):
         for value_dict in self.item_dict.values():
             item = value_dict.get('item')
             tab_dict = value_dict.get('tab_dict')
-            tab_index = None
             if tab_dict:
                 tab_index = tab_dict.get('tab_index')
+                self.tab_widget.setTabIcon(tab_index, current_icon)
                 loading_mask = tab_dict.get('loading_mask')
                 loading_mask.start()
-            self.icon_movie.frameChanged.connect(lambda: self.sync_icon_movie(
-                item, tab_index, QIcon(self.icon_movie.currentPixmap())))
-            self.pre_process_other(item)
-
-    def pre_process_other(self, item): ...
-
-    def sync_icon_movie(self, item, tab_index, current_icon):
-        # 首先同步到树节点 icon
-        item.setIcon(0, current_icon)
-        # 同步到tab icon
-        if tab_index:
-            self.tab_widget.setTabIcon(tab_index, current_icon)
+            # 首先同步到树节点 icon
+            item.setIcon(0, current_icon)
 
     def post_process(self):
         # 结束动画
@@ -249,23 +242,9 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
             loading_mask.stop()
             self.tab_widget.setTabIcon(tab_index, tab_icon)
         item.setIcon(0, item_icon)
-        self.post_process_other(item)
-
-    def post_process_other(self, item): ...
 
     def success_post_process(self, *args):
         self.success_callback(*args)
 
     def fail_post_process(self):
         self.fail_callback()
-
-
-class RefreshMovieThreadExecutor(IconMovieLoadingMaskThreadExecutor):
-    """刷新使用的过渡动画层"""
-
-    def pre_process_other(self, item):
-        item.tree_node.is_refreshing = True
-
-    def post_process_other(self, item):
-        item.tree_node.is_refreshing = False
-

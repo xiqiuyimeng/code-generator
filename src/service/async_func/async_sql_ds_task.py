@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
+
+from PyQt5.QtCore import pyqtSignal
 
 from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
     OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, OPEN_DB_TITLE, \
@@ -7,7 +8,7 @@ from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, T
     REFRESH_TB_TITLE, REFRESH_DB_TITLE, REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
-    IconMovieLoadingMaskThreadExecutor, RefreshMovieThreadExecutor
+    IconMovieLoadingMaskThreadExecutor
 from service.sql_ds_executor import *
 from service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
@@ -207,20 +208,11 @@ class RefreshDBWorker(ConnWorkerABC):
         self.db_name = db_name
         self.opened_db_id = opened_db_id
 
-    @transactional
     def do_executor_func(self, executor: SqlDBExecutor):
         # 读取库下最新的表名列表
         tb_names = executor.open_db(self.db_name)
         self.modifying_db_task = True
-        tree_item_sqlite = OpenedTreeItemSqlite()
-        new_items, exists_items, delete_items = self.deal_tables(tree_item_sqlite, tb_names)
-        # 对上述集合分别处理
-        if new_items:
-            tree_item_sqlite.batch_insert(new_items)
-        if exists_items:
-            tree_item_sqlite.batch_update(exists_items)
-        if delete_items:
-            tree_item_sqlite.batch_delete(delete_items)
+        new_items, exists_items, delete_items = self.deal_tables(tb_names)
         # 将表的变化整理，发射信号
         self.table_changed_signal.emit({
             'new': new_items,
@@ -234,7 +226,9 @@ class RefreshDBWorker(ConnWorkerABC):
         self.success_signal.emit()
         log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT} ==> {tb_names}')
 
-    def deal_tables(self, tree_item_sqlite, tb_names):
+    @transactional
+    def deal_tables(self, tb_names):
+        tree_item_sqlite = OpenedTreeItemSqlite()
         # 获取本地库中缓存的数据
         level = SqlTreeItemLevel.tb_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
@@ -259,8 +253,17 @@ class RefreshDBWorker(ConnWorkerABC):
             else:
                 new_items.append(opened_item)
         [delete_items.append(opened_item) for opened_item in tb_opened_item_dict.values()]
+        # 对上述集合分别处理
+        if new_items:
+            tree_item_sqlite.batch_insert(new_items)
+        if exists_items:
+            tree_item_sqlite.batch_update(exists_items)
+        if delete_items:
+            delete_item_ids = tuple(map(lambda x: x.id, delete_items))
+            tree_item_sqlite.batch_delete(delete_item_ids)
         return new_items, exists_items, delete_items
 
+    @transactional
     def refresh_tab_cols(self, executor, exists_items):
         opened_id_name_dict = dict(map(lambda x: (str(x.id), x.item_name), exists_items))
         opened_tabs = DsTableTabSqlite().select_by_opened_ids(opened_id_name_dict.keys())
@@ -386,7 +389,7 @@ class RefreshTBWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class RefreshTBExecutor(RefreshMovieThreadExecutor):
+class RefreshTBExecutor(IconMovieLoadingMaskThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, success_callback, fail_callback, window, REFRESH_TB_TITLE)
