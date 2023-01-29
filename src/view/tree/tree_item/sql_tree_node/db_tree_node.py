@@ -154,7 +154,7 @@ class DBTreeNode(AbstractSqlTreeNode):
                                                      self.refresh_success, self.refresh_fail)
         self.refresh_db_executor.start()
 
-    def refresh_tables_callback(self, table_changed_dict: dict):
+    def refresh_tables_callback(self, table_changed_dict: dict, refresh_executor=None):
         # 清空选中数据
         del_data = get_add_del_data(self.item)
         self.tree_widget.tree_data.del_node(del_data)
@@ -178,7 +178,10 @@ class DBTreeNode(AbstractSqlTreeNode):
             set_item_opened_record(update_item, exists_item_record)
             # 只停止没有打开tab表的节点动画
             if not get_item_opened_tab(update_item):
-                self.refresh_db_executor.stop_one_movie(update_item)
+                if refresh_executor:
+                    refresh_executor.stop_one_movie(update_item)
+                else:
+                    self.refresh_db_executor.stop_one_movie(update_item)
         # 最后处理需要插入的节点元素
         icon = get_icon(get_item_opened_record(self.item).data_type.tb_icon_name)
         for new_item_record in new_items:

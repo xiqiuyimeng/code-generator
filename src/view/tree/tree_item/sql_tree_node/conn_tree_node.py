@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
@@ -6,13 +7,14 @@ from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_C
     ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
-from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor
+from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
 from view.bar.bar_action import add_sql_ds_actions
 from view.box.message_box import pop_ok, pop_question
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids
-from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func
+from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
+    get_item_opened_tab, set_item_opened_record
+from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, make_sql_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -27,6 +29,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.test_conn_executor: TestConnIconMovieExecutor = ...
         self.del_conn_executor: DelConnExecutor = ...
         self.close_conn_executor: CloseConnExecutor = ...
+        self.refresh_conn_executor: RefreshConnExecutor = ...
         self.is_testing = False
 
     def open_item(self):
@@ -180,7 +183,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
             if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.conn_name), self.window):
                 self.del_conn()
         # 刷新
-        elif func == REFRESH_ACTION.format(self.conn_name):
+        elif func == f'{REFRESH_ACTION}连接 [{self.conn_name}]':
             self.refresh()
 
     def edit_conn(self):
@@ -212,7 +215,72 @@ class ConnTreeNode(AbstractSqlTreeNode):
         # 删除节点
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
 
-    def refresh(self): ...
+    def refresh(self):
+        if self.is_refreshing:
+            return
+        self.is_refreshing = True
+        self.refresh_conn_executor = RefreshConnExecutor(self.item, self.window,
+                                                         self.refresh_db_callback,
+                                                         self.refresh_table_callback,
+                                                         self.refresh_cols_callback,
+                                                         self.refresh_success, self.refresh_fail)
+        self.refresh_conn_executor.start()
+
+    def refresh_db_callback(self, table_changed_dict: dict):
+        # 清空选中数据
+        del_data = get_add_del_data(self.item)
+        self.tree_widget.tree_data.del_node(del_data)
+
+        new_items = table_changed_dict.get('new')
+        exists_items = table_changed_dict.get('exists')
+        delete_items = table_changed_dict.get('delete')
+
+        # 首先处理删除的元素
+        for delete_item_record in delete_items:
+            del_item = self.tree_widget.get_item_by_opened_id(delete_item_record.id)
+            # 如果存在子节点
+            if del_item.childCount():
+                for del_index in range(del_item.childCount()):
+                    del_child_item = del_item.child(del_index)
+                    del_tab = get_item_opened_tab(del_child_item)
+                    if del_tab:
+                        del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
+                        # 删除tab，清除对应数据由槽函数处理
+                        self.window.sql_tab_widget.tab_bar.remove_tab(del_tab_index, False)
+                    del_item.removeChild(del_child_item)
+            # 删除树节点
+            self.item.removeChild(del_item)
+        # 处理需要更新的元素
+        for exists_item_record in exists_items:
+            update_item = self.tree_widget.get_item_by_opened_id(exists_item_record.id)
+            set_item_opened_record(update_item, exists_item_record)
+            # 只停止没有子节点的节点动画
+            if not update_item.childCount():
+                self.refresh_conn_executor.stop_one_movie(update_item)
+        # 最后处理需要插入的节点元素
+        icon = get_icon(get_item_opened_record(self.item).data_type.db_icon_name)
+        for new_item_record in new_items:
+            # 根据顺序来插入
+            new_item = make_sql_tree_item(self.tree_widget, self.item, new_item_record.item_name,
+                                          icon, new_item_record)
+            self.item.insertChild(new_item_record.item_order, new_item)
+
+    def refresh_table_callback(self, table_changed_dict: dict):
+        db_item = self.tree_widget.get_item_by_opened_id(table_changed_dict.get('parent_id'))
+        db_item.tree_node.refresh_tables_callback(table_changed_dict, self.refresh_conn_executor)
+
+    def refresh_cols_callback(self, table_tab):
+        # 刷新tab页面
+        tb_item = self.tree_widget.get_item_by_opened_id(table_tab.parent_opened_id)
+        tb_item.tree_node.refresh_success(table_tab)
+        # 刷新完成，停止tab动画
+        self.refresh_conn_executor.stop_one_movie(tb_item)
+
+    def refresh_success(self):
+        self.is_refreshing = False
+
+    def refresh_fail(self):
+        self.is_refreshing = False
 
     def worker_terminate(self):
         if self.open_conn_executor is not Ellipsis:

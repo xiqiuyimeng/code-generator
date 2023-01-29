@@ -72,6 +72,9 @@ DEL_CONN_FAIL_PROMPT = "删除连接失败"
 LIST_ALL_CONN_TITLE = "获取连接列表"
 LIST_ALL_CONN_SUCCESS_PROMPT = "获取存储的所有连接成功"
 LIST_ALL_CONN_FAIL_PROMPT = "获取存储的所有连接失败"
+REFRESH_CONN_TITLE = '刷新连接'
+REFRESH_CONN_SUCCESS_PROMPT = "刷新连接成功"
+REFRESH_CONN_FAIL_PROMPT = "刷新连接失败"
 # ---------- 操作连接时提示语 end ---------- #
 
 # ---------- 操作数据库时提示语 start ---------- #

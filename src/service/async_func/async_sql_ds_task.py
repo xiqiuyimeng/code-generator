@@ -5,7 +5,8 @@ from PyQt5.QtCore import pyqtSignal
 from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
     OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, OPEN_DB_TITLE, \
     OPEN_TB_TITLE, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT, \
-    REFRESH_TB_TITLE, REFRESH_DB_TITLE, REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT
+    REFRESH_TB_TITLE, REFRESH_DB_TITLE, REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT, REFRESH_CONN_TITLE, \
+    REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     IconMovieLoadingMaskThreadExecutor
@@ -16,6 +17,7 @@ from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTable
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem
 from service.system_storage.sqlite_abc import transactional
+from service.util.refresh_util import deal_opened_items, refresh_tab_cols
 from view.box.message_box import pop_ok
 from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 
@@ -144,6 +146,71 @@ class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
 
 # ---------------------------------------- 打开连接 end ---------------------------------------- #
 
+# ---------------------------------------- 刷新连接 start ---------------------------------------- #
+
+class RefreshConnWorker(ConnWorkerABC):
+    success_signal = pyqtSignal()
+    db_changed_signal = pyqtSignal(dict)
+    table_changed_signal = pyqtSignal(dict)
+    col_signal = pyqtSignal(DsTableTab)
+
+    def __init__(self, conn_opened_item: OpenedTreeItem):
+        super().__init__(conn_opened_item)
+
+    def do_executor_func(self, executor: SqlDBExecutor):
+        # 读取连接下的库名列表
+        db_names = executor.open_conn()
+        self.modifying_db_task = True
+        data_type = self.conn_opened_item.data_type
+        level = SqlTreeItemLevel.db_level.value
+        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        exists_db_items = deal_opened_items(db_names, self.conn_opened_item.id, data_type,
+                                            level, ds_type, self.db_changed_signal)
+
+        # 读取库下的表名列表
+        if exists_db_items:
+            for exists_db_item in exists_db_items:
+                self.refresh_db(executor, exists_db_item, data_type)
+        self.modifying_db_task = False
+        self.success_signal.emit()
+        log.info(f'[{self.conn_opened_item.item_name}]{REFRESH_CONN_SUCCESS_PROMPT}')
+
+    def refresh_db(self, executor, db_item, data_type):
+        tree_item_sqlite = OpenedTreeItemSqlite()
+        # 获取本地库中缓存的数据
+        level = SqlTreeItemLevel.tb_level.value
+        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        child_opened_items = tree_item_sqlite.get_children(db_item.id, level, ds_type)
+        # 如果之前没有子节点，那么不需要进行刷新处理
+        if not child_opened_items:
+            return
+        tb_names = executor.open_db(db_item.item_name)
+        exists_items = deal_opened_items(tb_names, db_item.id, data_type,
+                                         level, ds_type, self.table_changed_signal)
+        if exists_items:
+            refresh_tab_cols(db_item.item_name, executor, exists_items, self.col_signal)
+
+    def do_exception(self, e: Exception):
+        err_msg = f'[{self.conn_opened_item.item_name}]{REFRESH_CONN_FAIL_PROMPT}'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+
+
+class RefreshConnExecutor(IconMovieLoadingMaskThreadExecutor):
+
+    def __init__(self, item, window, db_changed_callback, tb_changed_callback, col_changed_callback,
+                 success_callback, fail_callback):
+        super().__init__(item, success_callback, fail_callback, window, REFRESH_CONN_TITLE)
+
+        self.worker.db_changed_signal.connect(db_changed_callback)
+        self.worker.table_changed_signal.connect(tb_changed_callback)
+        self.worker.col_signal.connect(col_changed_callback)
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return RefreshConnWorker(get_item_opened_record(self.item))
+
+# ---------------------------------------- 刷新连接 end ---------------------------------------- #
+
 
 # ---------------------------------------- 打开数据库 start ---------------------------------------- #
 
@@ -212,68 +279,18 @@ class RefreshDBWorker(ConnWorkerABC):
         # 读取库下最新的表名列表
         tb_names = executor.open_db(self.db_name)
         self.modifying_db_task = True
-        new_items, exists_items, delete_items = self.deal_tables(tb_names)
-        # 将表的变化整理，发射信号
-        self.table_changed_signal.emit({
-            'new': new_items,
-            'exists': exists_items,
-            'delete': delete_items
-        })
+        data_type = self.conn_opened_item.data_type
+        level = SqlTreeItemLevel.tb_level.value
+        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        exists_items = deal_opened_items(tb_names, self.opened_db_id, data_type,
+                                         level, ds_type, self.table_changed_signal)
+
         # 接下来处理数据表列信息，将每一个打开的数据表列信息进行刷新
         if exists_items:
-            self.refresh_tab_cols(executor, exists_items)
+            refresh_tab_cols(self.db_name, executor, exists_items, self.col_signal)
         self.modifying_db_task = False
         self.success_signal.emit()
         log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT} ==> {tb_names}')
-
-    @transactional
-    def deal_tables(self, tb_names):
-        tree_item_sqlite = OpenedTreeItemSqlite()
-        # 获取本地库中缓存的数据
-        level = SqlTreeItemLevel.tb_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        tb_opened_items = tree_item_sqlite.get_children(self.opened_db_id, level, ds_type)
-        tb_opened_item_dict = dict(map(lambda x: (x.item_name, x), tb_opened_items))
-        # 组装新的元素
-        refreshed_items = tree_item_sqlite.add_opened_child_item(tb_names, self.opened_db_id, level,
-                                                                 ds_type, self.conn_opened_item.data_type,
-                                                                 insert_db=False)
-        # 将元素进行对比，处理策略：
-        # new_items 为之前不存在的新元素，对于这些元素，需要入库
-        # exists_items 为之前已经存在的元素，对于这些元素，应该更新为最新的数据
-        # delete_items 为之前存在，但是现在不存在的元素，这些元素应当删除
-        new_items, exists_items, delete_items = list(), list(), list()
-        for opened_item in refreshed_items:
-            item_name = opened_item.item_name
-            exists_opened_item = tb_opened_item_dict.pop(item_name) if item_name in tb_opened_item_dict else None
-            # 如果当前元素存在，将原id赋值给当前新的元素
-            if exists_opened_item:
-                opened_item.id = exists_opened_item.id
-                exists_items.append(opened_item)
-            else:
-                new_items.append(opened_item)
-        [delete_items.append(opened_item) for opened_item in tb_opened_item_dict.values()]
-        # 对上述集合分别处理
-        if new_items:
-            tree_item_sqlite.batch_insert(new_items)
-        if exists_items:
-            tree_item_sqlite.batch_update(exists_items)
-        if delete_items:
-            delete_item_ids = tuple(map(lambda x: x.id, delete_items))
-            tree_item_sqlite.batch_delete(delete_item_ids)
-        return new_items, exists_items, delete_items
-
-    @transactional
-    def refresh_tab_cols(self, executor, exists_items):
-        opened_id_name_dict = dict(map(lambda x: (str(x.id), x.item_name), exists_items))
-        opened_tabs = DsTableTabSqlite().select_by_opened_ids(opened_id_name_dict.keys())
-        for tab in opened_tabs:
-            columns = executor.open_tb(self.db_name,
-                                       opened_id_name_dict.get(str(tab.parent_opened_id)),
-                                       check=False)
-            DsTableColInfoSqlite().refresh_tab_cols(tab.id, columns)
-            tab.col_list = columns
-            self.col_signal.emit(tab)
 
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_FAIL_PROMPT}'
