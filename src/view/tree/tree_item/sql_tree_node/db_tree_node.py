@@ -6,12 +6,13 @@ from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, 
     SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import CloseDBExecutor
-from service.async_func.async_sql_ds_task import OpenDBExecutor
+from service.async_func.async_sql_ds_task import OpenDBExecutor, RefreshDBExecutor
 from view.box.message_box import pop_fail, pop_question
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, get_add_del_data, get_children_opened_ids
-from view.tree.tree_widget.tree_function import make_table_items, check_table_status
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, get_add_del_data, get_children_opened_ids, \
+    set_item_opened_record, get_item_opened_record
+from view.tree.tree_widget.tree_function import make_table_items, check_table_status, make_sql_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
@@ -24,12 +25,14 @@ class DBTreeNode(AbstractSqlTreeNode):
         self.db_name = self.item.text(0)
         self.open_db_executor: OpenDBExecutor = ...
         self.close_db_executor: CloseDBExecutor = ...
+        self.refresh_db_executor: RefreshDBExecutor = ...
 
     def open_item(self):
         if not self.item.childCount():
             # 设置正在打开中状态
             self.is_opening = True
-            self.open_db_executor = OpenDBExecutor(self.item, self.window, self.open_item_ui, self.open_item_fail)
+            self.open_db_executor = OpenDBExecutor(self.item, self.window,
+                                                   self.open_item_ui, self.open_item_fail)
             self.open_db_executor.start()
         self.tree_widget.set_selected_focus(self.item)
 
@@ -40,7 +43,8 @@ class DBTreeNode(AbstractSqlTreeNode):
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:
-            pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name), OPEN_DB_TITLE, self.window)
+            pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name),
+                     OPEN_DB_TITLE, self.window)
 
     def open_item_fail(self):
         self.is_opening = False
@@ -137,10 +141,58 @@ class DBTreeNode(AbstractSqlTreeNode):
         elif func == UNSELECT_TB_MENU:
             self.tree_widget.handle_child_item_checked(self.item, Qt.Unchecked)
         # 刷新
-        elif func == REFRESH_ACTION.format(self.db_name):
+        elif func == f'{REFRESH_ACTION}数据库[{self.db_name}]':
             self.refresh()
 
-    def refresh(self): ...
+    def refresh(self):
+        if self.is_refreshing:
+            return
+        self.is_refreshing = True
+        self.refresh_db_executor = RefreshDBExecutor(self.item, self.window,
+                                                     self.refresh_tables_callback,
+                                                     self.refresh_cols_callback,
+                                                     self.refresh_success, self.refresh_fail)
+        self.refresh_db_executor.start()
+
+    def refresh_tables_callback(self, table_changed_dict: dict):
+        # 清空选中数据
+        del_data = get_add_del_data(self.item)
+        self.tree_widget.tree_data.del_node(del_data)
+
+        new_items = table_changed_dict.get('new')
+        exists_items = table_changed_dict.get('exists')
+        delete_items = table_changed_dict.get('delete')
+        # 首先处理删除的元素
+        for delete_item_record in delete_items:
+            del_item = self.tree_widget.get_item_by_opened_id(delete_item_record.id)
+            del_tab = get_item_opened_tab(del_item)
+            del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
+            # 删除tab，清除对应数据由槽函数处理
+            self.window.sql_tab_widget.tab_bar.remove_tab(del_tab_index, False)
+            # 删除树节点
+            self.item.removeChild(del_item)
+        # 处理需要更新的元素
+        for exists_item_record in exists_items:
+            update_item = self.tree_widget.get_item_by_opened_id(exists_item_record.id)
+            set_item_opened_record(update_item, exists_item_record)
+        # 最后处理需要插入的节点元素
+        icon = get_icon(get_item_opened_record(self.item).data_type.tb_icon_name)
+        for new_item_record in new_items:
+            # 根据顺序来插入
+            new_item = make_sql_tree_item(self.tree_widget, self.item, new_item_record.item_name,
+                                          icon, new_item_record, Qt.Unchecked)
+            self.item.insertChild(new_item_record.item_order, new_item)
+
+    def refresh_cols_callback(self, table_tab):
+        # 刷新tab页面
+        item = self.tree_widget.get_item_by_opened_id(table_tab.parent_opened_id)
+        item.tree_node.refresh_success(table_tab)
+
+    def refresh_success(self):
+        self.is_refreshing = False
+
+    def refresh_fail(self):
+        self.is_refreshing = False
 
     def worker_terminate(self):
         if self.open_db_executor is not Ellipsis:

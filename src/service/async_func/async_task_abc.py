@@ -215,14 +215,14 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
                 tab_index = tab_dict.get('tab_index')
                 loading_mask = tab_dict.get('loading_mask')
                 loading_mask.start()
-            self.icon_movie.frameChanged.connect(lambda: self.sync_icon_movie(item, tab_index))
+            self.icon_movie.frameChanged.connect(lambda: self.sync_icon_movie(
+                item, tab_index, QIcon(self.icon_movie.currentPixmap())))
             self.pre_process_other(item)
 
     def pre_process_other(self, item): ...
 
-    def sync_icon_movie(self, item, tab_index):
+    def sync_icon_movie(self, item, tab_index, current_icon):
         # 首先同步到树节点 icon
-        current_icon = QIcon(self.icon_movie.currentPixmap())
         item.setIcon(0, current_icon)
         # 同步到tab icon
         if tab_index:

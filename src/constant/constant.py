@@ -78,6 +78,9 @@ LIST_ALL_CONN_FAIL_PROMPT = "获取存储的所有连接失败"
 OPEN_DB_TITLE = "打开数据库"
 OPEN_DB_SUCCESS_PROMPT = "打开数据库成功"
 OPEN_DB_FAIL_PROMPT = "打开数据库失败"
+REFRESH_DB_TITLE = '刷新数据库'
+REFRESH_DB_SUCCESS_PROMPT = "刷新数据库成功"
+REFRESH_DB_FAIL_PROMPT = "刷新数据库失败"
 # ---------- 操作数据库时提示语 end ---------- #
 
 # ---------- 操作数据表时提示语 start ---------- #

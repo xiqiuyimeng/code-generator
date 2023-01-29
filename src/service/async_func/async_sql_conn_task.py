@@ -247,13 +247,9 @@ class ListConnExecutor(LoadingMaskThreadExecutor):
         self.reopen_end_callback = reopen_end_callback
         super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE)
 
-        self.start_callback = start_callback
-        self.opened_items_callback = opened_items_callback
-        self.opened_tab_callback = opened_tab_callback
-
-        self.worker.start_signal.connect(self.start_callback)
-        self.worker.opened_items_signal.connect(self.opened_items_callback)
-        self.worker.tab_info_signal.connect(self.opened_tab_callback)
+        self.worker.start_signal.connect(start_callback)
+        self.worker.opened_items_signal.connect(opened_items_callback)
+        self.worker.tab_info_signal.connect(opened_tab_callback)
 
     def get_worker(self) -> ListConnWorker:
         return ListConnWorker()

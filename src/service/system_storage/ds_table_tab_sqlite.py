@@ -24,6 +24,7 @@ ds_table_tab_sql_dict = {
     );''',
     'move_order_forward': f'update {table_name} set item_order = item_order - 1 '
                           f'where item_order > :item_order and ds_type = :ds_type',
+    'select_by_opened_ids': f'select id, parent_opened_id from {table_name} where parent_opened_id in '
 }
 
 
@@ -104,3 +105,9 @@ class DsTableTabSqlite(SqliteBasic):
         get_db_conn().query(move_order_forward_sql, **param)
         log.info(f'将tab_table顺序前移语句 ==> {move_order_forward_sql}')
         log.info(f'将tab_table顺序前移参数 ==> {param}')
+
+    @staticmethod
+    def select_by_opened_ids(opened_ids):
+        sql = f"{ds_table_tab_sql_dict.get('select_by_opened_ids')} ({', '.join(opened_ids)})"
+        rows = get_db_conn().query(sql)
+        return list(map(lambda x: DsTableTab(**x), rows.all()))

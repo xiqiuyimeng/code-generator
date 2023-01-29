@@ -93,7 +93,8 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_item.expanded = ExpandedEnum.expanded.value
         self.update(opened_item)
 
-    def add_opened_child_item(self, child_item_names, opened_item_id, child_level, ds_type, data_type):
+    def add_opened_child_item(self, child_item_names, opened_item_id, child_level,
+                              ds_type, data_type, insert_db=True):
         is_current = CurrentEnum.not_current.value
         expanded = ExpandedEnum.collapsed.value
         opened_child_items = list()
@@ -109,7 +110,8 @@ class OpenedTreeItemSqlite(SqliteBasic):
             opened_child_item.item_order = index
             opened_child_item.data_type = data_type
             opened_child_items.append(opened_child_item)
-        self.batch_insert(opened_child_items)
+        if insert_db:
+            self.batch_insert(opened_child_items)
         return opened_child_items
 
     @transactional

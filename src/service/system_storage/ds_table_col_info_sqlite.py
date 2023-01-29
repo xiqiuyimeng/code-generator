@@ -144,3 +144,8 @@ class DsTableColInfoSqlite(SqliteBasic):
         col_param = DsTableColInfo()
         col_param.parent_tab_id = parent_tab_id
         return self.select_by_order(col_param)
+
+    def refresh_tab_cols(self, tab_id, columns):
+        self.delete_by_parent_tab_id(tab_id)
+        # 默认数据应为未选中情况
+        self.add_table(columns, tab_id, CheckedEnum.unchecked.value)
