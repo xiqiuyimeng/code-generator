@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_item.tree_item_func import get_item_opened_record, set_item_opened_tab
+from view.tree.tree_item.tree_item_func import get_item_opened_record, set_item_opened_tab, get_item_opened_tab, \
+    get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:36'
@@ -39,6 +41,22 @@ class AbstractTreeNode:
         tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
             lambda check_state: check_state_func(check_state))
         return tab
+
+    def refresh_item_tab(self, table_tab, check_state_func):
+        if table_tab:
+            # 开始刷新tab页面
+            tab = get_item_opened_tab(self.item)
+            if tab:
+                tab.refresh_ui(table_tab)
+                # 连接表头复选框变化信号
+                tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
+                    lambda check_state: check_state_func(check_state))
+        # 将当前项置为非选中
+        self.item.setCheckState(0, Qt.Unchecked)
+        self.tree_widget.item_changed_executor.item_checked(self.item)
+        # 清空选中数据
+        del_data = get_add_del_data(self.item)
+        self.tree_widget.tree_data.del_node(del_data)
 
     def open_item(self): ...
 

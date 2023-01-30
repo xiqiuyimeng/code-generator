@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION
@@ -107,20 +106,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         self.refresh_tb_executor.start()
 
     def refresh_success(self, table_tab):
-        if table_tab:
-            # 开始刷新tab页面
-            tab = get_item_opened_tab(self.item)
-            if tab:
-                tab.refresh_ui(table_tab)
-                # 连接表头复选框变化信号
-                tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
-                    lambda check_state: self.set_check_state(check_state))
-        # 将当前项置为非选中
-        self.item.setCheckState(0, Qt.Unchecked)
-        self.tree_widget.item_changed_executor.item_checked(self.item)
-        # 清空选中数据
-        del_data = get_add_del_data(self.item)
-        self.tree_widget.tree_data.del_node(del_data)
+        self.refresh_item_tab(table_tab, self.set_check_state)
         super().refresh_success()
 
     def refresh_fail(self):

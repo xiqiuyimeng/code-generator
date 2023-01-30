@@ -2,11 +2,13 @@
 from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
-from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
+from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
+    IconMovieLoadingMaskThreadExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.sqlite_abc import transactional
 from service.system_storage.struct_sqlite import StructInfo, StructSqlite
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/12/5 15:35'
@@ -64,9 +66,7 @@ class OpenStructWorker(ThreadWorkerABC):
 
     def do_run(self):
         # 读取结构体内容
-        param = StructInfo()
-        param.opened_item_id = self.opened_table_item.id
-        struct_list = StructSqlite().select(param)
+        struct_list = self.get_struct_list()
         if struct_list:
             self.struct_info = struct_list[0]
             # 解析转化
@@ -80,6 +80,11 @@ class OpenStructWorker(ThreadWorkerABC):
             self.success_signal.emit(DsTableTab())
 
     def parse(self) -> list: ...
+
+    def get_struct_list(self):
+        param = StructInfo()
+        param.opened_item_id = self.opened_table_item.id
+        return StructSqlite().select(param)
 
     @transactional
     def save_parse_result(self, column_list):
@@ -130,3 +135,50 @@ class OpenStructExecutor(IconMovieThreadExecutor):
         self.fail_callback()
 
 # ---------------------------------------- 打开结构体 end ---------------------------------------- #
+
+
+# ---------------------------------------- 刷新结构体 start ---------------------------------------- #
+
+class RefreshStructWorker(OpenStructWorker):
+
+    def __init__(self, table_tab, opened_table_item):
+        super().__init__(opened_table_item)
+        self.table_tab = table_tab
+
+    def do_run(self):
+        """重写run方法，实现刷新逻辑"""
+        # 读取结构体内容
+        struct_list = self.get_struct_list()
+        if struct_list:
+            self.struct_info = struct_list[0]
+            # 解析转化
+            column_list = self.parse()
+            if not column_list:
+                # 如果不能解析出结果，那么应该返回错误
+                raise Exception('刷新失败，解析结构体结果为空')
+            self.refresh_json(column_list)
+            self.success_signal.emit(self.table_tab)
+        else:
+            raise Exception('查询不到结构体信息')
+
+    @transactional
+    def refresh_json(self, column_list):
+        self.modifying_db_task = True
+        # 保存新的列信息
+        self.table_info_sqlite.refresh_tab_cols(self.table_tab.id, column_list)
+        self.table_tab.col_list = column_list
+        self.modifying_db_task = False
+
+
+class RefreshStructExecutor(IconMovieLoadingMaskThreadExecutor):
+
+    def __init__(self, item, window, success_callback, fail_callback, error_box_title):
+        super().__init__(item, success_callback, fail_callback, window, error_box_title)
+
+    def get_worker(self) -> RefreshStructWorker:
+        tab = get_item_opened_tab(self.item)
+        return RefreshStructWorker(tab.table_tab if tab else None,
+                                   get_item_opened_record(self.item))
+
+
+# ---------------------------------------- 刷新结构体 end ---------------------------------------- #

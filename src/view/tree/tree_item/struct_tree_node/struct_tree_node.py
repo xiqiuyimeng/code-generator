@@ -21,6 +21,7 @@ class StructTreeNode(AbstractStructTreeNode):
         super().__init__(*args)
         self.open_struct_executor: OpenStructExecutor = ...
         self.del_struct_executor: DelStructExecutor = ...
+        self.refresh_struct_executor: RefreshStructExecutor = ...
         self.is_opening = False
 
     def open_item(self):
@@ -103,7 +104,7 @@ class StructTreeNode(AbstractStructTreeNode):
                     and self.close_item():
                 self.del_struct()
         # 刷新
-        elif func == REFRESH_ACTION.format(self.item_name):
+        elif func == f'{REFRESH_ACTION}[{self.item_name}]':
             self.refresh()
 
     def edit_struct(self):
@@ -148,4 +149,14 @@ class StructTreeNode(AbstractStructTreeNode):
         if self.open_struct_executor is not Ellipsis:
             self.open_struct_executor.worker_terminate()
 
-    def refresh(self): ...
+    def refresh(self):
+        if self.is_refreshing:
+            return
+        self.is_refreshing = True
+        self.refresh_struct_executor = globals()[self.opened_item.data_type.refresh_executor](
+                self.item, self.window, self.refresh_success, self.refresh_fail)
+        self.refresh_struct_executor.start()
+
+    def refresh_success(self, table_tab):
+        self.refresh_item_tab(table_tab, self.set_check_state)
+        super().refresh_success()

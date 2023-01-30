@@ -388,7 +388,7 @@ class RefreshTBWorker(ConnWorkerABC):
     def do_executor_func(self, executor: SqlDBExecutor):
         # 首先检查表本身是否存在
         executor.check_tb(self.db_name, self.tb_name)
-        # 如果表之前u已经打开，尝试获取新的列数据
+        # 如果表之前tab页已经打开，尝试获取新的列数据
         if self.tab:
             columns = executor.open_tb(self.db_name, self.tb_name, check=False)
             self.tab.col_list = columns
