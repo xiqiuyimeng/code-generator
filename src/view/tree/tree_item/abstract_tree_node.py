@@ -52,7 +52,7 @@ class AbstractTreeNode:
                 tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
                     lambda check_state: check_state_func(check_state))
         # 将当前项置为非选中
-        self.item.setCheckState(0, Qt.Unchecked)
+        check_state_func(Qt.Unchecked)
         self.tree_widget.item_changed_executor.item_checked(self.item)
         # 清空选中数据
         del_data = get_add_del_data(self.item)
