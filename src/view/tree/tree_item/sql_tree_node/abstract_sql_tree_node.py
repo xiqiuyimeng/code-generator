@@ -12,3 +12,6 @@ class AbstractSqlTreeNode(AbstractTreeNode):
         super().__init__(*args)
         self.is_opening = False
 
+    def open_item_fail(self):
+        self.is_opening = False
+

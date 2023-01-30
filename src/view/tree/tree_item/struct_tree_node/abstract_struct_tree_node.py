@@ -32,7 +32,7 @@ class AbstractStructTreeNode(AbstractTreeNode):
         # 联动父节点变化
         parent_item = parent_item if parent_item else self.item.parent()
         if parent_item:
-            parent_node = parent_item.tree_node
+            parent_node = self.tree_widget.get_item_node(parent_item)
             parent_node.set_check_state()
 
     def get_need_reorder_items(self):

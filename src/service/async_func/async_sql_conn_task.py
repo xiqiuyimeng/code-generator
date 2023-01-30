@@ -188,8 +188,6 @@ class EditConnExecutor(LoadingMaskThreadExecutor):
 # ---------------------------------------- 获取所有连接 start ---------------------------------------- #
 
 class ListConnWorker(ThreadWorkerABC):
-    # 开始信号
-    start_signal = pyqtSignal()
     # 打开表中的查询结果
     opened_items_signal = pyqtSignal(list)
     # tab页表信息查询结果
@@ -199,7 +197,6 @@ class ListConnWorker(ThreadWorkerABC):
         super().__init__()
 
     def do_run(self):
-        self.start_signal.emit()
         # 首选读取存储的连接，这里需要连表 opened_tree_item_sqlite 获取连接的顺序
         connections = ConnSqlite().get_conn_id_types()
 
@@ -242,12 +239,11 @@ class ListConnWorker(ThreadWorkerABC):
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, masked_widget, window, start_callback, opened_items_callback,
+    def __init__(self, masked_widget, window, opened_items_callback,
                  opened_tab_callback, reopen_end_callback):
         self.reopen_end_callback = reopen_end_callback
         super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE)
 
-        self.worker.start_signal.connect(start_callback)
         self.worker.opened_items_signal.connect(opened_items_callback)
         self.worker.tab_info_signal.connect(opened_tab_callback)
 

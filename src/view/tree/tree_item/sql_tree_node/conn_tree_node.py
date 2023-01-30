@@ -46,9 +46,6 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.item.setExpanded(True)
         self.tree_widget.set_selected_focus(self.item)
 
-    def open_item_fail(self):
-        self.is_opening = False
-
     def reopen_item(self, opened_items):
         # 打开连接下的库节点
         make_db_items(self.tree_widget, self.item, opened_items)
@@ -90,7 +87,8 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.tree_widget.tree_data.del_node(del_data)
         # 移除界面中属于当前连接的tab页
         if tab_indexes:
-            [self.window.sql_tab_widget.tab_bar.remove_tab(index, False, False) for index in tab_indexes]
+            [self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
+             for index in tab_indexes]
         # 停止子节点线程
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
@@ -245,9 +243,9 @@ class ConnTreeNode(AbstractSqlTreeNode):
                     # 寻找子节点打开的tab页，将其删除
                     del_tab = get_item_opened_tab(del_child_item)
                     if del_tab:
-                        del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
+                        del_tab_index = self.tree_widget.get_current_tab_widget().indexOf(del_tab)
                         # 删除tab，清除对应数据由槽函数处理
-                        self.window.sql_tab_widget.tab_bar.remove_tab(del_tab_index, False)
+                        self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(del_tab_index, False)
                     del_item.removeChild(del_child_item)
             # 删除树节点
             self.item.removeChild(del_item)
@@ -268,24 +266,19 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def refresh_table_callback(self, table_changed_dict: dict):
         db_item = self.tree_widget.get_item_by_opened_id(table_changed_dict.get('parent_id'))
-        db_item.tree_node.refresh_tables_callback(table_changed_dict, self.refresh_conn_executor)
+        self.tree_widget.get_item_node(db_item).refresh_tables_callback(
+            table_changed_dict, self.refresh_conn_executor)
 
     def refresh_cols_callback(self, table_tab):
         # 刷新tab页面
         tb_item = self.tree_widget.get_item_by_opened_id(table_tab.parent_opened_id)
-        tb_item.tree_node.refresh_success(table_tab)
+        self.tree_widget.get_item_node(tb_item).refresh_success(table_tab)
         # 刷新完成，停止tab动画
         self.refresh_conn_executor.stop_one_movie(tb_item)
 
     def refresh_db_finished_callback(self, opened_db_id):
         db_item = self.tree_widget.get_item_by_opened_id(opened_db_id)
         self.refresh_conn_executor.stop_one_movie(db_item)
-
-    def refresh_success(self):
-        self.is_refreshing = False
-
-    def refresh_fail(self):
-        self.is_refreshing = False
 
     def worker_terminate(self):
         if self.open_conn_executor is not Ellipsis:

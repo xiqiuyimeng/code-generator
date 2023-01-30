@@ -15,4 +15,5 @@ class SqlTabBar(TabBar):
     def need_change_current(self, current_tab) -> bool:
         # 项目初始化中，或正在打开tab页不处理
         return not self.main_window.sql_tree_widget.reopening_flag \
-            and (current_tab and not current_tab.tree_item.tree_node.is_opening)
+            and (current_tab
+                 and not current_tab.tree_widget.get_item_node(current_tab.tree_item).is_opening)

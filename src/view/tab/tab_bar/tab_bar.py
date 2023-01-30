@@ -155,7 +155,7 @@ class TabBar(QTabBar):
             self.remove_tab_signal.emit(table_tab)
         # 清除选中数据，调用item node清除数据
         if batch_clear_checked:
-            tab_widget.tree_item.tree_node.close_tab_callback()
+            tab_widget.tree_widget.get_item_node(tab_widget.tree_item).close_tab_callback()
 
     def change_current(self, index):
         # 获取当前项

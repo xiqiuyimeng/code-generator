@@ -2,9 +2,9 @@
 from service.async_func.async_struct_task import ListStructExecutor
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from service.util.tree_node import TreeData
-from view.tab.tab_ui import TabTableUI
+from view.tab.tab_widget.tab_widget import TabWidget
 from view.tree.tree_item.context import get_struct_tree_node
-from view.tree.tree_item.tree_item_func import get_item_opened_tab
+from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
 from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from view.tree.tree_widget.tree_function import add_struct_tree_item
 
@@ -23,18 +23,6 @@ class StructTreeWidget(AbstractTreeWidget):
         self.top_item = OpenedTreeItem()
         self.top_item.level = -1
         self.top_item.id = 0
-
-    def do_open_tree_item(self, item):
-        get_struct_tree_node(item, self, self.main_window).open_item()
-
-    def do_fill_menu(self, item, menu):
-        get_struct_tree_node(item, self, self.main_window).do_fill_menu(menu)
-
-    def do_handle_right_menu_func(self, item, func_name):
-        get_struct_tree_node(item, self, self.main_window).handle_menu_func(func_name)
-
-    def do_handle_checkbox_changed(self, item, clicked):
-        get_struct_tree_node(item, self, self.main_window).change_check_box(item.checkState(0), clicked)
 
     def reopen_tree(self):
         # 如果还没初始化过，再执行初始化
@@ -59,38 +47,11 @@ class StructTreeWidget(AbstractTreeWidget):
             # 如果是其他类型，按策略来执行
             self.reopen_tree_item(opened_items)
 
-    def reopen_tab(self, opened_tabs):
-        """
-        重新打开tab页
-        """
-        current_tab = None
-        for opened_tab in opened_tabs:
-            # 找到表节点
-            item = self.get_item_by_opened_id(opened_tab.parent_opened_id)
-            get_struct_tree_node(item, self, self.main_window).reopen_item(opened_tab)
-            tab = get_item_opened_tab(item)
-            if opened_tab.is_current:
-                current_tab = tab
-        # 将当前页置为当前
-        self.main_window.struct_tab_widget.setCurrentWidget(current_tab)
-
-    def reopen_end(self):
-        # 找出当前项，选中
-        self.set_record_current_item()
-        self.reopening_flag = False
-
-    def reopen_tree_item(self, opened_items):
-        # 首先获取父元素
-        parent_item = self.get_item_by_opened_id(opened_items[0].parent_id)
-        get_struct_tree_node(parent_item, self, self.main_window).reopen_item(opened_items)
-
-    def get_current_tab(self) -> TabTableUI:
-        return self.main_window.struct_tab_widget.currentWidget()
+    def get_current_tab_widget(self) -> TabWidget:
+        return self.main_window.struct_tab_widget
 
     def link_parent_node(self, item, parent_item=None):
-        get_struct_tree_node(item, self, self.main_window).link_parent_node(parent_item)
+        self.get_item_node(item).link_parent_node(parent_item)
 
-    def refresh(self, item):
-        get_struct_tree_node(item, self, self.main_window).refresh()
-
-
+    def get_item_node(self, item) -> AbstractStructTreeNode:
+        return get_struct_tree_node(item, self, self.main_window)

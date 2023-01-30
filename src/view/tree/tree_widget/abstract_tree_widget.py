@@ -17,7 +17,9 @@ from service.async_func.async_item_changed_task import ItemChangedExecutor
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.searcher.smart_item_view import SmartSearcherTreeWidget
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox
+from view.tab.tab_widget.tab_widget import TabWidget
+from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox, get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
@@ -197,16 +199,51 @@ class AbstractTreeWidget(DisplayTreeWidget):
         if tab:
             self.set_selected_focus(tab.tree_item)
 
-    def do_open_tree_item(self, item): ...
+    def do_open_tree_item(self, item):
+        self.get_item_node(item).open_item()
 
-    def do_fill_menu(self, item, menu): ...
+    def do_fill_menu(self, item, menu):
+        self.get_item_node(item).do_fill_menu(menu)
 
-    def do_handle_right_menu_func(self, item, func_name): ...
+    def do_handle_right_menu_func(self, item, func_name):
+        self.get_item_node(item).handle_menu_func(func_name)
 
-    def do_handle_checkbox_changed(self, item, clicked): ...
+    def do_handle_checkbox_changed(self, item, clicked):
+        self.get_item_node(item).change_check_box(item.checkState(0), clicked)
+
+    def refresh(self, item):
+        self.get_item_node(item).refresh()
+
+    def get_current_tab(self) -> TabTableUI:
+        return self.get_current_tab_widget().get_current_widget()
+
+    def reopen_tree_item(self, opened_items):
+        # 首先获取父元素
+        parent_item = self.get_item_by_opened_id(opened_items[0].parent_id)
+        self.get_item_node(parent_item).reopen_item(opened_items)
+
+    def reopen_tab(self, opened_tabs):
+        """
+        重新打开tab页
+        """
+        current_tab = None
+        for opened_tab in opened_tabs:
+            # 找到表节点
+            item = self.get_item_by_opened_id(opened_tab.parent_opened_id)
+            self.get_item_node(item).reopen_item(opened_tab)
+            tab = get_item_opened_tab(item)
+            if opened_tab.is_current:
+                current_tab = tab
+        # 将当前页置为当前
+        self.get_current_tab_widget().setCurrentWidget(current_tab)
+
+    def reopen_end(self):
+        # 找出当前项，选中
+        self.set_record_current_item()
+        self.reopening_flag = False
 
     def reopen_tree(self): ...
 
-    def get_current_tab(self) -> TabTableUI: ...
+    def get_current_tab_widget(self) -> TabWidget: ...
 
-    def refresh(self, item): ...
+    def get_item_node(self, item) -> AbstractTreeNode: ...

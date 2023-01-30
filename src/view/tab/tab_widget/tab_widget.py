@@ -24,6 +24,9 @@ class TabWidget(QTabWidget):
 
         self.async_save_executor.start()
 
+    def get_current_widget(self):
+        return self.currentWidget()
+
     def get_tab_bar(self, window) -> TabBar: ...
 
     def connect_signal(self):

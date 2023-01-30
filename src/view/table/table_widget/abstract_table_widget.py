@@ -7,7 +7,6 @@ from constant.constant import TABLE_HEADER_LABELS, EXPAND_CHILD_TABLE, COLLAPSE_
 from constant.icon_enum import get_icon
 from service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
-from service.util.tree_node import TreeData
 from view.custom_widget.check_box import CheckBox
 from view.custom_widget.scrollable_widget import ScrollableWidget
 from view.table.table_header import CheckBoxHeader
@@ -20,14 +19,15 @@ _date_ = '2022/12/6 15:50'
 
 class AbstractTableWidget(QTableWidget, ScrollableWidget):
 
-    def __init__(self, main_window, parent, cols, parent_table=None):
+    def __init__(self, main_window, tree_widget, parent, cols, parent_table=None):
         super().__init__(parent)
         self.main_window = main_window
+        self.tree_widget = tree_widget
         self.cols = cols
         # 获取tab widget中的队列线程执行器
         self.async_save_executor = self.get_async_save_executor()
         # 选中数据
-        self.tree_data = self.get_tree_data()
+        self.tree_data = self.tree_widget.tree_data
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
@@ -40,9 +40,8 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.setup_ui()
         self.connect_signal()
 
-    def get_async_save_executor(self) -> AsyncSaveTabObjExecutor: ...
-
-    def get_tree_data(self) -> TreeData: ...
+    def get_async_save_executor(self) -> AsyncSaveTabObjExecutor:
+        return self.tree_widget.get_current_tab_widget().async_save_executor
 
     def setup_ui(self):
         # 设置双击触发修改

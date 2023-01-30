@@ -7,10 +7,8 @@ from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor import *
 from service.async_func.async_struct_task import DelStructExecutor
 from view.box.message_box import pop_question
-from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, set_item_opened_tab, \
-    link_table_checkbox, get_add_del_data
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
@@ -30,7 +28,7 @@ class StructTreeNode(AbstractStructTreeNode):
         tab_widget = get_item_opened_tab(self.item)
         # 如果存在打开的tab，展示到当前页
         if tab_widget:
-            self.window.struct_tab_widget.setCurrentWidget(tab_widget)
+            self.tree_widget.get_current_tab_widget().setCurrentWidget(tab_widget)
         else:
             # 执行打开tab页, 设置正在打开中状态
             self.is_opening = True
@@ -40,28 +38,20 @@ class StructTreeNode(AbstractStructTreeNode):
 
     def open_item_ui(self, table_tab):
         tab = self.reopen_item(table_tab)
-        self.window.struct_tab_widget.setCurrentWidget(tab)
+        self.tree_widget.get_current_tab_widget().setCurrentWidget(tab)
         self.is_opening = False
 
     def open_item_fail(self):
         self.is_opening = False
 
     def reopen_item(self, table_tab):
-        # 创建tab页
-        tab = TabTableUI(self.window, table_tab, self.item)
-        self.window.struct_tab_widget.addTab(tab, self.item_name)
-        # 记录tab对象
-        set_item_opened_tab(self.item, tab)
-        # 连接表头复选框变化信号
-        tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
-            lambda check_state: self.set_check_state(check_state))
-        return tab
+        return self.reopen_tab(table_tab, self.item_name, self.set_check_state)
 
     def close_item(self):
         tab = get_item_opened_tab(self.item)
         if tab:
-            index = self.window.struct_tab_widget.indexOf(tab)
-            tab_bar = self.window.struct_tab_widget.tab_bar
+            index = self.tree_widget.get_current_tab_widget().indexOf(tab)
+            tab_bar = self.tree_widget.get_current_tab_widget().tab_bar
             if tab_bar.table_allow_close((index,)):
                 # 删除tab
                 tab_bar.remove_tab(index)

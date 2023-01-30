@@ -46,9 +46,6 @@ class DBTreeNode(AbstractSqlTreeNode):
             pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name),
                      OPEN_DB_TITLE, self.window)
 
-    def open_item_fail(self):
-        self.is_opening = False
-
     def reopen_item(self, opened_items):
         # 打开库下的表节点
         make_table_items(self.tree_widget, self.item, opened_items, self.tree_widget.tree_data)
@@ -76,7 +73,8 @@ class DBTreeNode(AbstractSqlTreeNode):
         self.tree_widget.tree_data.del_node(del_data)
         # 处理tab
         if tab_indexes:
-            [self.window.sql_tab_widget.tab_bar.remove_tab(index, False, False) for index in tab_indexes]
+            [self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
+             for index in tab_indexes]
         # 再处理子节点线程
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
@@ -93,7 +91,7 @@ class DBTreeNode(AbstractSqlTreeNode):
             item = self.item.child(i)
             tab = get_item_opened_tab(item)
             if tab:
-                tab_indexes.append(self.window.sql_tab_widget.indexOf(tab))
+                tab_indexes.append(self.tree_widget.get_current_tab_widget().indexOf(tab))
                 tab_ids.append(tab.table_tab.id)
         if tab_indexes:
             # 倒序
@@ -167,9 +165,9 @@ class DBTreeNode(AbstractSqlTreeNode):
             del_item = self.tree_widget.get_item_by_opened_id(delete_item_record.id)
             del_tab = get_item_opened_tab(del_item)
             if del_tab:
-                del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
+                del_tab_index = self.tree_widget.get_current_tab_widget().indexOf(del_tab)
                 # 删除tab，清除对应数据由槽函数处理
-                self.window.sql_tab_widget.tab_bar.remove_tab(del_tab_index, False)
+                self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(del_tab_index, False)
             # 删除树节点
             self.item.removeChild(del_item)
         # 处理需要更新的元素
@@ -193,15 +191,9 @@ class DBTreeNode(AbstractSqlTreeNode):
     def refresh_cols_callback(self, table_tab):
         # 刷新tab页面
         item = self.tree_widget.get_item_by_opened_id(table_tab.parent_opened_id)
-        item.tree_node.refresh_success(table_tab)
+        self.tree_widget.get_item_node(item).refresh_success(table_tab)
         # 刷新完成，停止tab动画
         self.refresh_db_executor.stop_one_movie(item)
-
-    def refresh_success(self):
-        self.is_refreshing = False
-
-    def refresh_fail(self):
-        self.is_refreshing = False
 
     def worker_terminate(self):
         if self.open_db_executor is not Ellipsis:

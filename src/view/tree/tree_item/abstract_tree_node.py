@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from view.tree.tree_item.tree_item_func import get_item_opened_record
+from view.tab.tab_ui import TabTableUI
+from view.tree.tree_item.tree_item_func import get_item_opened_record, set_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:36'
@@ -21,6 +22,23 @@ class AbstractTreeNode:
         self.tree_widget = tree_widget
         self.window = window
         self.is_refreshing = False
+
+    def refresh_success(self, *args):
+        self.is_refreshing = False
+
+    def refresh_fail(self):
+        self.is_refreshing = False
+
+    def reopen_tab(self, table_tab, tab_name, check_state_func):
+        # 创建tab页
+        tab = TabTableUI(self.window, table_tab, self.item, self.tree_widget)
+        self.tree_widget.get_current_tab_widget().addTab(tab, tab_name)
+        # 记录tab对象
+        set_item_opened_tab(self.item, tab)
+        # 连接表头复选框变化信号
+        tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
+            lambda check_state: check_state_func(check_state))
+        return tab
 
     def open_item(self): ...
 

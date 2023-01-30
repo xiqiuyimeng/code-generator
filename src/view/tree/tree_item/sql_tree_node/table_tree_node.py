@@ -5,10 +5,9 @@ from PyQt5.QtWidgets import QAction
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
-from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
-    set_item_opened_tab, link_table_checkbox, save_tree_data, get_add_del_data
+    link_table_checkbox, save_tree_data, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -27,7 +26,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         tab_widget = get_item_opened_tab(self.item)
         # 如果存在打开的tab，展示到当前页
         if tab_widget:
-            self.window.sql_tab_widget.setCurrentWidget(tab_widget)
+            self.tree_widget.get_current_tab_widget().setCurrentWidget(tab_widget)
         else:
             # 执行打开tab页, 设置正在打开中状态
             self.is_opening = True
@@ -36,28 +35,17 @@ class TableTreeNode(AbstractSqlTreeNode):
 
     def open_item_ui(self, table_tab):
         tab = self.reopen_item(table_tab)
-        self.window.sql_tab_widget.setCurrentWidget(tab)
+        self.tree_widget.get_current_tab_widget().setCurrentWidget(tab)
         self.is_opening = False
 
     def reopen_item(self, table_tab):
-        # 创建tab页
-        tab = TabTableUI(self.window, table_tab, self.item)
-        self.window.sql_tab_widget.addTab(tab, self.table_name)
-        # 记录tab对象
-        set_item_opened_tab(self.item, tab)
-        # 连接表头复选框变化信号
-        tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
-            lambda check_state: self.set_check_state(check_state))
-        return tab
-
-    def open_item_fail(self):
-        self.is_opening = False
+        return self.reopen_tab(table_tab, self.table_name, self.set_check_state)
 
     def close_item(self):
         tab = get_item_opened_tab(self.item)
         if tab:
-            index = self.window.sql_tab_widget.indexOf(tab)
-            tab_bar = self.window.sql_tab_widget.tab_bar
+            index = self.tree_widget.get_current_tab_widget().indexOf(tab)
+            tab_bar = self.tree_widget.get_current_tab_widget().tab_bar
             if tab_bar.table_allow_close((index, )):
                 # 删除tab
                 tab_bar.remove_tab(index)
@@ -133,7 +121,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 清空选中数据
         del_data = get_add_del_data(self.item)
         self.tree_widget.tree_data.del_node(del_data)
-        self.is_refreshing = False
+        super().refresh_success()
 
     def refresh_fail(self):
         # 清空数据
@@ -147,7 +135,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 如果上级节点没有子节点，将状态置为收起
         if not parent_item.childCount():
             parent_item.setExpanded(False)
-        self.is_refreshing = False
+        super().refresh_fail()
 
     def worker_terminate(self):
         if self.open_tb_executor is not Ellipsis:

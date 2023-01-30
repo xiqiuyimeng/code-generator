@@ -81,7 +81,7 @@ class FolderTreeNode(AbstractStructTreeNode):
         elif func == RENAME_FOLDER_ACTION.format(self.item_name):
             parent_item = self.item.parent()
             parent_opened_item = self.tree_widget.top_item \
-                if parent_item is None else parent_item.tree_node.opened_item
+                if parent_item is None else self.tree_widget.get_item_node([parent_item]).opened_item
             # 打开重命名文件夹对话框
             edit_folder_func(self.window.geometry(), self.tree_widget, parent_opened_item,
                              self.opened_item, parent_item)
@@ -126,7 +126,8 @@ class FolderTreeNode(AbstractStructTreeNode):
         self.stop_child_worker(self.item, tab_indexes)
         if tab_indexes:
             tab_indexes.sort(reverse=True)
-            [self.window.struct_tab_widget.tab_bar.remove_tab(index, False, False) for index in tab_indexes]
+            [self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
+             for index in tab_indexes]
         self.del_callback()
 
     def stop_child_worker(self, parent_item, tab_indexes):
@@ -139,7 +140,7 @@ class FolderTreeNode(AbstractStructTreeNode):
             opened_record = get_item_opened_record(child_item)
             # 如果子节点不是文件夹类型，停止子节点线程
             if opened_record.data_type.type != FOLDER_TYPE:
-                child_item.tree_node.worker_terminate()
+                self.tree_widget.get_item_node(child_item).worker_terminate()
             else:
                 # 对于文件夹节点，递归处理
                 self.stop_child_worker(child_item, tab_indexes)
@@ -152,7 +153,7 @@ class FolderTreeNode(AbstractStructTreeNode):
             child_item = parent_item.child(idx)
             tab = get_item_opened_tab(child_item)
             if tab:
-                tab_indexes.append(self.window.struct_tab_widget.indexOf(tab))
+                tab_indexes.append(self.tree_widget.get_current_tab_widget().indexOf(tab))
                 tab_ids.append(tab.table_tab.id)
             self.get_child_tab_indexes_and_ids(child_item, tab_indexes, tab_ids)
 
