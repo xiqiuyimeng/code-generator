@@ -2,7 +2,7 @@
 """
 自定义标题栏，实现扁平化效果，标题栏沉浸效果
 """
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QPushButton, QHBoxLayout
 
@@ -69,14 +69,14 @@ class TitleBar(DraggableWidget):
 
     def max_window(self):
         """窗口最大化"""
-        self.parent.showFullScreen()
+        self.parent.showMaximized()
         self.restore_button.setVisible(True)
         self.max_button.setVisible(False)
         self.setFixedWidth(self.parent.width())
 
     def restore_window(self):
         """窗口还原"""
-        self.parent.setWindowState(Qt.WindowNoState)
+        self.parent.showNormal()
         self.restore_button.setVisible(False)
         self.max_button.setVisible(True)
         self.setFixedWidth(self.parent.width())
