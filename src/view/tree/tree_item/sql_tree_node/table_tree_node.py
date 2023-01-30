@@ -122,10 +122,11 @@ class TableTreeNode(AbstractSqlTreeNode):
         if table_tab:
             # 开始刷新tab页面
             tab = get_item_opened_tab(self.item)
-            tab.refresh_ui(table_tab)
-            # 连接表头复选框变化信号
-            tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
-                lambda check_state: self.set_check_state(check_state))
+            if tab:
+                tab.refresh_ui(table_tab)
+                # 连接表头复选框变化信号
+                tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
+                    lambda check_state: self.set_check_state(check_state))
         # 将当前项置为非选中
         self.item.setCheckState(0, Qt.Unchecked)
         self.tree_widget.item_changed_executor.item_checked(self.item)

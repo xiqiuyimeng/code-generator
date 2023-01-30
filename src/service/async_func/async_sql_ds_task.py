@@ -151,6 +151,7 @@ class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
 class RefreshConnWorker(ConnWorkerABC):
     success_signal = pyqtSignal()
     db_changed_signal = pyqtSignal(dict)
+    db_finished_signal = pyqtSignal(int)
     table_changed_signal = pyqtSignal(dict)
     col_signal = pyqtSignal(DsTableTab)
 
@@ -189,6 +190,8 @@ class RefreshConnWorker(ConnWorkerABC):
                                          level, ds_type, self.table_changed_signal)
         if exists_items:
             refresh_tab_cols(db_item.item_name, executor, exists_items, self.col_signal)
+        # 库刷新完成，发射信号
+        self.db_finished_signal.emit(db_item.id)
 
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}]{REFRESH_CONN_FAIL_PROMPT}'
@@ -199,12 +202,13 @@ class RefreshConnWorker(ConnWorkerABC):
 class RefreshConnExecutor(IconMovieLoadingMaskThreadExecutor):
 
     def __init__(self, item, window, db_changed_callback, tb_changed_callback, col_changed_callback,
-                 success_callback, fail_callback):
+                 db_finished_callback, success_callback, fail_callback):
         super().__init__(item, success_callback, fail_callback, window, REFRESH_CONN_TITLE)
 
         self.worker.db_changed_signal.connect(db_changed_callback)
         self.worker.table_changed_signal.connect(tb_changed_callback)
         self.worker.col_signal.connect(col_changed_callback)
+        self.worker.db_finished_signal.connect(db_finished_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return RefreshConnWorker(get_item_opened_record(self.item))

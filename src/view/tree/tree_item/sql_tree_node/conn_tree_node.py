@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
@@ -223,6 +222,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
                                                          self.refresh_db_callback,
                                                          self.refresh_table_callback,
                                                          self.refresh_cols_callback,
+                                                         self.refresh_db_finished_callback,
                                                          self.refresh_success, self.refresh_fail)
         self.refresh_conn_executor.start()
 
@@ -242,6 +242,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
             if del_item.childCount():
                 for del_index in range(del_item.childCount()):
                     del_child_item = del_item.child(del_index)
+                    # 寻找子节点打开的tab页，将其删除
                     del_tab = get_item_opened_tab(del_child_item)
                     if del_tab:
                         del_tab_index = self.window.sql_tab_widget.indexOf(del_tab)
@@ -275,6 +276,10 @@ class ConnTreeNode(AbstractSqlTreeNode):
         tb_item.tree_node.refresh_success(table_tab)
         # 刷新完成，停止tab动画
         self.refresh_conn_executor.stop_one_movie(tb_item)
+
+    def refresh_db_finished_callback(self, opened_db_id):
+        db_item = self.tree_widget.get_item_by_opened_id(opened_db_id)
+        self.refresh_conn_executor.stop_one_movie(db_item)
 
     def refresh_success(self):
         self.is_refreshing = False
