@@ -274,27 +274,32 @@ class RefreshDBWorker(ConnWorkerABC):
     table_changed_signal = pyqtSignal(dict)
     col_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, conn_opened_item: OpenedTreeItem, db_name, opened_db_id):
+    def __init__(self, conn_opened_item: OpenedTreeItem, db_name, opened_db_id, child_count):
         super().__init__(conn_opened_item)
         self.db_name = db_name
         self.opened_db_id = opened_db_id
+        self.child_count = child_count
 
     def do_executor_func(self, executor: SqlDBExecutor):
-        # 读取库下最新的表名列表
-        tb_names = executor.open_db(self.db_name)
-        self.modifying_db_task = True
-        data_type = self.conn_opened_item.data_type
-        level = SqlTreeItemLevel.tb_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        exists_items = deal_opened_items(tb_names, self.opened_db_id, data_type,
-                                         level, ds_type, self.table_changed_signal)
+        if self.child_count:
+            # 读取库下最新的表名列表
+            tb_names = executor.open_db(self.db_name)
+            self.modifying_db_task = True
+            data_type = self.conn_opened_item.data_type
+            level = SqlTreeItemLevel.tb_level.value
+            ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+            exists_items = deal_opened_items(tb_names, self.opened_db_id, data_type,
+                                             level, ds_type, self.table_changed_signal)
 
-        # 接下来处理数据表列信息，将每一个打开的数据表列信息进行刷新
-        if exists_items:
-            refresh_tab_cols(self.db_name, executor, exists_items, self.col_signal)
-        self.modifying_db_task = False
+            # 接下来处理数据表列信息，将每一个打开的数据表列信息进行刷新
+            if exists_items:
+                refresh_tab_cols(self.db_name, executor, exists_items, self.col_signal)
+            self.modifying_db_task = False
+            log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT} ==> {tb_names}')
+        else:
+            # 只检查库
+            executor.check_db(self.db_name)
         self.success_signal.emit()
-        log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT} ==> {tb_names}')
 
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_FAIL_PROMPT}'
@@ -313,7 +318,7 @@ class RefreshDBExecutor(IconMovieLoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return RefreshDBWorker(get_item_opened_record(self.item.parent()), self.item.text(0),
-                               get_item_opened_record(self.item).id)
+                               get_item_opened_record(self.item).id, self.item.childCount())
 
 
 # ---------------------------------------- 刷新数据库 end ---------------------------------------- #

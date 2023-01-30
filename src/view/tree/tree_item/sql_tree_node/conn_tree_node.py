@@ -215,6 +215,9 @@ class ConnTreeNode(AbstractSqlTreeNode):
     def refresh(self):
         if self.is_refreshing:
             return
+        # 如果连接下没有子节点，也就是连接还未打开，那么跳过
+        if not self.item.childCount():
+            return
         self.is_refreshing = True
         self.refresh_conn_executor = RefreshConnExecutor(self.item, self.window,
                                                          self.refresh_db_callback,

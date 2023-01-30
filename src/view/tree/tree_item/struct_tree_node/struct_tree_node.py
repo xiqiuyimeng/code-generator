@@ -152,9 +152,13 @@ class StructTreeNode(AbstractStructTreeNode):
     def refresh(self):
         if self.is_refreshing:
             return
+        opened_tab = get_item_opened_tab(self.item)
+        # 如果不存在打开表，那么无需处理
+        if not opened_tab:
+            return
         self.is_refreshing = True
         self.refresh_struct_executor = globals()[self.opened_item.data_type.refresh_executor](
-                self.item, self.window, self.refresh_success, self.refresh_fail)
+                self.item, self.window, opened_tab.table_tab, self.refresh_success, self.refresh_fail)
         self.refresh_struct_executor.start()
 
     def refresh_success(self, table_tab):

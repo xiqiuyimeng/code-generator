@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from service.async_func.async_struct_executor.async_struct_executor import PrettyStructWorker, PrettyStructExecutor, \
     OpenStructWorker, OpenStructExecutor, RefreshStructExecutor, RefreshStructWorker
 from service.util.struct_parser import parse_json
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
+from view.tree.tree_item.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/12/5 10:13'
@@ -61,12 +61,12 @@ class RefreshJsonWorker(RefreshStructWorker, OpenJsonWorker):
 
 class RefreshJsonExecutor(RefreshStructExecutor):
 
-    def __init__(self, item, window, success_callback, fail_callback):
+    def __init__(self, item, window, table_tab, success_callback, fail_callback):
+        self.table_tab = table_tab
         super().__init__(item, window, success_callback, fail_callback, '刷新json结构体')
 
     def get_worker(self) -> RefreshJsonWorker:
-        tab = get_item_opened_tab(self.item)
-        return RefreshJsonWorker(tab.table_tab if tab else None,
+        return RefreshJsonWorker(self.table_tab,
                                  get_item_opened_record(self.item))
 
 

@@ -8,7 +8,6 @@ from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.sqlite_abc import transactional
 from service.system_storage.struct_sqlite import StructInfo, StructSqlite
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/12/5 15:35'
@@ -174,11 +173,6 @@ class RefreshStructExecutor(IconMovieLoadingMaskThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback, error_box_title):
         super().__init__(item, success_callback, fail_callback, window, error_box_title)
-
-    def get_worker(self) -> RefreshStructWorker:
-        tab = get_item_opened_tab(self.item)
-        return RefreshStructWorker(tab.table_tab if tab else None,
-                                   get_item_opened_record(self.item))
 
 
 # ---------------------------------------- 刷新结构体 end ---------------------------------------- #
