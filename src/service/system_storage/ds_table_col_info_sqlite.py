@@ -96,12 +96,20 @@ class DsTableColInfoSqlite(SqliteBasic):
     def __init__(self):
         super().__init__(table_name, ds_table_col_info_sql_dict)
 
-    def add_table(self, columns, parent_tab_id, check_state):
+    def save_cols(self, columns, parent_tab_id, check_state, parent_id=None):
         for index, column in enumerate(columns, start=1):
             column.parent_tab_id = parent_tab_id
             column.checked = check_state
             column.item_order = index
+            if parent_id:
+                column.parent_id = parent_id
         self.batch_insert(columns)
+
+        # 考虑存在子集合的情况
+        for col_info in columns:
+            if not col_info.children:
+                return
+            self.save_cols(col_info.children, parent_tab_id, check_state, col_info.id)
 
     @staticmethod
     def delete_by_parent_tab_id(parent_tab_id):
@@ -148,4 +156,4 @@ class DsTableColInfoSqlite(SqliteBasic):
     def refresh_tab_cols(self, tab_id, columns):
         self.delete_by_parent_tab_id(tab_id)
         # 默认数据应为未选中情况
-        self.add_table(columns, tab_id, CheckedEnum.unchecked.value)
+        self.save_cols(columns, tab_id, CheckedEnum.unchecked.value)

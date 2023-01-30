@@ -351,7 +351,7 @@ class OpenTBWorker(ConnWorkerABC):
         # 存储tab信息
         table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
         # 存储列信息
-        DsTableColInfoSqlite().add_table(columns, table_tab.id, self.check_state)
+        DsTableColInfoSqlite().save_cols(columns, table_tab.id, self.check_state)
         self.modifying_db_task = False
         table_tab.col_list = columns
         return table_tab
