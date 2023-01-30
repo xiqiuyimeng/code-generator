@@ -62,29 +62,36 @@ class OpenStructWorker(ThreadWorkerABC):
         self.struct_info = ...
         self.table_tab_id = ...
 
-    @transactional
     def do_run(self):
         # 读取结构体内容
         param = StructInfo()
         param.opened_item_id = self.opened_table_item.id
         struct_list = StructSqlite().select(param)
         if struct_list:
-            self.modifying_db_task = True
             self.struct_info = struct_list[0]
-            # 存储tab信息
-            table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
-            self.table_tab_id = table_tab.id
             # 解析转化
             column_list = self.parse()
-            table_tab.col_list = column_list
-            # 保存列信息
-            self.save_cols(column_list, parent_id=0)
-            self.modifying_db_task = False
+            if not column_list:
+                # 如果不能解析出结果，那么应该返回错误
+                raise Exception('解析结构体结果为空')
+            table_tab = self.save_parse_result(column_list)
             self.success_signal.emit(table_tab)
         else:
             self.success_signal.emit(DsTableTab())
 
     def parse(self) -> list: ...
+
+    @transactional
+    def save_parse_result(self, column_list):
+        self.modifying_db_task = True
+        # 存储tab信息
+        table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
+        self.table_tab_id = table_tab.id
+        table_tab.col_list = column_list
+        # 保存列信息
+        self.save_cols(column_list, parent_id=0)
+        self.modifying_db_task = False
+        return table_tab
 
     def save_cols(self, column_list, parent_id):
         # 保存解析后的列数据，首先处理当前的列数据，再考虑子集合
