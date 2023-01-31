@@ -170,7 +170,7 @@ class FolderTreeNode(AbstractStructTreeNode):
     def refresh_item_callback(self, *args):
         refreshed_item, refreshed_tab = args[0]
         # 刷新对应节点的tab页
-        self.refresh_item_tab(refreshed_tab, self.tree_widget.get_item_node(refreshed_item).set_check_state)
+        self.tree_widget.get_item_node(refreshed_item).refresh_success(refreshed_tab)
         # 停止动画
         self.refresh_folder_executor.stop_one_movie(refreshed_item)
 
