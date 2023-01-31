@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog
 from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
     CHOOSE_STRUCT_FILE_TEXT, PRETTY_STRUCT_TEXT
 from constant.icon_enum import get_icon
+from service.async_func.async_struct_executor.async_struct_executor import PrettyStructExecutor
 from service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor, \
     QueryStructExecutor
-from service.async_func.async_struct_executor import *
 from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from service.system_storage.struct_sqlite import StructInfo
 from service.system_storage.struct_type import StructType
@@ -140,8 +140,8 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_text_input.appendPlainText(text)
 
     def pretty_func(self):
-        self.pretty_executor = globals()[self.struct_type.beautifier_executor](
-            self.new_dialog_data.content, self.struct_type.display_name,
+        self.pretty_executor = PrettyStructExecutor(
+            self.new_dialog_data.content, self.struct_type.beautifier_executor,
             self, self, self.struct_text_input.setPlainText
         )
         self.pretty_executor.start()

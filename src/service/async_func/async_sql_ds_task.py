@@ -52,7 +52,7 @@ class ConnWorkerABC(ThreadWorkerABC):
         if not self.connection:
             conn_param = SqlConnection()
             conn_param.id = self.conn_opened_item.parent_id
-            self.connection = ConnSqlite().select(conn_param)[0]
+            self.connection = ConnSqlite().select_one(conn_param)
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         # 实际的功能实现
         self.do_executor_func(executor)

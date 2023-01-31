@@ -67,3 +67,7 @@ class StructSqlite(SqliteBasic):
         get_db_conn().query(sql)
         log.info(f'删除[{self.table_name}]语句 ==> {sql}')
 
+    def get_struct_info(self, opened_item_id):
+        param = StructInfo()
+        param.opened_item_id = opened_item_id
+        return self.select_one(param)

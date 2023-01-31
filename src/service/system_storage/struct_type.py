@@ -38,8 +38,6 @@ class StructType:
     beautifier_executor: str = field(init=False, default=None)
     # 对应的内容解析器
     parse_executor: str = field(init=False, default=None)
-    # 对应的刷新执行器
-    refresh_executor: str = field(init=False, default=None)
 
 
 class FolderTypeEnum(Enum):
@@ -55,7 +53,5 @@ class StructTypeEnum(Enum):
     json_type.type = JSON_TYPE
     json_type.display_name = JSON_DISPLAY_NAME
     json_type.type_dialog = 'JsonStructDialog'
-    json_type.beautifier_executor = 'PrettyJsonExecutor'
-    json_type.parse_executor = 'OpenJsonExecutor'
-    json_type.refresh_executor = 'RefreshJsonExecutor'
-
+    json_type.beautifier_executor = 'JsonBeautifier'
+    json_type.parse_executor = 'JsonParser'

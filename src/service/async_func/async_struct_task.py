@@ -168,13 +168,11 @@ class QueryStructWorker(ThreadWorkerABC):
         self.opened_struct_id = opened_struct_id
 
     def do_run(self):
-        param = StructInfo()
-        param.opened_item_id = self.opened_struct_id
-        struct_list = StructSqlite().select(param)
-        if struct_list:
-            self.success_signal.emit(struct_list[0])
+        struct_info = StructSqlite().get_struct_info(self.opened_struct_id)
+        if struct_info:
+            self.success_signal.emit(struct_info)
         else:
-            self.success_signal.emit(param)
+            self.success_signal.emit(StructInfo())
 
     def do_exception(self, e: Exception):
         err_msg = '查询结构体失败'

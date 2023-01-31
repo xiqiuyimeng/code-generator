@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMenu, QAction
 from constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
     DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_ACTION
 from constant.icon_enum import get_icon
+from service.async_func.async_struct_executor.async_struct_executor import RefreshFolderExecutor
 from service.async_func.async_struct_task import DelFolderExecutor
 from view.bar.bar_action import add_structure_ds_actions
 from view.box.message_box import pop_question
@@ -21,6 +22,7 @@ class FolderTreeNode(AbstractStructTreeNode):
     def __init__(self, *args):
         super().__init__(*args)
         self.del_folder_executor: DelFolderExecutor = ...
+        self.refresh_folder_executor: RefreshFolderExecutor = ...
 
     def reopen_item(self, opened_items):
         for opened_item in opened_items:
@@ -157,4 +159,18 @@ class FolderTreeNode(AbstractStructTreeNode):
                 tab_ids.append(tab.table_tab.id)
             self.get_child_tab_indexes_and_ids(child_item, tab_indexes, tab_ids)
 
-    def refresh(self): ...
+    def refresh(self):
+        if self.is_refreshing:
+            return
+        self.refresh_folder_executor = RefreshFolderExecutor(self.tree_widget, self.item,
+                                                             self.window, self.refresh_item_callback)
+        if self.refresh_folder_executor.struct_items:
+            self.refresh_folder_executor.start()
+
+    def refresh_item_callback(self, *args):
+        refreshed_item, refreshed_tab = args[0]
+        # 刷新对应节点的tab页
+        self.refresh_item_tab(refreshed_tab, self.tree_widget.get_item_node(refreshed_item).set_check_state)
+        # 停止动画
+        self.refresh_folder_executor.stop_one_movie(refreshed_item)
+

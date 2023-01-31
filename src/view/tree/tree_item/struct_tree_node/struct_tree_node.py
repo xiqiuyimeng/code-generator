@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QAction
 from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, OPEN_STRUCT_ACTION, \
     CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_ACTION
 from constant.icon_enum import get_icon
-from service.async_func.async_struct_executor import *
+from service.async_func.async_struct_executor.async_struct_executor import OpenStructExecutor, RefreshStructExecutor
 from service.async_func.async_struct_task import DelStructExecutor
 from view.box.message_box import pop_question
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
@@ -33,9 +33,9 @@ class StructTreeNode(AbstractStructTreeNode):
         else:
             # 执行打开tab页, 设置正在打开中状态
             self.is_opening = True
-            parse_executor = globals()[self.opened_item.data_type.parse_executor]
-            self.open_struct_executor = parse_executor(self.item, self.window,
-                                                       self.open_item_ui, self.open_item_fail)
+            self.open_struct_executor = OpenStructExecutor(self.item, self.window,
+                                                           self.open_item_ui,
+                                                           self.open_item_fail)
             self.open_struct_executor.start()
 
     def open_item_ui(self, table_tab):
@@ -157,9 +157,8 @@ class StructTreeNode(AbstractStructTreeNode):
         # 如果不存在打开表，那么无需处理
         if not opened_tab:
             return
-        refresh_executor = globals()[self.opened_item.data_type.refresh_executor]
-        self.refresh_struct_executor = refresh_executor(self.tree_widget, self.item, self.window,
-                                                        opened_tab.table_tab, self.refresh_success)
+        self.refresh_struct_executor = RefreshStructExecutor(self.tree_widget, self.item, self.window,
+                                                             opened_tab.table_tab, self.refresh_success)
         self.refresh_struct_executor.start()
 
     def refresh_success(self, table_tab):

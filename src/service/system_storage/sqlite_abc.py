@@ -270,6 +270,12 @@ class SqliteBasic:
         # 映射为参数对象类
         return list(map(lambda x: select_obj.__class__(**x), rows.all()))
 
+    def select_one(self, select_obj, order_by=None, sort_order='asc'):
+        """根据条件查询，根据不为空的属性作为条件进行查询，返回第一条"""
+        result = self._do_select(self._select_sql, select_obj, order_by, sort_order).all()
+        # 映射为参数对象类
+        return select_obj.__class__(**result[0]) if result else None
+
     def select_count(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，查询存在的记录数量"""
         rows = self._do_select(self._select_count_sql, select_obj, order_by, sort_order)

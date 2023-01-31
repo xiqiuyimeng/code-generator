@@ -153,9 +153,8 @@ class EditConnWorker(ThreadWorkerABC):
         opened_tree_item_param.parent_id = self.connection.id
         opened_tree_item_param.level = SqlTreeItemLevel.conn_level.value
         opened_tree_item_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        opened_conn_tree_items = opened_tree_item_sqlite.select(opened_tree_item_param)
-        if opened_conn_tree_items:
-            opened_conn_tree_item = opened_conn_tree_items[0]
+        opened_conn_tree_item = opened_tree_item_sqlite.select_one(opened_tree_item_param)
+        if opened_tree_item_param:
             opened_conn_tree_item.item_name = self.connection.conn_name
             opened_tree_item_sqlite.update(opened_conn_tree_item)
 
@@ -271,8 +270,7 @@ class QueryConnInfoWorker(ThreadWorkerABC):
     def do_run(self):
         conn_param = SqlConnection()
         conn_param.id = self.conn_id
-        conn_list = ConnSqlite().select(conn_param)
-        self.success_signal.emit(conn_list[0])
+        self.success_signal.emit(ConnSqlite().select_one(conn_param))
 
     def do_exception(self, e: Exception):
         err_msg = f'查询连接信息失败，连接id：{self.conn_id}'

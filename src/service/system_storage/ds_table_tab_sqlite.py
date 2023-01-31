@@ -85,12 +85,11 @@ class DsTableTabSqlite(SqliteBasic):
         table_tab = DsTableTab()
         table_tab.set_current()
         table_tab.ds_type = ds_type
-        current_tabs = self.select(table_tab)
-        # 当前项应该不多于1个
-        if current_tabs:
+        current_tab = self.select_one(table_tab)
+        if current_tab:
             origin_current_tab = DsTableTab()
             origin_current_tab.set_not_current()
-            origin_current_tab.id = current_tabs[0].id
+            origin_current_tab.id = current_tab.id
             self.update(origin_current_tab)
 
     @transactional

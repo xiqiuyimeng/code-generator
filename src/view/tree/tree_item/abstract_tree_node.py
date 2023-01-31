@@ -36,10 +36,11 @@ class AbstractTreeNode:
             lambda check_state: check_state_func(check_state))
         return tab
 
-    def refresh_item_tab(self, table_tab, check_state_func):
+    def refresh_item_tab(self, table_tab, check_state_func, item=None):
+        current_item = item if item else self.item
         if table_tab:
             # 开始刷新tab页面
-            tab = get_item_opened_tab(self.item)
+            tab = get_item_opened_tab(current_item)
             if tab:
                 tab.refresh_ui(table_tab)
                 # 连接表头复选框变化信号
@@ -47,9 +48,9 @@ class AbstractTreeNode:
                     lambda check_state: check_state_func(check_state))
         # 将当前项置为非选中
         check_state_func(Qt.Unchecked)
-        self.tree_widget.item_changed_executor.item_checked(self.item)
+        self.tree_widget.item_changed_executor.item_checked(current_item)
         # 清空选中数据
-        del_data = get_add_del_data(self.item)
+        del_data = get_add_del_data(current_item)
         self.tree_widget.tree_data.del_node(del_data)
 
     def open_item(self): ...
