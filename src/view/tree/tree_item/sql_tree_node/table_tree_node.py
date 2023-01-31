@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QAction
 
-from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION
+from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION, \
+    REFRESH_TB_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
@@ -74,7 +75,7 @@ class TableTreeNode(AbstractSqlTreeNode):
 
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}表[{self.table_name}]', menu))
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_TB_ACTION.format(self.table_name), menu))
 
     def handle_menu_func(self, func):
         # 打开表
@@ -87,7 +88,7 @@ class TableTreeNode(AbstractSqlTreeNode):
         elif func == CLOSE_TABLE_MENU.format(self.table_name):
             self.close_item()
         # 刷新
-        elif func == f'{REFRESH_ACTION}表[{self.table_name}]':
+        elif func == REFRESH_TB_ACTION.format(self.table_name):
             self.refresh()
 
     def close_tab_callback(self):
@@ -99,15 +100,13 @@ class TableTreeNode(AbstractSqlTreeNode):
     def refresh(self):
         if self.is_refreshing:
             return
-        self.is_refreshing = True
         # 刷新表
-        self.refresh_tb_executor = RefreshTBExecutor(self.item, self.window,
+        self.refresh_tb_executor = RefreshTBExecutor(self.tree_widget, self.item, self.window,
                                                      self.refresh_success, self.refresh_fail)
         self.refresh_tb_executor.start()
 
     def refresh_success(self, table_tab):
         self.refresh_item_tab(table_tab, self.set_check_state)
-        super().refresh_success()
 
     def refresh_fail(self):
         # 清空数据
@@ -121,7 +120,6 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 如果上级节点没有子节点，将状态置为收起
         if not parent_item.childCount():
             parent_item.setExpanded(False)
-        super().refresh_fail()
 
     def worker_terminate(self):
         if self.open_tb_executor is not Ellipsis:

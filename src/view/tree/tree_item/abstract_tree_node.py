@@ -25,12 +25,6 @@ class AbstractTreeNode:
         self.window = window
         self.is_refreshing = False
 
-    def refresh_success(self, *args):
-        self.is_refreshing = False
-
-    def refresh_fail(self):
-        self.is_refreshing = False
-
     def reopen_tab(self, table_tab, tab_name, check_state_func):
         # 创建tab页
         tab = TabTableUI(self.window, table_tab, self.item, self.tree_widget)
@@ -75,5 +69,9 @@ class AbstractTreeNode:
     def handle_menu_func(self, func): ...
 
     def refresh(self): ...
+
+    def refresh_success(self, *args): ...
+
+    def refresh_fail(self): ...
 
     def worker_terminate(self): ...

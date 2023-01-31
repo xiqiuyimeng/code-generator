@@ -33,8 +33,9 @@ class StructTreeNode(AbstractStructTreeNode):
         else:
             # 执行打开tab页, 设置正在打开中状态
             self.is_opening = True
-            self.open_struct_executor = globals()[self.opened_item.data_type.parse_executor](
-                self.item, self.window, self.open_item_ui, self.open_item_fail)
+            parse_executor = globals()[self.opened_item.data_type.parse_executor]
+            self.open_struct_executor = parse_executor(self.item, self.window,
+                                                       self.open_item_ui, self.open_item_fail)
             self.open_struct_executor.start()
 
     def open_item_ui(self, table_tab):
@@ -156,11 +157,10 @@ class StructTreeNode(AbstractStructTreeNode):
         # 如果不存在打开表，那么无需处理
         if not opened_tab:
             return
-        self.is_refreshing = True
-        self.refresh_struct_executor = globals()[self.opened_item.data_type.refresh_executor](
-                self.item, self.window, opened_tab.table_tab, self.refresh_success, self.refresh_fail)
+        refresh_executor = globals()[self.opened_item.data_type.refresh_executor]
+        self.refresh_struct_executor = refresh_executor(self.tree_widget, self.item, self.window,
+                                                        opened_tab.table_tab, self.refresh_success)
         self.refresh_struct_executor.start()
 
     def refresh_success(self, table_tab):
         self.refresh_item_tab(table_tab, self.set_check_state)
-        super().refresh_success()

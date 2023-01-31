@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
-    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE
+    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE, REFRESH_DB_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import CloseDBExecutor
 from service.async_func.async_sql_ds_task import OpenDBExecutor, RefreshDBExecutor
@@ -120,7 +120,7 @@ class DBTreeNode(AbstractSqlTreeNode):
 
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}数据库[{self.db_name}]', menu))
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_DB_ACTION.format(self.db_name), menu))
 
     def handle_menu_func(self, func):
         # 打开数据库
@@ -139,17 +139,15 @@ class DBTreeNode(AbstractSqlTreeNode):
         elif func == UNSELECT_TB_MENU:
             self.tree_widget.handle_child_item_checked(self.item, Qt.Unchecked)
         # 刷新
-        elif func == f'{REFRESH_ACTION}数据库[{self.db_name}]':
+        elif func == REFRESH_DB_ACTION.format(self.db_name):
             self.refresh()
 
     def refresh(self):
         if self.is_refreshing:
             return
-        self.is_refreshing = True
-        self.refresh_db_executor = RefreshDBExecutor(self.item, self.window,
+        self.refresh_db_executor = RefreshDBExecutor(self.tree_widget, self.item, self.window,
                                                      self.refresh_tables_callback,
-                                                     self.refresh_cols_callback,
-                                                     self.refresh_success, self.refresh_fail)
+                                                     self.refresh_cols_callback)
         self.refresh_db_executor.start()
 
     def refresh_tables_callback(self, table_changed_dict: dict, refresh_executor=None):

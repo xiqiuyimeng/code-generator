@@ -61,13 +61,12 @@ class RefreshJsonWorker(RefreshStructWorker, OpenJsonWorker):
 
 class RefreshJsonExecutor(RefreshStructExecutor):
 
-    def __init__(self, item, window, table_tab, success_callback, fail_callback):
+    def __init__(self, tree_widget, item, window, table_tab, success_callback):
         self.table_tab = table_tab
-        super().__init__(item, window, success_callback, fail_callback, '刷新json结构体')
+        super().__init__(tree_widget, item, window, '刷新json结构体', success_callback)
 
     def get_worker(self) -> RefreshJsonWorker:
-        return RefreshJsonWorker(self.table_tab,
-                                 get_item_opened_record(self.item))
+        return RefreshJsonWorker(self.table_tab, get_item_opened_record(self.item))
 
 
 # ---------------------------------------- 刷新json结构体 end ---------------------------------------- #

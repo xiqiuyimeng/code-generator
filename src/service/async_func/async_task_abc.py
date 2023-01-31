@@ -153,7 +153,7 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
     """支持使用多个动画，用于多组树节点icon movie + 对应tab的 masked widget，根据给定的item，对所有子节点处理"""
 
-    def __init__(self, item, success_callback, fail_callback, window, error_box_title):
+    def __init__(self, item, window, error_box_title, success_callback=None, fail_callback=None):
         self.item = item
         # 首先获取 item 下所有的子节点，key -> item id, value -> item item_icon tab_dict
         self.item_dict = dict()
@@ -166,6 +166,8 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
         super().__init__(window, error_box_title)
 
     def get_item_dict(self, item, window):
+        # 设置 item 标志
+        self.item_pre_process(item)
         # 如果存在子元素，那么当前节点一定不存在tab
         if item.childCount():
             self.item_dict[id(item)] = {
@@ -174,6 +176,8 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
             }
             for i in range(item.childCount()):
                 child_item = item.child(i)
+                # 设置 child_item 标志
+                self.item_pre_process(child_item)
                 self.item_dict[id(child_item)] = {
                     "item": child_item,
                     "item_icon": child_item.icon(0),
@@ -242,9 +246,31 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
             loading_mask.stop()
             self.tab_widget.setTabIcon(tab_index, tab_icon)
         item.setIcon(0, item_icon)
+        self.item_post_process(item)
 
     def success_post_process(self, *args):
-        self.success_callback(*args)
+        if self.success_callback:
+            self.success_callback(*args)
 
     def fail_post_process(self):
-        self.fail_callback()
+        if self.fail_callback:
+            self.fail_callback()
+
+    def item_pre_process(self, item): ...
+
+    def item_post_process(self, item): ...
+
+
+# ----------------------- refresh movie worker manager ABC -----------------------
+
+class RefreshMovieThreadExecutor(IconMovieLoadingMaskThreadExecutor):
+
+    def __init__(self, tree_widget, *args):
+        self.tree_widget = tree_widget
+        super().__init__(*args)
+
+    def item_pre_process(self, item):
+        self.tree_widget.get_item_node(item).is_refreshing = True
+
+    def item_post_process(self, item):
+        self.tree_widget.get_item_node(item).is_refreshing = False

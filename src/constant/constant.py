@@ -115,6 +115,8 @@ ADD_CONN_ACTION = '添加连接'
 EDIT_CONN_ACTION = '编辑连接 [{}]'
 # 删除连接
 DEL_CONN_ACTION = '删除连接 [{}]'
+# 刷新连接
+REFRESH_CONN_ACTION = '刷新连接 [{}]'
 
 """关于数据库的右键菜单"""
 # 打开数据库
@@ -127,6 +129,8 @@ CLOSE_DB_MENU = '关闭数据库 [{}]'
 SELECT_ALL_TB_MENU = '全选所有表'
 # 取消选择表
 UNSELECT_TB_MENU = '取消选择表'
+# 刷新数据库
+REFRESH_DB_ACTION = '刷新数据库 [{}]'
 
 """关于表的右键菜单"""
 # 打开表
@@ -140,6 +144,8 @@ SELECT_ALL_FIELD_MENU = '全选 [{}] 表中所有字段'
 # 取消选择字段
 UNSELECT_FIELD_MENU = '取消选择字段'
 CLOSE_TABLE_TITLE = '关闭表'
+# 刷新数据表
+REFRESH_TB_ACTION = '刷新数据表 [{}]'
 
 """关于结构体的右键菜单"""
 OPEN_STRUCT_ACTION = '打开[{}]'

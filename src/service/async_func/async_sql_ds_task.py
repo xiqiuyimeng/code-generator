@@ -9,7 +9,7 @@ from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, T
     REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
-    IconMovieLoadingMaskThreadExecutor
+    RefreshMovieThreadExecutor
 from service.sql_ds_executor import *
 from service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
@@ -199,11 +199,11 @@ class RefreshConnWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class RefreshConnExecutor(IconMovieLoadingMaskThreadExecutor):
+class RefreshConnExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, item, window, db_changed_callback, tb_changed_callback, col_changed_callback,
-                 db_finished_callback, success_callback, fail_callback):
-        super().__init__(item, success_callback, fail_callback, window, REFRESH_CONN_TITLE)
+    def __init__(self, tree_widget, item, window, db_changed_callback, tb_changed_callback,
+                 col_changed_callback, db_finished_callback):
+        super().__init__(tree_widget, item, window, REFRESH_CONN_TITLE)
 
         self.worker.db_changed_signal.connect(db_changed_callback)
         self.worker.table_changed_signal.connect(tb_changed_callback)
@@ -307,11 +307,10 @@ class RefreshDBWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class RefreshDBExecutor(IconMovieLoadingMaskThreadExecutor):
+class RefreshDBExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, item, window, tb_changed_callback, col_changed_callback,
-                 success_callback, fail_callback):
-        super().__init__(item, success_callback, fail_callback, window, REFRESH_DB_TITLE)
+    def __init__(self, tree_widget, item, window, tb_changed_callback, col_changed_callback):
+        super().__init__(tree_widget, item, window, REFRESH_DB_TITLE)
 
         self.worker.table_changed_signal.connect(tb_changed_callback)
         self.worker.col_signal.connect(col_changed_callback)
@@ -415,10 +414,10 @@ class RefreshTBWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class RefreshTBExecutor(IconMovieLoadingMaskThreadExecutor):
+class RefreshTBExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, item, window, success_callback, fail_callback):
-        super().__init__(item, success_callback, fail_callback, window, REFRESH_TB_TITLE)
+    def __init__(self, tree_widget, item, window, success_callback, fail_callback):
+        super().__init__(tree_widget, item, window, REFRESH_TB_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         tab = get_item_opened_tab(self.item)

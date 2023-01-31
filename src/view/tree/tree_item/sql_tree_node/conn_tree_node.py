@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
-    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION
+    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION, REFRESH_CONN_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
@@ -137,7 +137,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}连接 [{self.conn_name}]', menu))
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_CONN_ACTION.format(self.conn_name), menu))
 
     def test_conn(self):
         self.is_testing = True
@@ -180,7 +180,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
             if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.conn_name), self.window):
                 self.del_conn()
         # 刷新
-        elif func == f'{REFRESH_ACTION}连接 [{self.conn_name}]':
+        elif func == REFRESH_CONN_ACTION.format(self.conn_name):
             self.refresh()
 
     def edit_conn(self):
@@ -218,13 +218,11 @@ class ConnTreeNode(AbstractSqlTreeNode):
         # 如果连接下没有子节点，也就是连接还未打开，那么跳过
         if not self.item.childCount():
             return
-        self.is_refreshing = True
-        self.refresh_conn_executor = RefreshConnExecutor(self.item, self.window,
+        self.refresh_conn_executor = RefreshConnExecutor(self.tree_widget, self.item, self.window,
                                                          self.refresh_db_callback,
                                                          self.refresh_table_callback,
                                                          self.refresh_cols_callback,
-                                                         self.refresh_db_finished_callback,
-                                                         self.refresh_success, self.refresh_fail)
+                                                         self.refresh_db_finished_callback)
         self.refresh_conn_executor.start()
 
     def refresh_db_callback(self, table_changed_dict: dict):

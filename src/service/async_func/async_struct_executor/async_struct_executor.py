@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from logger.log import logger as log
 from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
-    IconMovieLoadingMaskThreadExecutor
+    RefreshMovieThreadExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.sqlite_abc import transactional
@@ -155,10 +155,10 @@ class RefreshStructWorker(OpenStructWorker):
         self.modifying_db_task = False
 
 
-class RefreshStructExecutor(IconMovieLoadingMaskThreadExecutor):
+class RefreshStructExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, item, window, success_callback, fail_callback, error_box_title):
-        super().__init__(item, success_callback, fail_callback, window, error_box_title)
+    def __init__(self, tree_widget, item, window, error_box_title, success_callback):
+        super().__init__(tree_widget, item, window, error_box_title, success_callback)
 
 
 # ---------------------------------------- 刷新结构体 end ---------------------------------------- #
