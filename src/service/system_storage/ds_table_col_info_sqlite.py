@@ -108,7 +108,7 @@ class DsTableColInfoSqlite(SqliteBasic):
         # 考虑存在子集合的情况
         for col_info in columns:
             if not col_info.children:
-                return
+                continue
             self.save_cols(col_info.children, parent_tab_id, check_state, col_info.id)
 
     @staticmethod
