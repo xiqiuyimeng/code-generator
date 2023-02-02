@@ -273,6 +273,8 @@ class RefreshFolderExecutor(RefreshMovieThreadExecutor):
                 "item_icon": struct_item.icon(0),
                 "tab_dict": self.get_tab_dict(struct_item, window)
             }
+            # 对于需要刷新的结构体节点，进行节点的前置处理
+            self.item_pre_process(struct_item)
 
     def get_worker(self) -> ThreadWorkerABC:
         return RefreshFolderWorker(self.struct_items, self.item.text(0))

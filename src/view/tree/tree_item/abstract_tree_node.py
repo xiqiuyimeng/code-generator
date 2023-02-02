@@ -24,6 +24,8 @@ class AbstractTreeNode:
         self.tree_widget = tree_widget
         self.window = window
         self.is_refreshing = False
+        # 只记录当前节点下一层，正在刷新的子节点数量，不关心子节点下有多少节点刷新
+        self.refreshing_child_count = 0
 
     def reopen_tab(self, table_tab, tab_name, check_state_func):
         # 创建tab页
@@ -51,6 +53,22 @@ class AbstractTreeNode:
         # 清空选中数据
         del_data = get_add_del_data(self.item)
         self.tree_widget.tree_data.del_node(del_data)
+
+    def add_refreshing_child_count(self):
+        # 如果当前刷新子节点数为0，那么这次增加之后，需要传递给上层节点
+        self.refreshing_child_count += 1
+        if self.refreshing_child_count == 1:
+            parent_item = self.item.parent()
+            if parent_item:
+                self.tree_widget.get_item_node(parent_item).add_refreshing_child_count()
+
+    def sub_refreshing_child_count(self):
+        # 如果当前刷新子节点数为1，那么这次增加之后，需要传递给上层节点
+        self.refreshing_child_count -= 1
+        if self.refreshing_child_count == 0:
+            parent_item = self.item.parent()
+            if parent_item:
+                self.tree_widget.get_item_node(parent_item).sub_refreshing_child_count()
 
     def open_item(self): ...
 

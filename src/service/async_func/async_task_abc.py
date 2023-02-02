@@ -274,3 +274,23 @@ class RefreshMovieThreadExecutor(IconMovieLoadingMaskThreadExecutor):
 
     def item_post_process(self, item):
         self.tree_widget.get_item_node(item).is_refreshing = False
+
+    def pre_process(self):
+        super().pre_process()
+        self.add_parent_refreshed_child_count()
+
+    def post_process(self):
+        super().post_process()
+        self.sub_parent_refreshed_child_count()
+
+    def add_parent_refreshed_child_count(self):
+        # 向上传递刷新节点数的变化
+        parent_item = self.item.parent()
+        if parent_item:
+            self.tree_widget.get_item_node(parent_item).add_refreshing_child_count()
+
+    def sub_parent_refreshed_child_count(self):
+        # 向上传递刷新节点数的变化
+        parent_item = self.item.parent()
+        if parent_item:
+            self.tree_widget.get_item_node(parent_item).sub_refreshing_child_count()
