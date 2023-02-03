@@ -2,8 +2,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction
 
-from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_MENU, OPEN_DB_MENU, CLOSE_DB_MENU, \
-    SELECT_ALL_TB_MENU, UNSELECT_TB_MENU, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE, REFRESH_DB_ACTION
+from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_ACTION, OPEN_DB_ACTION, CLOSE_DB_ACTION, \
+    SELECT_ALL_TB_ACTION, UNSELECT_TB_ACTION, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE, REFRESH_DB_ACTION, \
+    CANCEL_REFRESH_DB_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import CloseDBExecutor
 from service.async_func.async_sql_ds_task import OpenDBExecutor, RefreshDBExecutor
@@ -22,28 +23,32 @@ class DBTreeNode(AbstractSqlTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.db_name = self.item.text(0)
         self.open_db_executor: OpenDBExecutor = ...
         self.close_db_executor: CloseDBExecutor = ...
         self.refresh_db_executor: RefreshDBExecutor = ...
 
     def open_item(self):
         if not self.item.childCount():
+            if self.is_opening or self.is_refreshing:
+                return
             # 设置正在打开中状态
             self.is_opening = True
+            self.tree_widget.get_item_node(self.item.parent()).add_opening_child_count()
             self.open_db_executor = OpenDBExecutor(self.item, self.window,
                                                    self.open_item_ui, self.open_item_fail)
             self.open_db_executor.start()
-        self.tree_widget.set_selected_focus(self.item)
+        else:
+            self.tree_widget.set_selected_focus(self.item)
 
     def open_item_ui(self, opened_table_items):
         self.is_opening = False
+        self.tree_widget.get_item_node(self.item.parent()).sub_opening_child_count()
         if opened_table_items:
             make_table_items(self.tree_widget, self.item, opened_table_items, self.tree_widget.tree_data)
             self.item.setExpanded(True)
             self.tree_widget.set_selected_focus(self.item)
         else:
-            pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.db_name),
+            pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.item_name),
                      OPEN_DB_TITLE, self.window)
 
     def reopen_item(self, opened_items):
@@ -55,16 +60,22 @@ class DBTreeNode(AbstractSqlTreeNode):
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):
+        # 检查库是否可以关闭
+        close_db_prompt = self.not_allow_operate_prompt()
+        if close_db_prompt:
+            close_db_prompt = close_db_prompt.format(self.item_name)
+            pop_fail(close_db_prompt, CLOSE_DB_ACTION.format(self.item_name), self.window)
+            return
         # 判断是否有选中数据
         del_data = get_add_del_data(self.item)
         db_data_node = self.tree_widget.tree_data.get_node(del_data)
         # 如果能找到选中数据，提示将清空数据，是否继续
         if db_data_node:
-            if not pop_question(CLOSE_DB_PROMPT, CLOSE_DB_MENU.format(self.db_name), self.window):
+            if not pop_question(CLOSE_DB_PROMPT, CLOSE_DB_ACTION.format(self.item_name), self.window):
                 return
         tab_indexes, tab_ids = self.get_tab_indexes_and_ids()
         child_opened_ids = get_children_opened_ids(self.item)
-        self.close_db_executor = CloseDBExecutor(self.db_name, child_opened_ids, tab_indexes,
+        self.close_db_executor = CloseDBExecutor(self.item_name, child_opened_ids, tab_indexes,
                                                  tab_ids, self.item, self.window, self.close_db_callback)
         self.close_db_executor.start()
 
@@ -100,51 +111,68 @@ class DBTreeNode(AbstractSqlTreeNode):
         return tab_indexes, tab_ids
 
     def do_fill_menu(self, menu):
+        # 如果正在打开库，只显示取消打开库
+        if self.is_opening:
+            menu.addAction(QAction(get_icon(CANCEL_OPEN_DB_ACTION),
+                                   CANCEL_OPEN_DB_ACTION.format(self.item_name), menu))
+            return
+        # 如果正在刷新库，只显示取消刷新库
+        if self.is_refreshing:
+            menu.addAction(QAction(get_icon(CANCEL_REFRESH_DB_ACTION),
+                                   CANCEL_REFRESH_DB_ACTION.format(self.item_name), menu))
+            return
+
         if self.item.childCount():
             check_state = check_table_status(self.item)
-            menu.addAction(QAction(CLOSE_DB_MENU.format(self.db_name), menu))
+            menu.addAction(QAction(get_icon(CLOSE_DB_ACTION),
+                                   CLOSE_DB_ACTION.format(self.item_name), menu))
             # 全选时：添加取消选择菜单
             if check_state[0]:
-                menu.addAction(QAction(UNSELECT_TB_MENU, menu))
+                menu.addAction(QAction(get_icon(UNSELECT_TB_ACTION), UNSELECT_TB_ACTION, menu))
             # 部分选中时：添加全选菜单和取消选择菜单
             elif check_state[1]:
-                menu.addAction(QAction(SELECT_ALL_TB_MENU, menu))
-                menu.addAction(QAction(UNSELECT_TB_MENU, menu))
+                menu.addAction(QAction(get_icon(SELECT_ALL_TB_ACTION), SELECT_ALL_TB_ACTION, menu))
+                menu.addAction(QAction(get_icon(UNSELECT_TB_ACTION), UNSELECT_TB_ACTION, menu))
             else:
                 # 都未选中时：添加全选菜单
-                menu.addAction(QAction(SELECT_ALL_TB_MENU, menu))
-        # 根据打开标识判断是否正在打开中
-        elif self.item.data(1, Qt.UserRole):
-            menu.addAction(QAction(CANCEL_OPEN_DB_MENU.format(self.db_name), menu))
+                menu.addAction(QAction(get_icon(SELECT_ALL_TB_ACTION), SELECT_ALL_TB_ACTION, menu))
         else:
-            menu.addAction(QAction(OPEN_DB_MENU.format(self.db_name), menu))
+            menu.addAction(QAction(get_icon(OPEN_DB_ACTION), OPEN_DB_ACTION.format(self.item_name), menu))
 
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_DB_ACTION.format(self.db_name), menu))
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_DB_ACTION.format(self.item_name), menu))
 
     def handle_menu_func(self, func):
         # 打开数据库
-        if func == OPEN_DB_MENU.format(self.db_name):
+        if func == OPEN_DB_ACTION.format(self.item_name):
             self.open_item()
         # 取消打开数据库
-        elif func == CANCEL_OPEN_DB_MENU.format(self.db_name):
+        elif func == CANCEL_OPEN_DB_ACTION.format(self.item_name):
             self.open_db_executor.worker_terminate(self.open_item_fail)
         # 关闭数据库
-        elif func == CLOSE_DB_MENU.format(self.db_name):
+        elif func == CLOSE_DB_ACTION.format(self.item_name):
             self.close_item()
         # 全选所有表
-        elif func == SELECT_ALL_TB_MENU:
+        elif func == SELECT_ALL_TB_ACTION:
             self.tree_widget.handle_child_item_checked(self.item, Qt.Checked)
         # 取消全选所有表
-        elif func == UNSELECT_TB_MENU:
+        elif func == UNSELECT_TB_ACTION:
             self.tree_widget.handle_child_item_checked(self.item, Qt.Unchecked)
         # 刷新
-        elif func == REFRESH_DB_ACTION.format(self.db_name):
+        elif func == REFRESH_DB_ACTION.format(self.item_name):
             self.refresh()
+        # 取消刷新
+        elif func == CANCEL_REFRESH_DB_ACTION.format(self.item_name):
+            self.refresh_db_executor.worker_terminate()
 
     def refresh(self):
-        if self.is_refreshing:
+        if self.is_refreshing or self.is_opening:
+            return
+        refresh_prompt = self.not_allow_operate_prompt()
+        if refresh_prompt:
+            pop_fail(refresh_prompt.format(self.item_name),
+                     REFRESH_DB_ACTION.format(self.item_name), self.window)
             return
         self.refresh_db_executor = RefreshDBExecutor(self.tree_widget, self.item, self.window,
                                                      self.refresh_tables_callback,

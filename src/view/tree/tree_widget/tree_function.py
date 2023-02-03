@@ -125,7 +125,7 @@ def update_conn_tree_item(tree_widget, conn_name):
     opened_record = get_item_opened_record(item)
     opened_record.item_name = conn_name
     # 这里需要同步更新下 tree_node 对象中的 conn_name，否则 tree_node 对象中取到的就是原来的连接名
-    tree_widget.get_item_node(item).conn_name = conn_name
+    tree_widget.get_item_node(item).item_name = conn_name
 
 
 def make_conn_tree_items(opened_items, parent):

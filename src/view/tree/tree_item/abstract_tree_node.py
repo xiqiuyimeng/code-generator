@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QTreeWidgetItem
 
+from constant.constant import CLOSE_REFRESHING_NODE_PROMPT, CLOSE_REFRESHING_CHILD_NODE_PROMPT, \
+    CLOSE_OPENING_CHILD_NODE_PROMPT
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, \
     get_add_del_data
@@ -18,11 +20,21 @@ class AbstractTreeNode:
 
     def __init__(self, item: QTreeWidgetItem, tree_widget, window):
         self.item = item
+        self.item_name = self.item.text(0)
         self.tree_widget = tree_widget
         self.window = window
+        self.is_opening = False
+        # 记录当前节点下一层，正在打开的节点数量
+        self.opening_child_count = 0
         self.is_refreshing = False
         # 只记录当前节点下一层，正在刷新的子节点数量，不关心子节点下有多少节点刷新
         self.refreshing_child_count = 0
+
+    def open_item_fail(self):
+        self.is_opening = False
+        parent_item = self.item.parent()
+        if parent_item:
+            self.tree_widget.get_item_node(parent_item).sub_opening_child_count()
 
     def reopen_tab(self, table_tab, tab_name, check_state_func):
         # 创建tab页
@@ -34,6 +46,22 @@ class AbstractTreeNode:
         tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
             lambda check_state: check_state_func(check_state))
         return tab
+
+    def add_opening_child_count(self):
+        # 如果当前节点的正在打开子节点数为0，那么需要向上传递打开节点数变化
+        self.opening_child_count += 1
+        if self.opening_child_count == 1:
+            parent_item = self.item.parent()
+            if parent_item:
+                self.tree_widget.get_item_node(parent_item).add_opening_child_count()
+
+    def sub_opening_child_count(self):
+        # 如果当前节点的正在打开子节点数为1，那么需要向上传递打开节点数变化
+        self.opening_child_count -= 1
+        if self.opening_child_count == 0:
+            parent_item = self.item.parent()
+            if parent_item:
+                self.tree_widget.get_item_node(parent_item).sub_opening_child_count()
 
     def refresh_item_tab(self, table_tab, check_state_func):
         if table_tab:
@@ -67,11 +95,18 @@ class AbstractTreeNode:
             if parent_item:
                 self.tree_widget.get_item_node(parent_item).sub_refreshing_child_count()
 
+    def not_allow_operate_prompt(self):
+        # 当前节点正在刷新中、子节点处于刷新中、子节点处于打开中，都不允许操作当前节点
+        if self.is_refreshing:
+            return CLOSE_REFRESHING_NODE_PROMPT
+        elif self.refreshing_child_count:
+            return CLOSE_REFRESHING_CHILD_NODE_PROMPT
+        elif self.opening_child_count:
+            return CLOSE_OPENING_CHILD_NODE_PROMPT
+
     def open_item(self): ...
 
     def open_item_ui(self, *args): ...
-
-    def open_item_fail(self): ...
 
     def reopen_item(self, opened_items): ...
 

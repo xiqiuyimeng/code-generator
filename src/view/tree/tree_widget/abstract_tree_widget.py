@@ -119,7 +119,8 @@ class AbstractTreeWidget(DisplayTreeWidget):
             for i in range(item.childCount()):
                 child_item = item.child(i)
                 # 如果复选框状态相同，跳过
-                if child_item.checkState(0) == check_state:
+                if child_item.data(0, Qt.CheckStateRole) is None \
+                        or child_item.checkState(0) == check_state:
                     continue
                 child_item.setCheckState(0, check_state)
                 self.handle_checkbox_changed(child_item, clicked=False)

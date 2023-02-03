@@ -4,7 +4,8 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
 from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
-    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE
+    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE, \
+    TABLE_CLOSE_WITH_REFRESHING
 from service.system_storage.ds_table_tab_sqlite import DsTableTab
 from view.box.message_box import pop_fail
 from view.tree.tree_item.tree_item_func import set_item_opened_tab
@@ -128,17 +129,23 @@ class TabBar(QTabBar):
             [self.remove_tab(idx) for idx in reversed(right_index_list)]
 
     def table_allow_close(self, indexes):
-        """根据索引，检查表是否都可以关闭，检查规则是：是否存在部分选中的表，如果部分选中则不可关闭"""
-        partially_checked_tables = list()
+        """根据索引，检查表是否都可以关闭，检查规则是：是否存在部分选中的表，如果部分选中则不可关闭，正在刷新的表也不可关闭"""
+        partially_checked_tables, refreshing_tables = list(), list()
         for index in indexes:
             tab_widget = self.parent.widget(index)
+            if tab_widget.tree_widget.get_item_node(tab_widget.tree_item).is_refreshing:
+                refreshing_tables.append(self.partially_checked_table_prompt(tab_widget))
             if tab_widget.tree_item.checkState(0) == Qt.PartiallyChecked:
                 partially_checked_tables.append(self.partially_checked_table_prompt(tab_widget))
-        if partially_checked_tables:
+        if partially_checked_tables or refreshing_tables:
+            prompt_list = list()
+            if refreshing_tables:
+                prompt_list.append(TABLE_CLOSE_WITH_REFRESHING.format('\n'.join(refreshing_tables)))
+            if partially_checked_tables:
+                prompt_list.append(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format('\n'.join(partially_checked_tables)))
             # 弹窗提示
-            pop_fail(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format('\n'.join(partially_checked_tables)),
-                     CLOSE_TABLE_TITLE, self.main_window)
-        return not partially_checked_tables
+            pop_fail('\n\n'.join(prompt_list), CLOSE_TABLE_TITLE, self.main_window)
+        return not (partially_checked_tables or refreshing_tables)
 
     def partially_checked_table_prompt(self, tab_widget) -> str: ...
 

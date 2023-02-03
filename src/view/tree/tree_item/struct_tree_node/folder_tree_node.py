@@ -3,12 +3,13 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
-    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_ACTION
+    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_FOLDER_ACTION, \
+    CANCEL_REFRESH_FOLDER_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor.async_struct_executor import RefreshFolderExecutor
 from service.async_func.async_struct_task import DelFolderExecutor
 from view.bar.bar_action import add_structure_ds_actions
-from view.box.message_box import pop_question
+from view.box.message_box import pop_question, pop_fail
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 from view.tree.tree_widget.tree_function import add_folder_func, edit_folder_func, add_struct_tree_item
@@ -47,25 +48,34 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 新建文件夹
         menu.addAction(QAction(get_icon(CREATE_NEW_FOLDER_ACTION), CREATE_NEW_FOLDER_ACTION, menu))
 
-        # 如果当前节点复选框状态为全选，菜单应该增加取消全选
-        if self.item.checkState(0) == Qt.Checked:
-            menu.addAction(QAction(UNSELECT_ACTION, menu))
-        elif self.item.checkState(0) == Qt.PartiallyChecked:
-            # 如果当前节点复选框状态为部分选择，菜单应该增加全选和取消全选
-            menu.addAction(QAction(SELECT_ALL_ACTION, menu))
-            menu.addAction(QAction(UNSELECT_ACTION, menu))
-        else:
-            # 如果当前节点复选框状态为未选择，菜单应该增加全选
-            menu.addAction(QAction(SELECT_ALL_ACTION, menu))
-        menu.addSeparator()
+        # 取消刷新
+        if self.is_refreshing:
+            menu.addAction(QAction(get_icon(CANCEL_REFRESH_FOLDER_ACTION),
+                                   CANCEL_REFRESH_FOLDER_ACTION.format(self.item_name), menu))
+            return
+        # 当文件夹下存在正在刷新或正在打开的节点时，不显示选择子节点菜单
+        if not (self.refreshing_child_count and self.opening_child_count):
+            # 如果当前节点复选框状态为全选，菜单应该增加取消全选
+            if self.item.checkState(0) == Qt.Checked:
+                menu.addAction(QAction(get_icon(UNSELECT_ACTION), UNSELECT_ACTION, menu))
+            elif self.item.checkState(0) == Qt.PartiallyChecked:
+                # 如果当前节点复选框状态为部分选择，菜单应该增加全选和取消全选
+                menu.addAction(QAction(get_icon(SELECT_ALL_ACTION), SELECT_ALL_ACTION, menu))
+                menu.addAction(QAction(get_icon(UNSELECT_ACTION), UNSELECT_ACTION, menu))
+            else:
+                # 如果当前节点复选框状态为未选择，菜单应该增加全选
+                menu.addAction(QAction(SELECT_ALL_ACTION, menu))
+            menu.addSeparator()
 
         # 重命名
-        menu.addAction(QAction(get_icon(RENAME_FOLDER_ACTION),
-                               RENAME_FOLDER_ACTION.format(self.item_name), menu))
+        menu.addAction(QAction(get_icon(RENAME_FOLDER_ACTION), RENAME_FOLDER_ACTION.format(self.item_name), menu))
         # 删除
         menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION),
                                DEL_FOLDER_ACTION.format(self.item_name), menu))
-        super().do_fill_menu(menu)
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_FOLDER_ACTION),
+                               REFRESH_FOLDER_ACTION.format(self.item_name), menu))
 
     def handle_menu_func(self, func):
         # 新建文件夹
@@ -89,11 +99,20 @@ class FolderTreeNode(AbstractStructTreeNode):
                              get_item_opened_record(self.item), parent_item)
         # 删除
         elif func == DEL_FOLDER_ACTION.format(self.item_name):
+            # 检查是否可以删除
+            del_prompt = self.not_allow_operate_prompt()
+            if del_prompt:
+                pop_fail(del_prompt.format(self.item_name),
+                         DEL_FOLDER_ACTION.format(self.item_name), self.window)
+                return
             if pop_question(DEL_FOLDER_PROMPT, DEL_FOLDER_ACTION.format(self.item_name), self.window):
                 self.del_folder()
         # 刷新
-        elif func == REFRESH_ACTION.format(self.item_name):
+        elif func == REFRESH_FOLDER_ACTION.format(self.item_name):
             self.refresh()
+        # 取消刷新
+        elif func == CANCEL_REFRESH_FOLDER_ACTION.format(self.item_name):
+            self.refresh_folder_executor.worker_terminate()
 
     def set_check_state(self):
         # 对于文件夹节点而言，由下而上联动复选框，需要考虑当前节点状态，以及应该向上传递的状态
@@ -167,6 +186,11 @@ class FolderTreeNode(AbstractStructTreeNode):
 
     def refresh(self):
         if self.is_refreshing:
+            return
+        refresh_prompt = self.not_allow_operate_prompt()
+        if refresh_prompt:
+            pop_fail(refresh_prompt.format(self.item_name),
+                     REFRESH_FOLDER_ACTION.format(self.item_name), self.window)
             return
         self.refresh_folder_executor = RefreshFolderExecutor(self.tree_widget, self.item,
                                                              self.window, self.refresh_item_callback)

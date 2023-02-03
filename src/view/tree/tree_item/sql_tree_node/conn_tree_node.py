@@ -3,12 +3,13 @@ from PyQt5.QtWidgets import QMenu, QAction
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
-    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION, REFRESH_CONN_ACTION
+    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION, REFRESH_CONN_ACTION, \
+    CANCEL_REFRESH_CONN_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
 from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
 from view.bar.bar_action import add_sql_ds_actions
-from view.box.message_box import pop_ok, pop_question
+from view.box.message_box import pop_ok, pop_question, pop_fail
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
@@ -23,7 +24,6 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.conn_name = self.item.text(0)
         self.open_conn_executor: OpenConnExecutor = ...
         self.test_conn_executor: TestConnIconMovieExecutor = ...
         self.del_conn_executor: DelConnExecutor = ...
@@ -35,7 +35,8 @@ class ConnTreeNode(AbstractSqlTreeNode):
         if not self.is_opening and not self.item.childCount():
             # 设置正在打开中状态
             self.is_opening = True
-            self.open_conn_executor = OpenConnExecutor(self.item, self.window, self.open_item_ui, self.open_item_fail)
+            self.open_conn_executor = OpenConnExecutor(self.item, self.window,
+                                                       self.open_item_ui, self.open_item_fail)
             self.open_conn_executor.start()
         else:
             self.tree_widget.set_selected_focus(self.item)
@@ -55,19 +56,24 @@ class ConnTreeNode(AbstractSqlTreeNode):
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self, close_for_edit=False):
+        # 检查连接是否可以关闭
+        close_conn_prompt = self.not_allow_operate_prompt()
+        if close_conn_prompt:
+            pop_fail(close_conn_prompt.format(self.item_name), CLOSE_CONN_ACTION.format(self.item_name), self.window)
+            return
         # 判断是否有选中数据
         del_data = get_add_del_data(self.item)
         conn_data_node = self.tree_widget.tree_data.get_node(del_data)
         # 如果能找到选中数据，提示将会清空数据，是否继续
         if conn_data_node:
-            if not pop_question(CLOSE_CONN_PROMPT, CLOSE_CONN_ACTION.format(self.conn_name), self.window):
+            if not pop_question(CLOSE_CONN_PROMPT, CLOSE_CONN_ACTION.format(self.item_name), self.window):
                 return
 
         # 关闭连接
         tab_indexes, tab_ids = self.get_tab_indexes_and_ids()
         opened_record = get_item_opened_record(self.item)
         child_opened_ids = get_children_opened_ids(self.item)
-        self.close_conn_executor = CloseConnExecutor(opened_record.parent_id, self.conn_name,
+        self.close_conn_executor = CloseConnExecutor(opened_record.parent_id, self.item_name,
                                                      child_opened_ids, tab_indexes, tab_ids,
                                                      close_for_edit, self.item, self.window,
                                                      self.close_conn_callback)
@@ -118,27 +124,38 @@ class ConnTreeNode(AbstractSqlTreeNode):
         menu.addMenu(add_conn_menu)
         menu.addSeparator()
 
-        # 打开连接、取消打开连接、关闭连接
-        if not self.is_testing:
-            open_menu_name = CANCEL_OPEN_CONN_ACTION \
-                if self.is_opening else OPEN_CONN_ACTION \
-                if not self.item.childCount() else CLOSE_CONN_ACTION
-            menu.addAction(QAction(get_icon(open_menu_name), open_menu_name.format(self.conn_name), menu))
-        if not self.is_opening:
-            # 测试连接、取消测试连接
-            test_conn_menu = CANCEL_TEST_CONN_ACTION \
-                if self.is_testing else TEST_CONN_ACTION
-            menu.addAction(QAction(get_icon(test_conn_menu), test_conn_menu.format(self.conn_name), menu))
+        # 如果正在打开连接，只显示取消打开连接
+        if self.is_opening:
+            menu.addAction(QAction(get_icon(CANCEL_OPEN_CONN_ACTION),
+                                   CANCEL_OPEN_CONN_ACTION.format(self.item_name), menu))
+            return
+        # 如果正在刷新连接，只显示取消刷新连接
+        if self.is_refreshing:
+            menu.addAction(QAction(get_icon(CANCEL_REFRESH_CONN_ACTION),
+                                   CANCEL_REFRESH_CONN_ACTION.format(self.item_name), menu))
+            return
+        # 如果正在测试连接，只显示取消测试连接
+        if self.is_testing:
+            menu.addAction(QAction(get_icon(CANCEL_TEST_CONN_ACTION),
+                                   CANCEL_TEST_CONN_ACTION.format(self.item_name), menu))
+            return
+
+        # 打开连接、关闭连接
+        open_menu_name = OPEN_CONN_ACTION \
+            if not self.item.childCount() else CLOSE_CONN_ACTION
+        menu.addAction(QAction(get_icon(open_menu_name), open_menu_name.format(self.item_name), menu))
+        # 测试连接
+        menu.addAction(QAction(get_icon(TEST_CONN_ACTION), TEST_CONN_ACTION.format(self.item_name), menu))
         # 编辑连接
-        menu.addAction(QAction(get_icon(EDIT_CONN_ACTION), EDIT_CONN_ACTION.format(self.conn_name), menu))
+        menu.addAction(QAction(get_icon(EDIT_CONN_ACTION), EDIT_CONN_ACTION.format(self.item_name), menu))
         menu.addSeparator()
 
         # 删除连接
-        menu.addAction(QAction(get_icon(DEL_CONN_ACTION), DEL_CONN_ACTION.format(self.conn_name), menu))
+        menu.addAction(QAction(get_icon(DEL_CONN_ACTION), DEL_CONN_ACTION.format(self.item_name), menu))
 
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_CONN_ACTION.format(self.conn_name), menu))
+        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_CONN_ACTION.format(self.item_name), menu))
 
     def test_conn(self):
         self.is_testing = True
@@ -148,41 +165,50 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def test_conn_success(self):
         self.is_testing = False
-        pop_ok(f'[{self.conn_name}]\n{TEST_CONN_SUCCESS_PROMPT}', TEST_CONN_TITLE, self.window)
+        pop_ok(f'[{self.item_name}]\n{TEST_CONN_SUCCESS_PROMPT}', TEST_CONN_TITLE, self.window)
 
     def test_conn_fail(self):
         self.is_testing = False
 
     def handle_menu_func(self, func):
         # 打开连接
-        if func == OPEN_CONN_ACTION.format(self.conn_name):
+        if func == OPEN_CONN_ACTION.format(self.item_name):
             self.open_item()
         # 取消打开连接
-        elif func == CANCEL_OPEN_CONN_ACTION.format(self.conn_name):
+        elif func == CANCEL_OPEN_CONN_ACTION.format(self.item_name):
             self.open_conn_executor.worker_terminate(self.open_item_fail)
         # 关闭连接
-        elif func == CLOSE_CONN_ACTION.format(self.conn_name):
+        elif func == CLOSE_CONN_ACTION.format(self.item_name):
             self.close_item()
         # 测试连接
-        elif func == TEST_CONN_ACTION.format(self.conn_name):
+        elif func == TEST_CONN_ACTION.format(self.item_name):
             self.test_conn()
         # 取消测试连接
-        elif func == CANCEL_TEST_CONN_ACTION.format(self.conn_name):
+        elif func == CANCEL_TEST_CONN_ACTION.format(self.item_name):
             self.test_conn_executor.worker_terminate(self.test_conn_fail)
         # 编辑连接
-        elif func == EDIT_CONN_ACTION.format(self.conn_name):
+        elif func == EDIT_CONN_ACTION.format(self.item_name):
             if self.item.childCount():
-                if pop_question(EDIT_CONN_PROMPT, EDIT_CONN_ACTION.format(self.conn_name), self.window):
+                if pop_question(EDIT_CONN_PROMPT, EDIT_CONN_ACTION.format(self.item_name), self.window):
                     self.close_item(close_for_edit=True)
             else:
                 self.edit_conn()
         # 删除连接
-        elif func == DEL_CONN_ACTION.format(self.conn_name):
-            if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.conn_name), self.window):
+        elif func == DEL_CONN_ACTION.format(self.item_name):
+            # 检查是否可以删除
+            del_prompt = self.not_allow_operate_prompt()
+            if del_prompt:
+                pop_fail(del_prompt.format(self.item_name),
+                         DEL_CONN_ACTION.format(self.item_name), self.window)
+                return
+            if pop_question(DEL_CONN_PROMPT, DEL_CONN_ACTION.format(self.item_name), self.window):
                 self.del_conn()
         # 刷新
-        elif func == REFRESH_CONN_ACTION.format(self.conn_name):
+        elif func == REFRESH_CONN_ACTION.format(self.item_name):
             self.refresh()
+        # 取消刷新
+        elif func == CANCEL_REFRESH_CONN_ACTION.format(self.item_name):
+            self.refresh_conn_executor.worker_terminate()
 
     def edit_conn(self):
         opened_record = get_item_opened_record(self.item)
@@ -216,10 +242,15 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.tree_widget.takeTopLevelItem(self.tree_widget.indexOfTopLevelItem(self.item))
 
     def refresh(self):
-        if self.is_refreshing:
+        if self.is_refreshing or self.is_opening:
             return
         # 如果连接下没有子节点，也就是连接还未打开，那么跳过
         if not self.item.childCount():
+            return
+        refresh_prompt = self.not_allow_operate_prompt()
+        if refresh_prompt:
+            pop_fail(refresh_prompt.format(self.item_name),
+                     REFRESH_CONN_ACTION.format(self.item_name), self.window)
             return
         self.refresh_conn_executor = RefreshConnExecutor(self.tree_widget, self.item, self.window,
                                                          self.refresh_db_callback,

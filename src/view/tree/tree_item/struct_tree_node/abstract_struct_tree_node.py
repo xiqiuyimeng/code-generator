@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, QVariant
-from PyQt5.QtWidgets import QAction
 
-from constant.constant import REFRESH_ACTION
-from constant.icon_enum import get_icon
 from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, save_tree_data
 
@@ -15,7 +12,6 @@ class AbstractStructTreeNode(AbstractTreeNode):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.item_name = self.item.text(0)
 
     def set_check_state(self, *args): ...
 
@@ -32,18 +28,14 @@ class AbstractStructTreeNode(AbstractTreeNode):
             parent_node = self.tree_widget.get_item_node(parent_item)
             parent_node.hide_check_box()
 
-    def do_fill_menu(self, menu):
-        # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), f'{REFRESH_ACTION}[{self.item_name}]', menu))
-
     def link_parent_node(self, parent_item=None):
         # 联动父节点变化
         parent_item = parent_item if parent_item else self.item.parent()
         if parent_item:
             parent_node = self.tree_widget.get_item_node(parent_item)
             # 如果父节点正在刷新，或包含正在刷新的节点，不触发复选框的变化
-            if parent_node.is_refreshing or parent_node.refreshing_child_count:
+            if parent_node.is_refreshing or parent_node.refreshing_child_count \
+                    or parent_node.is_opening or parent_node.opening_child_count:
                 return
             parent_node.set_check_state()
 

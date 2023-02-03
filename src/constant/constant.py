@@ -117,42 +117,50 @@ EDIT_CONN_ACTION = '编辑连接 [{}]'
 DEL_CONN_ACTION = '删除连接 [{}]'
 # 刷新连接
 REFRESH_CONN_ACTION = '刷新连接 [{}]'
+# 取消刷新连接
+CANCEL_REFRESH_CONN_ACTION = '取消刷新连接 [{}]'
 
 """关于数据库的右键菜单"""
 # 打开数据库
-OPEN_DB_MENU = '打开数据库 [{}]'
+OPEN_DB_ACTION = '打开数据库 [{}]'
 # 取消打开数据库
-CANCEL_OPEN_DB_MENU = '打开数据库 [{}]'
+CANCEL_OPEN_DB_ACTION = '打开数据库 [{}]'
 # 关闭数据库
-CLOSE_DB_MENU = '关闭数据库 [{}]'
+CLOSE_DB_ACTION = '关闭数据库 [{}]'
 # 全选所有表
-SELECT_ALL_TB_MENU = '全选所有表'
+SELECT_ALL_TB_ACTION = '全选所有表'
 # 取消选择表
-UNSELECT_TB_MENU = '取消选择表'
+UNSELECT_TB_ACTION = '取消选择表'
 # 刷新数据库
 REFRESH_DB_ACTION = '刷新数据库 [{}]'
+# 取消刷新数据库
+CANCEL_REFRESH_DB_ACTION = '取消刷新数据库 [{}]'
 
 """关于表的右键菜单"""
 # 打开表
-OPEN_TABLE_MENU = '打开表 [{}]'
+OPEN_TABLE_ACTION = '打开表 [{}]'
 # 取消打开表
-CANCEL_OPEN_TABLE_MENU = '取消打开表 [{}]'
+CANCEL_OPEN_TABLE_ACTION = '取消打开表 [{}]'
 # 关闭表
-CLOSE_TABLE_MENU = '关闭表 [{}]'
+CLOSE_TABLE_ACTION = '关闭表 [{}]'
 # 全选表中所有字段
-SELECT_ALL_FIELD_MENU = '全选 [{}] 表中所有字段'
+SELECT_ALL_FIELD_ACTION = '全选 [{}] 表中所有字段'
 # 取消选择字段
-UNSELECT_FIELD_MENU = '取消选择字段'
+UNSELECT_FIELD_ACTION = '取消选择字段'
 CLOSE_TABLE_TITLE = '关闭表'
 # 刷新数据表
 REFRESH_TB_ACTION = '刷新数据表 [{}]'
+# 取消刷新数据表
+CANCEL_REFRESH_TB_ACTION = '取消刷新数据表 [{}]'
 
 """关于结构体的右键菜单"""
-OPEN_STRUCT_ACTION = '打开[{}]'
-CLOSE_STRUCT_ACTION = '关闭[{}]'
-CANCEL_OPEN_STRUCT_ACTION = '取消打开[{}]'
-EDIT_STRUCT_ACTION = '编辑[{}]'
-DEL_STRUCT_ACTION = '删除[{}]'
+OPEN_STRUCT_ACTION = '打开 [{}]'
+CLOSE_STRUCT_ACTION = '关闭 [{}]'
+CANCEL_OPEN_STRUCT_ACTION = '取消打开 [{}]'
+EDIT_STRUCT_ACTION = '编辑 [{}]'
+DEL_STRUCT_ACTION = '删除 [{}]'
+REFRESH_STRUCT_ACTION = '刷新结构体 [{}]'
+CANCEL_REFRESH_STRUCT_ACTION = '取消刷新结构体 [{}]'
 
 EXPAND_CHILD_TABLE = '展开子表'
 COLLAPSE_CHILD_TABLE = '折叠子表'
@@ -162,8 +170,10 @@ ADD_STRUCT_ACTION = '添加结构体'
 CREATE_NEW_FOLDER_ACTION = '新建文件夹'
 SELECT_ALL_ACTION = '全选所有节点'
 UNSELECT_ACTION = '取消选择节点'
-RENAME_FOLDER_ACTION = '重命名[{}]'
-DEL_FOLDER_ACTION = '删除[{}]'
+RENAME_FOLDER_ACTION = '重命名 [{}]'
+DEL_FOLDER_ACTION = '删除 [{}]'
+REFRESH_FOLDER_ACTION = '刷新文件夹 [{}]'
+CANCEL_REFRESH_FOLDER_ACTION = '取消刷新文件 [{}]'
 
 """操作结构体提示语"""
 EDIT_STRUCT_PROMPT = '编辑结构体需要先关闭结构体，是否继续？'
@@ -534,6 +544,10 @@ SET_CURRENT_INDEX = '当前页置顶'
 
 TABLE_CLOSE_WITH_PARTIALLY_CHECKED = '以下表数据只选择了一部分，关闭表后，' \
                                      '将无法获知选中的具体数据，请全选表数据或清空选择：\n{}'
+TABLE_CLOSE_WITH_REFRESHING = '以下表处于刷新中，请等待刷新完成\n{}'
+CLOSE_REFRESHING_NODE_PROMPT = '当前节点 [{}] 正在刷新，请等待操作完成'
+CLOSE_REFRESHING_CHILD_NODE_PROMPT = '当前节点 [{}] 包含正在刷新的子节点，请等待操作完成'
+CLOSE_OPENING_CHILD_NODE_PROMPT = '当前节点 [{}] 包含正在打开的子节点，请等待操作完成'
 
 SQL_CONFIRM_SELECTED_HEADER_TXT = 'sql数据源已选数据展示'
 STRUCTURE_CONFIRM_SELECTED_HEADER_TXT = '结构体数据源已选数据展示'

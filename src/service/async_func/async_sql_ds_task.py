@@ -370,9 +370,10 @@ class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
         super().__init__(item, window, OPEN_TB_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
+        opened_record = get_item_opened_record(self.item)
         return OpenTBWorker(get_item_opened_record(self.item.parent().parent()),
                             self.item.parent().text(0), self.item.text(0),
-                            get_item_opened_record(self.item), self.item.checkState(0))
+                            opened_record, opened_record.checked)
 
 # ---------------------------------------- 打开数据表 end ---------------------------------------- #
 

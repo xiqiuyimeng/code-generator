@@ -2,7 +2,8 @@
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, OPEN_STRUCT_ACTION, \
-    CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_ACTION
+    CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
+    CANCEL_REFRESH_STRUCT_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor.async_struct_executor import OpenStructExecutor, RefreshStructExecutor
 from service.async_func.async_struct_task import DelStructExecutor
@@ -23,7 +24,6 @@ class StructTreeNode(AbstractStructTreeNode):
         self.open_struct_executor: OpenStructExecutor = ...
         self.del_struct_executor: DelStructExecutor = ...
         self.refresh_struct_executor: RefreshStructExecutor = ...
-        self.is_opening = False
 
     def open_item(self):
         # 获取打开的tab
@@ -32,8 +32,12 @@ class StructTreeNode(AbstractStructTreeNode):
         if tab_widget:
             self.tree_widget.get_current_tab_widget().setCurrentWidget(tab_widget)
         else:
+            if self.is_opening:
+                return
+            self.hide_check_box()
             # 执行打开tab页, 设置正在打开中状态
             self.is_opening = True
+            self.tree_widget.get_item_node(self.item.parent()).add_opening_child_count()
             self.open_struct_executor = OpenStructExecutor(self.item, self.window,
                                                            self.open_item_ui,
                                                            self.open_item_fail)
@@ -43,9 +47,12 @@ class StructTreeNode(AbstractStructTreeNode):
         tab = self.reopen_item(table_tab)
         self.tree_widget.get_current_tab_widget().setCurrentWidget(tab)
         self.is_opening = False
+        self.tree_widget.get_item_node(self.item.parent()).sub_opening_child_count()
+        self.show_check_box()
 
     def open_item_fail(self):
-        self.is_opening = False
+        super().open_item_fail()
+        self.show_check_box()
 
     def reopen_item(self, table_tab):
         return self.reopen_tab(table_tab, self.item_name, self.set_check_state)
@@ -77,9 +84,18 @@ class StructTreeNode(AbstractStructTreeNode):
         self.link_parent_node()
 
     def do_fill_menu(self, menu):
+        # 取消打开
+        if self.is_opening:
+            cancel_open_text = CANCEL_OPEN_STRUCT_ACTION.format(self.item_name)
+            menu.addAction(QAction(get_icon(CANCEL_OPEN_STRUCT_ACTION), cancel_open_text, menu))
+            return
+        # 取消刷新
+        if self.is_refreshing:
+            cancel_refresh_text = CANCEL_REFRESH_STRUCT_ACTION.format(self.item_name)
+            menu.addAction(QAction(get_icon(CANCEL_REFRESH_STRUCT_ACTION), cancel_refresh_text, menu))
+            return
         # 打开
-        open_struct_action = CANCEL_OPEN_STRUCT_ACTION \
-            if self.is_opening else OPEN_STRUCT_ACTION \
+        open_struct_action = OPEN_STRUCT_ACTION \
             if not get_item_opened_tab(self.item) else CLOSE_STRUCT_ACTION
         menu.addAction(QAction(get_icon(open_struct_action), open_struct_action.format(self.item_name), menu))
         menu.addSeparator()
@@ -90,7 +106,10 @@ class StructTreeNode(AbstractStructTreeNode):
         # 删除
         menu.addAction(QAction(get_icon(DEL_STRUCT_ACTION),
                                DEL_STRUCT_ACTION.format(self.item_name), menu))
-        super().do_fill_menu(menu)
+        # 刷新
+        menu.addSeparator()
+        menu.addAction(QAction(get_icon(REFRESH_STRUCT_ACTION),
+                               REFRESH_STRUCT_ACTION.format(self.item_name), menu))
 
     def handle_menu_func(self, func):
         # 打开结构体
@@ -111,8 +130,11 @@ class StructTreeNode(AbstractStructTreeNode):
                     and self.close_item():
                 self.del_struct()
         # 刷新
-        elif func == f'{REFRESH_ACTION}[{self.item_name}]':
+        elif func == REFRESH_STRUCT_ACTION.format(self.item_name):
             self.refresh()
+        # 取消刷新
+        elif func == CANCEL_REFRESH_STRUCT_ACTION.format(self.item_name):
+            self.refresh_struct_executor.worker_terminate()
 
     def edit_struct(self):
         # 如果结构体已经打开，先关闭，再进行编辑
