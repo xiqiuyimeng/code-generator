@@ -125,14 +125,15 @@ class StructTreeNode(AbstractStructTreeNode):
             editable = True
 
         if editable:
-            edit_struct_func(self.opened_item.data_type.display_name, self.tree_widget,
-                             self.window.geometry(), self.opened_item.id)
+            opened_record = get_item_opened_record(self.item)
+            edit_struct_func(opened_record.data_type.display_name, self.tree_widget,
+                             self.window.geometry(), opened_record.id)
 
     def del_struct(self):
         # 删除结构体后，应该对同级别的其他项进行重排序
         reorder_items = self.get_need_reorder_items()
-        self.del_struct_executor = DelStructExecutor(self.item, self.opened_item, reorder_items,
-                                                     self.del_struct_callback, self.window)
+        self.del_struct_executor = DelStructExecutor(self.item, get_item_opened_record(self.item),
+                                                     reorder_items, self.del_struct_callback, self.window)
         self.del_struct_executor.start()
 
     def del_struct_callback(self):

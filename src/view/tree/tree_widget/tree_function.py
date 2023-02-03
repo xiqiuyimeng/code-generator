@@ -26,6 +26,7 @@ _date_ = '2020/7/6 11:34'
 def make_sql_tree_item(tree_widget, parent, name, icon, opened_item_record=None, checkbox=None):
     """
     构造sql树的子项
+    :param tree_widget: 树部件
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象

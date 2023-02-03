@@ -49,8 +49,9 @@ class DBTreeNode(AbstractSqlTreeNode):
     def reopen_item(self, opened_items):
         # 打开库下的表节点
         make_table_items(self.tree_widget, self.item, opened_items, self.tree_widget.tree_data)
-        self.item.setExpanded(self.opened_item.expanded)
-        if self.opened_item.is_current:
+        opened_record = get_item_opened_record(self.item)
+        self.item.setExpanded(opened_record.expanded)
+        if opened_record.is_current:
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self):

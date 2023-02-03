@@ -49,8 +49,9 @@ class ConnTreeNode(AbstractSqlTreeNode):
     def reopen_item(self, opened_items):
         # 打开连接下的库节点
         make_db_items(self.tree_widget, self.item, opened_items)
-        self.item.setExpanded(self.opened_item.expanded)
-        if self.opened_item.is_current:
+        opened_record = get_item_opened_record(self.item)
+        self.item.setExpanded(opened_record.expanded)
+        if opened_record.is_current:
             self.tree_widget.set_selected_focus(self.item)
 
     def close_item(self, close_for_edit=False):
@@ -184,14 +185,16 @@ class ConnTreeNode(AbstractSqlTreeNode):
             self.refresh()
 
     def edit_conn(self):
-        edit_conn_func(self.opened_item.data_type.display_name, self.tree_widget,
-                       self.window.geometry(), self.opened_item.parent_id)
+        opened_record = get_item_opened_record(self.item)
+        edit_conn_func(opened_record.data_type.display_name, self.tree_widget,
+                       self.window.geometry(), opened_record.parent_id)
 
     def del_conn(self):
         # 在删除连接之后的连接项，应该对其进行重新排序
         reorder_items = self.get_need_reorder_items()
         tab_indexes, tab_ids = self.get_tab_indexes_and_ids()
-        self.del_conn_executor = DelConnExecutor(self.opened_item.parent_id, self.opened_item.item_name,
+        opened_record = get_item_opened_record(self.item)
+        self.del_conn_executor = DelConnExecutor(opened_record.parent_id, opened_record.item_name,
                                                  reorder_items, tab_indexes, tab_ids,
                                                  self.del_conn_callback, self.item, self.window)
         self.del_conn_executor.start()

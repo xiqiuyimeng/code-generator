@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from view.tab.tab_ui import TabTableUI
-from view.tree.tree_item.tree_item_func import get_item_opened_record, set_item_opened_tab, get_item_opened_tab, \
+from view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, \
     get_add_del_data
 
 _author_ = 'luwt'
@@ -14,8 +14,6 @@ class AbstractTreeNode:
     def __new__(cls, item: QTreeWidgetItem, tree_widget, window):
         if not hasattr(item, 'tree_node'):
             item.tree_node = object.__new__(cls)
-            # 打开数据是不会变的
-            item.tree_node.opened_item = get_item_opened_record(item)
         return item.tree_node
 
     def __init__(self, item: QTreeWidgetItem, tree_widget, window):
