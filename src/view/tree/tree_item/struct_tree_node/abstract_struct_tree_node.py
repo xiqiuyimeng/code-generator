@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt, QVariant
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import REFRESH_ACTION
@@ -23,6 +24,14 @@ class AbstractStructTreeNode(AbstractTreeNode):
         save_tree_data(self.item, self.tree_widget.tree_data)
         self.tree_widget.item_changed_executor.item_checked(self.item)
 
+    def hide_check_box(self):
+        # 隐藏复选框
+        self.item.setData(0, Qt.CheckStateRole, QVariant())
+        parent_item = self.item.parent()
+        if parent_item:
+            parent_node = self.tree_widget.get_item_node(parent_item)
+            parent_node.hide_check_box()
+
     def do_fill_menu(self, menu):
         # 刷新
         menu.addSeparator()
@@ -33,6 +42,9 @@ class AbstractStructTreeNode(AbstractTreeNode):
         parent_item = parent_item if parent_item else self.item.parent()
         if parent_item:
             parent_node = self.tree_widget.get_item_node(parent_item)
+            # 如果父节点正在刷新，或包含正在刷新的节点，不触发复选框的变化
+            if parent_node.is_refreshing or parent_node.refreshing_child_count:
+                return
             parent_node.set_check_state()
 
     def get_need_reorder_items(self):

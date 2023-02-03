@@ -7,6 +7,7 @@ from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThread
     RefreshMovieThreadExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
+from service.system_storage.opened_tree_item_sqlite import CheckedEnum, OpenedTreeItemSqlite
 from service.system_storage.sqlite_abc import transactional
 from service.system_storage.struct_sqlite import StructSqlite
 from service.util.struct_util import *
@@ -128,9 +129,10 @@ class OpenStructExecutor(IconMovieThreadExecutor):
 class RefreshStructWorker(ThreadWorkerABC):
     success_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, struct_parser_type, table_tab):
+    def __init__(self, opened_struct_item, table_tab):
         super().__init__()
-        self.struct_parser_type = struct_parser_type
+        self.opened_struct_item = opened_struct_item
+        self.struct_parser_type = opened_struct_item.data_type.parse_executor
         self.table_tab = table_tab
         self.struct_info = ...
 
@@ -153,6 +155,9 @@ class RefreshStructWorker(ThreadWorkerABC):
     @transactional
     def refresh_struct(self, column_list):
         self.modifying_db_task = True
+        # 更新表的复选框状态
+        self.opened_struct_item.checked = CheckedEnum.unchecked.value
+        OpenedTreeItemSqlite().update_checked(self.opened_struct_item)
         # 保存新的列信息
         DsTableColInfoSqlite().refresh_tab_cols(self.table_tab.id, column_list)
         self.table_tab.col_list = column_list
@@ -171,8 +176,7 @@ class RefreshStructExecutor(RefreshMovieThreadExecutor):
         super().__init__(tree_widget, item, window, '刷新结构体', success_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
-        struct_parser_type = get_item_opened_record(self.item).data_type.parse_executor
-        return RefreshStructWorker(struct_parser_type, self.table_tab)
+        return RefreshStructWorker(get_item_opened_record(self.item), self.table_tab)
 
 
 # ---------------------------------------- 刷新结构体 end ---------------------------------------- #
@@ -201,7 +205,7 @@ class RefreshFolderWorker(ThreadWorkerABC):
                 if not column_list:
                     # 错误处理
                     raise Exception(f'刷新失败，解析结构体结果为空: [{struct_info.struct_name}]')
-                self.refresh_struct(column_list, table_tab)
+                self.refresh_struct(column_list, table_tab, opened_record)
                 # 发射当前成功结构体信号
                 self.refresh_item_signal.emit((item, table_tab))
             else:
@@ -210,8 +214,11 @@ class RefreshFolderWorker(ThreadWorkerABC):
         self.success_signal.emit()
 
     @transactional
-    def refresh_struct(self, column_list, table_tab):
+    def refresh_struct(self, column_list, table_tab, opened_record):
         self.modifying_db_task = True
+        # 刷新 结构体 选中状态
+        opened_record.checked = CheckedEnum.unchecked.value
+        OpenedTreeItemSqlite().update_checked(opened_record)
         # 保存新的列信息
         DsTableColInfoSqlite().refresh_tab_cols(table_tab.id, column_list)
         table_tab.col_list = column_list
@@ -266,6 +273,7 @@ class RefreshFolderExecutor(RefreshMovieThreadExecutor):
                 "item": folder_item,
                 "item_icon": folder_item.icon(0),
             }
+            self.item_pre_process(folder_item)
         for struct_values in self.struct_items:
             struct_item = struct_values[0]
             self.item_dict[id(struct_item)] = {

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt, QVariant
 from PyQt5.QtWidgets import QAction
 
 from constant.constant import CANCEL_OPEN_TABLE_MENU, OPEN_TABLE_MENU, CLOSE_TABLE_MENU, REFRESH_ACTION, \
@@ -7,7 +8,7 @@ from constant.icon_enum import get_icon
 from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
-    link_table_checkbox, save_tree_data, get_add_del_data
+    link_table_checkbox, save_tree_data, get_add_del_data, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -65,6 +66,14 @@ class TableTreeNode(AbstractSqlTreeNode):
         # 当表格表头变化，联动当前节点表头复选框变化
         self.item.setCheckState(0, check_state)
         self.save_check_state()
+
+    def hide_check_box(self):
+        # 隐藏复选框
+        self.item.setData(0, Qt.CheckStateRole, QVariant())
+
+    def show_check_box(self):
+        # 显示复选框，选中状态根据 opened record 决定
+        self.item.setCheckState(0, get_item_opened_record(self.item).checked)
 
     def do_fill_menu(self, menu):
         open_menu_name = CANCEL_OPEN_TABLE_MENU.format(self.table_name) \

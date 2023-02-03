@@ -94,7 +94,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         self.update(opened_item)
 
     def add_opened_child_item(self, child_item_names, opened_item_id, child_level,
-                              ds_type, data_type, insert_db=True):
+                              ds_type, data_type, init_checked=True, insert_db=True):
         is_current = CurrentEnum.not_current.value
         expanded = ExpandedEnum.collapsed.value
         opened_child_items = list()
@@ -106,7 +106,8 @@ class OpenedTreeItemSqlite(SqliteBasic):
             opened_child_item.parent_id = opened_item_id
             opened_child_item.level = child_level
             opened_child_item.ds_type = ds_type
-            opened_child_item.checked = CheckedEnum.unchecked.value
+            if init_checked:
+                opened_child_item.checked = CheckedEnum.unchecked.value
             opened_child_item.item_order = index
             opened_child_item.data_type = data_type
             opened_child_items.append(opened_child_item)
@@ -190,3 +191,9 @@ class OpenedTreeItemSqlite(SqliteBasic):
             reorder_item.item_order = opened_item.item_order
             update_opened_items.append(reorder_item)
         self.batch_update(update_opened_items)
+
+    def update_checked(self, opened_record):
+        update_param = OpenedTreeItem()
+        update_param.id = opened_record.id
+        update_param.checked = opened_record.checked
+        self.update(update_param)

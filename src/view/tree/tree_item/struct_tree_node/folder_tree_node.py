@@ -99,7 +99,7 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 对于文件夹节点而言，由下而上联动复选框，需要考虑当前节点状态，以及应该向上传递的状态
         check_state = self.calculate_check_state()
         self.item.setCheckState(0, check_state)
-        self.change_check_box(check_state, False)
+        self.save_check_state()
         self.link_parent_node()
 
     def calculate_check_state(self):
@@ -112,6 +112,12 @@ class FolderTreeNode(AbstractStructTreeNode):
             return check_set.pop()
         else:
             return Qt.PartiallyChecked
+
+    def show_check_box(self):
+        check_state = self.calculate_check_state()
+        self.item.setCheckState(0, check_state)
+        self.tree_widget.item_changed_executor.item_checked(self.item)
+        self.link_parent_node()
 
     def del_folder(self):
         # 删除结构体后，应该对同级别的其他项进行重排序

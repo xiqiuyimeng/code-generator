@@ -8,7 +8,8 @@ from service.async_func.async_struct_executor.async_struct_executor import OpenS
 from service.async_func.async_struct_task import DelStructExecutor
 from view.box.message_box import pop_question
 from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data
+from view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data, \
+    get_item_opened_record
 from view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
@@ -69,6 +70,11 @@ class StructTreeNode(AbstractStructTreeNode):
         # 如果是点击，联动父节点变化
         if clicked:
             self.link_parent_node()
+
+    def show_check_box(self):
+        # 显示复选框，选中状态根据 opened record 决定
+        self.item.setCheckState(0, get_item_opened_record(self.item).checked)
+        self.link_parent_node()
 
     def do_fill_menu(self, menu):
         # 打开

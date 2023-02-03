@@ -161,6 +161,8 @@ class DBTreeNode(AbstractSqlTreeNode):
         # 首先处理删除的元素
         for delete_item_record in delete_items:
             del_item = self.tree_widget.get_item_by_opened_id(delete_item_record.id)
+            # 停止动画
+            self.stop_refresh_movie(del_item, refresh_executor)
             del_tab = get_item_opened_tab(del_item)
             if del_tab:
                 del_tab_index = self.tree_widget.get_current_tab_widget().indexOf(del_tab)
@@ -174,10 +176,9 @@ class DBTreeNode(AbstractSqlTreeNode):
             set_item_opened_record(update_item, exists_item_record)
             # 只停止没有打开tab表的节点动画
             if not get_item_opened_tab(update_item):
-                if refresh_executor:
-                    refresh_executor.stop_one_movie(update_item)
-                else:
-                    self.refresh_db_executor.stop_one_movie(update_item)
+                self.stop_refresh_movie(update_item, refresh_executor)
+            # 显示子节点复选框
+            self.tree_widget.get_item_node(update_item).show_check_box()
         # 最后处理需要插入的节点元素
         icon = get_icon(get_item_opened_record(self.item).data_type.tb_icon_name)
         for new_item_record in new_items:
@@ -185,6 +186,12 @@ class DBTreeNode(AbstractSqlTreeNode):
             new_item = make_sql_tree_item(self.tree_widget, self.item, new_item_record.item_name,
                                           icon, new_item_record, Qt.Unchecked)
             self.item.insertChild(new_item_record.item_order, new_item)
+
+    def stop_refresh_movie(self, item, executor):
+        if executor:
+            executor.stop_one_movie(item)
+        else:
+            self.refresh_db_executor.stop_one_movie(item)
 
     def refresh_cols_callback(self, table_tab):
         # 刷新tab页面

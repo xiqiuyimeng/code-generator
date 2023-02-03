@@ -15,7 +15,8 @@ from service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem
+from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem, \
+    CheckedEnum
 from service.system_storage.sqlite_abc import transactional
 from service.util.refresh_util import deal_opened_items, refresh_tab_cols
 from view.box.message_box import pop_ok
@@ -127,7 +128,8 @@ class OpenConnWorker(ConnWorkerABC):
         db_level = SqlTreeItemLevel.db_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
         return opened_tree_item_sqlite.add_opened_child_item(db_names, self.conn_opened_item.id, db_level,
-                                                             ds_type, self.conn_opened_item.data_type)
+                                                             ds_type, self.conn_opened_item.data_type,
+                                                             init_checked=False)
 
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_item.item_name}]{OPEN_CONN_FAIL_PROMPT}'
@@ -166,7 +168,7 @@ class RefreshConnWorker(ConnWorkerABC):
         level = SqlTreeItemLevel.db_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
         exists_db_items = deal_opened_items(db_names, self.conn_opened_item.id, data_type,
-                                            level, ds_type, self.db_changed_signal)
+                                            level, ds_type, self.db_changed_signal, False)
 
         # 读取库下的表名列表
         if exists_db_items:
@@ -186,10 +188,10 @@ class RefreshConnWorker(ConnWorkerABC):
         if not child_opened_items:
             return
         tb_names = executor.open_db(db_item.item_name)
-        exists_items = deal_opened_items(tb_names, db_item.id, data_type,
-                                         level, ds_type, self.table_changed_signal)
-        if exists_items:
-            refresh_tab_cols(db_item.item_name, executor, exists_items, self.col_signal)
+        exists_tb_items = deal_opened_items(tb_names, db_item.id, data_type, level,
+                                            ds_type, self.table_changed_signal)
+        if exists_tb_items:
+            refresh_tab_cols(db_item.item_name, executor, exists_tb_items, self.col_signal)
         # 库刷新完成，发射信号
         self.db_finished_signal.emit(db_item.id)
 
@@ -392,6 +394,9 @@ class RefreshTBWorker(ConnWorkerABC):
     def do_executor_func(self, executor: SqlDBExecutor):
         # 首先检查表本身是否存在
         executor.check_tb(self.db_name, self.tb_name)
+        # 更新表的复选框状态
+        self.opened_table_item.checked = CheckedEnum.unchecked.value
+        OpenedTreeItemSqlite().update_checked(self.opened_table_item)
         # 如果表之前tab页已经打开，尝试获取新的列数据
         if self.tab:
             columns = executor.open_tb(self.db_name, self.tb_name, check=False)

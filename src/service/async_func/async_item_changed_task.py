@@ -27,7 +27,7 @@ class ItemChangedWorker(ThreadWorkerABC):
             elif method == 'current_item_changed':
                 OpenedTreeItemSqlite().item_current_changed(opened_item)
             elif method == 'item_checked':
-                OpenedTreeItemSqlite().update(opened_item)
+                OpenedTreeItemSqlite().update_checked(opened_item)
             log.debug(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):

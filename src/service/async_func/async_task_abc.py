@@ -270,18 +270,25 @@ class RefreshMovieThreadExecutor(IconMovieLoadingMaskThreadExecutor):
         super().__init__(*args)
 
     def item_pre_process(self, item):
-        self.tree_widget.get_item_node(item).is_refreshing = True
+        node = self.tree_widget.get_item_node(item)
+        node.is_refreshing = True
+        # 隐藏节点复选框
+        node.hide_check_box()
 
     def item_post_process(self, item):
-        self.tree_widget.get_item_node(item).is_refreshing = False
+        node = self.tree_widget.get_item_node(item)
+        node.is_refreshing = False
+        # 在每个节点调用的时候，都触发下减少父节点记录的刷新节点数
+        self.sub_parent_refreshed_child_count(item)
+        node.show_check_box()
 
     def pre_process(self):
-        super().pre_process()
+        # 在开启线程时进行
+        # 以当前节点为顶级节点，记录其下子节点刷新节点数
+        self.add_child_refreshed_child_count(self.item)
+        # 从当前节点向上传递刷新节点数
         self.add_parent_refreshed_child_count()
-
-    def post_process(self):
-        super().post_process()
-        self.sub_parent_refreshed_child_count()
+        super().pre_process()
 
     def add_parent_refreshed_child_count(self):
         # 向上传递刷新节点数的变化
@@ -289,8 +296,22 @@ class RefreshMovieThreadExecutor(IconMovieLoadingMaskThreadExecutor):
         if parent_item:
             self.tree_widget.get_item_node(parent_item).add_refreshing_child_count()
 
-    def sub_parent_refreshed_child_count(self):
+    def add_child_refreshed_child_count(self, item):
+        # 找出当前节点下刷新节点数，递归向下处理
+        child_count = item.childCount()
+        if child_count:
+            for idx in range(child_count):
+                child_item = item.child(idx)
+                child_node = self.tree_widget.get_item_node(child_item)
+                # 只记录正在刷新的节点
+                if not child_node.is_refreshing:
+                    continue
+                self.tree_widget.get_item_node(item).refreshing_child_count += 1
+                # 递归处理子节点
+                self.add_child_refreshed_child_count(child_item)
+
+    def sub_parent_refreshed_child_count(self, item):
         # 向上传递刷新节点数的变化
-        parent_item = self.item.parent()
+        parent_item = item.parent()
         if parent_item:
             self.tree_widget.get_item_node(parent_item).sub_refreshing_child_count()

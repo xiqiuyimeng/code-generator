@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 from view.tab.tab_ui import TabTableUI
@@ -47,9 +46,6 @@ class AbstractTreeNode:
                 # 连接表头复选框变化信号
                 tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
                     lambda check_state: check_state_func(check_state))
-        # 将当前项置为非选中
-        check_state_func(Qt.Unchecked)
-        self.tree_widget.item_changed_executor.item_checked(self.item)
         # 清空选中数据
         del_data = get_add_del_data(self.item)
         self.tree_widget.tree_data.del_node(del_data)
@@ -65,6 +61,9 @@ class AbstractTreeNode:
     def sub_refreshing_child_count(self):
         # 如果当前刷新子节点数为1，那么这次增加之后，需要传递给上层节点
         self.refreshing_child_count -= 1
+        # 如果当前节点正在刷新，提交数量变化，应由当前节点触发，而非子节点，否则会多次提交
+        if self.is_refreshing:
+            return
         if self.refreshing_child_count == 0:
             parent_item = self.item.parent()
             if parent_item:
@@ -81,6 +80,10 @@ class AbstractTreeNode:
     def close_item(self): ...
 
     def change_check_box(self, check_state, clicked): ...
+
+    def hide_check_box(self): ...
+
+    def show_check_box(self): ...
 
     def do_fill_menu(self, menu): ...
 

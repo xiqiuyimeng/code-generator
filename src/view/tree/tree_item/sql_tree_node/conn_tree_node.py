@@ -237,6 +237,8 @@ class ConnTreeNode(AbstractSqlTreeNode):
         # 首先处理删除的元素
         for delete_item_record in delete_items:
             del_item = self.tree_widget.get_item_by_opened_id(delete_item_record.id)
+            # 停止动画
+            self.refresh_conn_executor.stop_one_movie(del_item)
             # 如果存在子节点
             if del_item.childCount():
                 for del_index in range(del_item.childCount()):

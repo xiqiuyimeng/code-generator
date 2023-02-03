@@ -9,14 +9,14 @@ _date_ = '2023/1/29 20:55'
 
 
 @transactional
-def deal_opened_items(item_names, parent_id, data_type, level, ds_type, changed_signal):
+def deal_opened_items(item_names, parent_id, data_type, level, ds_type, changed_signal, init_checked=True):
     tree_item_sqlite = OpenedTreeItemSqlite()
     # 获取本地库中缓存的数据
     child_opened_items = tree_item_sqlite.get_children(parent_id, level, ds_type)
     child_opened_item_dict = dict(map(lambda x: (x.item_name, x), child_opened_items))
     # 组装新的元素
-    refreshed_items = tree_item_sqlite.add_opened_child_item(item_names, parent_id, level,
-                                                             ds_type, data_type, insert_db=False)
+    refreshed_items = tree_item_sqlite.add_opened_child_item(item_names, parent_id, level, ds_type,
+                                                             data_type, init_checked, insert_db=False)
     # 将元素进行对比，处理策略：
     # new_items 为之前不存在的新元素，对于这些元素，需要入库
     # exists_items 为之前已经存在的元素，对于这些元素，应该更新为最新的数据
