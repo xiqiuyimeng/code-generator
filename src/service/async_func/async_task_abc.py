@@ -197,11 +197,9 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
         if tab:
             if self.tab_widget is Ellipsis:
                 self.tab_widget = tab.parent().parent()
-            tab_index = self.tab_widget.indexOf(tab)
             tab_dict = {
                 "tab": tab,
-                "tab_index": tab_index,
-                "tab_icon": self.tab_widget.tabIcon(tab_index),
+                "tab_icon": self.tab_widget.tabIcon(self.tab_widget.indexOf(tab)),
                 "loading_mask": RefreshLoadingMaskWidget(window, tab, QMovie(self.loading_gif))
             }
         else:
@@ -218,7 +216,7 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
             item = value_dict.get('item')
             tab_dict = value_dict.get('tab_dict')
             if tab_dict:
-                tab_index = tab_dict.get('tab_index')
+                tab_index = self.tab_widget.indexOf(tab_dict.get('tab'))
                 self.tab_widget.setTabIcon(tab_index, current_icon)
                 loading_mask = tab_dict.get('loading_mask')
                 loading_mask.start()
@@ -240,11 +238,10 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
         item_icon = value_dict.get('item_icon')
         tab_dict = value_dict.get('tab_dict')
         if tab_dict:
-            tab_index = tab_dict.get('tab_index')
             tab_icon = tab_dict.get('tab_icon')
             loading_mask = tab_dict.get('loading_mask')
             loading_mask.stop()
-            self.tab_widget.setTabIcon(tab_index, tab_icon)
+            self.tab_widget.setTabIcon(self.tab_widget.indexOf(tab_dict.get('tab')), tab_icon)
         item.setIcon(0, item_icon)
         self.item_post_process(item)
 

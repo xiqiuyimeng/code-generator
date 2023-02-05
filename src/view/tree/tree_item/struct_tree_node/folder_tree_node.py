@@ -54,7 +54,7 @@ class FolderTreeNode(AbstractStructTreeNode):
                                    CANCEL_REFRESH_FOLDER_ACTION.format(self.item_name), menu))
             return
         # 当文件夹下存在正在刷新或正在打开的节点时，不显示选择子节点菜单
-        if not (self.refreshing_child_count and self.opening_child_count):
+        if self.refreshing_child_count + self.opening_child_count == 0:
             # 如果当前节点复选框状态为全选，菜单应该增加取消全选
             if self.item.checkState(0) == Qt.Checked:
                 menu.addAction(QAction(get_icon(UNSELECT_ACTION), UNSELECT_ACTION, menu))
