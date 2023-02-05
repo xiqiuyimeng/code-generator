@@ -64,7 +64,7 @@ class FolderTreeNode(AbstractStructTreeNode):
                 menu.addAction(QAction(get_icon(UNSELECT_ACTION), UNSELECT_ACTION, menu))
             else:
                 # 如果当前节点复选框状态为未选择，菜单应该增加全选
-                menu.addAction(QAction(SELECT_ALL_ACTION, menu))
+                menu.addAction(QAction(get_icon(SELECT_ALL_ACTION), SELECT_ALL_ACTION, menu))
             menu.addSeparator()
 
         # 重命名

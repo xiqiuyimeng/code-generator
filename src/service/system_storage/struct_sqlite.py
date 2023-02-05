@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 
+from logger.log import logger as log
 from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
 from service.system_storage.struct_type import mapping_struct_type
-from logger.log import logger as log
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:49'

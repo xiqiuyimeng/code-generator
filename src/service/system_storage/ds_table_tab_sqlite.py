@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
+from logger.log import logger as log
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
-from logger.log import logger as log
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:30'
