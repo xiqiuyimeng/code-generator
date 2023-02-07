@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QMenu, QAction
+from PyQt5.QtWidgets import QMenu
 
 from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
-    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_ACTION, REFRESH_CONN_ACTION, \
+    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_CONN_ACTION, \
     CANCEL_REFRESH_CONN_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
@@ -124,38 +124,30 @@ class ConnTreeNode(AbstractSqlTreeNode):
         menu.addMenu(add_conn_menu)
         menu.addSeparator()
 
-        # 如果正在打开连接，只显示取消打开连接
-        if self.is_opening:
-            menu.addAction(QAction(get_icon(CANCEL_OPEN_CONN_ACTION),
-                                   CANCEL_OPEN_CONN_ACTION.format(self.item_name), menu))
-            return
-        # 如果正在刷新连接，只显示取消刷新连接
-        if self.is_refreshing:
-            menu.addAction(QAction(get_icon(CANCEL_REFRESH_CONN_ACTION),
-                                   CANCEL_REFRESH_CONN_ACTION.format(self.item_name), menu))
+        # 取消打开和取消刷新
+        if self.add_cancel_open_refresh_menu(CANCEL_OPEN_CONN_ACTION,
+                                             CANCEL_REFRESH_CONN_ACTION, menu):
             return
         # 如果正在测试连接，只显示取消测试连接
         if self.is_testing:
-            menu.addAction(QAction(get_icon(CANCEL_TEST_CONN_ACTION),
-                                   CANCEL_TEST_CONN_ACTION.format(self.item_name), menu))
+            self.add_menu(CANCEL_TEST_CONN_ACTION, menu)
             return
 
         # 打开连接、关闭连接
         open_menu_name = OPEN_CONN_ACTION \
             if not self.item.childCount() else CLOSE_CONN_ACTION
-        menu.addAction(QAction(get_icon(open_menu_name), open_menu_name.format(self.item_name), menu))
+        self.add_menu(open_menu_name, menu)
         # 测试连接
-        menu.addAction(QAction(get_icon(TEST_CONN_ACTION), TEST_CONN_ACTION.format(self.item_name), menu))
+        self.add_menu(TEST_CONN_ACTION, menu)
         # 编辑连接
-        menu.addAction(QAction(get_icon(EDIT_CONN_ACTION), EDIT_CONN_ACTION.format(self.item_name), menu))
+        self.add_menu(EDIT_CONN_ACTION, menu)
         menu.addSeparator()
 
         # 删除连接
-        menu.addAction(QAction(get_icon(DEL_CONN_ACTION), DEL_CONN_ACTION.format(self.item_name), menu))
+        self.add_menu(DEL_CONN_ACTION, menu)
 
         # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_CONN_ACTION.format(self.item_name), menu))
+        self.add_refresh_menu(REFRESH_CONN_ACTION, menu)
 
     def test_conn(self):
         self.is_testing = True

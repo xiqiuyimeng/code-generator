@@ -10,6 +10,19 @@ _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
 
 
+def convert_tb_data(db_record):
+    table_info = DsTableColInfo()
+    table_info.col_name = db_record.get('name')
+    table_info.full_data_type = db_record.get('type')
+    table_info.is_pk = db_record.get('pk')
+    table_info.checked = CheckedEnum.unchecked.value
+    # sqlite 没有注释
+    table_info.col_comment = ''
+    table_info.handle_data_type()
+    table_info.col_type = ColTypeEnum.col.value
+    return table_info
+
+
 class SqliteDBExecutor(SqlDBExecutor):
 
     def __init__(self, *args):
@@ -35,16 +48,4 @@ class SqliteDBExecutor(SqlDBExecutor):
     def open_tb(self, db, tb, check=True):
         query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(tb)
         db_records = self.get_data(query_col_sql)
-        return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
-
-    def convert_tb_data(self, db_record):
-        table_info = DsTableColInfo()
-        table_info.col_name = db_record.get('name')
-        table_info.full_data_type = db_record.get('type')
-        table_info.is_pk = db_record.get('pk')
-        table_info.checked = CheckedEnum.unchecked.value
-        # sqlite 没有注释
-        table_info.col_comment = ''
-        table_info.handle_data_type()
-        table_info.col_type = ColTypeEnum.col.value
-        return table_info
+        return tuple(map(lambda x: convert_tb_data(x), db_records.as_dict(ordered=True)))

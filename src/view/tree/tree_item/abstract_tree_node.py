@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt5.QtWidgets import QTreeWidgetItem, QAction
 
 from constant.constant import CLOSE_REFRESHING_NODE_PROMPT, CLOSE_REFRESHING_CHILD_NODE_PROMPT, \
     CLOSE_OPENING_CHILD_NODE_PROMPT
+from constant.icon_enum import get_icon
 from view.tab.tab_ui import TabTableUI
 from view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, \
     get_add_del_data
@@ -103,6 +104,30 @@ class AbstractTreeNode:
             return CLOSE_REFRESHING_CHILD_NODE_PROMPT
         elif self.opening_child_count:
             return CLOSE_OPENING_CHILD_NODE_PROMPT
+
+    def add_open_close_table_menu(self, open_table_action_text, close_table_action_text, menu):
+        open_table_action = open_table_action_text \
+            if not get_item_opened_tab(self.item) else close_table_action_text
+        self.add_menu(open_table_action, menu)
+
+    def add_cancel_open_refresh_menu(self, cancel_open_action_text, cancel_refresh_action_text, menu):
+        # 如果正在打开，只显示取消打开
+        if self.is_opening:
+            self.add_menu(cancel_open_action_text, menu)
+            return True
+        # 如果正在刷新，只显示取消刷新菜单
+        if self.is_refreshing:
+            self.add_menu(cancel_refresh_action_text, menu)
+            return True
+
+    def add_refresh_menu(self, refresh_action_text, menu):
+        # 刷新
+        menu.addSeparator()
+        self.add_menu(refresh_action_text, menu)
+
+    def add_menu(self, action_text, menu, with_item_name=True):
+        action_display_text = action_text.format(self.item_name) if with_item_name else action_text
+        menu.addAction(QAction(get_icon(action_text), action_display_text, menu))
 
     def open_item(self): ...
 

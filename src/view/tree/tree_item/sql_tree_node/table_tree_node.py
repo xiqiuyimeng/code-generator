@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, QVariant
-from PyQt5.QtWidgets import QAction
 
-from constant.constant import CANCEL_OPEN_TABLE_ACTION, OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_ACTION, \
-    REFRESH_TB_ACTION, CANCEL_REFRESH_TB_ACTION
-from constant.icon_enum import get_icon
+from constant.constant import CANCEL_OPEN_TABLE_ACTION, OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, \
+    CANCEL_REFRESH_TB_ACTION
 from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
 from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
@@ -87,23 +85,15 @@ class TableTreeNode(AbstractSqlTreeNode):
         self.item.setCheckState(0, get_item_opened_record(self.item).checked)
 
     def do_fill_menu(self, menu):
-        # 如果正在打开表，只显示取消打开表
-        if self.is_opening:
-            menu.addAction(QAction(get_icon(CANCEL_OPEN_TABLE_ACTION),
-                                   CANCEL_OPEN_TABLE_ACTION.format(self.item_name), menu))
+        # 取消打开和取消刷新
+        if self.add_cancel_open_refresh_menu(CANCEL_OPEN_TABLE_ACTION,
+                                             CANCEL_REFRESH_TB_ACTION, menu):
             return
-        # 如果正在刷新，只显示取消刷新菜单
-        if self.is_refreshing:
-            menu.addAction(QAction(get_icon(CANCEL_REFRESH_TB_ACTION),
-                                   CANCEL_REFRESH_TB_ACTION.format(self.item_name), menu))
-            return
-        open_menu_name = OPEN_TABLE_ACTION \
-            if not get_item_opened_tab(self.item) else CLOSE_TABLE_ACTION
-        menu.addAction(QAction(get_icon(open_menu_name), open_menu_name.format(self.item_name), menu))
+        # 添加打开或关闭菜单
+        self.add_open_close_table_menu(OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, menu)
 
         # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_TB_ACTION.format(self.item_name), menu))
+        self.add_refresh_menu(REFRESH_TB_ACTION, menu)
 
     def handle_menu_func(self, func):
         # 打开表

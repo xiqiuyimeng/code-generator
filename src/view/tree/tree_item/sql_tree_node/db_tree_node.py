@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAction
 
 from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_ACTION, OPEN_DB_ACTION, CLOSE_DB_ACTION, \
-    SELECT_ALL_TB_ACTION, UNSELECT_TB_ACTION, CLOSE_DB_PROMPT, REFRESH_ACTION, OPEN_DB_TITLE, REFRESH_DB_ACTION, \
+    SELECT_ALL_TB_ACTION, UNSELECT_TB_ACTION, CLOSE_DB_PROMPT, OPEN_DB_TITLE, REFRESH_DB_ACTION, \
     CANCEL_REFRESH_DB_ACTION
 from constant.icon_enum import get_icon
 from service.async_func.async_sql_conn_task import CloseDBExecutor
@@ -111,37 +110,29 @@ class DBTreeNode(AbstractSqlTreeNode):
         return tab_indexes, tab_ids
 
     def do_fill_menu(self, menu):
-        # 如果正在打开库，只显示取消打开库
-        if self.is_opening:
-            menu.addAction(QAction(get_icon(CANCEL_OPEN_DB_ACTION),
-                                   CANCEL_OPEN_DB_ACTION.format(self.item_name), menu))
-            return
-        # 如果正在刷新库，只显示取消刷新库
-        if self.is_refreshing:
-            menu.addAction(QAction(get_icon(CANCEL_REFRESH_DB_ACTION),
-                                   CANCEL_REFRESH_DB_ACTION.format(self.item_name), menu))
+        # 取消打开和取消刷新
+        if self.add_cancel_open_refresh_menu(CANCEL_OPEN_DB_ACTION,
+                                             CANCEL_REFRESH_DB_ACTION, menu):
             return
 
         if self.item.childCount():
             check_state = check_table_status(self.item)
-            menu.addAction(QAction(get_icon(CLOSE_DB_ACTION),
-                                   CLOSE_DB_ACTION.format(self.item_name), menu))
+            self.add_menu(CLOSE_DB_ACTION, menu)
             # 全选时：添加取消选择菜单
             if check_state[0]:
-                menu.addAction(QAction(get_icon(UNSELECT_TB_ACTION), UNSELECT_TB_ACTION, menu))
+                self.add_menu(UNSELECT_TB_ACTION, menu)
             # 部分选中时：添加全选菜单和取消选择菜单
             elif check_state[1]:
-                menu.addAction(QAction(get_icon(SELECT_ALL_TB_ACTION), SELECT_ALL_TB_ACTION, menu))
-                menu.addAction(QAction(get_icon(UNSELECT_TB_ACTION), UNSELECT_TB_ACTION, menu))
+                self.add_menu(SELECT_ALL_TB_ACTION, menu)
+                self.add_menu(UNSELECT_TB_ACTION, menu)
             else:
                 # 都未选中时：添加全选菜单
-                menu.addAction(QAction(get_icon(SELECT_ALL_TB_ACTION), SELECT_ALL_TB_ACTION, menu))
+                self.add_menu(SELECT_ALL_TB_ACTION, menu)
         else:
-            menu.addAction(QAction(get_icon(OPEN_DB_ACTION), OPEN_DB_ACTION.format(self.item_name), menu))
+            self.add_menu(OPEN_DB_ACTION, menu)
 
         # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_ACTION), REFRESH_DB_ACTION.format(self.item_name), menu))
+        self.add_refresh_menu(REFRESH_DB_ACTION, menu)
 
     def handle_menu_func(self, func):
         # 打开数据库

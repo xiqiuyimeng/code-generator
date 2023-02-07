@@ -46,36 +46,32 @@ class FolderTreeNode(AbstractStructTreeNode):
         menu.addSeparator()
 
         # 新建文件夹
-        menu.addAction(QAction(get_icon(CREATE_NEW_FOLDER_ACTION), CREATE_NEW_FOLDER_ACTION, menu))
+        self.add_menu(CREATE_NEW_FOLDER_ACTION, menu, with_item_name=False)
 
         # 取消刷新
         if self.is_refreshing:
-            menu.addAction(QAction(get_icon(CANCEL_REFRESH_FOLDER_ACTION),
-                                   CANCEL_REFRESH_FOLDER_ACTION.format(self.item_name), menu))
+            self.add_menu(CANCEL_REFRESH_FOLDER_ACTION, menu)
             return
         # 当文件夹下存在正在刷新或正在打开的节点时，不显示选择子节点菜单
         if self.refreshing_child_count + self.opening_child_count == 0:
             # 如果当前节点复选框状态为全选，菜单应该增加取消全选
             if self.item.checkState(0) == Qt.Checked:
-                menu.addAction(QAction(get_icon(UNSELECT_ACTION), UNSELECT_ACTION, menu))
+                self.add_menu(UNSELECT_ACTION, menu, with_item_name=False)
             elif self.item.checkState(0) == Qt.PartiallyChecked:
                 # 如果当前节点复选框状态为部分选择，菜单应该增加全选和取消全选
-                menu.addAction(QAction(get_icon(SELECT_ALL_ACTION), SELECT_ALL_ACTION, menu))
-                menu.addAction(QAction(get_icon(UNSELECT_ACTION), UNSELECT_ACTION, menu))
+                self.add_menu(SELECT_ALL_ACTION, menu, with_item_name=False)
+                self.add_menu(UNSELECT_ACTION, menu, with_item_name=False)
             else:
                 # 如果当前节点复选框状态为未选择，菜单应该增加全选
-                menu.addAction(QAction(get_icon(SELECT_ALL_ACTION), SELECT_ALL_ACTION, menu))
+                self.add_menu(SELECT_ALL_ACTION, menu, with_item_name=False)
             menu.addSeparator()
 
         # 重命名
-        menu.addAction(QAction(get_icon(RENAME_FOLDER_ACTION), RENAME_FOLDER_ACTION.format(self.item_name), menu))
+        self.add_menu(RENAME_FOLDER_ACTION, menu)
         # 删除
-        menu.addAction(QAction(get_icon(DEL_FOLDER_ACTION),
-                               DEL_FOLDER_ACTION.format(self.item_name), menu))
+        self.add_menu(DEL_FOLDER_ACTION, menu)
         # 刷新
-        menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_FOLDER_ACTION),
-                               REFRESH_FOLDER_ACTION.format(self.item_name), menu))
+        self.add_refresh_menu(REFRESH_FOLDER_ACTION, menu)
 
     def handle_menu_func(self, func):
         # 新建文件夹

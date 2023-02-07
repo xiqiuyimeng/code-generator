@@ -84,32 +84,21 @@ class StructTreeNode(AbstractStructTreeNode):
         self.link_parent_node()
 
     def do_fill_menu(self, menu):
-        # 取消打开
-        if self.is_opening:
-            cancel_open_text = CANCEL_OPEN_STRUCT_ACTION.format(self.item_name)
-            menu.addAction(QAction(get_icon(CANCEL_OPEN_STRUCT_ACTION), cancel_open_text, menu))
-            return
-        # 取消刷新
-        if self.is_refreshing:
-            cancel_refresh_text = CANCEL_REFRESH_STRUCT_ACTION.format(self.item_name)
-            menu.addAction(QAction(get_icon(CANCEL_REFRESH_STRUCT_ACTION), cancel_refresh_text, menu))
+        # 取消打开和取消刷新
+        if self.add_cancel_open_refresh_menu(CANCEL_OPEN_STRUCT_ACTION,
+                                             CANCEL_REFRESH_STRUCT_ACTION, menu):
             return
         # 打开
-        open_struct_action = OPEN_STRUCT_ACTION \
-            if not get_item_opened_tab(self.item) else CLOSE_STRUCT_ACTION
-        menu.addAction(QAction(get_icon(open_struct_action), open_struct_action.format(self.item_name), menu))
+        self.add_open_close_table_menu(OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, menu)
         menu.addSeparator()
 
         # 编辑
-        menu.addAction(QAction(get_icon(EDIT_STRUCT_ACTION),
-                               EDIT_STRUCT_ACTION.format(self.item_name), menu))
+        self.add_menu(EDIT_STRUCT_ACTION, menu)
         # 删除
-        menu.addAction(QAction(get_icon(DEL_STRUCT_ACTION),
-                               DEL_STRUCT_ACTION.format(self.item_name), menu))
+        self.add_menu(DEL_STRUCT_ACTION, menu)
         # 刷新
         menu.addSeparator()
-        menu.addAction(QAction(get_icon(REFRESH_STRUCT_ACTION),
-                               REFRESH_STRUCT_ACTION.format(self.item_name), menu))
+        self.add_menu(REFRESH_STRUCT_ACTION, menu)
 
     def handle_menu_func(self, func):
         # 打开结构体
