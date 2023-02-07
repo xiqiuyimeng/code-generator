@@ -58,25 +58,31 @@ class InternetConnDialog(AbstractConnDialog):
         self.port_label.setText(PORT_TEXT)
         self.user_label.setText(USERNAME_TEXT)
         self.pwd_label.setText(PWD_TEXT)
+        self.setup_special_conn_info_label()
+
+    def setup_special_conn_info_label(self): ...
 
     def setup_echo_other_data(self):
         self.host_value.setText(self.dialog_data.conn_info_type.host)
         self.port_value.setText(str(self.dialog_data.conn_info_type.port))
         self.user_value.setText(self.dialog_data.conn_info_type.user)
         self.pwd_value.setText(self.dialog_data.conn_info_type.pwd)
+        self.setup_echo_special_conn_info_data()
+
+    def setup_echo_special_conn_info_data(self): ...
 
     def collect_conn_info_input(self):
         host = self.host_value.text()
         port = int(self.port_value.text())
         user = self.user_value.text()
         pwd = self.pwd_value.text()
-        other_conn_info = self.collect_other_conn_info()
+        other_conn_info = self.collect_special_conn_info()
         conn_param = host, port, user, pwd
         if other_conn_info:
             conn_param = *conn_param, *other_conn_info
         return conn_param
 
-    def collect_other_conn_info(self) -> tuple: ...
+    def collect_special_conn_info(self) -> tuple: ...
 
     def setup_other_input_limit_rule(self):
         # 设置端口号只能输入数字
@@ -85,9 +91,15 @@ class InternetConnDialog(AbstractConnDialog):
         self.host_value.setMaxLength(100)
         self.user_value.setMaxLength(30)
         self.pwd_value.setMaxLength(50)
+        self.setup_special_conn_info_input_limit_rule()
+
+    def setup_special_conn_info_input_limit_rule(self): ...
 
     def connect_conn_info_signal(self):
         self.host_value.textEdited.connect(self.check_input)
         self.port_value.textEdited.connect(self.check_input)
         self.user_value.textEdited.connect(self.check_input)
         self.pwd_value.textEdited.connect(self.check_input)
+        self.connect_special_conn_info_signal()
+
+    def connect_special_conn_info_signal(self): ...

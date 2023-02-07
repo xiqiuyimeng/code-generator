@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from constant.constant import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER
+from constant.constant import MYSQL_DEFAULT_HOST, MYSQL_DEFAULT_PORT, MYSQL_DEFAULT_USER
 from service.system_storage.conn_type import ConnTypeEnum
 from view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
 
@@ -10,13 +10,10 @@ _date_ = '2022/9/27 19:31'
 
 class MysqlConnDialog(InternetConnDialog):
 
-    def __init__(self, *args):
-        super().__init__(*args)
-
     def get_conn_type(self):
         return ConnTypeEnum.mysql.value
 
     def setup_default_value(self):
-        self.host_value.setText(DEFAULT_HOST)
-        self.port_value.setText(DEFAULT_PORT)
-        self.user_value.setText(DEFAULT_USER)
+        self.host_value.setText(MYSQL_DEFAULT_HOST)
+        self.port_value.setText(MYSQL_DEFAULT_PORT)
+        self.user_value.setText(MYSQL_DEFAULT_USER)

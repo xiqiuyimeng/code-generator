@@ -25,9 +25,6 @@ def convert_tb_data(db_record):
 
 class SqliteDBExecutor(SqlDBExecutor):
 
-    def __init__(self, *args):
-        super().__init__(*args)
-
     def connect_db(self):
         self.db = records.Database(self.sql_url, poolclass=SingletonThreadPool,
                                    connect_args={'check_same_thread': False})

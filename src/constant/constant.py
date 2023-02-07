@@ -16,14 +16,19 @@ EDIT_CONN_DIALOG_TITLE = "编辑{}连接"
 # 输入框部分
 CONN_NAME_TEXT = "连接名："
 HOST_TEXT = "主机："
+SERVICE_NAME_TEXT = '服务：'
 PORT_TEXT = "端口号："
 USERNAME_TEXT = "用户名："
 PWD_TEXT = "密码："
 SQLITE_FILE_URL_TXT = "文件："
-# 默认host、端口、用户名
-DEFAULT_HOST = "localhost"
-DEFAULT_PORT = "3306"
-DEFAULT_USER = "root"
+# mysql 默认host、端口、用户名
+MYSQL_DEFAULT_HOST = "localhost"
+MYSQL_DEFAULT_PORT = "3306"
+MYSQL_DEFAULT_USER = "root"
+#
+ORACLE_DEFAULT_HOST = 'localhost'
+ORACLE_DEFAULT_PORT = '1521'
+ORACLE_DEFAULT_SERVICE_NAME = 'XE'
 
 ADD_STRUCT_DIALOG_TITLE = "添加{}数据源"
 ADD_STRUCT_TITLE = "添加数据源"
@@ -182,12 +187,7 @@ DEL_FOLDER_PROMPT = '是否要删除文件夹？'
 
 # ---------- 树节点右键菜单文字 end ---------- #
 
-# mysql查询数据库列表sql
-MYSQL_QUERY_DB_SQL = 'show databases'
-# mysql查询数据库中的表名sql
-MYSQL_QUERY_TB_SQL = 'show tables'
-# mysql查询数据库表的列名sql
-MYSQL_QUERY_COL_SQL = "show full columns from `{}`;"
+# ---------- 查询数据库结构sql start ---------- #
 
 # sqlite 查询数据库列表sql
 SQLITE_QUERY_DB_SQL = 'PRAGMA database_list;'
@@ -195,6 +195,34 @@ SQLITE_QUERY_DB_SQL = 'PRAGMA database_list;'
 SQLITE_QUERY_TB_SQL = 'select tbl_name from sqlite_master where tbl_name != "sqlite_sequence";'
 # sqlite 查询数据库表列名sql
 SQLITE_QUERY_COL_SQL = 'PRAGMA table_info(`{}`);'
+
+# mysql查询数据库列表sql
+MYSQL_QUERY_DB_SQL = 'show databases'
+# mysql查询数据库中的表名sql
+MYSQL_QUERY_TB_SQL = 'show tables from {}'
+# mysql查询数据库表的列名sql
+MYSQL_QUERY_COL_SQL = "show full columns from `{}`.`{}`;"
+
+# oracle查询数据库列表sql
+ORACLE_QUERY_DB_SQL = 'select distinct(OWNER) from all_tables order by OWNER'
+# mysql查询数据库中的表名sql
+ORACLE_QUERY_TB_SQL = 'select TABLE_NAME from ALL_TABLES where OWNER = \'{}\' order by TABLE_NAME'
+# mysql查询数据库表的列名sql
+ORACLE_QUERY_COL_SQL = """
+select ATC.COLUMN_NAME, ATC.DATA_TYPE, ATC.DATA_LENGTH, ATC.DATA_PRECISION, ATC.DATA_SCALE,
+       ATC.CHAR_USED, UCC.COMMENTS, nvl2(UP.CONSTRAINT_TYPE, 'Y', 'N') as PRIMARY_KEY
+from ALL_TAB_COLS ATC
+    inner join USER_COL_COMMENTS UCC on ATC.TABLE_NAME = UCC.TABLE_NAME and ATC.COLUMN_NAME = UCC.COLUMN_NAME
+    left join (select COLUMN_NAME, CONSTRAINT_TYPE, UC.TABLE_NAME
+               from USER_CONS_COLUMNS UCC inner join USER_CONSTRAINTS UC
+                on UCC.CONSTRAINT_NAME = UC.CONSTRAINT_NAME and
+                   UCC.TABLE_NAME = UC.TABLE_NAME and
+                   UCC.OWNER = UC.OWNER and UC.CONSTRAINT_TYPE = 'P') UP
+        on UP.COLUMN_NAME = ATC.COLUMN_NAME and UP.TABLE_NAME = ATC.TABLE_NAME
+where ATC.OWNER = '{}' and ATC.TABLE_NAME = '{}'
+order by ATC.COLUMN_ID"""
+
+# ---------- 查询数据库结构sql end ---------- #
 
 # 查询系统表sql
 QUERY_SYS_TB = 'select column_name, data_type, column_key, column_comment from information_schema.columns'
@@ -303,7 +331,7 @@ CLOSE_CONN_PROMPT = '该连接下有已选的字段，强行关闭将清空连�
 CLOSE_DB_PROMPT = '该数据库下有已选的字段，强行关闭将清空库下所选字段，是否继续？'
 
 """表格列头"""
-TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "完整数据类型", "是否是主键", "备注"]
+TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "完整数据类型", "主键", "备注"]
 """模板列表表格表头"""
 TEMPLATE_TABLE_HEADER_LABELS = ['全选', '模板名称', '模板类型', '使用次数', '使用中', '创建时间', '修改时间', '操作']
 
@@ -525,6 +553,11 @@ MYSQL_DISPLAY_NAME = 'mysql'
 MYSQL_DB = 'mysql_db'
 MYSQL_TB = 'mysql_tb'
 MYSQL_COL = 'mysql_col'
+ORACLE_TYPE = 'oracle'
+ORACLE_DISPLAY_NAME = 'oracle'
+ORACLE_DB = 'oracle_db'
+ORACLE_TB = 'oracle_tb'
+ORACLE_COL = 'oracle_col'
 
 JSON_TYPE = 'json'
 JSON_DISPLAY_NAME = 'json'

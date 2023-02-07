@@ -40,9 +40,6 @@ class SqlDBExecutor:
 
 class InternetDBExecutor(SqlDBExecutor):
 
-    def __init__(self, *args):
-        super().__init__(*args)
-
     def connect_db(self):
         self.db = records.Database(self.sql_url)
 
@@ -58,27 +55,23 @@ class InternetDBExecutor(SqlDBExecutor):
     def open_db(self, db, check=True):
         if check:
             self.check_db(db)
-        self.change_db(db)
-        query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql
+        query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql.format(db)
         db_records = self.get_data(query_tb_sql)
         return tuple(map(lambda x: map(lambda y: y, x.values()).__next__(), db_records.as_dict(ordered=True)))
 
     def open_tb(self, db, tb, check=True):
         if check:
             self.check_tb(db, tb)
-        query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(tb)
+        query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(db, tb)
         db_records = self.get_data(query_col_sql)
         return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
 
     def get_dialect_driver(self) -> str: ...
 
-    def change_db(self, db): ...
-
     def check_tb(self, db, tb):
         self.check_db(db)
-        self.change_db(db)
-        self.do_check_tb(tb)
+        self.do_check_tb(db, tb)
 
-    def do_check_tb(self, tb): ...
+    def do_check_tb(self, db, tb): ...
 
     def convert_tb_data(self, db_record): ...

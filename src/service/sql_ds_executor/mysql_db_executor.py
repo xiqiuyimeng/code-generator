@@ -10,9 +10,6 @@ _date_ = '2022/10/1 12:52'
 
 class MySqlDBExecutor(InternetDBExecutor):
 
-    def __init__(self, *args):
-        super().__init__(*args)
-
     def get_dialect_driver(self) -> str:
         return 'mysql+pymysql'
 
@@ -22,14 +19,11 @@ class MySqlDBExecutor(InternetDBExecutor):
         if not db_records:
             raise BusinessException(f'{db}库不存在')
 
-    def do_check_tb(self, tb):
-        query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql
+    def do_check_tb(self, db, tb):
+        query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql.format(db)
         db_records = self.get_data(f'{query_tb_sql} like \'{tb}\'').all()
         if not db_records:
             raise BusinessException(f'{tb}表不存在')
-
-    def change_db(self, db):
-        self.db.query(f'use {db};')
 
     def convert_tb_data(self, db_record):
         table_info = DsTableColInfo()

@@ -15,7 +15,7 @@ from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, SWITC
     CANCEL_REFRESH_DB_ACTION, OPEN_TABLE_ACTION, CANCEL_OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, SELECT_ALL_FIELD_ACTION, \
     UNSELECT_FIELD_ACTION, REFRESH_TB_ACTION, CANCEL_REFRESH_TB_ACTION, REFRESH_STRUCT_ACTION, \
     CANCEL_REFRESH_STRUCT_ACTION, REFRESH_FOLDER_ACTION, CANCEL_REFRESH_FOLDER_ACTION, SELECT_ALL_ACTION, \
-    UNSELECT_ACTION
+    UNSELECT_ACTION, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -105,6 +105,11 @@ class IconEnum(Enum):
     sql_mysql_db_icon = MYSQL_DB, ':/icon/database_icon.png'
     sql_mysql_tb_icon = MYSQL_TB, ':/icon/table_icon.png'
     sql_mysql_col_icon = MYSQL_COL, ':/icon/column_icon.png'
+    # oracle
+    sql_oracle_conn_icon = ORACLE_DISPLAY_NAME, ':/icon/right.png'
+    sql_oracle_db_icon = ORACLE_DB, ':/icon/template.png'
+    sql_oracle_tb_icon = ORACLE_TB, ':/icon/table_icon.png'
+    sql_oracle_col_icon = ORACLE_COL, ':/icon/column_icon.png'
 
     # structure datasource icon
     folder_icon = FOLDER_TYPE, ':/icon/template.png'

@@ -5,7 +5,8 @@ from enum import Enum
 
 from constant.constant import SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, \
     MYSQL_QUERY_DB_SQL, MYSQL_QUERY_TB_SQL, MYSQL_QUERY_COL_SQL, SQLITE_QUERY_DB_SQL, SQLITE_QUERY_TB_SQL, \
-    SQLITE_QUERY_COL_SQL, SQLITE_COL, MYSQL_COL, SQLITE_TYPE, MYSQL_TYPE
+    SQLITE_QUERY_COL_SQL, SQLITE_COL, MYSQL_COL, SQLITE_TYPE, MYSQL_TYPE, ORACLE_TYPE, ORACLE_DISPLAY_NAME, ORACLE_DB, \
+    ORACLE_TB, ORACLE_COL, ORACLE_QUERY_DB_SQL, ORACLE_QUERY_TB_SQL, ORACLE_QUERY_COL_SQL
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 17:59'
@@ -39,7 +40,6 @@ def get_conn_dialog(display_name):
 
 @dataclass
 class ConnType:
-
     type: int = field(init=False)
     # 展示名称，也用来标识icon类型
     display_name: str = field(init=False)
@@ -61,7 +61,6 @@ class ConnType:
 
 
 class ConnTypeEnum(Enum):
-
     sqlite = ConnType()
     sqlite.type = SQLITE_TYPE
     sqlite.display_name = SQLITE_DISPLAY_NAME
@@ -88,18 +87,33 @@ class ConnTypeEnum(Enum):
     mysql.query_tb_sql = MYSQL_QUERY_TB_SQL
     mysql.query_col_sql = MYSQL_QUERY_COL_SQL
 
+    oracle = ConnType()
+    oracle.type = ORACLE_TYPE
+    oracle.display_name = ORACLE_DISPLAY_NAME
+    oracle.db_icon_name = ORACLE_DB
+    oracle.tb_icon_name = ORACLE_TB
+    oracle.col_icon_name = ORACLE_COL
+    oracle.type_class = 'OracleSqlConn'
+    oracle.type_dialog = 'OracleConnDialog'
+    oracle.db_executor = 'OracleDBExecutor'
+    oracle.query_db_sql = ORACLE_QUERY_DB_SQL
+    oracle.query_tb_sql = ORACLE_QUERY_TB_SQL
+    oracle.query_col_sql = ORACLE_QUERY_COL_SQL
+
 
 @dataclass
 class SqliteConn:
-
     file_url: str
 
 
 @dataclass
 class InternetSqlConn:
-
     host: str
     port: int
     user: str
     pwd: str
 
+
+@dataclass
+class OracleSqlConn(InternetSqlConn):
+    service_name: str
