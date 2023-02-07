@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QAction
 
 from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, OPEN_STRUCT_ACTION, \
     CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
     CANCEL_REFRESH_STRUCT_ACTION
-from constant.icon_enum import get_icon
 from service.async_func.async_struct_executor.async_struct_executor import OpenStructExecutor, RefreshStructExecutor
 from service.async_func.async_struct_task import DelStructExecutor
 from view.box.message_box import pop_question
