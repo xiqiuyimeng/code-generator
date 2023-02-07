@@ -54,7 +54,7 @@ class Searcher:
             # 处理不了的情况，交由调用方处理
             original_func(*args)
         # 给子类一个处理特有逻辑的机会
-        self.search_post_processor()
+        self.search_post_process()
         # 渲染，触发界面绘制刷新
         self.target.viewport().update()
 
@@ -162,7 +162,7 @@ class Searcher:
 
     def get_item_text(self, item) -> str: ...
 
-    def search_post_processor(self): ...
+    def search_post_process(self): ...
 
     def clear_row_index(self): ...
 
