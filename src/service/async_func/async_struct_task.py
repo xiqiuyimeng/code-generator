@@ -213,10 +213,11 @@ class ListStructWorker(ThreadWorkerABC):
         # 转换为dict，key：opened_item_id，value：struct info
         struct_opened_dict = dict(map(lambda x: (x.opened_item_id, x), struct_info_list))
 
+        ds_type = DatasourceTypeEnum.struct_ds_type.value.name
         # 读取打开记录表中的信息，获取所有的文件夹和结构体记录
-        children_generator = OpenedTreeItemSqlite().recursive_get_children(
-            0, 0, DatasourceTypeEnum.struct_ds_type.value.name
-        )
+        opened_item_sqlite = OpenedTreeItemSqlite()
+        max_level = opened_item_sqlite.get_max_level(ds_type)
+        children_generator = opened_item_sqlite.recursive_get_children(0, 0, ds_type, max_level)
         for children in children_generator:
             for child in children:
                 # 设置结构体类型

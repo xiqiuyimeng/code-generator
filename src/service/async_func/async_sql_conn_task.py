@@ -192,22 +192,21 @@ class ListConnWorker(ThreadWorkerABC):
     # tab页表信息查询结果
     tab_info_signal = pyqtSignal(list)
 
-    def __init__(self):
-        super().__init__()
-
     def do_run(self):
         # 首选读取存储的连接，这里需要连表 opened_tree_item_sqlite 获取连接的顺序
         connections = ConnSqlite().get_conn_id_types()
 
         # 查询 OpenedItem
         level = SqlTreeItemLevel.conn_level.value
+        max_level = SqlTreeItemLevel.tb_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
 
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         for conn in connections:
             conn_type = get_conn_type_by_type(conn.conn_type)
             # 深度优先查找
-            children_generator = opened_tree_item_sqlite.recursive_get_children(conn.id, level, ds_type)
+            children_generator = opened_tree_item_sqlite.recursive_get_children(conn.id, level,
+                                                                                ds_type, max_level)
             for children in children_generator:
                 for child in children:
                     child.data_type = conn_type

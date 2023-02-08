@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional
+from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional, get_db_conn
 
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
@@ -25,6 +25,7 @@ opened_item_sql_dict = {
     update_time datetime
     );''',
     'batch_delete': f'delete from {table_name} where id in',
+    'max_level': f'select max(level) as max_level from {table_name} where ds_type = ',
 }
 
 
@@ -134,7 +135,9 @@ class OpenedTreeItemSqlite(SqliteBasic):
 
         self.update(opened_item)
 
-    def recursive_get_children(self, parent_id, level, ds_type):
+    def recursive_get_children(self, parent_id, level, ds_type, max_level=None):
+        if max_level is not None and level > max_level:
+            return
         opened_items = self.get_children(parent_id, level, ds_type)
         if opened_items:
             yield opened_items
@@ -142,7 +145,8 @@ class OpenedTreeItemSqlite(SqliteBasic):
                 # 作为父元素，继续查询子元素
                 yield from self.recursive_get_children(opened_item.id,
                                                        opened_item.level + 1,
-                                                       opened_item.ds_type)
+                                                       opened_item.ds_type,
+                                                       max_level)
 
     def get_children(self, parent_id, level, ds_type):
         opened_param = OpenedTreeItem()
@@ -197,3 +201,10 @@ class OpenedTreeItemSqlite(SqliteBasic):
         update_param.id = opened_record.id
         update_param.checked = opened_record.checked
         self.update(update_param)
+
+    @staticmethod
+    def get_max_level(ds_type):
+        max_level_sql = f'{opened_item_sql_dict.get("max_level")}"{ds_type}"'
+        result = get_db_conn().query(max_level_sql).as_dict()
+        return result[0].get('max_level') if result else -1
+

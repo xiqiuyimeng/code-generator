@@ -141,18 +141,18 @@ def make_conn_tree_items(opened_items, parent):
 
 def make_db_items(tree_widget, parent_item, opened_db_items):
     """构建数据库层叶子节点"""
+    icon = get_icon(opened_db_items[0].data_type.db_icon_name)
     for opened_db_item in opened_db_items:
-        icon = get_icon(opened_db_item.data_type.db_icon_name)
         make_sql_tree_item(tree_widget, parent_item, opened_db_item.item_name, icon, opened_db_item)
 
 
 def make_table_items(tree_widget, parent_item, opened_table_items, tree_data: TreeData):
     """构建数据表层叶子节点"""
     checked_table_opened_items = list()
+    icon = get_icon(opened_table_items[0].data_type.tb_icon_name)
     for opened_table_item in opened_table_items:
-        icon = get_icon(opened_table_item.data_type.tb_icon_name)
-        make_sql_tree_item(tree_widget, parent_item, opened_table_item.item_name,
-                           icon, opened_table_item, checkbox=opened_table_item.checked)
+        make_sql_tree_item(tree_widget, parent_item, opened_table_item.item_name, icon,
+                           opened_table_item, checkbox=opened_table_item.checked)
         if opened_table_item.checked:
             checked_table_opened_items.append(opened_table_item)
     # 如果表已选中，添加到选中数据集合中
