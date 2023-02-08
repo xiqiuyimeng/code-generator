@@ -3,17 +3,17 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog, QPushButton
 
-from constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
+from src.constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
     CHOOSE_STRUCT_FILE_TEXT, PRETTY_STRUCT_TEXT
-from constant.icon_enum import get_icon
-from service.async_func.async_struct_executor.async_struct_executor import PrettyStructExecutor
-from service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor, \
+from src.constant.icon_enum import get_icon
+from src.service.async_func.async_struct_executor.async_struct_executor import PrettyStructExecutor
+from src.service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor, \
     QueryStructExecutor
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from service.system_storage.struct_sqlite import StructInfo
-from service.system_storage.struct_type import StructType
-from view.custom_widget.scrollable_widget import ScrollableTextEdit
-from view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.service.system_storage.struct_sqlite import StructInfo
+from src.service.system_storage.struct_type import StructType
+from src.view.custom_widget.scrollable_widget import ScrollableTextEdit
+from src.view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:46'

@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(
     ['main.py'],
-    pathex=['E:\\python_workspace\\mybatis-generator', 'E:\\python_workspace\\mybatis-generator\\src'],
+    pathex=['E:\\python_workspace\\code-generator'],
     binaries=[],
     datas=[],
     hiddenimports=[],

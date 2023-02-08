@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_ACTION, OPEN_DB_ACTION, CLOSE_DB_ACTION, \
+from src.constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_ACTION, OPEN_DB_ACTION, CLOSE_DB_ACTION, \
     SELECT_ALL_TB_ACTION, UNSELECT_TB_ACTION, CLOSE_DB_PROMPT, OPEN_DB_TITLE, REFRESH_DB_ACTION, \
     CANCEL_REFRESH_DB_ACTION
-from constant.icon_enum import get_icon
-from service.async_func.async_sql_conn_task import CloseDBExecutor
-from service.async_func.async_sql_ds_task import OpenDBExecutor, RefreshDBExecutor
-from view.box.message_box import pop_fail, pop_question
-from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
-from view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, get_add_del_data, get_children_opened_ids, \
+from src.constant.icon_enum import get_icon
+from src.service.async_func.async_sql_conn_task import CloseDBExecutor
+from src.service.async_func.async_sql_ds_task import OpenDBExecutor, RefreshDBExecutor
+from src.view.box.message_box import pop_fail, pop_question
+from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, get_add_del_data, get_children_opened_ids, \
     set_item_opened_record, get_item_opened_record
-from view.tree.tree_widget.tree_function import make_table_items, check_table_status, make_sql_tree_item
+from src.view.tree.tree_widget.tree_function import make_table_items, check_table_status, make_sql_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'

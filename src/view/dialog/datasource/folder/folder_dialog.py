@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
-from service.async_func.async_struct_task import AddFolderExecutor, EditFolderExecutor
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from view.dialog.name_check_dialog import NameCheckDialog
+from src.service.async_func.async_struct_task import AddFolderExecutor, EditFolderExecutor
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.view.dialog.name_check_dialog import NameCheckDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/22 8:06'

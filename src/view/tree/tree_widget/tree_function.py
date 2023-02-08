@@ -5,18 +5,18 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
+from src.constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
     EDIT_STRUCT_DIALOG_TITLE, CREATE_NEW_FOLDER, FOLDER_TYPE, EDIT_FOLDER_NAME
-from constant.icon_enum import get_icon
-from service.system_storage.conn_type import get_conn_dialog
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from service.system_storage.struct_type import get_struct_dialog, FolderTypeEnum
-from service.util.tree_node import TreeData
-from view.dialog.datasource.conn import *
-from view.dialog.datasource.folder.folder_dialog import FolderDialog
-from view.dialog.datasource.structure import *
-from view.tree.tree_item.tree_item import TreeWidgetItem
-from view.tree.tree_item.tree_item_func import set_item_opened_record, \
+from src.constant.icon_enum import get_icon
+from src.service.system_storage.conn_type import get_conn_dialog
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.service.system_storage.struct_type import get_struct_dialog, FolderTypeEnum
+from src.service.util.tree_node import TreeData
+from src.view.dialog.datasource.conn import *
+from src.view.dialog.datasource.folder.folder_dialog import FolderDialog
+from src.view.dialog.datasource.structure import *
+from src.view.tree.tree_item.tree_item import TreeWidgetItem
+from src.view.tree.tree_item.tree_item_func import set_item_opened_record, \
     get_item_opened_record, get_children_items, get_add_del_data
 
 _author_ = 'luwt'

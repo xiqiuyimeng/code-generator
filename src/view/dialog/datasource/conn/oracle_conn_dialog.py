@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QLineEdit
 
-from constant.constant import ORACLE_DEFAULT_HOST, ORACLE_DEFAULT_PORT, ORACLE_DEFAULT_SERVICE_NAME, SERVICE_NAME_TEXT
-from service.system_storage.conn_type import ConnType, ConnTypeEnum
-from view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
+from src.constant.constant import ORACLE_DEFAULT_HOST, ORACLE_DEFAULT_PORT, ORACLE_DEFAULT_SERVICE_NAME, SERVICE_NAME_TEXT
+from src.service.system_storage.conn_type import ConnType, ConnTypeEnum
+from src.view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
 
 _author_ = 'luwt'
 _date_ = '2023/2/7 11:26'

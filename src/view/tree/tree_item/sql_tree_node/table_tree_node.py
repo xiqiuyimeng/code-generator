@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, QVariant
 
-from constant.constant import CANCEL_OPEN_TABLE_ACTION, OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, \
+from src.constant.constant import CANCEL_OPEN_TABLE_ACTION, OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, \
     CANCEL_REFRESH_TB_ACTION
-from service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
-from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, \
+from src.service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
+from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, \
     link_table_checkbox, save_tree_data, get_add_del_data, get_item_opened_record
 
 _author_ = 'luwt'

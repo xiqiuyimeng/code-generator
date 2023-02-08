@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from constant.constant import MYSQL_DEFAULT_HOST, MYSQL_DEFAULT_PORT, MYSQL_DEFAULT_USER
-from service.system_storage.conn_type import ConnTypeEnum
-from view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
+from src.constant.constant import MYSQL_DEFAULT_HOST, MYSQL_DEFAULT_PORT, MYSQL_DEFAULT_USER
+from src.service.system_storage.conn_type import ConnTypeEnum
+from src.view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 19:31'

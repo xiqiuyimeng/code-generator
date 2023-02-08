@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import ctypes
 
 from PyQt5 import QtWidgets
@@ -6,9 +6,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
 import sys
-from service.read_qrc.read_config import read_qss
-from view.window.main_window import MainWindow
-from logger.log import logger as log
+from src.service.read_qrc.read_config import read_qss
+from src.view.window.main_window import MainWindow
+from src.logger.log import logger as log
 # 引入静态资源
 from static import image_rc
 # 引入pyinstaller打包使用的过渡图程序，打包的时候需要放开
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     log.info("**********生成器启动**********")
     app = QtWidgets.QApplication(sys.argv)
     splash = QtWidgets.QSplashScreen(
-        QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        QPixmap(":/boot/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
     )
     splash.showMessage("加载中...", Qt.AlignHCenter | Qt.AlignBottom)
     # 显示启动界面

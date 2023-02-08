@@ -2,9 +2,9 @@
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QToolBar, QMenu
 
-from constant.constant import SWITCH_ACTION, ADD_DS_ACTION, ADD_DS_ACTION_TIP
-from view.bar.bar_action import *
-from view.custom_widget.draggable_widget import DraggableWidget
+from src.constant.constant import SWITCH_ACTION, ADD_DS_ACTION, ADD_DS_ACTION_TIP
+from src.view.bar.bar_action import *
+from src.view.custom_widget.draggable_widget import DraggableWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 12:43'

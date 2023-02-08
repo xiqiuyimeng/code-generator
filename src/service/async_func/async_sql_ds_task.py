@@ -2,25 +2,25 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
+from src.constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
     OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, OPEN_DB_TITLE, \
     OPEN_TB_TITLE, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT, \
     REFRESH_TB_TITLE, REFRESH_DB_TITLE, REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT, REFRESH_CONN_TITLE, \
     REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT
-from logger.log import logger as log
-from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
+from src.logger.log import logger as log
+from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     RefreshMovieThreadExecutor
-from service.sql_ds_executor import *
-from service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
-from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem, \
+from src.service.sql_ds_executor import *
+from src.service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
+from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
+from src.service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem, \
     CheckedEnum
-from service.system_storage.sqlite_abc import transactional
-from service.util.refresh_util import deal_opened_items, refresh_tab_cols
-from view.box.message_box import pop_ok
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
+from src.service.system_storage.sqlite_abc import transactional
+from src.service.util.refresh_util import deal_opened_items, refresh_tab_cols
+from src.view.box.message_box import pop_ok
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/5/31 19:05'

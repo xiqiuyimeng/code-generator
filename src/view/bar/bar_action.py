@@ -2,14 +2,14 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction, QToolButton
 
-from constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
+from src.constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
     TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
     HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, SQL_DATASOURCE_TYPE, \
     STRUCT_DATASOURCE_TYPE
-from constant.icon_enum import get_icon
-from service.system_storage.conn_type import ConnTypeEnum
-from service.system_storage.struct_type import StructTypeEnum
-from view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh
+from src.constant.icon_enum import get_icon
+from src.service.system_storage.conn_type import ConnTypeEnum
+from src.service.system_storage.struct_type import StructTypeEnum
+from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'

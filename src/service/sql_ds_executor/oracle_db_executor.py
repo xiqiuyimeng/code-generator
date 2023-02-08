@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from constant.constant import ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL
-from service.sql_ds_executor.db_executor import InternetDBExecutor
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
+from src.constant.constant import ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL
+from src.service.sql_ds_executor.db_executor import InternetDBExecutor
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2023/2/7 11:03'

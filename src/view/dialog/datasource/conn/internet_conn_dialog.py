@@ -2,8 +2,8 @@
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit
 
-from constant.constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT
-from view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
+from src.constant.constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT
+from src.view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 18:05'

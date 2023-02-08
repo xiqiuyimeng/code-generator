@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from queue import Queue
 
-from logger.log import logger as log
-from service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
-from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
+from src.logger.log import logger as log
+from src.service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
+from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
 
 _author_ = 'luwt'
 _date_ = '2022/10/12 12:10'

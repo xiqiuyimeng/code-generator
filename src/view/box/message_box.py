@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
-from constant.constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
+from src.constant.constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
 
 _author_ = 'luwt'
 _date_ = '2020/6/21 16:08'

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
-from view.box.message_box import pop_ok
-from view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
-from view.dialog.generator.confirm_selected.structure_confirm_selected_dialog import StructureConfirmSelectedDialog
-from view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
+from src.constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
+from src.view.box.message_box import pop_ok
+from src.view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
+from src.view.dialog.generator.confirm_selected.structure_confirm_selected_dialog import StructureConfirmSelectedDialog
+from src.view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
 
 _author_ = 'luwt'
 _date_ = '2022/5/29 16:51'

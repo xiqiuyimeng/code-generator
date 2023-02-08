@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
-from logger.log import logger as log
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
-from service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.logger.log import logger as log
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:30'
@@ -109,4 +109,4 @@ class DsTableTabSqlite(SqliteBasic):
     def select_by_opened_ids(opened_ids):
         sql = f"{ds_table_tab_sql_dict.get('select_by_opened_ids')} ({', '.join(opened_ids)})"
         rows = get_db_conn().query(sql)
-        return list(map(lambda x: DsTableTab(**x), rows.all()))
+        return list(map(lambda x: DsTableTab(**x), rows.as_dict()))

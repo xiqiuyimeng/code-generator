@@ -3,7 +3,7 @@ from PyQt5.QtCore import QRect
 from PyQt5.QtGui import QBrush, QColor
 from PyQt5.QtWidgets import QStyledItemDelegate, QStyle
 
-from view.searcher.style_item_delegate.painter_delegate import ItemPainterContext
+from src.view.searcher.style_item_delegate.painter_delegate import ItemPainterContext
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:06'

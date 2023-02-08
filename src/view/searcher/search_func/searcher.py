@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from view.searcher.dock.dock_widget import SearcherDockWidget
-from view.searcher.search_func.matcher_func import SmartMatcher
-from view.searcher.style_item_delegate.searcher_style_delegate import SearchStyledItemDelegate
+from src.view.searcher.dock.dock_widget import SearcherDockWidget
+from src.view.searcher.search_func.matcher_func import SmartMatcher
+from src.view.searcher.style_item_delegate.searcher_style_delegate import SearchStyledItemDelegate
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:02'

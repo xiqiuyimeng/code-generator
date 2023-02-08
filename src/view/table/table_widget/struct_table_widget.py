@@ -4,8 +4,8 @@
 """
 from PyQt5.QtWidgets import QWidget, QHBoxLayout
 
-from view.table.table_widget.abstract_table_widget import AbstractTableWidget
-from view.tree.tree_item.tree_item_func import get_add_del_data
+from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'

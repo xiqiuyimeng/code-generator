@@ -6,7 +6,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QPushButton, QHBoxLayout
 
-from view.custom_widget.draggable_widget import DraggableWidget
+from src.view.custom_widget.draggable_widget import DraggableWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 16:37'

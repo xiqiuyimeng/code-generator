@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from service.async_func.async_struct_task import ListStructExecutor
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from service.util.tree_node import TreeData
-from view.tab.tab_widget.tab_widget import TabWidget
-from view.tree.tree_item.context import get_struct_tree_node
-from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
-from view.tree.tree_widget.tree_function import add_struct_tree_item
+from src.service.async_func.async_struct_task import ListStructExecutor
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.service.util.tree_node import TreeData
+from src.view.tab.tab_widget.tab_widget import TabWidget
+from src.view.tree.tree_item.context import get_struct_tree_node
+from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
+from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from src.view.tree.tree_widget.tree_function import add_struct_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:10'

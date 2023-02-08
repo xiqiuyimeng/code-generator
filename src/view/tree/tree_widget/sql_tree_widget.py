@@ -3,14 +3,14 @@
 sql数据源树结构
 """
 
-from service.async_func.async_sql_conn_task import ListConnExecutor
-from service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
-from service.util.tree_node import TreeData
-from view.tab.tab_widget.tab_widget import TabWidget
-from view.tree.tree_item.context import get_sql_tree_node
-from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
-from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
-from view.tree.tree_widget.tree_function import make_conn_tree_items
+from src.service.async_func.async_sql_conn_task import ListConnExecutor
+from src.service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
+from src.service.util.tree_node import TreeData
+from src.view.tab.tab_widget.tab_widget import TabWidget
+from src.view.tree.tree_item.context import get_sql_tree_node
+from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from src.view.tree.tree_widget.tree_function import make_conn_tree_items
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:21'

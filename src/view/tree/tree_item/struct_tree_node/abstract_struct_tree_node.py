@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, QVariant
 
-from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, save_tree_data
+from src.view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, save_tree_data
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:32'

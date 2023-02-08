@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from constant.constant import SAVE_DS_INFO_TITLE
-from view.dialog.name_check_dialog import NameCheckDialog
+from src.constant.constant import SAVE_DS_INFO_TITLE
+from src.view.dialog.name_check_dialog import NameCheckDialog
 
 _author_ = 'luwt'
 _date_ = '2022/5/29 17:55'

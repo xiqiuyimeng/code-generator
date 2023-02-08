@@ -4,8 +4,8 @@
 """
 from PyQt5.QtWidgets import QMenuBar, QMenu
 
-from constant.constant import FILE_MENU, HELP_MENU, SWITCH_ACTION, ADD_DS_ACTION
-from view.bar.bar_action import *
+from src.constant.constant import FILE_MENU, HELP_MENU, SWITCH_ACTION, ADD_DS_ACTION
+from src.view.bar.bar_action import *
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 12:18'

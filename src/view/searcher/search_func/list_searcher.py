@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from view.searcher.search_func.searcher import Searcher
+from src.view.searcher.search_func.searcher import Searcher
 
 _author_ = 'luwt'
 _date_ = '2022/11/17 16:11'

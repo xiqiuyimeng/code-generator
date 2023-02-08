@@ -13,13 +13,13 @@ from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator, QAbstractItemView
 
-from service.async_func.async_item_changed_task import ItemChangedExecutor
-from view.custom_widget.scrollable_widget import ScrollableWidget
-from view.searcher.smart_item_view import SmartSearcherTreeWidget
-from view.tab.tab_ui import TabTableUI
-from view.tab.tab_widget.tab_widget import TabWidget
-from view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox, get_item_opened_tab
+from src.service.async_func.async_item_changed_task import ItemChangedExecutor
+from src.view.custom_widget.scrollable_widget import ScrollableWidget
+from src.view.searcher.smart_item_view import SmartSearcherTreeWidget
+from src.view.tab.tab_ui import TabTableUI
+from src.view.tab.tab_widget.tab_widget import TabWidget
+from src.view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox, get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'

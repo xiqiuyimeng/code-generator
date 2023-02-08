@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
-from view.table.table_frame.table_frame import get_table_frame
+from src.view.table.table_frame.table_frame import get_table_frame
 
 _author_ = 'luwt'
 _date_ = '2022/10/10 12:12'

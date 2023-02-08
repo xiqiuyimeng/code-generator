@@ -2,7 +2,7 @@
 from PyQt5.QtCore import QModelIndex, QRect
 from PyQt5.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox
 
-from view.custom_widget.scrollable_widget import ScrollableTextEdit
+from src.view.custom_widget.scrollable_widget import ScrollableTextEdit
 
 _author_ = 'luwt'
 _date_ = '2022/10/11 17:54'

@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QMenu
 
-from constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
+from src.constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
     TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
     ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_CONN_ACTION, \
     CANCEL_REFRESH_CONN_ACTION
-from constant.icon_enum import get_icon
-from service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
-from service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
-from view.bar.bar_action import add_sql_ds_actions
-from view.box.message_box import pop_ok, pop_question, pop_fail
-from view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
-from view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
+from src.constant.icon_enum import get_icon
+from src.service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
+from src.service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
+from src.view.bar.bar_action import add_sql_ds_actions
+from src.view.box.message_box import pop_ok, pop_question, pop_fail
+from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
     get_item_opened_tab, set_item_opened_record
-from view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, make_sql_tree_item
+from src.view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, make_sql_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'

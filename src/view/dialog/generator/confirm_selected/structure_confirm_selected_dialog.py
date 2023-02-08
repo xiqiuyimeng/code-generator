@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from constant.constant import STRUCTURE_CONFIRM_SELECTED_HEADER_TXT, STRUCT_COL_ICON
-from constant.icon_enum import get_icon
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
-from view.tree.tree_widget.tree_function import make_display_tree_item
+from src.constant.constant import STRUCTURE_CONFIRM_SELECTED_HEADER_TXT, STRUCT_COL_ICON
+from src.constant.icon_enum import get_icon
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
+from src.view.tree.tree_widget.tree_function import make_display_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/11/1 10:30'

@@ -2,8 +2,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
-from view.tab.tab_widget.tab_widget import TabWidget, SqlTabWidget, StructTabWidget
+from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
+from src.view.tab.tab_widget.tab_widget import TabWidget, SqlTabWidget, StructTabWidget
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 18:10'

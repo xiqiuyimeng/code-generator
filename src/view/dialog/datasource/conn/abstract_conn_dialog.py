@@ -4,13 +4,13 @@ import dataclasses
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QPushButton
 
-from constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT
-from service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor, QueryConnInfoExecutor
-from service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
-from service.system_storage.conn_sqlite import SqlConnection
-from service.system_storage.conn_type import *
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
+from src.constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT
+from src.service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor, QueryConnInfoExecutor
+from src.service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
+from src.service.system_storage.conn_sqlite import SqlConnection
+from src.service.system_storage.conn_type import *
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
 
 _author_ = 'luwt'
 _date_ = '2022/5/29 17:55'

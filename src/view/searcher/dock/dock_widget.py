@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QDockWidget, QWidget
 
-from view.searcher.line_edit.search_line_edit import SearcherLineEdit
+from src.view.searcher.line_edit.search_line_edit import SearcherLineEdit
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 18:59'

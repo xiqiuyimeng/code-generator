@@ -2,17 +2,17 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu
 
-from constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
+from src.constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
     DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_FOLDER_ACTION, \
     CANCEL_REFRESH_FOLDER_ACTION
-from constant.icon_enum import get_icon
-from service.async_func.async_struct_executor.async_struct_executor import RefreshFolderExecutor
-from service.async_func.async_struct_task import DelFolderExecutor
-from view.bar.bar_action import add_structure_ds_actions
-from view.box.message_box import pop_question, pop_fail
-from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
-from view.tree.tree_widget.tree_function import add_folder_func, edit_folder_func, add_struct_tree_item
+from src.constant.icon_enum import get_icon
+from src.service.async_func.async_struct_executor.async_struct_executor import RefreshFolderExecutor
+from src.service.async_func.async_struct_task import DelFolderExecutor
+from src.view.bar.bar_action import add_structure_ds_actions
+from src.view.box.message_box import pop_question, pop_fail
+from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
+from src.view.tree.tree_widget.tree_function import add_folder_func, edit_folder_func, add_struct_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 12:08'

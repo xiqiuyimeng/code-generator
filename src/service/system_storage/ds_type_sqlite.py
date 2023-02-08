@@ -2,8 +2,8 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
-from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
+from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
+from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:43'

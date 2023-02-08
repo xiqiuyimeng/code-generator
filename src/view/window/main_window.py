@@ -2,16 +2,16 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar
 
-from constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
-from constant.icon_enum import get_icon
-from service.async_func.async_ds_type_task import InitDsTypeExecutor, SwitchDsTypeExecutor
-from service.system_storage.ds_type_sqlite import DatasourceType
-from service.util.ds_type_util import get_current_datasource_type
-from view.bar.menubar import Menubar
-from view.bar.titlebar import TitleBar
-from view.bar.toolbar import ToolBar
-from view.box.message_box import pop_ok
-from view.window.central_widget import CentralWidget
+from src.constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
+from src.constant.icon_enum import get_icon
+from src.service.async_func.async_ds_type_task import InitDsTypeExecutor, SwitchDsTypeExecutor
+from src.service.system_storage.ds_type_sqlite import DatasourceType
+from src.service.util.ds_type_util import get_current_datasource_type
+from src.view.bar.menubar import Menubar
+from src.view.bar.titlebar import TitleBar
+from src.view.bar.toolbar import ToolBar
+from src.view.box.message_box import pop_ok
+from src.view.window.central_widget import CentralWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 10:04'

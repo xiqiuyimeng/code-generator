@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
 
-from constant.constant import NAME_AVAILABLE, NAME_EXISTS, NO_CHANGE_PROMPT
-from constant.icon_enum import get_icon
-from service.async_func.async_task_abc import LoadingMaskThreadExecutor
-from service.read_qrc.read_config import read_qss
-from service.system_storage.sqlite_abc import BasicSqliteDTO
-from view.box.message_box import pop_ok
-from view.dialog.custom_dialog import CustomDialog
+from src.constant.constant import NAME_AVAILABLE, NAME_EXISTS, NO_CHANGE_PROMPT
+from src.constant.icon_enum import get_icon
+from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
+from src.service.read_qrc.read_config import read_qss
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO
+from src.view.box.message_box import pop_ok
+from src.view.dialog.custom_dialog import CustomDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/22 9:02'

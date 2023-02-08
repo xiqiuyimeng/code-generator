@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from view.tab.tab_bar.tab_bar import TabBar
+from src.view.tab.tab_bar.tab_bar import TabBar
 
 _author_ = 'luwt'
 _date_ = '2022/12/7 12:39'

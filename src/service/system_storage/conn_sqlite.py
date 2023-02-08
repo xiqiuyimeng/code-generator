@@ -3,9 +3,9 @@ import dataclasses
 import json
 from dataclasses import dataclass, field
 
-from service.system_storage.conn_type import mapping_conn_type
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
-from service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
+from src.service.system_storage.conn_type import mapping_conn_type
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
+from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:26'
@@ -58,7 +58,7 @@ class ConnSqlite(SqliteBasic):
 
     def get_conn_id_types(self):
         rows = self._do_select(conn_sql_dict.get('select_id_type'), SqlConnection())
-        return list(map(lambda x: SqlConnection(**x), rows.all()))
+        return list(map(lambda x: SqlConnection(**x), rows.as_dict()))
 
     def check_name_available(self, sql_conn):
         """检查连接名称是否可用，名称必须唯一"""

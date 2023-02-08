@@ -2,20 +2,20 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
+from src.constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
     SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
     LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT, LIST_ALL_CONN_TITLE
-from logger.log import logger as log
-from service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
-from service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
-from service.system_storage.conn_type import get_conn_type_by_type
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
-from service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from service.system_storage.ds_type_sqlite import DatasourceTypeEnum
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
-from service.system_storage.sqlite_abc import transactional
-from view.box.message_box import pop_ok
-from view.tree.tree_item.tree_item_func import get_children_opened_ids, get_item_opened_record
+from src.logger.log import logger as log
+from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
+from src.service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
+from src.service.system_storage.conn_type import get_conn_type_by_type
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
+from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
+from src.service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
+from src.service.system_storage.sqlite_abc import transactional
+from src.view.box.message_box import pop_ok
+from src.view.tree.tree_item.tree_item_func import get_children_opened_ids, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/30 20:31'

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from service.system_storage.struct_type import StructTypeEnum
-from view.dialog.datasource.structure import AbstractStructDialog
+from src.service.system_storage.struct_type import StructTypeEnum
+from src.view.dialog.datasource.structure import AbstractStructDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/16 12:37'

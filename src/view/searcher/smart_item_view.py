@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QAbstractItemView, QTreeWidget, QListWidget
 
-from view.searcher.search_func.list_searcher import ListSearcher
-from view.searcher.search_func.tree_searcher import TreeSearcher
+from src.view.searcher.search_func.list_searcher import ListSearcher
+from src.view.searcher.search_func.tree_searcher import TreeSearcher
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:07'

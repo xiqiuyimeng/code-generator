@@ -7,10 +7,10 @@ from datetime import datetime
 import records
 from sqlalchemy.pool import SingletonThreadPool
 
-from constant.constant import SYS_DB_PATH
-from exception.exception import ThreadStopException
-from logger.log import logger as log
-from service.util.db_id_generator import update_id_generator, get_id
+from src.constant.constant import SYS_DB_PATH
+from src.exception.exception import ThreadStopException
+from src.logger.log import logger as log
+from src.service.util.db_id_generator import update_id_generator, get_id
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
@@ -150,7 +150,7 @@ class SqliteBasic:
         field_list = table_field_dict.get(self.table_name)
         if not field_list:
             rows = get_db_conn().query(self._field_list_sql)
-            field_list = list(map(lambda x: x.name, rows.all()))
+            field_list = list(map(lambda x: x.get('name'), rows.as_dict()))
             table_field_dict[self.table_name] = field_list
         return field_list
 
@@ -268,11 +268,11 @@ class SqliteBasic:
         """根据条件查询，根据不为空的属性作为条件进行查询"""
         rows = self._do_select(self._select_sql, select_obj, order_by, sort_order)
         # 映射为参数对象类
-        return list(map(lambda x: select_obj.__class__(**x), rows.all()))
+        return list(map(lambda x: select_obj.__class__(**x), rows.as_dict()))
 
     def select_one(self, select_obj, order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询，返回第一条"""
-        result = self._do_select(self._select_sql, select_obj, order_by, sort_order).all()
+        result = self._do_select(self._select_sql, select_obj, order_by, sort_order).as_dict()
         # 映射为参数对象类
         return select_obj.__class__(**result[0]) if result else None
 

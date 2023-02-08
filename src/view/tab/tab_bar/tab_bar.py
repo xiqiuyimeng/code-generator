@@ -3,12 +3,12 @@ from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
-from constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
+from src.constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
     CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE, \
     TABLE_CLOSE_WITH_REFRESHING
-from service.system_storage.ds_table_tab_sqlite import DsTableTab
-from view.box.message_box import pop_fail
-from view.tree.tree_item.tree_item_func import set_item_opened_tab
+from src.service.system_storage.ds_table_tab_sqlite import DsTableTab
+from src.view.box.message_box import pop_fail
+from src.view.tree.tree_item.tree_item_func import set_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'

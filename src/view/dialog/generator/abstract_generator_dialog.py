@@ -2,9 +2,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QGridLayout, QPushButton, QLabel
 
-from constant.constant import RESELECT_TXT, CHOOSE_TEMPLATE_TXT
-from view.custom_widget.draggable_widget import DraggableDialog
-from view.tree.tree_widget.abstract_tree_widget import DisplayTreeWidget
+from src.constant.constant import RESELECT_TXT, CHOOSE_TEMPLATE_TXT
+from src.view.custom_widget.draggable_widget import DraggableDialog
+from src.view.tree.tree_widget.abstract_tree_widget import DisplayTreeWidget
 
 _author_ = 'luwt'
 _date_ = '2022/10/31 11:47'

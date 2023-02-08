@@ -2,11 +2,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, LOCATION_TXT, CREATE_NEW_FOLDER
-from view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
-from view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
-from view.tree.tree_widget.struct_tree_widget import StructTreeWidget
-from view.tree.tree_widget.tree_function import add_folder_func
+from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, LOCATION_TXT, CREATE_NEW_FOLDER
+from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
+from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget
+from src.view.tree.tree_widget.tree_function import add_folder_func
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 18:01'

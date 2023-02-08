@@ -3,10 +3,10 @@ from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
 
-from constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
-from view.table.table_widget.abstract_table_widget import AbstractTableWidget
-from view.table.table_widget.sql_table_widget import SqlTableWidget
-from view.table.table_widget.struct_table_widget import StructTableWidget
+from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
+from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.sql_table_widget import SqlTableWidget
+from src.view.table.table_widget.struct_table_widget import StructTableWidget
 
 _author_ = 'luwt'
 _date_ = '2022/9/26 19:28'

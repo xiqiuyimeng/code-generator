@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QPushButton, QFileDialog
 
-from constant.constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
-from service.system_storage.conn_type import ConnTypeEnum
-from view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
+from src.constant.constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
+from src.service.system_storage.conn_type import ConnTypeEnum
+from src.view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 19:31'

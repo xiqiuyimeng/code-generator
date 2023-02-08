@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from constant.constant import SQL_CONFIRM_SELECTED_HEADER_TXT
-from constant.icon_enum import get_icon
-from view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
-from view.tree.tree_widget.tree_function import make_display_tree_item
+from src.constant.constant import SQL_CONFIRM_SELECTED_HEADER_TXT
+from src.constant.icon_enum import get_icon
+from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
+from src.view.tree.tree_widget.tree_function import make_display_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/11/1 9:12'

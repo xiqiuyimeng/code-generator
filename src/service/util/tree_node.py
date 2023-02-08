@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
-from service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 
 _author_ = 'luwt'
 _date_ = '2022/6/3 15:56'

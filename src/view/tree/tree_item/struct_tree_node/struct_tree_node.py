@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, OPEN_STRUCT_ACTION, \
-    CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
+from src.constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
+    OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
     CANCEL_REFRESH_STRUCT_ACTION
-from service.async_func.async_struct_executor.async_struct_executor import OpenStructExecutor, RefreshStructExecutor
-from service.async_func.async_struct_task import DelStructExecutor
-from view.box.message_box import pop_question
-from view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data, \
+from src.service.async_func.async_struct_executor.async_struct_executor import OpenStructExecutor, RefreshStructExecutor
+from src.service.async_func.async_struct_task import DelStructExecutor
+from src.view.box.message_box import pop_question
+from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
+from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data, \
     get_item_opened_record
-from view.tree.tree_widget.tree_function import edit_struct_func
+from src.view.tree.tree_widget.tree_function import edit_struct_func
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 12:09'

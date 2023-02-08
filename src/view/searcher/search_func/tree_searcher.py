@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItemIterator
 
-from view.searcher.search_func.searcher import Searcher
+from src.view.searcher.search_func.searcher import Searcher
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:03'

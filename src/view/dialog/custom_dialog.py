@@ -2,8 +2,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QGridLayout, QPushButton
 
-from constant.constant import OK_BTN_TEXT, CANCEL_BTN_TEXT
-from view.custom_widget.draggable_widget import DraggableDialog
+from src.constant.constant import OK_BTN_TEXT, CANCEL_BTN_TEXT
+from src.view.custom_widget.draggable_widget import DraggableDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/22 10:20'

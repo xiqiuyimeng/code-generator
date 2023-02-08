@@ -18,7 +18,8 @@ log_format = (
 )
 
 # 定义新的控制台输出样式
-logger.add(sys.stderr, format=log_format, level="INFO")
+if sys.stderr:
+    logger.add(sys.stderr, format=log_format, level="INFO")
 
 
 log_filename = "generator.log"

@@ -4,11 +4,11 @@ import threading
 from PyQt5.QtCore import QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QMovie, QIcon
 
-from exception.exception import ThreadStopException
-from service.system_storage.sqlite_abc import set_thread_terminate
-from view.box.message_box import pop_fail
-from view.custom_widget.loading_widget import LoadingMaskWidget, RefreshLoadingMaskWidget
-from view.tree.tree_item.tree_item_func import get_item_opened_tab
+from src.exception.exception import ThreadStopException
+from src.service.system_storage.sqlite_abc import set_thread_terminate
+from src.view.box.message_box import pop_fail
+from src.view.custom_widget.loading_widget import LoadingMaskWidget, RefreshLoadingMaskWidget
+from src.view.tree.tree_item.tree_item_func import get_item_opened_tab
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 16:46'
