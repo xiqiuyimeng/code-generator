@@ -198,16 +198,24 @@ SQLITE_QUERY_COL_SQL = 'PRAGMA table_info(`{}`);'
 
 # mysql查询数据库列表sql
 MYSQL_QUERY_DB_SQL = 'show databases'
+# mysql检查数据库表sql
+MYSQL_CHECK_DB_SQL = 'show databases like \'{}\''
 # mysql查询数据库中的表名sql
 MYSQL_QUERY_TB_SQL = 'show tables from {}'
+# mysql检查表sql
+MYSQL_CHECK_TB_SQL = 'show tables from {} like \'{}\''
 # mysql查询数据库表的列名sql
-MYSQL_QUERY_COL_SQL = "show full columns from `{}`.`{}`;"
+MYSQL_QUERY_COL_SQL = "show full columns from `{}`.`{}`"
 
 # oracle查询数据库列表sql
 ORACLE_QUERY_DB_SQL = 'select distinct(OWNER) from all_tables order by OWNER'
-# mysql查询数据库中的表名sql
+# oracle检查数据库sql
+ORACLE_CHECK_DB_SQL = 'select distinct(OWNER) from all_tables where OWNER = \'{}\''
+# oracle查询数据库中的表名sql
 ORACLE_QUERY_TB_SQL = 'select TABLE_NAME from ALL_TABLES where OWNER = \'{}\' order by TABLE_NAME'
-# mysql查询数据库表的列名sql
+# oracle检查表sql
+ORACLE_CHECK_TB_SQL = 'select TABLE_NAME from ALL_TABLES where OWNER = \'{}\' and TABLE_NAME = \'{}\''
+# oracle查询数据库表的列名sql
 ORACLE_QUERY_COL_SQL = """
 select ATC.COLUMN_NAME, ATC.DATA_TYPE, ATC.DATA_LENGTH, ATC.DATA_PRECISION, ATC.DATA_SCALE,
        ATC.CHAR_USED, UCC.COMMENTS, nvl2(UP.CONSTRAINT_TYPE, 'Y', 'N') as PRIMARY_KEY

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import records
 
+from exception.exception import BusinessException
 from service.system_storage.conn_sqlite import SqlConnection
 from service.system_storage.conn_type import get_conn_type_by_type
 
@@ -29,11 +30,7 @@ class SqlDBExecutor:
 
     def open_db(self, db, check=True): ...
 
-    def check_db(self, db): ...
-
     def open_tb(self, db, tb, check=True): ...
-
-    def check_tb(self, db, tb): ...
 
     def get_sql_connect_url(self) -> str: ...
 
@@ -66,12 +63,23 @@ class InternetDBExecutor(SqlDBExecutor):
         db_records = self.get_data(query_col_sql)
         return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
 
-    def get_dialect_driver(self) -> str: ...
+    def check_db(self, db):
+        check_db_sql = self.get_check_db_sql()
+        db_records = self.get_data(check_db_sql.format(db)).all()
+        if not db_records:
+            raise BusinessException(f'{db}库不存在')
 
     def check_tb(self, db, tb):
         self.check_db(db)
-        self.do_check_tb(db, tb)
+        check_tb_sql = self.get_check_tb_sql()
+        db_records = self.get_data(check_tb_sql.format(db, tb)).all()
+        if not db_records:
+            raise BusinessException(f'{tb}表不存在')
 
-    def do_check_tb(self, db, tb): ...
+    def get_dialect_driver(self) -> str: ...
+
+    def get_check_db_sql(self) -> str: ...
+
+    def get_check_tb_sql(self) -> str: ...
 
     def convert_tb_data(self, db_record): ...

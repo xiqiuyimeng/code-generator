@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from constant.constant import ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL
 from service.sql_ds_executor.db_executor import InternetDBExecutor
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
@@ -12,9 +13,11 @@ class OracleDBExecutor(InternetDBExecutor):
         return f'oracle://{self.conn_info.user}:{self.conn_info.pwd}@' \
                f'{self.conn_info.host}:{self.conn_info.port}/?service_name={self.conn_info.service_name}'
 
-    def check_db(self, db): ...
+    def get_check_db_sql(self) -> str:
+        return ORACLE_CHECK_DB_SQL
 
-    def do_check_tb(self, db, tb): ...
+    def get_check_tb_sql(self) -> str:
+        return ORACLE_CHECK_TB_SQL
 
     def convert_tb_data(self, db_record):
         table_info = DsTableColInfo()

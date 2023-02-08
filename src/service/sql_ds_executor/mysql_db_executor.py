@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from exception.exception import BusinessException
+from constant.constant import MYSQL_CHECK_DB_SQL, MYSQL_CHECK_TB_SQL
 from service.sql_ds_executor.db_executor import InternetDBExecutor
-from service.system_storage.conn_type import get_conn_type_by_type
 from service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
@@ -13,17 +12,11 @@ class MySqlDBExecutor(InternetDBExecutor):
     def get_dialect_driver(self) -> str:
         return 'mysql+pymysql'
 
-    def check_db(self, db):
-        query_db_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_db_sql
-        db_records = self.get_data(f'{query_db_sql} like \'{db}\'').all()
-        if not db_records:
-            raise BusinessException(f'{db}库不存在')
+    def get_check_db_sql(self) -> str:
+        return MYSQL_CHECK_DB_SQL
 
-    def do_check_tb(self, db, tb):
-        query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql.format(db)
-        db_records = self.get_data(f'{query_tb_sql} like \'{tb}\'').all()
-        if not db_records:
-            raise BusinessException(f'{tb}表不存在')
+    def get_check_tb_sql(self) -> str:
+        return MYSQL_CHECK_TB_SQL
 
     def convert_tb_data(self, db_record):
         table_info = DsTableColInfo()
