@@ -202,6 +202,12 @@ class OpenedTreeItemSqlite(SqliteBasic):
         update_param.checked = opened_record.checked
         self.update(update_param)
 
+    def update_child_checked(self, opened_record):
+        # 批量更新所有子项选中状态
+        update_param = OpenedTreeItem()
+        update_param.checked = opened_record.checked
+        self.update(update_param, {'parent_id': opened_record.id})
+
     @staticmethod
     def get_max_level(ds_type):
         max_level_sql = f'{opened_item_sql_dict.get("max_level")}"{ds_type}"'

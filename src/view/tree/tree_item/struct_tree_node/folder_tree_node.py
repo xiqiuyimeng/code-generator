@@ -30,10 +30,9 @@ class FolderTreeNode(AbstractStructTreeNode):
             add_struct_tree_item(self.tree_widget, self.item, opened_item, opened_item.data_type.display_name)
 
     def change_check_box(self, check_state, clicked):
-        # 保存数据
-        self.save_check_state()
-        # 如果是点击，联动父节点变化
+        # 如果是点击，保存数据，联动父节点变化
         if clicked:
+            self.save_check_state()
             self.link_parent_node()
 
     def do_fill_menu(self, menu):
@@ -79,12 +78,10 @@ class FolderTreeNode(AbstractStructTreeNode):
             add_folder_func(self.window.geometry(), self.tree_widget)
         # 全选
         elif func == SELECT_ALL_ACTION:
-            self.item.setCheckState(0, Qt.Checked)
-            self.tree_widget.handle_checkbox_changed(self.item, clicked=False)
+            self.handle_child_item_checked(Qt.Checked)
         # 取消全选
         elif func == UNSELECT_ACTION:
-            self.item.setCheckState(0, Qt.Unchecked)
-            self.tree_widget.handle_checkbox_changed(self.item, clicked=False)
+            self.handle_child_item_checked(Qt.Unchecked)
         # 重命名
         elif func == RENAME_FOLDER_ACTION.format(self.item_name):
             parent_item = self.item.parent()
@@ -109,6 +106,11 @@ class FolderTreeNode(AbstractStructTreeNode):
         # 取消刷新
         elif func == CANCEL_REFRESH_FOLDER_ACTION.format(self.item_name):
             self.refresh_folder_executor.worker_terminate()
+
+    def handle_child_item_checked(self, check_state):
+        self.tree_widget.item_changed_executor.item_checked(self.item)
+        self.item.setCheckState(0, check_state)
+        self.tree_widget.handle_child_item_checked(self.item, check_state)
 
     def set_check_state(self):
         # 对于文件夹节点而言，由下而上联动复选框，需要考虑当前节点状态，以及应该向上传递的状态

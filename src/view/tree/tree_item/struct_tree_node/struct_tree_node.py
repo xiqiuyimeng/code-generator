@@ -68,12 +68,11 @@ class StructTreeNode(AbstractStructTreeNode):
         return True
 
     def change_check_box(self, check_state, clicked):
-        # 保存复选框状态变化
-        self.save_check_state()
         # 联动表格内的复选框
         link_table_checkbox(self.item, check_state)
-        # 如果是点击，联动父节点变化
+        # 如果是点击，保存复选框状态变化，联动父节点变化
         if clicked:
+            self.save_check_state()
             self.link_parent_node()
 
     def show_check_box(self):

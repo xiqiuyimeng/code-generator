@@ -19,7 +19,8 @@ from src.view.searcher.smart_item_view import SmartSearcherTreeWidget
 from src.view.tab.tab_ui import TabTableUI
 from src.view.tab.tab_widget.tab_widget import TabWidget
 from src.view.tree.tree_item.abstract_tree_node import AbstractTreeNode
-from src.view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox, get_item_opened_tab
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox, get_item_opened_tab, \
+    recursive_get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
@@ -52,6 +53,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
         # 是否正在重新打开中，重新打开的过程，会创建子节点，并设置展开状态等，影响部分信号槽
         self.reopening_flag = False
         self.connect_signal()
+        self.tree_data = ...
         # 用来记录item变化：当前项变化、展开状态
         self.item_changed_executor = ItemChangedExecutor()
         self.item_changed_executor.start()
@@ -116,14 +118,28 @@ class AbstractTreeWidget(DisplayTreeWidget):
         # 是为了避免当前节点没有设置复选框，但是又需要将子节点复选框状态统一修改时使用
         # 如果存在子元素，应该将子元素复选框状态同步修改
         if item.childCount():
+            # 批量更新选中状态
+            self.item_changed_executor.item_child_checked(item, check_state)
+
+            # 批量添加选中数据
+            add_del_data, opened_list = dict(), list()
+
             for i in range(item.childCount()):
                 child_item = item.child(i)
                 # 如果复选框状态相同，跳过
                 if child_item.data(0, Qt.CheckStateRole) is None \
                         or child_item.checkState(0) == check_state:
                     continue
+                opened_list.append(get_item_opened_record(child_item))
                 child_item.setCheckState(0, check_state)
                 self.handle_checkbox_changed(child_item, clicked=False)
+            if opened_list:
+                recursive_get_add_del_data(item, add_del_data)
+                add_del_data[opened_list[0].level] = opened_list
+                if check_state == Qt.Unchecked:
+                    self.tree_data.del_node(add_del_data)
+                else:
+                    self.tree_data.add_node(add_del_data)
 
     def handle_item_collapsed(self, item):
         if not self.reopening_flag:

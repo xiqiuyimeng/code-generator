@@ -28,6 +28,8 @@ class ItemChangedWorker(ThreadWorkerABC):
                 OpenedTreeItemSqlite().item_current_changed(opened_item)
             elif method == 'item_checked':
                 OpenedTreeItemSqlite().update_checked(opened_item)
+            elif method == 'item_child_checked':
+                OpenedTreeItemSqlite().update_child_checked(opened_item)
             log.debug(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):
@@ -67,3 +69,8 @@ class ItemChangedExecutor(ThreadExecutorABC):
         opened_item = get_item_opened_record(item)
         opened_item.checked = item.checkState(0)
         self.queue.put(('item_checked', opened_item))
+
+    def item_child_checked(self, item, check_state):
+        opened_item = get_item_opened_record(item)
+        opened_item.checked = check_state
+        self.queue.put(('item_child_checked', opened_item))

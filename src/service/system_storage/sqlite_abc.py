@@ -206,8 +206,8 @@ class SqliteBasic:
         log.info(f'批量删除[{self.table_name}]参数 ==> {obj_ids}')
         get_db_conn().bulk_query(self._delete_sql, list(map(lambda x: {'id': x}, obj_ids)))
 
-    def update(self, update_obj: BasicSqliteDTO):
-        """更新记录方法，根据id更新，创建时间不修改，更新时间传入当前时间"""
+    def update(self, update_obj: BasicSqliteDTO, condition=None):
+        """更新记录方法，根据id（如果存在condition，以condition为准）更新，创建时间不修改，更新时间传入当前时间"""
         update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         update_dict = self.filter_illegal_field(update_obj)
         update_dict.pop('create_time')
@@ -223,7 +223,14 @@ class SqliteBasic:
 
         if update_field_list:
             update_field_str = ", ".join(list(map(lambda x: f'{x} = :{x}', update_field_list)))
-            update_sql = f'{self._update_sql} {update_field_str} {self._id_clause_sql}'
+            if condition:
+                clause_sql_list = list()
+                for k, v in condition.items():
+                    clause_sql_list.append(f'{k} = {v}')
+                clause_sql = f'where {" and ".join(clause_sql_list)}'
+            else:
+                clause_sql = self._id_clause_sql
+            update_sql = f'{self._update_sql} {update_field_str} {clause_sql}'
             log.info(f'更新[{self.table_name}]语句 ==> {update_sql}')
             log.info(f'更新[{self.table_name}]参数 ==> {update_val_dict}')
 
