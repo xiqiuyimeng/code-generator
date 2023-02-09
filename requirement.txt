@@ -7,6 +7,7 @@ pefile==2023.2.7
 Pillow==9.4.0
 pyinstaller==5.7.0
 pyinstaller-hooks-contrib==2022.15
+PyMySQL==1.0.2
 PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.11.1
