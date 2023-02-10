@@ -72,5 +72,7 @@ class ItemChangedExecutor(ThreadExecutorABC):
 
     def item_child_checked(self, item, check_state):
         opened_item = get_item_opened_record(item)
-        opened_item.checked = check_state
-        self.queue.put(('item_child_checked', opened_item))
+        update_record = OpenedTreeItem()
+        update_record.id = opened_item.id
+        update_record.checked = check_state
+        self.queue.put(('item_child_checked', update_record))

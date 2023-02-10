@@ -8,7 +8,7 @@ from src.exception.exception import ThreadStopException
 from src.service.system_storage.sqlite_abc import set_thread_terminate
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.loading_widget import LoadingMaskWidget, RefreshLoadingMaskWidget
-from src.view.tree.tree_item.tree_item_func import get_item_opened_tab
+from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 16:46'
@@ -155,13 +155,13 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
 
     def __init__(self, item, window, error_box_title, success_callback=None, fail_callback=None):
         self.item = item
-        # 首先获取 item 下所有的子节点，key -> item id, value -> item item_icon tab_dict
-        self.item_dict = dict()
         self.success_callback = success_callback
         self.fail_callback = fail_callback
         self.tab_widget = ...
         self.loading_gif = ":/gif/loading.gif"
         self.icon_movie = QMovie(":/gif/loading_simple.gif")
+        # 首先获取 item 下所有的子节点，key -> item id, value -> item item_icon tab_dict
+        self.item_dict = dict()
         self.get_item_dict(item, window)
         super().__init__(window, error_box_title)
 
@@ -226,7 +226,9 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
     def post_process(self):
         # 结束动画
         self.icon_movie.stop()
-        for value_dict in self.item_dict.values():
+        sorted_values = sorted(self.item_dict.values(),
+                               key=lambda x: get_item_opened_record(x.get('item')).level, reverse=True)
+        for value_dict in sorted_values:
             self._stop_movie(value_dict)
 
     def stop_one_movie(self, item):

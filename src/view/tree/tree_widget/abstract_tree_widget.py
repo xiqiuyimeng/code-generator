@@ -132,6 +132,7 @@ class AbstractTreeWidget(DisplayTreeWidget):
                     continue
                 opened_list.append(get_item_opened_record(child_item))
                 child_item.setCheckState(0, check_state)
+                get_item_opened_record(child_item).checked = check_state
                 self.handle_checkbox_changed(child_item, clicked=False)
             if opened_list:
                 recursive_get_add_del_data(item, add_del_data)

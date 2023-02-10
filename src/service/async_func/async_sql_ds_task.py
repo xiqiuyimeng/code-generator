@@ -42,17 +42,17 @@ class SqlDSIconMovieThreadExecutor(IconMovieThreadExecutor):
 
 class ConnWorkerABC(ThreadWorkerABC):
 
-    def __init__(self, conn_opened_item: OpenedTreeItem, connection: SqlConnection = None):
+    def __init__(self, conn_opened_record: OpenedTreeItem, connection: SqlConnection = None):
         super().__init__()
-        self.conn_opened_item = conn_opened_item
+        self.conn_opened_record = conn_opened_record
         self.connection = connection
 
     def do_run(self):
-        db_executor_class = self.conn_opened_item.data_type.db_executor
+        db_executor_class = self.conn_opened_record.data_type.db_executor
         # 获取连接对象，如果没有传进来，从数据库获取
         if not self.connection:
             conn_param = SqlConnection()
-            conn_param.id = self.conn_opened_item.parent_id
+            conn_param.id = self.conn_opened_record.parent_id
             self.connection = ConnSqlite().select_one(conn_param)
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         # 实际的功能实现
@@ -67,11 +67,11 @@ class TestConnWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor):
         executor.test_conn()
-        log.info(f'[{self.conn_opened_item.item_name}]{TEST_CONN_SUCCESS_PROMPT}')
+        log.info(f'[{self.conn_opened_record.item_name}]{TEST_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}]{TEST_CONN_FAIL_PROMPT}'
+        err_msg = f'[{self.conn_opened_record.item_name}]{TEST_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
@@ -116,23 +116,23 @@ class OpenConnWorker(ConnWorkerABC):
         db_opened_items = self.save_opened_items(db_names)
         self.modifying_db_task = False
         self.success_signal.emit(db_opened_items)
-        log.info(f'[{self.conn_opened_item.item_name}]{OPEN_CONN_SUCCESS_PROMPT}')
+        log.info(f'[{self.conn_opened_record.item_name}]{OPEN_CONN_SUCCESS_PROMPT}')
 
     @transactional
     def save_opened_items(self, db_names):
-        log.info(f"保存打开连接[{self.conn_opened_item.item_name}]下的库名列表")
+        log.info(f"保存打开连接[{self.conn_opened_record.item_name}]下的库名列表")
         # 更新连接节点为展开状态，当前项
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
-        opened_tree_item_sqlite.open_item(self.conn_opened_item.id)
+        opened_tree_item_sqlite.open_item(self.conn_opened_record.id)
         # 添加库节点
         db_level = SqlTreeItemLevel.db_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        return opened_tree_item_sqlite.add_opened_child_item(db_names, self.conn_opened_item.id, db_level,
-                                                             ds_type, self.conn_opened_item.data_type,
+        return opened_tree_item_sqlite.add_opened_child_item(db_names, self.conn_opened_record.id, db_level,
+                                                             ds_type, self.conn_opened_record.data_type,
                                                              init_checked=False)
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}]{OPEN_CONN_FAIL_PROMPT}'
+        err_msg = f'[{self.conn_opened_record.item_name}]{OPEN_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
@@ -157,47 +157,47 @@ class RefreshConnWorker(ConnWorkerABC):
     table_changed_signal = pyqtSignal(dict)
     col_signal = pyqtSignal(tuple)
 
-    def __init__(self, conn_opened_item: OpenedTreeItem):
-        super().__init__(conn_opened_item)
+    def __init__(self, conn_opened_record: OpenedTreeItem):
+        super().__init__(conn_opened_record)
 
     def do_executor_func(self, executor: SqlDBExecutor):
         # 读取连接下的库名列表
         db_names = executor.open_conn()
         self.modifying_db_task = True
-        data_type = self.conn_opened_item.data_type
+        data_type = self.conn_opened_record.data_type
         level = SqlTreeItemLevel.db_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        exists_db_items = deal_opened_items(db_names, self.conn_opened_item.id, data_type,
-                                            level, ds_type, self.db_changed_signal, False)
+        exists_db_records = deal_opened_items(db_names, self.conn_opened_record.id, data_type,
+                                              level, ds_type, self.db_changed_signal, False)
 
         # 读取库下的表名列表
-        if exists_db_items:
-            for exists_db_item in exists_db_items:
-                self.refresh_db(executor, exists_db_item, data_type)
+        if exists_db_records:
+            for exists_db_record in exists_db_records:
+                self.refresh_db(executor, exists_db_record, data_type)
         self.modifying_db_task = False
         self.success_signal.emit()
-        log.info(f'[{self.conn_opened_item.item_name}]{REFRESH_CONN_SUCCESS_PROMPT}')
+        log.info(f'[{self.conn_opened_record.item_name}]{REFRESH_CONN_SUCCESS_PROMPT}')
 
-    def refresh_db(self, executor, db_item, data_type):
+    def refresh_db(self, executor, db_record, data_type):
         tree_item_sqlite = OpenedTreeItemSqlite()
         # 获取本地库中缓存的数据
         level = SqlTreeItemLevel.tb_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        child_opened_items = tree_item_sqlite.get_children(db_item.id, level, ds_type)
+        child_opened_records = tree_item_sqlite.get_children(db_record.id, level, ds_type)
         # 如果之前没有子节点，那么不需要进行刷新处理
-        if not child_opened_items:
+        if not child_opened_records:
             return
-        tb_names = executor.open_db(db_item.item_name)
-        exists_tb_items = deal_opened_items(tb_names, db_item.id, data_type, level,
-                                            ds_type, self.table_changed_signal,
-                                            parent_item_order=db_item.item_order)
-        if exists_tb_items:
-            refresh_tab_cols(db_item, executor, exists_tb_items, self.col_signal)
+        tb_names = executor.open_db(db_record.item_name)
+        exists_tb_records = deal_opened_items(tb_names, db_record.id, data_type, level,
+                                              ds_type, self.table_changed_signal,
+                                              parent_item_order=db_record.item_order)
+        if exists_tb_records:
+            refresh_tab_cols(db_record, executor, exists_tb_records, self.col_signal)
         # 库刷新完成，发射信号
-        self.db_finished_signal.emit(db_item.item_order)
+        self.db_finished_signal.emit(db_record.item_order)
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}]{REFRESH_CONN_FAIL_PROMPT}'
+        err_msg = f'[{self.conn_opened_record.item_name}]{REFRESH_CONN_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
@@ -210,7 +210,7 @@ class RefreshConnExecutor(RefreshMovieThreadExecutor):
 
         self.worker.db_changed_signal.connect(db_changed_callback)
         self.worker.table_changed_signal.connect(tb_changed_callback)
-        self.worker.col_signal.connect(col_changed_callback)
+        self.worker.col_signal.connect(lambda result: col_changed_callback(*result))
         self.worker.db_finished_signal.connect(db_finished_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
@@ -224,8 +224,8 @@ class RefreshConnExecutor(RefreshMovieThreadExecutor):
 class OpenDBWorker(ConnWorkerABC):
     success_signal = pyqtSignal(list)
 
-    def __init__(self, conn_opened_item: OpenedTreeItem, db_name, opened_db_id):
-        super().__init__(conn_opened_item)
+    def __init__(self, conn_opened_record: OpenedTreeItem, db_name, opened_db_id):
+        super().__init__(conn_opened_record)
         self.db_name = db_name
         self.opened_db_id = opened_db_id
 
@@ -237,7 +237,7 @@ class OpenDBWorker(ConnWorkerABC):
             tb_opened_items = self.save_opened_items(tb_names)
             self.modifying_db_task = False
         self.success_signal.emit(tb_opened_items)
-        log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT}')
+        log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT}')
 
     @transactional
     def save_opened_items(self, tb_names):
@@ -249,10 +249,10 @@ class OpenDBWorker(ConnWorkerABC):
         tb_level = SqlTreeItemLevel.tb_level.value
         ds_type = DatasourceTypeEnum.sql_ds_type.value.name
         return opened_tree_item_sqlite.add_opened_child_item(tb_names, self.opened_db_id, tb_level,
-                                                             ds_type, self.conn_opened_item.data_type)
+                                                             ds_type, self.conn_opened_record.data_type)
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
+        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
@@ -277,8 +277,8 @@ class RefreshDBWorker(ConnWorkerABC):
     table_changed_signal = pyqtSignal(dict)
     col_signal = pyqtSignal(tuple)
 
-    def __init__(self, conn_opened_item: OpenedTreeItem, db_opened_item: OpenedTreeItem, child_count):
-        super().__init__(conn_opened_item)
+    def __init__(self, conn_opened_record: OpenedTreeItem, db_opened_item: OpenedTreeItem, child_count):
+        super().__init__(conn_opened_record)
         self.db_opened_item = db_opened_item
         self.db_name = db_opened_item.item_name
         self.opened_db_id = db_opened_item.id
@@ -289,24 +289,24 @@ class RefreshDBWorker(ConnWorkerABC):
             # 读取库下最新的表名列表
             tb_names = executor.open_db(self.db_name)
             self.modifying_db_task = True
-            data_type = self.conn_opened_item.data_type
+            data_type = self.conn_opened_record.data_type
             level = SqlTreeItemLevel.tb_level.value
             ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-            exists_items = deal_opened_items(tb_names, self.opened_db_id, data_type,
-                                             level, ds_type, self.table_changed_signal)
+            exists_item_records = deal_opened_items(tb_names, self.opened_db_id, data_type,
+                                                    level, ds_type, self.table_changed_signal)
 
             # 接下来处理数据表列信息，将每一个打开的数据表列信息进行刷新
-            if exists_items:
-                refresh_tab_cols(self.db_opened_item, executor, exists_items, self.col_signal, False)
+            if exists_item_records:
+                refresh_tab_cols(self.db_opened_item, executor, exists_item_records, self.col_signal, False)
             self.modifying_db_task = False
-            log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT}')
+            log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT}')
         else:
             # 只检查库
             executor.check_db(self.db_name)
         self.success_signal.emit()
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}]{REFRESH_DB_FAIL_PROMPT}'
+        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}]{REFRESH_DB_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
@@ -317,7 +317,7 @@ class RefreshDBExecutor(RefreshMovieThreadExecutor):
         super().__init__(tree_widget, item, window, REFRESH_DB_TITLE)
 
         self.worker.table_changed_signal.connect(tb_changed_callback)
-        self.worker.col_signal.connect(col_changed_callback)
+        self.worker.col_signal.connect(lambda col_result: col_changed_callback(*col_result))
 
     def get_worker(self) -> ThreadWorkerABC:
         return RefreshDBWorker(get_item_opened_record(self.item.parent()),
@@ -333,9 +333,9 @@ class RefreshDBExecutor(RefreshMovieThreadExecutor):
 class OpenTBWorker(ConnWorkerABC):
     success_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, conn_opened_item: OpenedTreeItem, db_name, tb_name,
+    def __init__(self, conn_opened_record: OpenedTreeItem, db_name, tb_name,
                  opened_table_item, check_state):
-        super().__init__(conn_opened_item)
+        super().__init__(conn_opened_record)
         self.db_name = db_name
         self.tb_name = tb_name
         self.opened_table_item = opened_table_item
@@ -344,7 +344,7 @@ class OpenTBWorker(ConnWorkerABC):
     def do_executor_func(self, executor: SqlDBExecutor):
         columns = executor.open_tb(self.db_name, self.tb_name)
         table_tab = self.save_opened_items(columns)
-        log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}')
+        log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}')
         self.success_signal.emit(table_tab)
 
     @transactional
@@ -360,7 +360,7 @@ class OpenTBWorker(ConnWorkerABC):
         return table_tab
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]' \
+        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
                   f'{OPEN_TB_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
@@ -385,9 +385,9 @@ class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
 class RefreshTBWorker(ConnWorkerABC):
     success_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, tab, conn_opened_item: OpenedTreeItem, db_name, tb_name,
+    def __init__(self, tab, conn_opened_record: OpenedTreeItem, db_name, tb_name,
                  opened_table_item):
-        super().__init__(conn_opened_item)
+        super().__init__(conn_opened_record)
         self.db_name = db_name
         self.tb_name = tb_name
         self.opened_table_item = opened_table_item
@@ -409,14 +409,14 @@ class RefreshTBWorker(ConnWorkerABC):
             # 保存新的数据，并发射信号
             DsTableColInfoSqlite().refresh_tab_cols(self.tab.id, columns)
             self.modifying_db_task = False
-            log.info(f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]'
+            log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]'
                      f'{REFRESH_TB_SUCCESS_PROMPT}')
             self.success_signal.emit(self.tab)
         else:
             self.success_signal.emit(DsTableTab())
 
     def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_item.item_name}][{self.db_name}][{self.tb_name}]' \
+        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
                   f'{REFRESH_TB_FAIL_PROMPT}'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')

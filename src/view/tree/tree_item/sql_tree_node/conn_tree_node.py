@@ -13,7 +13,7 @@ from src.view.box.message_box import pop_ok, pop_question, pop_fail
 from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from src.view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
-    get_item_opened_tab, set_item_opened_record
+    get_item_opened_tab, refresh_tree_item_callback
 from src.view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, make_sql_tree_item
 
 _author_ = 'luwt'
@@ -252,62 +252,45 @@ class ConnTreeNode(AbstractSqlTreeNode):
         self.refresh_conn_executor.start()
 
     def refresh_db_callback(self, table_changed_dict: dict):
-        # 清空选中数据
-        del_data = get_add_del_data(self.item)
-        self.tree_widget.tree_data.del_node(del_data)
+        refresh_tree_item_callback(self.tree_widget, self.item, table_changed_dict,
+                                   self.handle_refresh_unchanged_records,
+                                   self.handle_refresh_delete_records,
+                                   make_sql_tree_item)
 
-        new_items = table_changed_dict.get('new')
-        exists_items = table_changed_dict.get('exists')
-        delete_items = table_changed_dict.get('delete')
+    def handle_refresh_unchanged_records(self, unchanged_item):
+        # 只停止没有子节点的节点动画
+        if not unchanged_item.childCount():
+            self.refresh_conn_executor.stop_one_movie(unchanged_item)
 
-        # 首先处理需要更新的元素
-        for old_item_order, exists_item_record in exists_items:
-            update_item = self.item.child(old_item_order)
-            set_item_opened_record(update_item, exists_item_record)
-            # 只停止没有子节点的节点动画
-            if not update_item.childCount():
-                self.refresh_conn_executor.stop_one_movie(update_item)
-        # 处理删除的元素
-        for delete_item_record in delete_items:
-            del_item = self.item.child(delete_item_record.item_order)
-            # 停止动画
-            self.refresh_conn_executor.stop_one_movie(del_item)
-            # 如果存在子节点
-            if del_item.childCount():
-                for del_index in range(del_item.childCount()):
-                    del_child_item = del_item.child(del_index)
-                    # 寻找子节点打开的tab页，将其删除
-                    del_tab = get_item_opened_tab(del_child_item)
-                    if del_tab:
-                        del_tab_index = self.tree_widget.get_current_tab_widget().indexOf(del_tab)
-                        # 删除tab，清除对应数据由槽函数处理
-                        self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(del_tab_index, False)
-                    del_item.removeChild(del_child_item)
-            # 删除树节点
-            self.item.removeChild(del_item)
-        # 最后处理需要插入的节点元素
-        if new_items:
-            icon = get_icon(get_item_opened_record(self.item).data_type.db_icon_name)
-            for new_item_record in new_items:
-                # 根据顺序来插入
-                new_item = make_sql_tree_item(self.tree_widget, self.item, new_item_record.item_name,
-                                              icon, new_item_record)
-                self.item.insertChild(new_item_record.item_order, new_item)
+    def handle_refresh_delete_records(self, del_item):
+        # 停止动画
+        self.refresh_conn_executor.stop_one_movie(del_item)
+        # 如果存在子节点
+        if del_item.childCount():
+            for del_index in range(del_item.childCount()):
+                del_child_item = del_item.child(del_index)
+                # 寻找子节点打开的tab页，将其删除
+                del_tab = get_item_opened_tab(del_child_item)
+                if del_tab:
+                    del_tab_index = self.tree_widget.get_current_tab_widget().indexOf(del_tab)
+                    # 删除tab，清除对应数据由槽函数处理
+                    self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(del_tab_index, False)
+                del_item.removeChild(del_child_item)
 
     def refresh_table_callback(self, table_changed_dict: dict):
-        db_item = self.item.child(table_changed_dict.get('parent_item_order'))
+        db_item = self.item.child(table_changed_dict.get('parent_item_order') - 1)
         self.tree_widget.get_item_node(db_item).refresh_tables_callback(
             table_changed_dict, self.refresh_conn_executor)
 
     def refresh_cols_callback(self, table_tab, db_item_order, tb_item_order):
         # 刷新tab页面
-        tb_item = self.item.child(db_item_order).child(tb_item_order)
+        tb_item = self.item.child(db_item_order - 1).child(tb_item_order - 1)
         self.tree_widget.get_item_node(tb_item).refresh_success(table_tab)
         # 刷新完成，停止tab动画
         self.refresh_conn_executor.stop_one_movie(tb_item)
 
     def refresh_db_finished_callback(self, item_order):
-        db_item = self.item.child(item_order)
+        db_item = self.item.child(item_order - 1)
         self.refresh_conn_executor.stop_one_movie(db_item)
 
     def worker_terminate(self):

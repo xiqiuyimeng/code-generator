@@ -2,6 +2,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
+from src.view.tree.tree_item.tree_item_func import get_item_opened_record
+
 _author_ = 'luwt'
 _date_ = '2022/12/9 17:50'
 
@@ -26,3 +28,7 @@ class TreeWidgetItem(QTreeWidgetItem):
         super().setData(column, role, value)
         if check_change:
             self.tree.item_checkbox_clicked.emit(self)
+
+    def __lt__(self, other):
+        """重载操作符，实现自定义排序"""
+        return get_item_opened_record(self).item_order < get_item_opened_record(other).item_order
