@@ -32,18 +32,17 @@ class FolderDialog(NameCheckDialog):
     def button_available(self) -> bool:
         return self.name_input.displayText() and self.name_available
 
+    def check_data_changed(self) -> bool:
+        return self.dialog_data.item_name != self.name_input.displayText()
+
     def save_func(self):
         new_folder_name = self.name_input.displayText()
         # 存在id，说明是编辑
         if self.dialog_data.id:
-            if self.dialog_data.item_name != new_folder_name:
-                self.dialog_data.item_name = new_folder_name
-                self.edit_folder_executor = EditFolderExecutor(self.dialog_data, self,
-                                                               self, self.edit_post_process)
-                self.edit_folder_executor.start()
-            else:
-                # 没有更改任何信息
-                self.dialog_data_no_change(self.dialog_title)
+            self.dialog_data.item_name = new_folder_name
+            self.edit_folder_executor = EditFolderExecutor(self.dialog_data, self,
+                                                           self, self.edit_post_process)
+            self.edit_folder_executor.start()
         else:
             # 新增操作
             self.add_folder_executor = AddFolderExecutor(new_folder_name, self.parent_folder_item.id,

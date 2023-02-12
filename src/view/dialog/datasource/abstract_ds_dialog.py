@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from src.constant.constant import SAVE_DS_INFO_TITLE
 from src.view.dialog.name_check_dialog import NameCheckDialog
 
 _author_ = 'luwt'
@@ -21,7 +20,3 @@ class AbstractDsInfoDialog(NameCheckDialog):
         self.frame_layout.addLayout(self.ds_info_layout)
 
     def setup_ds_content_info_ui(self): ...
-
-    def ds_info_no_change(self):
-        super().dialog_data_no_change(SAVE_DS_INFO_TITLE)
-

@@ -55,8 +55,7 @@ CANCEL_BTN_TEXT = "取消"
 # ---------- 连接对话框中的展示文本 end ---------- #
 
 # ---------- 操作数据源时提示语 start ---------- #
-SAVE_DS_INFO_TITLE = "保存数据源"
-NO_CHANGE_PROMPT = "信息无变化"
+NAME_UNCHANGED_PROMPT = "名称无变化"
 # ---------- 操作数据源时提示语 end ---------- #
 
 

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
 
-from src.constant.constant import NAME_AVAILABLE, NAME_EXISTS, NO_CHANGE_PROMPT
+from src.constant.constant import NAME_AVAILABLE, NAME_EXISTS, NAME_UNCHANGED_PROMPT
 from src.constant.icon_enum import get_icon
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.service.read_qrc.read_config import read_qss
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO
-from src.view.box.message_box import pop_ok
 from src.view.dialog.custom_dialog import CustomDialog
 
 _author_ = 'luwt'
@@ -73,7 +72,11 @@ class NameCheckDialog(CustomDialog):
         if name:
             self.name_available = self.check_available(name)
             if self.name_available:
-                prompt = NAME_AVAILABLE.format(name)
+                # 如果名称无变化，提示
+                if self.old_name == name:
+                    prompt = NAME_UNCHANGED_PROMPT
+                else:
+                    prompt = NAME_AVAILABLE.format(name)
                 style = "color:green"
                 # 重载样式表
                 self.name_input.setStyleSheet(read_qss())
@@ -150,27 +153,23 @@ class NameCheckDialog(CustomDialog):
         self.collect_input()
         # 如果输入框都有值，那么就开放按钮，否则关闭
         if self.button_available():
-            self.set_button_available()
+            self.set_other_button_available()
+            # 如果数据变化，应该放开保存按钮
+            if self.check_data_changed():
+                self.save_button.setDisabled(False)
+            else:
+                # 否则按钮应该不可用
+                self.save_button.setDisabled(True)
         else:
-            self.init_button_status()
+            self.save_button.setDisabled(True)
+            self.init_other_button_status()
 
     def collect_input(self): ...
 
     def button_available(self) -> bool: ...
 
-    def set_button_available(self):
-        self.save_button.setDisabled(False)
-        self.set_other_button_available()
+    def check_data_changed(self) -> bool: ...
 
     def set_other_button_available(self): ...
 
-    def init_button_status(self):
-        self.save_button.setDisabled(True)
-        self.init_other_button_status()
-
     def init_other_button_status(self): ...
-
-    def dialog_data_no_change(self, title):
-        # 没有更改任何信息
-        pop_ok(NO_CHANGE_PROMPT, title, self)
-        self.close()

@@ -104,6 +104,9 @@ class AbstractStructDialog(AbstractDsInfoDialog):
     def button_available(self) -> bool:
         return all((self.new_dialog_data.struct_name, self.new_dialog_data.content)) and self.name_available
 
+    def check_data_changed(self) -> bool:
+        return self.new_dialog_data != self.dialog_data
+
     def collect_input(self):
         # 根据参数构建结构体信息对象
         self.new_dialog_data = StructInfo()
@@ -152,16 +155,12 @@ class AbstractStructDialog(AbstractDsInfoDialog):
     def save_func(self):
         # 存在id，说明是编辑
         if self.dialog_data:
-            if self.new_dialog_data != self.dialog_data:
-                self.new_dialog_data.id = self.dialog_data.id
-                self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
-                self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
-                self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
-                                                               self.edit_post_process)
-                self.edit_struct_executor.start()
-            else:
-                # 没有更改任何信息
-                self.ds_info_no_change()
+            self.new_dialog_data.id = self.dialog_data.id
+            self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
+            self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
+            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
+                                                           self.edit_post_process)
+            self.edit_struct_executor.start()
         else:
             # 新增操作
             self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,

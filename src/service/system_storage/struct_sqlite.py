@@ -30,7 +30,7 @@ struct_sql_dict = {
 @dataclass
 class StructInfo(BasicSqliteDTO):
 
-    opened_item_id: str = field(init=False, default=None)
+    opened_item_id: str = field(init=False, default=None, compare=False)
     struct_name: str = field(init=False, default=None)
     struct_type: str = field(init=False, default=None)
     # 具体结构体内容，文本信息

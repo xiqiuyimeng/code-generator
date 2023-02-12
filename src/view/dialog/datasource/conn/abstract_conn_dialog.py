@@ -67,6 +67,10 @@ class AbstractConnDialog(AbstractDsInfoDialog):
                 and all(dataclasses.astuple(self.conn_info)) \
                 and self.name_available
 
+    def check_data_changed(self) -> bool:
+        self.new_dialog_data.construct_conn_info()
+        return self.new_dialog_data != self.dialog_data
+
     def collect_input(self):
         self.new_dialog_data.conn_name = self.name_input.text()
         conn_param = self.collect_conn_info_input()
@@ -104,15 +108,11 @@ class AbstractConnDialog(AbstractDsInfoDialog):
         self.new_dialog_data.construct_conn_info()
         # 存在id，说明是编辑（当添加连接时， dialog_data = None, 当编辑时，读取数据库，dialog_data = SQLConnection）
         if self.dialog_data:
-            if self.new_dialog_data != self.dialog_data:
-                self.new_dialog_data.id = self.dialog_data.id
-                self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name
-                self.edit_conn_executor = EditConnExecutor(self.new_dialog_data, self, self,
-                                                           self.edit_post_process, self.name_changed)
-                self.edit_conn_executor.start()
-            else:
-                # 没有更改任何信息
-                self.ds_info_no_change()
+            self.new_dialog_data.id = self.dialog_data.id
+            self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name
+            self.edit_conn_executor = EditConnExecutor(self.new_dialog_data, self, self,
+                                                       self.edit_post_process, self.name_changed)
+            self.edit_conn_executor.start()
         else:
             # 新增操作
             self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self, self, self.save_post_process)
