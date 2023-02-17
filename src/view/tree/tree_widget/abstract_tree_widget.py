@@ -10,7 +10,7 @@
     在clicked信号槽函数中重置标志位，实现点击复选框功能
 """
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator, QHeaderView
+from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 
 from src.service.async_func.async_item_changed_task import ItemChangedExecutor
 from src.view.item_view_widget.abstract_item_view import AbstractItemView
@@ -30,15 +30,22 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
     def __init__(self, parent):
         super().__init__(parent)
         self.headerItem().setHidden(True)
-        # 设置树节点文本过长不转为省略号，展示水平滚动条，需要下面两个指令一起设置
-        self.header().setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.header().setStretchLastSection(False)
+        # 设置宽度
+        self.resize_header_width()
 
     def keyPressEvent(self, event) -> None:
         # 先调用智能搜索的按键检测方法
         super().keyPressEvent(event)
         # 再调用统一元素视图中的方法
         AbstractItemView.keyPressEvent(self, event)
+
+    def resizeEvent(self, e) -> None:
+        self.resize_header_width()
+        super().resizeEvent(e)
+
+    def resize_header_width(self):
+        # 按列宽来设置最小宽度，这样可以避免文本过长时，自动隐藏为省略号
+        self.header().setMinimumSectionSize(self.sizeHintForColumn(0))
 
 
 class AbstractTreeWidget(DisplayTreeWidget):

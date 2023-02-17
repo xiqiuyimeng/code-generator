@@ -14,8 +14,6 @@ class ScrollableWidget(QAbstractScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        # 抓取键盘事件
-        self.grabKeyboard()
         # 检测是否按下shift键
         self.press_shift = False
 
@@ -41,12 +39,16 @@ class ScrollableWidget(QAbstractScrollArea):
         """设置滚动条在进入控件区域的时候显示"""
         self.verticalScrollBar().setHidden(False)
         self.horizontalScrollBar().setHidden(False)
+        # 当鼠标进入时，抓取键盘输入
+        self.grabKeyboard()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
         """设置滚动条在离开控件区域的时候隐藏"""
         self.verticalScrollBar().setHidden(True)
         self.horizontalScrollBar().setHidden(True)
+        # 当鼠标离开时，不再抓取键盘输入
+        self.releaseKeyboard()
         super().leaveEvent(event)
 
 
