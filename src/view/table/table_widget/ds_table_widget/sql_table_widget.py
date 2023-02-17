@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.ds_table_widget.abstract_ds_col_table_widget import AbstractDsColTableWidget
 from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
 
 
-class SqlTableWidget(AbstractTableWidget):
+class SqlDsColTableWidget(AbstractDsColTableWidget):
 
     def add_checked_data(self, cols):
         add_data = get_add_del_data(self.tree_item)

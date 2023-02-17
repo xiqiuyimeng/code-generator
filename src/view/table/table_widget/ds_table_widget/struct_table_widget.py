@@ -4,14 +4,14 @@
 """
 from PyQt5.QtWidgets import QWidget, QHBoxLayout
 
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.ds_table_widget.abstract_ds_col_table_widget import AbstractDsColTableWidget
 from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
 
 
-class StructTableWidget(AbstractTableWidget):
+class StructDsColTableWidget(AbstractDsColTableWidget):
 
     def do_add_child_table(self, col_data, row_index) -> QWidget:
         child_widget = QWidget()
@@ -20,8 +20,8 @@ class StructTableWidget(AbstractTableWidget):
         child_layout = QHBoxLayout()
         child_widget.setLayout(child_layout)
         # 创建子表格
-        child_table = StructTableWidget(self.main_window, self.tree_widget, child_widget,
-                                        col_data.children, self)
+        child_table = StructDsColTableWidget(self.main_window, self.tree_widget, child_widget,
+                                             col_data.children, self)
         child_widget.child_table = child_table
         child_layout.addWidget(child_table)
 
