@@ -14,8 +14,8 @@ class ScrollableWidget(QAbstractScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        # 给自身安装监听事件
-        self.installEventFilter(self)
+        # 抓取键盘事件
+        self.grabKeyboard()
         # 检测是否按下shift键
         self.press_shift = False
 
