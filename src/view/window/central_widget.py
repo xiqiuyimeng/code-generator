@@ -39,19 +39,19 @@ class CentralWidget(QWidget):
             self.tab_frame.hide()
 
         # 获取tree frame
-        tree_frame_key = f'tree-frame:{self.main_window.current_ds_type.name}'
+        tree_frame_key = f'tree-frame:{self.main_window.current_ds_category.name}'
         self.tree_frame = self.frame_dict.get(tree_frame_key)
         if not self.tree_frame:
-            self.tree_frame = get_tree_frame(self.main_window.current_ds_type.name,
+            self.tree_frame = get_tree_frame(self.main_window.current_ds_category.name,
                                              self.horizontal_splitter, self.main_window)
             self.frame_dict[tree_frame_key] = self.tree_frame
         self.tree_frame.show()
 
         # 获取tab frame
-        tab_frame_key = f'tab-frame:{self.main_window.current_ds_type.name}'
+        tab_frame_key = f'tab-frame:{self.main_window.current_ds_category.name}'
         self.tab_frame = self.frame_dict.get(tab_frame_key)
         if not self.tab_frame:
-            self.tab_frame = get_tab_frame(self.main_window.current_ds_type.name,
+            self.tab_frame = get_tab_frame(self.main_window.current_ds_category.name,
                                            self.horizontal_splitter, self.main_window)
             self.frame_dict[tab_frame_key] = self.tab_frame
         self.tab_frame.show()

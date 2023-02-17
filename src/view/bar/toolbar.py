@@ -21,11 +21,11 @@ class ToolBar(QToolBar, DraggableWidget):
         # 设置名称显示在图标下面（默认本来是只显示图标）
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
-        self.switch_ds_type_menu = ...
+        self.switch_ds_category_menu = ...
         self.add_ds_menu: QMenu = ...
 
     def fill_tool_bar(self):
-        self.add_switch_source_type_tool()
+        self.add_switch_ds_category_tool()
         self.add_ds_tool()
 
         # 模板设置
@@ -39,7 +39,6 @@ class ToolBar(QToolBar, DraggableWidget):
         self.add_generate_tool()
         # 清空选择
         self.add_clear_tool()
-
         self.addSeparator()
 
         # 帮助
@@ -49,23 +48,23 @@ class ToolBar(QToolBar, DraggableWidget):
         # 退出
         self.add_exit_tool()
 
-    def switch_ds_type(self):
-        # 重新构建 switch_ds_type_menu 和 add_ds_menu 的下拉列表
-        self.switch_ds_type_menu.clear()
+    def switch_ds_category(self):
+        # 重新构建 switch_ds_category_menu 和 add_ds_menu 的下拉列表
+        self.switch_ds_category_menu.clear()
         self.add_ds_menu.clear()
-        add_switch_ds_type_actions(self.switch_ds_type_menu, self.main_window)
+        add_switch_ds_category_actions(self.switch_ds_category_menu, self.main_window)
         add_ds_actions(self.add_ds_menu, self.main_window)
 
-    def add_switch_source_type_tool(self):
+    def add_switch_ds_category_tool(self):
         # 实现工具栏下拉效果，需要使用 QToolButton，设置menu即可下拉
-        switch_ds_type_tool = add_tool_button(SWITCH_ACTION, SWITCH_ACTION_TIP)
+        switch_ds_category_tool = add_tool_button(SWITCH_ACTION, SWITCH_ACTION_TIP)
 
-        self.switch_ds_type_menu = QMenu()
-        self.switch_ds_type_menu.triggered.connect(self.main_window.switch_ds_type)
-        switch_ds_type_tool.setMenu(self.switch_ds_type_menu)
+        self.switch_ds_category_menu = QMenu()
+        self.switch_ds_category_menu.triggered.connect(self.main_window.switch_ds_category)
+        switch_ds_category_tool.setMenu(self.switch_ds_category_menu)
 
         self.addSeparator()
-        self.addWidget(switch_ds_type_tool)
+        self.addWidget(switch_ds_category_tool)
 
     def add_ds_tool(self):
         add_ds_tool = add_tool_button(ADD_DS_ACTION, ADD_DS_ACTION_TIP)

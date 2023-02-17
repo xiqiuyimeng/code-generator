@@ -11,7 +11,7 @@ from src.service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
 from src.service.system_storage.conn_type import get_conn_type_by_type
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from src.service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
 from src.service.system_storage.sqlite_abc import transactional
 from src.view.box.message_box import pop_ok
@@ -152,7 +152,7 @@ class EditConnWorker(ThreadWorkerABC):
         opened_tree_item_param = OpenedTreeItem()
         opened_tree_item_param.parent_id = self.connection.id
         opened_tree_item_param.level = SqlTreeItemLevel.conn_level.value
-        opened_tree_item_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        opened_tree_item_param.ds_category = DsCategoryEnum.sql_ds_category.value.name
         opened_conn_tree_item = opened_tree_item_sqlite.select_one(opened_tree_item_param)
         if opened_tree_item_param:
             opened_conn_tree_item.item_name = self.connection.conn_name
@@ -199,14 +199,14 @@ class ListConnWorker(ThreadWorkerABC):
         # 查询 OpenedItem
         level = SqlTreeItemLevel.conn_level.value
         max_level = SqlTreeItemLevel.tb_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        ds_category = DsCategoryEnum.sql_ds_category.value.name
 
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         for conn in connections:
             conn_type = get_conn_type_by_type(conn.conn_type)
             # 深度优先查找
             children_generator = opened_tree_item_sqlite.recursive_get_children(conn.id, level,
-                                                                                ds_type, max_level)
+                                                                                ds_category, max_level)
             for children in children_generator:
                 for child in children:
                     child.data_type = conn_type
@@ -221,7 +221,7 @@ class ListConnWorker(ThreadWorkerABC):
 
     def get_tab_cols(self):
         tab_param = DsTableTab()
-        tab_param.ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        tab_param.ds_category = DsCategoryEnum.sql_ds_category.value.name
         tab_list = DsTableTabSqlite().select_by_order(tab_param)
         for tab in tab_list:
             col_param = DsTableColInfo()

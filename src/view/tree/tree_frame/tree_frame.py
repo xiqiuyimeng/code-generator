@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
-from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, LOCATION_TXT, CREATE_NEW_FOLDER
+from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY, LOCATION_TXT, CREATE_NEW_FOLDER
 from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget
@@ -14,9 +14,9 @@ _date_ = '2022/9/14 18:01'
 
 def get_tree_frame(current_frame_name, frame_parent, window):
     """根据当前的frame名称获取对应的树结构frame"""
-    if current_frame_name == SQL_DATASOURCE_TYPE:
+    if current_frame_name == SQL_DS_CATEGORY:
         return SqlTreeFrame(frame_parent, window)
-    elif current_frame_name == STRUCT_DATASOURCE_TYPE:
+    elif current_frame_name == STRUCT_DS_CATEGORY:
         return StructureTreeFrame(frame_parent, window)
 
 
@@ -69,7 +69,7 @@ class SqlTreeFrame(AbstractTreeFrame):
         window.sql_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
-        return SQL_DATASOURCE_TYPE
+        return SQL_DS_CATEGORY
 
     def get_tree_widget(self, window) -> SqlTreeWidget:
         return SqlTreeWidget(self, window)
@@ -93,7 +93,7 @@ class StructureTreeFrame(AbstractTreeFrame):
         window.struct_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
-        return STRUCT_DATASOURCE_TYPE
+        return STRUCT_DS_CATEGORY
 
     def get_tree_widget(self, window) -> StructTreeWidget:
         return StructTreeWidget(self, window)

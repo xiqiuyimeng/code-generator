@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import QAction, QToolButton
 
 from src.constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
     TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
-    HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, SQL_DATASOURCE_TYPE, \
-    STRUCT_DATASOURCE_TYPE
+    HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, SQL_DS_CATEGORY, \
+    STRUCT_DS_CATEGORY
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.struct_type import StructTypeEnum
@@ -15,11 +15,11 @@ _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
 
 
-def add_switch_ds_type_actions(parent_menu, main_window):
-    for ds_type in main_window.datasource_types:
-        switch_ds_type_action = QAction(get_icon(ds_type.name), ds_type.name, main_window)
-        switch_ds_type_action.setStatusTip(f'{SWITCH_ACTION_TIP} {ds_type.name}')
-        parent_menu.addAction(switch_ds_type_action)
+def add_switch_ds_category_actions(parent_menu, main_window):
+    for ds_category in main_window.ds_categories:
+        switch_ds_category_action = QAction(get_icon(ds_category.name), ds_category.name, main_window)
+        switch_ds_category_action.setStatusTip(f'{SWITCH_ACTION_TIP} {ds_category.name}')
+        parent_menu.addAction(switch_ds_category_action)
 
 
 def add_ds_actions(parent_menu, main_window):
@@ -27,9 +27,9 @@ def add_ds_actions(parent_menu, main_window):
     if parent_menu.receivers(parent_menu.triggered):
         parent_menu.triggered.disconnect()
     # 根据当前的数据源类型，决定构建的action类型
-    if main_window.current_ds_type.name == SQL_DATASOURCE_TYPE:
+    if main_window.current_ds_category.name == SQL_DS_CATEGORY:
         add_sql_ds_actions(parent_menu, main_window)
-    elif main_window.current_ds_type.name == STRUCT_DATASOURCE_TYPE:
+    elif main_window.current_ds_category.name == STRUCT_DS_CATEGORY:
         add_structure_ds_actions(parent_menu, main_window)
 
 

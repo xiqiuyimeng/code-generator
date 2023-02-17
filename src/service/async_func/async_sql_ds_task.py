@@ -14,7 +14,7 @@ from src.service.sql_ds_executor import *
 from src.service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from src.service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem, \
     CheckedEnum
 from src.service.system_storage.sqlite_abc import transactional
@@ -125,10 +125,10 @@ class OpenConnWorker(ConnWorkerABC):
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         opened_tree_item_sqlite.open_item(self.conn_opened_record.id)
         # 添加库节点
-        db_level = SqlTreeItemLevel.db_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        return opened_tree_item_sqlite.add_opened_child_item(db_names, self.conn_opened_record.id, db_level,
-                                                             ds_type, self.conn_opened_record.data_type,
+        return opened_tree_item_sqlite.add_opened_child_item(db_names, self.conn_opened_record.id,
+                                                             SqlTreeItemLevel.db_level.value,
+                                                             DsCategoryEnum.sql_ds_category.value.name,
+                                                             self.conn_opened_record.data_type,
                                                              init_checked=False)
 
     def do_exception(self, e: Exception):
@@ -166,9 +166,9 @@ class RefreshConnWorker(ConnWorkerABC):
         self.modifying_db_task = True
         data_type = self.conn_opened_record.data_type
         level = SqlTreeItemLevel.db_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+        ds_category = DsCategoryEnum.sql_ds_category.value.name
         exists_db_records = deal_opened_items(db_names, self.conn_opened_record.id, data_type,
-                                              level, ds_type, self.db_changed_signal, False)
+                                              level, ds_category, self.db_changed_signal, False)
 
         # 读取库下的表名列表
         if exists_db_records:
@@ -182,14 +182,14 @@ class RefreshConnWorker(ConnWorkerABC):
         tree_item_sqlite = OpenedTreeItemSqlite()
         # 获取本地库中缓存的数据
         level = SqlTreeItemLevel.tb_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        child_opened_records = tree_item_sqlite.get_children(db_record.id, level, ds_type)
+        ds_category = DsCategoryEnum.sql_ds_category.value.name
+        child_opened_records = tree_item_sqlite.get_children(db_record.id, level, ds_category)
         # 如果之前没有子节点，那么不需要进行刷新处理
         if not child_opened_records:
             return
         tb_names = executor.open_db(db_record.item_name)
         exists_tb_records = deal_opened_items(tb_names, db_record.id, data_type, level,
-                                              ds_type, self.table_changed_signal,
+                                              ds_category, self.table_changed_signal,
                                               parent_item_order=db_record.item_order)
         if exists_tb_records:
             refresh_tab_cols(db_record, executor, exists_tb_records, self.col_signal)
@@ -246,10 +246,10 @@ class OpenDBWorker(ConnWorkerABC):
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         opened_tree_item_sqlite.open_item(self.opened_db_id)
         # 添加表节点
-        tb_level = SqlTreeItemLevel.tb_level.value
-        ds_type = DatasourceTypeEnum.sql_ds_type.value.name
-        return opened_tree_item_sqlite.add_opened_child_item(tb_names, self.opened_db_id, tb_level,
-                                                             ds_type, self.conn_opened_record.data_type)
+        return opened_tree_item_sqlite.add_opened_child_item(tb_names, self.opened_db_id,
+                                                             SqlTreeItemLevel.tb_level.value,
+                                                             DsCategoryEnum.sql_ds_category.value.name,
+                                                             self.conn_opened_record.data_type)
 
     def do_exception(self, e: Exception):
         err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
@@ -291,9 +291,9 @@ class RefreshDBWorker(ConnWorkerABC):
             self.modifying_db_task = True
             data_type = self.conn_opened_record.data_type
             level = SqlTreeItemLevel.tb_level.value
-            ds_type = DatasourceTypeEnum.sql_ds_type.value.name
+            ds_category = DsCategoryEnum.sql_ds_category.value.name
             exists_item_records = deal_opened_items(tb_names, self.opened_db_id, data_type,
-                                                    level, ds_type, self.table_changed_signal)
+                                                    level, ds_category, self.table_changed_signal)
 
             # 接下来处理数据表列信息，将每一个打开的数据表列信息进行刷新
             if exists_item_records:

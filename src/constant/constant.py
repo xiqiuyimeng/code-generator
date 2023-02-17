@@ -255,8 +255,8 @@ PARAM_PATH_ERROR = "路径参数有误"
 
 """菜单栏"""
 FILE_MENU = '文件'
-SWITCH_ACTION = '切换数据源类型'
-SWITCH_ACTION_TIP = '切换数据源类型'
+SWITCH_ACTION = '切换数据源种类'
+SWITCH_ACTION_TIP = '切换数据源种类'
 ADD_DS_ACTION = '添加数据源'
 ADD_DS_ACTION_TIP = '添加数据源'
 REFRESH_ACTION = '刷新'
@@ -281,8 +281,8 @@ ABOUT_MENU = '关于'
 NO_SELECTED_DATA = '当前未选中任何数据，请先选择数据'
 
 
-SWITCH_DS_TYPE_TITLE = '切换数据源类型'
-DS_TYPE_NO_CHANGE_MSG = '当前数据源类型已经是 {}，无需切换'
+SWITCH_DS_CATEGORY_TITLE = '切换数据源种类'
+DS_CATEGORY_NO_CHANGE_MSG = '当前数据源种类已经是 {}，无需切换'
 
 
 # 生成
@@ -542,8 +542,8 @@ TP_ENGINE_INFO = '使用模板引擎为jinja2，可参考文档了解jinja2引�
                  '默认已经添加trim_blocks=True, lstrip_blocks=True，去除模板本身所生成的空行。'
 TP_KEY_DESC = '模板中的关键词介绍'
 
-SQL_DATASOURCE_TYPE = 'sql数据源'
-STRUCT_DATASOURCE_TYPE = '结构体数据源'
+SQL_DS_CATEGORY = 'sql数据源'
+STRUCT_DS_CATEGORY = '结构体数据源'
 
 STRUCTURE_TABLE_HEADER_BUTTON_TXT = '导入结构体数据'
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.service.system_storage.data_type import get_data_type
+from src.service.util.struct_util.data_type import get_data_type
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 
 _author_ = 'luwt'

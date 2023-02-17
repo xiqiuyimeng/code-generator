@@ -63,8 +63,8 @@ class ThreadExecutorABC(QObject):
         # 自定义线程工作对象
         self.worker = self.get_worker()
         # 获取成功失败信息
-        self.worker.error_signal.connect(lambda error_msg: self.fail(error_msg))
         self.worker.success_signal.connect(lambda *args: self.success(*args))
+        self.worker.error_signal.connect(lambda error_msg: self.fail(error_msg))
 
     def start(self):
         self.worker.start()

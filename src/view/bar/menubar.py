@@ -20,7 +20,7 @@ class Menubar(QMenuBar):
         self.file_menu: QMenu = self.addMenu(FILE_MENU)
         self.help_menu = self.addMenu(HELP_MENU)
 
-        self.switch_ds_type_menu = ...
+        self.switch_ds_category_menu = ...
         self.add_datasource_menu = ...
 
     def fill_menu_bar(self):
@@ -35,6 +35,8 @@ class Menubar(QMenuBar):
         self.add_generate_menu()
         # 清空选择
         self.add_clear_menu()
+        self.addSeparator()
+
         # 退出
         self.add_exit_menu()
 
@@ -43,16 +45,16 @@ class Menubar(QMenuBar):
         # 关于
         self.add_about_menu()
 
-    def switch_ds_type(self):
-        # 重新构建 switch_ds_type_menu 和 add_datasource_menu 的下拉列表
-        self.switch_ds_type_menu.clear()
+    def switch_ds_category(self):
+        # 重新构建 switch_ds_category_menu 和 add_ds_menu 的下拉列表
+        self.switch_ds_category_menu.clear()
         self.add_datasource_menu.clear()
-        add_switch_ds_type_actions(self.switch_ds_type_menu, self.main_window)
+        add_switch_ds_category_actions(self.switch_ds_category_menu, self.main_window)
         add_ds_actions(self.add_datasource_menu, self.main_window)
 
     def add_switch_menu(self):
-        self.switch_ds_type_menu = self.file_menu.addMenu(get_icon(SWITCH_ACTION), SWITCH_ACTION)
-        self.switch_ds_type_menu.triggered.connect(self.main_window.switch_ds_type)
+        self.switch_ds_category_menu = self.file_menu.addMenu(get_icon(SWITCH_ACTION), SWITCH_ACTION)
+        self.switch_ds_category_menu.triggered.connect(self.main_window.switch_ds_category)
 
     def add_ds_menu(self):
         self.add_datasource_menu = self.file_menu.addMenu(get_icon(ADD_DS_ACTION), ADD_DS_ACTION)

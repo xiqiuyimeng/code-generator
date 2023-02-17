@@ -30,7 +30,6 @@ conn_sql_dict = {
 
 @dataclass
 class SqlConnection(BasicSqliteDTO):
-
     conn_name: str = field(init=False, default=None)
     conn_type: str = field(init=False, default=None)
     # json串，存储连接信息

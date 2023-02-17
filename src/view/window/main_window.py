@@ -2,11 +2,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar
 
-from src.constant.constant import SWITCH_DS_TYPE_TITLE, DS_TYPE_NO_CHANGE_MSG
+from src.constant.constant import SWITCH_DS_CATEGORY_TITLE, DS_CATEGORY_NO_CHANGE_MSG
 from src.constant.icon_enum import get_icon
-from src.service.async_func.async_ds_type_task import InitDsTypeExecutor, SwitchDsTypeExecutor
-from src.service.system_storage.ds_type_sqlite import DatasourceType
-from src.service.util.ds_type_util import get_current_datasource_type
+from src.service.async_func.async_ds_category_task import InitDsCategoryExecutor, SwitchDsCategoryExecutor
+from src.service.system_storage.ds_category_sqlite import DsCategory
+from src.service.util.ds_category_util import get_current_ds_category
 from src.view.bar.menubar import Menubar
 from src.view.bar.titlebar import TitleBar
 from src.view.bar.toolbar import ToolBar
@@ -38,19 +38,19 @@ class MainWindow(QMainWindow):
         self.toolbar: ToolBar = ...
         self.statusbar: QStatusBar = ...
 
-        self.datasource_types = ...
-        self.current_ds_type = ...
-        self.init_ds_type_executor = ...
+        self.ds_categories = ...
+        self.current_ds_category = ...
+        self.init_ds_category_executor = ...
 
         self.setup_ui()
 
-        # 初始化 datasource_type
-        self.init_ds_type_executor = InitDsTypeExecutor(self.setup_ui_by_ds_type,
-                                                        self, self, SWITCH_DS_TYPE_TITLE)
-        self.init_ds_type_executor.start()
+        # 初始化 ds category
+        self.init_ds_category_executor = InitDsCategoryExecutor(self.setup_ui_by_ds_category,
+                                                                self, self, SWITCH_DS_CATEGORY_TITLE)
+        self.init_ds_category_executor.start()
 
-        # 切换数据源类型线程
-        self.switch_ds_type_executor = ...
+        # 切换数据源种类线程
+        self.switch_ds_category_executor = ...
 
     def setup_ui(self):
         # 设置窗口无边框，点击任务栏图标，可以实现隐藏和显示
@@ -99,23 +99,23 @@ class MainWindow(QMainWindow):
         # 任务栏图标
         self.setWindowIcon(get_icon('window'))
 
-    def setup_ui_by_ds_type(self, ds_types):
-        self.datasource_types = ds_types
-        self.current_ds_type: DatasourceType = get_current_datasource_type(self.datasource_types)
+    def setup_ui_by_ds_category(self, ds_categories):
+        self.ds_categories = ds_categories
+        self.current_ds_category: DsCategory = get_current_ds_category(self.ds_categories)
 
         # 首先处理bar
-        self.menubar.switch_ds_type()
-        self.toolbar.switch_ds_type()
+        self.menubar.switch_ds_category()
+        self.toolbar.switch_ds_category()
 
         # 处理主窗体
         self.central_widget.setup_ui()
 
-    def switch_ds_type(self, ds_type_action):
-        ds_type = ds_type_action.text()
+    def switch_ds_category(self, ds_category_action):
+        ds_category = ds_category_action.text()
         # 切换数据源类型，如果类型一致，应提示
-        if ds_type != self.current_ds_type.name:
-            self.switch_ds_type_executor = SwitchDsTypeExecutor(ds_type, self.setup_ui_by_ds_type,
-                                                                self, self, SWITCH_DS_TYPE_TITLE)
-            self.switch_ds_type_executor.start()
+        if ds_category != self.current_ds_category.name:
+            self.switch_ds_category_executor = SwitchDsCategoryExecutor(ds_category, self.setup_ui_by_ds_category,
+                                                                        self, self, SWITCH_DS_CATEGORY_TITLE)
+            self.switch_ds_category_executor.start()
         else:
-            pop_ok(DS_TYPE_NO_CHANGE_MSG.format(ds_type), SWITCH_DS_TYPE_TITLE, self)
+            pop_ok(DS_CATEGORY_NO_CHANGE_MSG.format(ds_category), SWITCH_DS_CATEGORY_TITLE, self)

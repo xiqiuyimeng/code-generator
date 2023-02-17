@@ -6,7 +6,6 @@ _date_ = '2022/12/6 19:49'
 
 
 class DataTypeEnum(Enum):
-
     str_type = str, 'string'
     int_type = int, 'int'
     float_type = float, 'float'

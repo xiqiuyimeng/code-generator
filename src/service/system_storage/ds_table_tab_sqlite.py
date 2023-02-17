@@ -18,25 +18,24 @@ ds_table_tab_sql_dict = {
     parent_opened_id integer not null,
     item_order integer not null,
     is_current integer not null,
-    ds_type char(10) not null,
+    ds_category char(10) not null,
     create_time datetime,
     update_time datetime
     );''',
     'move_order_forward': f'update {table_name} set item_order = item_order - 1 '
-                          f'where item_order > :item_order and ds_type = :ds_type',
+                          f'where item_order > :item_order and ds_category = :ds_category',
     'select_by_opened_ids': f'select id, parent_opened_id from {table_name} where parent_opened_id in '
 }
 
 
 @dataclass
 class DsTableTab(BasicSqliteDTO):
-
     # 父id，指向opened_tree_item表
     parent_opened_id: int = field(init=False, default=None)
     # 标识tab是否应该置为当前项
     is_current: int = field(init=False, default=None)
-    # 数据源类型
-    ds_type: str = field(init=False, default=None)
+    # 数据源种类
+    ds_category: str = field(init=False, default=None)
     # col_list
     col_list: List[DsTableColInfo] = field(init=False, default=None)
 
@@ -52,7 +51,6 @@ class DsTableTab(BasicSqliteDTO):
 
 
 class CurrentEnum(Enum):
-
     is_current = 1
     not_current = 0
 
@@ -63,12 +61,12 @@ class DsTableTabSqlite(SqliteBasic):
         super().__init__(table_name, ds_table_tab_sql_dict)
 
     def add_tab(self, opened_table_item):
-        self.change_other_not_current(opened_table_item.ds_type)
+        self.change_other_not_current(opened_table_item.ds_category)
 
         table_tab = DsTableTab()
         table_tab.parent_opened_id = opened_table_item.id
-        table_tab.item_order = self.get_max_order({'ds_type': opened_table_item.ds_type})
-        table_tab.ds_type = opened_table_item.ds_type
+        table_tab.item_order = self.get_max_order({'ds_category': opened_table_item.ds_category})
+        table_tab.ds_category = opened_table_item.ds_category
         table_tab.set_current()
         self.insert(table_tab)
         return table_tab
@@ -76,15 +74,15 @@ class DsTableTabSqlite(SqliteBasic):
     @transactional
     def change_current(self, current_tab: DsTableTab):
         # 将同一数据源下的其他项全部置为非当前，将当前值置为当前项
-        self.change_other_not_current(current_tab.ds_type)
+        self.change_other_not_current(current_tab.ds_category)
         current_tab.set_current()
         self.update(current_tab)
 
-    def change_other_not_current(self, ds_type):
-        # 将同一数据源下的其他项全部置为非当前
+    def change_other_not_current(self, ds_category):
+        # 将同一数据源种类下的其他项全部置为非当前
         table_tab = DsTableTab()
         table_tab.set_current()
-        table_tab.ds_type = ds_type
+        table_tab.ds_category = ds_category
         current_tab = self.select_one(table_tab)
         if current_tab:
             origin_current_tab = DsTableTab()
@@ -99,7 +97,7 @@ class DsTableTabSqlite(SqliteBasic):
         move_order_forward_sql = ds_table_tab_sql_dict.get('move_order_forward')
         param = {
             'item_order': tab.item_order,
-            'ds_type': tab.ds_type
+            'ds_category': tab.ds_category
         }
         get_db_conn().query(move_order_forward_sql, **param)
         log.info(f'将tab_table顺序前移语句 ==> {move_order_forward_sql}')

@@ -31,7 +31,7 @@ def init_id_generator(get_sqlite_sequence_func):
 
 
 def update_id_generator(table_name):
-    # 更新只会在表重新创建时调用，所以id的初始值为1
+    # 更新只会在表重新创建或清空表时调用，所以id的初始值为1
     generator = generate_id(1)
     generator.__next__()
     table_id_generator_dict[table_name] = generator

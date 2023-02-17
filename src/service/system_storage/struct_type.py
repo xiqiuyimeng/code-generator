@@ -28,7 +28,6 @@ def get_struct_dialog(display_name):
 
 @dataclass
 class StructType:
-
     type: str = field(init=False)
     # 展示名称，也用来标识icon类型
     display_name: str = field(init=False)
@@ -48,7 +47,6 @@ class FolderTypeEnum(Enum):
 
 
 class StructTypeEnum(Enum):
-
     json_type = StructType()
     json_type.type = JSON_TYPE
     json_type.display_name = JSON_DISPLAY_NAME

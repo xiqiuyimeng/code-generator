@@ -3,7 +3,7 @@ from enum import Enum
 
 from PyQt5.QtGui import QIcon
 
-from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE, SWITCH_ACTION, ADD_DS_ACTION, \
+from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY, SWITCH_ACTION, ADD_DS_ACTION, \
     REFRESH_ACTION, TEMPLATE_ACTION, GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, \
     SQLITE_DISPLAY_NAME, MYSQL_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, MYSQL_DB, MYSQL_TB, OPEN_CONN_ACTION, \
     CANCEL_OPEN_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
@@ -30,7 +30,7 @@ class IconEnum(Enum):
     window_icon = 'window', ':/icon/exec.png'
 
     # bar icon
-    switch_ds_type_icon = SWITCH_ACTION, ':/icon/exec.png'
+    switch_ds_category_icon = SWITCH_ACTION, ':/icon/exec.png'
     add_ds_icon = ADD_DS_ACTION, ':/icon/add.png'
     refresh_icon = REFRESH_ACTION, ':/icon/refresh.png'
     template_icon = TEMPLATE_ACTION, ':/icon/template.png'
@@ -90,11 +90,11 @@ class IconEnum(Enum):
     name_available_icon = NAME_AVAILABLE, ':/icon/right.png'
     name_unavailable_icon = NAME_EXISTS, ':/icon/wrong.png'
 
-    # datasource type icon
-    sql_ds_icon = SQL_DATASOURCE_TYPE, ':/icon/add.png'
-    structure_ds_icon = STRUCT_DATASOURCE_TYPE, ':/icon/add.png'
+    # ds category icon
+    sql_ds_icon = SQL_DS_CATEGORY, ':/icon/add.png'
+    structure_ds_icon = STRUCT_DS_CATEGORY, ':/icon/add.png'
 
-    # sql datasource icon
+    # sql ds icon
     # sqlite
     sql_sqlite_conn_icon = SQLITE_DISPLAY_NAME, ':/icon/table_icon.png'
     sql_sqlite_db_icon = SQLITE_DB, ':/icon/database_icon.png'
@@ -111,7 +111,7 @@ class IconEnum(Enum):
     sql_oracle_tb_icon = ORACLE_TB, ':/icon/table_icon.png'
     sql_oracle_col_icon = ORACLE_COL, ':/icon/column_icon.png'
 
-    # structure datasource icon
+    # structure ds icon
     folder_icon = FOLDER_TYPE, ':/icon/template.png'
     json_type_icon = JSON_DISPLAY_NAME, ':/icon/exec.png'
     struct_col_icon = STRUCT_COL_ICON, ':/icon/column_icon.png'
@@ -124,6 +124,8 @@ def get_icon_path(name):
     for icon_enum in IconEnum:
         if icon_enum.value[0] == name:
             return icon_enum.value[1]
+    # 如果获取不到，给个默认值，创建一个空icon对象，避免程序出错
+    return 'default_icon_path'
 
 
 def create_icon(icon_path, name):

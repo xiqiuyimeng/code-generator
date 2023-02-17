@@ -7,7 +7,7 @@ from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab, DsTableTabSqlite
-from src.service.system_storage.ds_type_sqlite import DatasourceTypeEnum
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem
 from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.struct_sqlite import StructSqlite, StructInfo
@@ -213,11 +213,11 @@ class ListStructWorker(ThreadWorkerABC):
         # 转换为dict，key：opened_item_id，value：struct info
         struct_opened_dict = dict(map(lambda x: (x.opened_item_id, x), struct_info_list))
 
-        ds_type = DatasourceTypeEnum.struct_ds_type.value.name
+        ds_category = DsCategoryEnum.struct_ds_category.value.name
         # 读取打开记录表中的信息，获取所有的文件夹和结构体记录
         opened_item_sqlite = OpenedTreeItemSqlite()
-        max_level = opened_item_sqlite.get_max_level(ds_type)
-        children_generator = opened_item_sqlite.recursive_get_children(0, 0, ds_type, max_level)
+        max_level = opened_item_sqlite.get_max_level(ds_category)
+        children_generator = opened_item_sqlite.recursive_get_children(0, 0, ds_category, max_level)
         for children in children_generator:
             for child in children:
                 # 设置结构体类型
@@ -233,7 +233,7 @@ class ListStructWorker(ThreadWorkerABC):
 
     def get_tab_cols(self):
         tab_param = DsTableTab()
-        tab_param.ds_type = DatasourceTypeEnum.struct_ds_type.value.name
+        tab_param.ds_category = DsCategoryEnum.struct_ds_category.value.name
         tab_list = DsTableTabSqlite().select_by_order(tab_param)
         for tab in tab_list:
             tab.col_list = DsTableColInfoSqlite().get_tab_cols(tab.id)

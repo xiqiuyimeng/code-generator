@@ -34,13 +34,11 @@ ds_table_col_info_sql_dict = {
 
 
 class CheckedEnum(Enum):
-
     checked = 2
     unchecked = 0
 
 
 class ColTypeEnum(Enum):
-
     col = 'col'
     obj = 'object'
     array = 'array'
@@ -48,7 +46,6 @@ class ColTypeEnum(Enum):
 
 @dataclass
 class DsTableColInfo(BasicSqliteDTO):
-
     # 列名
     col_name: str = field(init=False, default=None)
     # 数据类型，只包含数据类型，不包含字段长度

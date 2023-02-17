@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
+from src.constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.view.box.message_box import pop_ok
 from src.view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
 from src.view.dialog.generator.confirm_selected.structure_confirm_selected_dialog import StructureConfirmSelectedDialog
@@ -47,10 +47,10 @@ def generate(main_window):
     if not selected_data:
         pop_ok(NO_SELECTED_DATA, GENERATE_ACTION, main_window)
     else:
-        if main_window.current_ds_type.name == SQL_DATASOURCE_TYPE:
+        if main_window.current_ds_category.name == SQL_DS_CATEGORY:
             confirm_selected_dialog = SqlConfirmSelectedDialog(selected_data, main_window.geometry())
             confirm_selected_dialog.exec()
-        elif main_window.current_ds_type.name == STRUCT_DATASOURCE_TYPE:
+        elif main_window.current_ds_category.name == STRUCT_DS_CATEGORY:
             confirm_selected_dialog = StructureConfirmSelectedDialog(selected_data, main_window.geometry())
             confirm_selected_dialog.exec()
 

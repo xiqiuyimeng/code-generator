@@ -3,10 +3,10 @@ from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
 
-from src.constant.constant import SQL_DATASOURCE_TYPE, STRUCT_DATASOURCE_TYPE
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
-from src.view.table.table_widget.sql_table_widget import SqlTableWidget
-from src.view.table.table_widget.struct_table_widget import StructTableWidget
+from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
+from src.view.table.table_widget.ds_table_widget.abstract_table_widget import AbstractDsColTableWidget
+from src.view.table.table_widget.ds_table_widget.sql_table_widget import SqlDsColTableWidget
+from src.view.table.table_widget.ds_table_widget.struct_table_widget import StructDsColTableWidget
 
 _author_ = 'luwt'
 _date_ = '2022/9/26 19:28'
@@ -14,9 +14,9 @@ _date_ = '2022/9/26 19:28'
 
 def get_table_frame(current_frame_name, *args):
     """根据当前的frame名称获取对应的表结构frame"""
-    if current_frame_name == SQL_DATASOURCE_TYPE:
+    if current_frame_name == SQL_DS_CATEGORY:
         return SqlTableFrame(*args)
-    elif current_frame_name == STRUCT_DATASOURCE_TYPE:
+    elif current_frame_name == STRUCT_DS_CATEGORY:
         return StructTableFrame(*args)
 
 
@@ -48,7 +48,7 @@ class AbstractTableFrame(QFrame):
 
     def get_header_label_text(self) -> str: ...
 
-    def get_table_widget(self) -> AbstractTableWidget: ...
+    def get_table_widget(self) -> AbstractDsColTableWidget: ...
 
     def refresh_ui(self, column_list):
         self.column_list = column_list
@@ -73,8 +73,8 @@ class SqlTableFrame(AbstractTableFrame):
                f'当前数据库：{self.tree_item.parent().text(0)}\n' \
                f'当前数据表：{self.tree_item.text(0)}'
 
-    def get_table_widget(self) -> AbstractTableWidget:
-        return SqlTableWidget(self.main_window, self.tree_widget, self, self.column_list)
+    def get_table_widget(self) -> AbstractDsColTableWidget:
+        return SqlDsColTableWidget(self.main_window, self.tree_widget, self, self.column_list)
 
 
 class StructTableFrame(AbstractTableFrame):
@@ -83,8 +83,8 @@ class StructTableFrame(AbstractTableFrame):
     def get_header_label_text(self) -> str:
         return f'当前结构体：{self.tree_item.text(0)}'
 
-    def get_table_widget(self) -> AbstractTableWidget:
-        return StructTableWidget(self.main_window, self.tree_widget, self, self.column_list)
+    def get_table_widget(self) -> AbstractDsColTableWidget:
+        return StructDsColTableWidget(self.main_window, self.tree_widget, self, self.column_list)
 
 
 
