@@ -36,8 +36,16 @@ class SmartSearcherTreeWidget(QTreeWidget, SmartSearcherItemView):
     def get_searcher(self):
         return TreeSearcher(self, self.parent_widget)
 
+    def keyPressEvent(self, event) -> None:
+        # 按键方法应该传递给智能搜索
+        SmartSearcherItemView.keyPressEvent(self, event)
+
 
 class SmartSearcherListWidget(QListWidget, SmartSearcherItemView):
 
     def get_searcher(self):
         return ListSearcher(self, self.parent_widget)
+
+    def keyPressEvent(self, event) -> None:
+        # 按键方法应该传递给智能搜索
+        SmartSearcherItemView.keyPressEvent(self, event)
