@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
 
 from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
-from src.view.table.table_widget.ds_table_widget.abstract_table_widget import AbstractDsColTableWidget
+from src.view.table.table_widget.ds_table_widget.abstract_ds_col_table_widget import AbstractDsColTableWidget
 from src.view.table.table_widget.ds_table_widget.sql_table_widget import SqlDsColTableWidget
 from src.view.table.table_widget.ds_table_widget.struct_table_widget import StructDsColTableWidget
 

@@ -2,19 +2,21 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QGridLayout, QPushButton
 
-from src.constant.constant import OK_BTN_TEXT, CANCEL_BTN_TEXT
+from src.constant.constant import QUIT_BTN_TEXT
 from src.view.custom_widget.draggable_widget import DraggableDialog
 
 _author_ = 'luwt'
-_date_ = '2022/11/22 10:20'
+_date_ = '2023/2/13 9:43'
 
 
 class CustomDialog(DraggableDialog):
 
-    def __init__(self, screen_rect, dialog_title):
+    def __init__(self, screen_rect, dialog_title, quit_button_row_index=3):
         super().__init__()
         self.parent_screen_rect = screen_rect
         self.dialog_title = dialog_title
+        # 退出按钮行位置，退出按钮在栅格布局最后的位置，默认为3，即表格布局的一行可以容纳四个控件
+        self.quit_button_row_index = quit_button_row_index
         # 当前对话框主布局
         self.dialog_layout: QVBoxLayout = ...
         # 当前对话框框架，用于放置所有部件
@@ -24,8 +26,7 @@ class CustomDialog(DraggableDialog):
         self.title: QLabel = ...
         self.placeholder_blank: QLabel = ...
         self.button_layout: QGridLayout = ...
-        self.save_button: QPushButton = ...
-        self.cancel_button: QPushButton = ...
+        self.quit_button: QPushButton = ...
 
         # 构建界面
         self.setup_ui()
@@ -75,11 +76,9 @@ class CustomDialog(DraggableDialog):
     def setup_button_ui(self):
         self.button_layout = QGridLayout()
 
-        self.button_layout.addWidget(self.placeholder_blank, 0, 0, 1, 2)
-        self.save_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.save_button, 0, 2, 1, 1)
-        self.cancel_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.cancel_button, 0, 3, 1, 1)
+        self.button_layout.addWidget(self.placeholder_blank, 0, 0, 1, self.quit_button_row_index)
+        self.quit_button = QPushButton(self.frame)
+        self.button_layout.addWidget(self.quit_button, 0, self.quit_button_row_index, 1, 1)
         self.setup_other_button()
 
         self.frame_layout.addLayout(self.button_layout)
@@ -88,18 +87,14 @@ class CustomDialog(DraggableDialog):
 
     def setup_label_text(self):
         self.title.setText(self.dialog_title)
-        self.save_button.setText(OK_BTN_TEXT)
-        self.cancel_button.setText(CANCEL_BTN_TEXT)
+        self.quit_button.setText(QUIT_BTN_TEXT)
         self.setup_other_label_text()
 
     def setup_other_label_text(self): ...
 
     def connect_signal(self):
-        self.save_button.clicked.connect(self.save_func)
-        self.cancel_button.clicked.connect(self.close)
+        self.quit_button.clicked.connect(self.close)
         self.connect_other_signal()
-
-    def save_func(self): ...
 
     def connect_other_signal(self): ...
 

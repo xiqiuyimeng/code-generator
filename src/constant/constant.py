@@ -51,7 +51,7 @@ DEL_FOLDER_TITLE = '删除文件夹'
 # 按钮部分
 TEST_CONN_BTN_TEXT = "测试连接"
 OK_BTN_TEXT = "保存"
-CANCEL_BTN_TEXT = "取消"
+QUIT_BTN_TEXT = "退出"
 # ---------- 连接对话框中的展示文本 end ---------- #
 
 # ---------- 操作数据源时提示语 start ---------- #
@@ -263,8 +263,6 @@ REFRESH_ACTION = '刷新'
 REFRESH_ACTION_TIP = '刷新当前数据源类型信息'
 CLEAR_DATA_ACTION = '清空选择'
 CLEAR_DATA_ACTION_TIP = '清空当前数据源类型已选数据'
-TEMPLATE_ACTION = '模板设置'
-TEMPLATE_ACTION_TIP = '查看模板、修改模板、新建模板等操作'
 GENERATE_ACTION = '生成'
 GENERATE_ACTION_TP = '根据选择数据生成代码文件'
 EXIT_ACTION = '退出'
@@ -339,6 +337,7 @@ CLOSE_DB_PROMPT = '该数据库下有已选的字段，强行关闭将清空库�
 
 """表格列头"""
 TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "完整数据类型", "主键", "备注"]
+TYPE_MAPPING_TABLE_HEADER_LABELS = ['序号', '类型映射名称', '数据源类型', '备注', '创建时间', '修改时间', '操作']
 """模板列表表格表头"""
 TEMPLATE_TABLE_HEADER_LABELS = ['全选', '模板名称', '模板类型', '使用次数', '使用中', '创建时间', '修改时间', '操作']
 

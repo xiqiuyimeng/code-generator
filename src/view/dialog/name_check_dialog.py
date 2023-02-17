@@ -6,13 +6,13 @@ from src.constant.icon_enum import get_icon
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.service.read_qrc.read_config import read_qss
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO
-from src.view.dialog.custom_dialog import CustomDialog
+from src.view.dialog.custom_save_dialog import CustomSaveDialog
 
 _author_ = 'luwt'
 _date_ = '2022/11/22 9:02'
 
 
-class NameCheckDialog(CustomDialog):
+class NameCheckDialog(CustomSaveDialog):
 
     def __init__(self, screen_rect, dialog_title, name_list, dialog_data=None, read_storage=True):
         # 框架布局，分四部分，第一部分：标题部分，第二部分：名称表单，第三部分：其他内容，第四部分：按钮部分
@@ -40,6 +40,7 @@ class NameCheckDialog(CustomDialog):
 
     def setup_content_ui(self):
         self.setup_name_form()
+        self.frame_layout.addLayout(self.name_layout)
         self.setup_other_content_ui()
 
     def setup_name_form(self):
@@ -54,10 +55,7 @@ class NameCheckDialog(CustomDialog):
         self.name_layout.addRow(self.name_label, self.name_input)
 
         self.name_checker = QLabel(self.frame)
-
         self.name_layout.addRow(self.placeholder_blank, self.name_checker)
-
-        self.frame_layout.addLayout(self.name_layout)
 
     def setup_other_content_ui(self): ...
 
@@ -123,19 +121,23 @@ class NameCheckDialog(CustomDialog):
         self.check_input()
 
     def setup_input_limit_rule(self):
-        # 设置名称最多可输入100字
-        self.name_input.setMaxLength(100)
+        # 设置名称最多可输入50字
+        self.name_input.setMaxLength(50)
         self.setup_other_input_limit_rule()
 
     def setup_other_input_limit_rule(self): ...
 
     def setup_lineedit_value(self):
-        if self.dialog_data and self.dialog_data.id:
+        if self.check_edit():
             # 数据回显
             self.setup_echo_data()
         else:
             # 默认值展示
             self.setup_default_value()
+
+    def check_edit(self):
+        """判断是否是编辑"""
+        return self.dialog_data and self.dialog_data.id
 
     def setup_echo_data(self):
         self.old_name = self.get_old_name()
