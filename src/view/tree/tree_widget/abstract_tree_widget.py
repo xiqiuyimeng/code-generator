@@ -9,12 +9,11 @@
     而在itemChanged信号发出时，会触发树节点的 setData 方法，所以可以根据是否点击和数据变化，判断复选框是否点击，
     在clicked信号槽函数中重置标志位，实现点击复选框功能
 """
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTreeWidgetItem, QMenu, QTreeWidgetItemIterator, QAbstractItemView
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator, QHeaderView
 
 from src.service.async_func.async_item_changed_task import ItemChangedExecutor
-from src.view.custom_widget.scrollable_widget import ScrollableWidget
+from src.view.item_view_widget.abstract_item_view import AbstractItemView
 from src.view.searcher.smart_item_view import SmartSearcherTreeWidget
 from src.view.tab.tab_ui import TabTableUI
 from src.view.tab.tab_widget.tab_widget import TabWidget
@@ -26,21 +25,23 @@ _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
 
 
-class DisplayTreeWidget(SmartSearcherTreeWidget, ScrollableWidget):
+class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
 
     def __init__(self, parent):
         super().__init__(parent)
         self.headerItem().setHidden(True)
-        # 统一设置图标大小
-        self.setIconSize(QSize(40, 30))
+        # 设置树节点文本过长不转为省略号，展示水平滚动条，需要下面两个指令一起设置
+        self.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.header().setStretchLastSection(False)
 
-        # 按像素滚动
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+    def keyPressEvent(self, event) -> None:
+        # 先调用智能搜索的按键检测方法
+        super().keyPressEvent(event)
+        # 再调用统一元素视图中的方法
+        AbstractItemView.keyPressEvent(self, event)
 
 
 class AbstractTreeWidget(DisplayTreeWidget):
-
     # 定义信号，发送点击复选框的树节点
     item_checkbox_clicked = pyqtSignal(QTreeWidgetItem)
 
@@ -52,7 +53,6 @@ class AbstractTreeWidget(DisplayTreeWidget):
         self.clicked_item = ...
         # 是否正在重新打开中，重新打开的过程，会创建子节点，并设置展开状态等，影响部分信号槽
         self.reopening_flag = False
-        self.connect_signal()
         self.tree_data = ...
         # 用来记录item变化：当前项变化、展开状态
         self.item_changed_executor = ItemChangedExecutor()
@@ -68,11 +68,9 @@ class AbstractTreeWidget(DisplayTreeWidget):
 
     def connect_signal(self):
         """定义通用的信号槽连接"""
+        super().connect_signal()
         # 双击树节点事件
         self.doubleClicked.connect(self.open_tree_item)
-        # 右击事件
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.handle_right_mouse_clicked)
         # 主要为了实现监听复选框点击
         self.itemClicked.connect(self.handle_item_clicked)
         self.item_checkbox_clicked.connect(self.handle_checkbox_changed)
@@ -85,19 +83,6 @@ class AbstractTreeWidget(DisplayTreeWidget):
     def open_tree_item(self, idx):
         item = self.itemFromIndex(idx)
         self.do_open_tree_item(item)
-
-    def handle_right_mouse_clicked(self, pos):
-        # 获取当前元素，只有在元素上才显示菜单
-        item = self.itemAt(pos)
-        if item:
-            # 生成右键菜单
-            menu = QMenu()
-            # 填充右键菜单内容
-            self.do_fill_menu(item, menu)
-            # 右键菜单点击事件
-            menu.triggered.connect(self.handle_right_menu_func)
-            # 右键菜单弹出位置跟随焦点位置
-            menu.exec_(QCursor.pos())
 
     def handle_item_clicked(self):
         # 鼠标左键点击结束事件，将标志位置位False
@@ -156,16 +141,6 @@ class AbstractTreeWidget(DisplayTreeWidget):
         if current_item and not self.reopening_flag:
             self.item_changed_executor.current_item_changed(current_item)
 
-    def handle_right_menu_func(self, action):
-        """
-        点击右键菜单选项后触发事件
-        :param action: 右键菜单中的选项
-        """
-        # 获取右键点击的项
-        item = self.currentItem()
-        func_name = action.text()
-        self.do_handle_right_menu_func(item, func_name)
-
     def recursive_collapse_item(self, item):
         if item.childCount():
             for index in range(item.childCount()):
@@ -220,10 +195,13 @@ class AbstractTreeWidget(DisplayTreeWidget):
     def do_open_tree_item(self, item):
         self.get_item_node(item).open_item()
 
+    def fill_menu(self, item, menu):
+        self.do_fill_menu(item, menu)
+
     def do_fill_menu(self, item, menu):
         self.get_item_node(item).do_fill_menu(menu)
 
-    def do_handle_right_menu_func(self, item, func_name):
+    def do_right_menu_func(self, item, func_name):
         self.get_item_node(item).handle_menu_func(func_name)
 
     def do_handle_checkbox_changed(self, item, clicked):
@@ -260,8 +238,11 @@ class AbstractTreeWidget(DisplayTreeWidget):
         self.set_record_current_item()
         self.reopening_flag = False
 
-    def reopen_tree(self): ...
+    def reopen_tree(self):
+        ...
 
-    def get_current_tab_widget(self) -> TabWidget: ...
+    def get_current_tab_widget(self) -> TabWidget:
+        ...
 
-    def get_item_node(self, item) -> AbstractTreeNode: ...
+    def get_item_node(self, item) -> AbstractTreeNode:
+        ...

@@ -33,17 +33,11 @@ class SmartSearcherItemView(QAbstractItemView):
 
 class SmartSearcherTreeWidget(QTreeWidget, SmartSearcherItemView):
 
-    def __init__(self, parent):
-        super().__init__(parent)
-
     def get_searcher(self):
         return TreeSearcher(self, self.parent_widget)
 
 
 class SmartSearcherListWidget(QListWidget, SmartSearcherItemView):
-
-    def __init__(self, parent):
-        super().__init__(parent)
 
     def get_searcher(self):
         return ListSearcher(self, self.parent_widget)
