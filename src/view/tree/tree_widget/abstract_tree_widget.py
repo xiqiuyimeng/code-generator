@@ -30,8 +30,6 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
     def __init__(self, parent):
         super().__init__(parent)
         self.headerItem().setHidden(True)
-        # 设置宽度
-        self.resize_header_width()
 
     def keyPressEvent(self, event) -> None:
         # 先调用智能搜索的按键检测方法
@@ -39,9 +37,9 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
         # 再调用统一元素视图中的方法
         AbstractItemView.keyPressEvent(self, event)
 
-    def resizeEvent(self, e) -> None:
+    def paintEvent(self, e) -> None:
         self.resize_header_width()
-        super().resizeEvent(e)
+        super().paintEvent(e)
 
     def resize_header_width(self):
         # 按列宽来设置最小宽度，这样可以避免文本过长时，自动隐藏为省略号
