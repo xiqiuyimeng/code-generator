@@ -18,10 +18,6 @@ class AbstractItemView(QAbstractItemView, ScrollableWidget):
         # 统一设置图标大小
         self.setIconSize(QSize(40, 30))
 
-        # 按像素滚动
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-
         self.connect_signal()
 
     def keyPressEvent(self, e) -> None:

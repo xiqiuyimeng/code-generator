@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidget, QAbstractItemView, QFrame
+from PyQt5.QtWidgets import QTableWidget, QFrame
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 from src.view.table.table_item import TableWidgetItem
@@ -27,9 +27,14 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.setAlternatingRowColors(True)
         # 默认行号隐藏
         self.verticalHeader().setHidden(True)
-        # 按像素滚动
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+
+        # 设置表头字体加粗
+        font = self.horizontalHeader().font()
+        # 比原字体略大一点
+        font.setPointSize(font.pointSize() + 1)
+        font.setBold(True)
+        self.horizontalHeader().setFont(font)
+
         self.setup_other_ui()
 
     def setup_other_ui(self): ...

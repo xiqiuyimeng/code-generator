@@ -4,7 +4,7 @@
 """
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAbstractScrollArea, QPlainTextEdit
+from PyQt5.QtWidgets import QAbstractScrollArea, QPlainTextEdit, QAbstractItemView
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:18'
@@ -14,6 +14,9 @@ class ScrollableWidget(QAbstractScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        # 按像素滚动
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         # 检测是否按下shift键
         self.press_shift = False
 
