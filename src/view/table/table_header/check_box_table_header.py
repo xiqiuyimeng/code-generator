@@ -26,6 +26,12 @@ class CheckBoxHeader(QHeaderView):
         # 用来放所有复选框
         self.checkbox_list = list()
         self.batch_callback = batch_callback
+        # 设置表头字体加粗
+        font = self.font()
+        # 比原字体略大一点
+        font.setPointSize(font.pointSize() + 1)
+        font.setBold(True)
+        self.setFont(font)
 
     def paintSection(self, painter, rect, index):
         painter.save()
