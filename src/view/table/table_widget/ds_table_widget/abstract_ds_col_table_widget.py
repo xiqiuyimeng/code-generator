@@ -9,7 +9,7 @@ from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.view.custom_widget.check_box import CheckBox
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
-from src.view.table.table_item_delegate import ComboboxDelegate, TextInputDelegate
+from src.view.table.table_item_delegate import ComboboxDelegate
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
 
 _author_ = 'luwt'
@@ -34,7 +34,6 @@ class AbstractDsColTableWidget(AbstractTableWidget):
         self.parent_table: AbstractDsColTableWidget = parent_table
         # 保存代理引用
         self.combox_delegate = ...
-        self.text_input_delegate = ...
         super().__init__(parent)
 
     def get_async_save_executor(self) -> AsyncSaveTabObjExecutor:
@@ -63,9 +62,8 @@ class AbstractDsColTableWidget(AbstractTableWidget):
         # 设置第五列（是否是主键）combox代理项，在编辑时触发
         self.combox_delegate = ComboboxDelegate()
         self.setItemDelegateForColumn(4, self.combox_delegate)
-        # 第六列设置代理项
-        self.text_input_delegate = TextInputDelegate()
-        self.setItemDelegateForColumn(5, self.text_input_delegate)
+        # 第2,3,4,6列设置编辑代理项
+        self.set_text_input_delegate((1, 2, 3, 5))
 
     def connect_other_signal(self):
         # 单行数据变化时，触发
