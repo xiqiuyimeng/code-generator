@@ -9,7 +9,7 @@ from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.view.custom_widget.check_box import CheckBox
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
-from src.view.table.table_item_delegate import ComboboxDelegate
+from src.view.table.table_item.table_item_delegate import ComboboxDelegate
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
 
 _author_ = 'luwt'

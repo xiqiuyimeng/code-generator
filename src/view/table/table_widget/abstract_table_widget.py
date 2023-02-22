@@ -3,8 +3,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTableWidget, QFrame
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
-from src.view.table.table_item import TableWidgetItem
-from src.view.table.table_item_delegate import TextInputDelegate
+from src.view.table.table_item.table_item import TableWidgetItem
+from src.view.table.table_item.table_item_delegate import TextInputDelegate
 
 _author_ = 'luwt'
 _date_ = '2023/2/13 11:38'
@@ -54,7 +54,7 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
     def show_tool_tip(self, model_index):
         self.setToolTip(model_index.data())
 
-    def make_item(self, text):
+    def make_item(self, text=None):
         item = TableWidgetItem(self)
         item.setText(text if text else '')
         return item

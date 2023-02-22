@@ -2,7 +2,8 @@
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit
 
-from src.constant.constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT
+from src.constant.constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, PORT_INPUT_PLACEHOLDER_TEXT, \
+    HOST_MAX_LENGTH_PLACEHOLDER_TEXT, USER_MAX_LENGTH_PLACEHOLDER_TEXT, PWD_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
 
 _author_ = 'luwt'
@@ -73,7 +74,7 @@ class InternetConnDialog(AbstractConnDialog):
 
     def collect_conn_info_input(self):
         host = self.host_value.text()
-        port = int(self.port_value.text())
+        port = int(self.port_value.text()) if self.port_value.text() else ''
         user = self.user_value.text()
         pwd = self.pwd_value.text()
         other_conn_info = self.collect_special_conn_info()
@@ -94,6 +95,15 @@ class InternetConnDialog(AbstractConnDialog):
         self.setup_special_conn_info_input_limit_rule()
 
     def setup_special_conn_info_input_limit_rule(self): ...
+
+    def setup_other_placeholder_text(self):
+        self.port_value.setPlaceholderText(PORT_INPUT_PLACEHOLDER_TEXT)
+        self.host_value.setPlaceholderText(HOST_MAX_LENGTH_PLACEHOLDER_TEXT)
+        self.user_value.setPlaceholderText(USER_MAX_LENGTH_PLACEHOLDER_TEXT)
+        self.pwd_value.setPlaceholderText(PWD_MAX_LENGTH_PLACEHOLDER_TEXT)
+        self.setup_special_conn_info_placeholder_text()
+
+    def setup_special_conn_info_placeholder_text(self): ...
 
     def connect_conn_info_signal(self):
         self.host_value.textEdited.connect(self.check_input)

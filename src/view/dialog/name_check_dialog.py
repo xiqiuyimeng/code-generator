@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
 
-from src.constant.constant import NAME_AVAILABLE, NAME_EXISTS, NAME_UNCHANGED_PROMPT
+from src.constant.constant import NAME_AVAILABLE, NAME_EXISTS, NAME_UNCHANGED_PROMPT, NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.constant.icon_enum import get_icon
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.service.read_qrc.read_config import read_qss
@@ -103,6 +103,7 @@ class NameCheckDialog(CustomSaveDialog):
 
     def post_process(self):
         self.setup_input_limit_rule()
+        self.setup_placeholder_text()
         # 如果读取数据库，那么打开线程执行器
         if self.read_storage:
             self.read_storage_executor = self.get_read_storage_executor(self.set_old_dialog_data)
@@ -126,6 +127,12 @@ class NameCheckDialog(CustomSaveDialog):
         self.setup_other_input_limit_rule()
 
     def setup_other_input_limit_rule(self): ...
+
+    def setup_placeholder_text(self):
+        self.name_input.setPlaceholderText(NAME_MAX_LENGTH_PLACEHOLDER_TEXT)
+        self.setup_other_placeholder_text()
+
+    def setup_other_placeholder_text(self): ...
 
     def setup_lineedit_value(self):
         if self.check_edit():

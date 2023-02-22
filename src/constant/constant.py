@@ -7,6 +7,14 @@ import os
 _author_ = 'luwt'
 _date_ = '2020/4/20 10:40'
 
+# ---------- 对话框占位符文本 start ---------- #
+NAME_MAX_LENGTH_PLACEHOLDER_TEXT = '名称最多可输入50字符'
+PORT_INPUT_PLACEHOLDER_TEXT = '端口号只允许输入数字符'
+HOST_MAX_LENGTH_PLACEHOLDER_TEXT = '主机地址最多可输入100字符'
+USER_MAX_LENGTH_PLACEHOLDER_TEXT = '用户名最多可输入30字符'
+PWD_MAX_LENGTH_PLACEHOLDER_TEXT = '密码最多可输入50字符'
+SERVICE_NAME_MAX_LENGTH_PLACEHOLDER_TEXT = '服务最多可输入50字符'
+# ---------- 对话框占位符文本 end ---------- #
 
 # ---------- 连接对话框中的展示文本 start ---------- #
 # 对话框标题
