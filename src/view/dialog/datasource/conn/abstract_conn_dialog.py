@@ -106,7 +106,7 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     def save_func(self):
         self.new_dialog_data.construct_conn_info()
-        # 存在id，说明是编辑（当添加连接时， dialog_data = None, 当编辑时，读取数据库，dialog_data = SQLConnection）
+        # 存在原数据，说明是编辑（当添加连接时， dialog_data = None, 当编辑时，读取数据库，dialog_data = SQLConnection）
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
             self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name

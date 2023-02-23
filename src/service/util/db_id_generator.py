@@ -18,6 +18,9 @@ def generate_id(id_start):
 
 def get_id(table_name, id_count):
     generator = table_id_generator_dict.get(table_name)
+    if generator is None:
+        update_id_generator(table_name)
+        return get_id(table_name, id_count)
     return generator.send(id_count)
 
 

@@ -29,6 +29,10 @@ class Menubar(QMenuBar):
 
         # 刷新
         self.add_refresh_menu()
+        self.addSeparator()
+
+        # 类型映射
+        self.add_type_mapping_menu()
         # 模板设置
         self.add_template_menu()
         # 生成
@@ -62,6 +66,10 @@ class Menubar(QMenuBar):
     def add_refresh_menu(self):
         refresh_action = add_refresh_action(self.main_window)
         self.file_menu.addAction(refresh_action)
+
+    def add_type_mapping_menu(self):
+        type_mapping_action = add_type_mapping_action(self.main_window)
+        self.file_menu.addAction(type_mapping_action)
 
     def add_template_menu(self):
         template_action = add_template_action(self.main_window)

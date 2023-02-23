@@ -28,13 +28,14 @@ class ToolBar(QToolBar, DraggableWidget):
         self.add_switch_ds_category_tool()
         self.add_ds_tool()
 
-        # 模板设置
-        self.add_template_tool()
-
-        self.addSeparator()
-
         # 刷新
         self.add_refresh_tool()
+        self.addSeparator()
+
+        # 类型映射
+        self.add_type_mapping_tool()
+        # 模板设置
+        self.add_template_tool()
         # 生成
         self.add_generate_tool()
         # 清空选择
@@ -77,6 +78,10 @@ class ToolBar(QToolBar, DraggableWidget):
     def add_refresh_tool(self):
         refresh_tool = add_refresh_action(self.main_window)
         self.addAction(refresh_tool)
+
+    def add_type_mapping_tool(self):
+        type_mapping_tool = add_type_mapping_action(self.main_window)
+        self.addAction(type_mapping_tool)
 
     def add_template_tool(self):
         template_tool = add_template_action(self.main_window)

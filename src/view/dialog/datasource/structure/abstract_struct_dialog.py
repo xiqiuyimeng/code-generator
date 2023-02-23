@@ -153,7 +153,7 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         return self.dialog_data.struct_name
 
     def save_func(self):
-        # 存在id，说明是编辑
+        # 原数据存在，说明是编辑
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
             self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id

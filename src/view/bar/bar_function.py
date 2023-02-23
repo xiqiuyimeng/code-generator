@@ -3,6 +3,7 @@ from src.constant.constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DS_CATE
 from src.view.box.message_box import pop_ok
 from src.view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
 from src.view.dialog.generator.confirm_selected.structure_confirm_selected_dialog import StructureConfirmSelectedDialog
+from src.view.dialog.type_mapping.type_mapping_table_dialog import TypeMappingListTableDialog
 from src.view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
 
 _author_ = 'luwt'
@@ -38,6 +39,11 @@ def refresh(main_window):
     item = main_window.central_widget.tree_frame.tree_widget.currentItem()
     if item:
         main_window.central_widget.tree_frame.tree_widget.refresh(item)
+
+
+def open_type_mapping_dialog(main_window):
+    """打开类型映射对话框"""
+    TypeMappingListTableDialog(main_window.geometry()).exec()
 
 
 def generate(main_window):

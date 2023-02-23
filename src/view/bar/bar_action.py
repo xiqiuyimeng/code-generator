@@ -5,11 +5,12 @@ from PyQt5.QtWidgets import QAction, QToolButton
 from src.constant.constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
     TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
     HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, SQL_DS_CATEGORY, \
-    STRUCT_DS_CATEGORY
+    STRUCT_DS_CATEGORY, TYPE_ACTION, TYPE_ACTION_TIP
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.struct_type import StructTypeEnum
-from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh
+from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh, \
+    open_type_mapping_dialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -68,6 +69,13 @@ def add_refresh_action(main_window):
     refresh_action.setStatusTip(REFRESH_ACTION_TIP)
     refresh_action.triggered.connect(lambda: refresh(main_window))
     return refresh_action
+
+
+def add_type_mapping_action(main_window):
+    type_mapping_action = QAction(get_icon(TYPE_ACTION), TYPE_ACTION, main_window)
+    type_mapping_action.setStatusTip(TYPE_ACTION_TIP)
+    type_mapping_action.triggered.connect(lambda: open_type_mapping_dialog(main_window))
+    return type_mapping_action
 
 
 def add_template_action(main_window):

@@ -15,7 +15,9 @@ from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY, SWITCH_AC
     CANCEL_REFRESH_DB_ACTION, OPEN_TABLE_ACTION, CANCEL_OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, \
     SELECT_ALL_FIELD_ACTION, UNSELECT_FIELD_ACTION, REFRESH_TB_ACTION, CANCEL_REFRESH_TB_ACTION, \
     REFRESH_STRUCT_ACTION, CANCEL_REFRESH_STRUCT_ACTION, REFRESH_FOLDER_ACTION, CANCEL_REFRESH_FOLDER_ACTION, \
-    SELECT_ALL_ACTION, UNSELECT_ACTION, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL
+    SELECT_ALL_ACTION, UNSELECT_ACTION, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL, TYPE_ACTION, \
+    TYPE_MAPPING_OPERATION_ICON, TYPE_MAPPING_CAT_EDIT_ICON, TYPE_MAPPING_REMOVE_ICON, EDIT_COL_TYPE_ICON, \
+    DEL_COL_TYPE_ICON, DEL_ALL_COL_TYPE_ICON
 
 _author_ = 'luwt'
 _date_ = '2022/9/30 17:57'
@@ -33,6 +35,7 @@ class IconEnum(Enum):
     switch_ds_category_icon = SWITCH_ACTION, ':/icon/exec.png'
     add_ds_icon = ADD_DS_ACTION, ':/icon/add.png'
     refresh_icon = REFRESH_ACTION, ':/icon/refresh.png'
+    type_mapping_icon = TYPE_ACTION, ':/icon/table_icon.png'
     template_icon = TEMPLATE_ACTION, ':/icon/template.png'
     generate_icon = GENERATE_ACTION, ':/icon/exec.png'
     clear_data_icon = CLEAR_DATA_ACTION, ':/icon/remove.png'
@@ -82,6 +85,11 @@ class IconEnum(Enum):
     refresh_folder_icon = REFRESH_FOLDER_ACTION, ':/icon/remove.png'
     cancel_refresh_folder_icon = CANCEL_REFRESH_FOLDER_ACTION, ':/icon/remove.png'
 
+    # 列类型右键
+    edit_col_type_icon = EDIT_COL_TYPE_ICON, ':/icon/refresh.png'
+    del_col_type_icon = DEL_COL_TYPE_ICON, ':/icon/remove.png'
+    del_all_col_type_icon = DEL_ALL_COL_TYPE_ICON, ':/icon/remove.png'
+
     # table
     expand_child_table_icon = EXPAND_CHILD_TABLE, ':/icon/add.png'
     collapse_child_table_icon = COLLAPSE_CHILD_TABLE, ':/icon/remove.png'
@@ -118,6 +126,11 @@ class IconEnum(Enum):
     new_folder_icon = CREATE_NEW_FOLDER_ACTION, ':/icon/add.png'
     rename_folder_icon = RENAME_FOLDER_ACTION, ':/icon/exec.png'
     del_folder_icon = DEL_FOLDER_ACTION, ':/icon/remove.png'
+
+    # 类型映射对话框 icon
+    type_mapping_operation_icon = TYPE_MAPPING_OPERATION_ICON, ':/icon/right.png'
+    type_mapping_cat_edit_icon = TYPE_MAPPING_CAT_EDIT_ICON, ':/icon/exec.png'
+    type_mapping_remove_icon = TYPE_MAPPING_REMOVE_ICON, ':/icon/remove.png'
 
 
 def get_icon_path(name):

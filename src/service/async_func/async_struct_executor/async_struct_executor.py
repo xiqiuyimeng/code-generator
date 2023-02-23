@@ -94,6 +94,7 @@ class OpenStructWorker(ThreadWorkerABC):
         # 保存列信息, 选中状态与树节点保持一致
         DsTableColInfoSqlite().save_cols(column_list, self.table_tab_id,
                                          self.opened_table_item.checked,
+                                         self.opened_table_item.data_type.display_name,
                                          parent_id=0)
         self.modifying_db_task = False
         return table_tab
@@ -159,7 +160,8 @@ class RefreshStructWorker(ThreadWorkerABC):
         self.opened_struct_item.checked = CheckedEnum.unchecked.value
         OpenedTreeItemSqlite().update_checked(self.opened_struct_item)
         # 保存新的列信息
-        DsTableColInfoSqlite().refresh_tab_cols(self.table_tab.id, column_list)
+        DsTableColInfoSqlite().refresh_tab_cols(self.table_tab.id, column_list,
+                                                self.opened_struct_item.data_type.display_name)
         self.table_tab.col_list = column_list
         self.modifying_db_task = False
 
@@ -220,7 +222,7 @@ class RefreshFolderWorker(ThreadWorkerABC):
         opened_record.checked = CheckedEnum.unchecked.value
         OpenedTreeItemSqlite().update_checked(opened_record)
         # 保存新的列信息
-        DsTableColInfoSqlite().refresh_tab_cols(table_tab.id, column_list)
+        DsTableColInfoSqlite().refresh_tab_cols(table_tab.id, column_list, opened_record.data_type.display_name)
         table_tab.col_list = column_list
         self.modifying_db_task = False
 

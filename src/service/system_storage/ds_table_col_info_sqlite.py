@@ -4,6 +4,7 @@ from enum import Enum
 from itertools import groupby
 
 from src.logger.log import logger as log
+from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
 
 _author_ = 'luwt'
@@ -93,7 +94,8 @@ class DsTableColInfoSqlite(SqliteBasic):
     def __init__(self):
         super().__init__(table_name, ds_table_col_info_sql_dict)
 
-    def save_cols(self, columns, parent_tab_id, check_state, parent_id=None):
+    def save_cols(self, columns, parent_tab_id, check_state, ds_type,
+                  parent_id=None, ds_col_type_sqlite=None):
         for index, column in enumerate(columns, start=1):
             column.parent_tab_id = parent_tab_id
             column.checked = check_state
@@ -102,11 +104,17 @@ class DsTableColInfoSqlite(SqliteBasic):
                 column.parent_id = parent_id
         self.batch_insert(columns)
 
+        # 在添加列的时候，将所有列的类型同步到数据源列类型表中
+        if not ds_col_type_sqlite:
+            ds_col_type_sqlite = DsColTypeSqlite()
+        ds_col_type_sqlite.batch_sync_col_types(ds_type, set(map(lambda x: x.data_type, columns)))
+
         # 考虑存在子集合的情况
         for col_info in columns:
             if not col_info.children:
                 continue
-            self.save_cols(col_info.children, parent_tab_id, check_state, col_info.id)
+            self.save_cols(col_info.children, parent_tab_id, check_state, ds_type,
+                           col_info.id, ds_col_type_sqlite)
 
     @staticmethod
     def delete_by_parent_tab_id(parent_tab_id):
@@ -150,7 +158,7 @@ class DsTableColInfoSqlite(SqliteBasic):
         col_param.parent_tab_id = parent_tab_id
         return self.select_by_order(col_param)
 
-    def refresh_tab_cols(self, tab_id, columns):
+    def refresh_tab_cols(self, tab_id, columns, ds_type):
         self.delete_by_parent_tab_id(tab_id)
         # 默认数据应为未选中情况
-        self.save_cols(columns, tab_id, CheckedEnum.unchecked.value)
+        self.save_cols(columns, tab_id, CheckedEnum.unchecked.value, ds_type)

@@ -81,14 +81,14 @@ def deal_opened_items(item_names, parent_id, data_type, level, ds_category, chan
 
 
 @transactional
-def refresh_tab_cols(db_item_record, executor, exists_records, col_signal, emit_db_order=True):
+def refresh_tab_cols(db_item_record, executor, exists_records, col_signal, ds_type, emit_db_order=True):
     db_name = db_item_record.item_name
     opened_id_record_dict = dict(map(lambda x: (str(x.id), x), exists_records))
     opened_tabs = DsTableTabSqlite().select_by_opened_ids(opened_id_record_dict.keys())
     for tab in opened_tabs:
         tb_item_record = opened_id_record_dict.get(str(tab.parent_opened_id))
         columns = executor.open_tb(db_name, tb_item_record.item_name, check=False)
-        DsTableColInfoSqlite().refresh_tab_cols(tab.id, columns)
+        DsTableColInfoSqlite().refresh_tab_cols(tab.id, columns, ds_type)
         tab.col_list = columns
         if emit_db_order:
             col_signal.emit((tab, db_item_record.item_order, tb_item_record.item_order))

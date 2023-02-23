@@ -192,7 +192,8 @@ class RefreshConnWorker(ConnWorkerABC):
                                               ds_category, self.table_changed_signal,
                                               parent_item_order=db_record.item_order)
         if exists_tb_records:
-            refresh_tab_cols(db_record, executor, exists_tb_records, self.col_signal)
+            refresh_tab_cols(db_record, executor, exists_tb_records, self.col_signal,
+                             self.conn_opened_record.data_type.display_name)
         # 库刷新完成，发射信号
         self.db_finished_signal.emit(db_record.item_order)
 
@@ -297,7 +298,8 @@ class RefreshDBWorker(ConnWorkerABC):
 
             # 接下来处理数据表列信息，将每一个打开的数据表列信息进行刷新
             if exists_item_records:
-                refresh_tab_cols(self.db_opened_item, executor, exists_item_records, self.col_signal, False)
+                refresh_tab_cols(self.db_opened_item, executor, exists_item_records, self.col_signal,
+                                 self.conn_opened_record.data_type.display_name, False)
             self.modifying_db_task = False
             log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}]{REFRESH_DB_SUCCESS_PROMPT}')
         else:
@@ -354,7 +356,8 @@ class OpenTBWorker(ConnWorkerABC):
         # 存储tab信息
         table_tab = DsTableTabSqlite().add_tab(self.opened_table_item)
         # 存储列信息
-        DsTableColInfoSqlite().save_cols(columns, table_tab.id, self.check_state)
+        DsTableColInfoSqlite().save_cols(columns, table_tab.id, self.check_state,
+                                         self.conn_opened_record.data_type.display_name)
         self.modifying_db_task = False
         table_tab.col_list = columns
         return table_tab
@@ -407,7 +410,8 @@ class RefreshTBWorker(ConnWorkerABC):
             # 获取成功后，删除原数据
             self.modifying_db_task = True
             # 保存新的数据，并发射信号
-            DsTableColInfoSqlite().refresh_tab_cols(self.tab.id, columns)
+            DsTableColInfoSqlite().refresh_tab_cols(self.tab.id, columns,
+                                                    self.conn_opened_record.data_type.display_name)
             self.modifying_db_task = False
             log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]'
                      f'{REFRESH_TB_SUCCESS_PROMPT}')

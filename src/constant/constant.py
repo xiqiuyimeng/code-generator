@@ -62,6 +62,92 @@ OK_BTN_TEXT = "保存"
 QUIT_BTN_TEXT = "退出"
 # ---------- 连接对话框中的展示文本 end ---------- #
 
+# ---------- 类型映射对话框列表中的展示文本 start ---------- #
+TYPE_MAPPING_LIST_TITLE = '类型映射列表'
+DS_COL_TYPE_BUTTON_TEXT = '数据源列类型'
+ADD_TYPE_MAPPING_BUTTON_TEXT = '添加类型映射'
+TYPE_MAPPING_BOX_TITLE = '读取类型映射列表'
+TYPE_MAPPING_OPERATION_TEXT = '操作'
+TYPE_MAPPING_OPERATION_ICON = '类型映射列表操作'
+TYPE_MAPPING_CAT_EDIT_TEXT = '查看编辑'
+TYPE_MAPPING_CAT_EDIT_ICON = '类型映射列表操作：查看编辑'
+TYPE_MAPPING_REMOVE_TEXT = '删除'
+TYPE_MAPPING_REMOVE_ICON = '类型映射列表操作：删除'
+ADD_TYPE_MAPPING_TITLE = '添加类型映射'
+EDIT_TYPE_MAPPING_TITLE = '编辑类型映射'
+DEL_TYPE_MAPPING_TITLE = '删除类型映射'
+DEL_TYPE_MAPPING_PROMPT = '类型映射：{}\n确认删除类型映射吗？'
+# ---------- 类型映射对话框列表中的展示文本 end ---------- #
+
+# ---------- 数据源列类型列表对话框中的展示文本 start ---------- #
+DS_COL_TYPE_LIST_TITLE = '数据源列类型列表'
+SYNC_DS_TYPE_BUTTON_TEXT = '同步数据源类型'
+ADD_DS_COL_TYPE_BUTTON_TEXT = '添加数据源列类型'
+ADD_DS_COL_TYPE_TITLE = '添加数据源列类型'
+EDIT_DS_COL_TYPE_TITLE = '添加数据源列类型'
+ADD_DS_COL_TYPE_NO_DS_TYPE = '当前没有数据源类型，请先同步数据源类型，再添加数据源列类型！'
+DS_COL_TYPE_LIST_BOX_TITLE = '读取数据源列类型列表'
+ADD_COL_TYPE_LIST_TITLE = '保存数据源列类型列表'
+# ---------- 数据源列类型列表对话框中的展示文本 end ---------- #
+
+# ---------- 类型映射信息对话框中的展示文本 start ---------- #
+TYPE_MAPPING_TITLE = '类型映射信息'
+READ_TYPE_MAPPING_TITLE = '读取类型映射信息'
+TYPE_MAPPING_INFO_TEXT = '基本信息'
+TYPE_MAPPING_COL_TABLE_TEXT = '列类型映射'
+TYPE_MAPPING_NAME = '类型映射名称：'
+DS_TYPE_TEXT = '数据源类型：'
+TYPE_MAPPING_COMMENT_TEXT = '备\t\b\b注：'
+# 同步数据源列类型按钮
+SYNC_DS_COL_TYPE_BTN_TEXT = '同步当前数据源列类型'
+# 添加列类型映射按钮
+ADD_COL_TYPE_MAPPING_BTN_TEXT = '添加列类型映射'
+# 删除列类型映射按钮
+DEL_COL_TYPE_MAPPING_BTN_TEXT = '删除列类型映射'
+DEL_COL_TYPE_MAPPING_TITLE = '删除列类型映射'
+DEL_COL_TYPE_MAPPING_PROMPT = '已选中 {} 个列类型映射\n确认要删除列类型映射吗？'
+# 添加列类型映射组按钮
+ADD_COL_TYPE_MAPPING_GROUP_BTN_TEXT = '添加列类型映射组'
+# 删除列类型映射组按钮
+DEL_COL_TYPE_MAPPING_GROUP_BTN_TEXT = '删除列类型映射组'
+DEL_COL_TYPE_MAPPING_GROUP_TITLE = '删除列类型映射组'
+DEL_COL_TYPE_MAPPING_GROUP_PROMPT = '{}\n确认要删除列类型映射组吗？'
+# 获取数据源类型
+GET_DS_TYPE_TITLE = '获取数据源类型'
+# 没有选择数据源类型提示语
+NO_DS_TYPE_PROMPT = f'数据源类型为空！\n\t请到 [{TYPE_MAPPING_INFO_TEXT}] -> [{DS_TYPE_TEXT.split("：")[0]}] ' \
+                    f'中选择一种数据源类型'
+# 获取数据源列类型
+GET_COL_TYPES_TITLE = '获取数据源列类型'
+# 根据数据源类型获取不到列类型，提示维护数据，或手动添加列类型
+NO_COL_TYPES_PROMPT = f'根据数据源类型 [{0}]，获取列类型为空！\n\t请退出对话框，到 [{DS_COL_TYPE_BUTTON_TEXT}] ' \
+                      f' -> [{ADD_DS_COL_TYPE_BUTTON_TEXT}] 中维护列类型数据；\t\n或者在当前表格中，' \
+                      f'[{ADD_COL_TYPE_MAPPING_BTN_TEXT}] 手动添加列类型数据'
+SAVE_DATA_TIPS = '温馨提示：在页面操作后，请点击 [保存] 按钮保存修改内容后退出。'
+DS_TYPE_COMBO_BOX_PLACEHOLDER_TXT = '请选择数据源类型'
+# 默认类型映射组
+DEFAULT_MAPPING_GROUP_TITLE = '默认映射组'
+
+# 检查列类型映射表中未完成数据的提示
+CHECK_COL_TYPE_MAPPING_FRAGMENTARY_TITLE = '列类型映射表数据检查'
+CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT = '输入不完整，以下列中存在空值，请完成输入！\n\n{}'
+# ---------- 类型映射信息对话框中的展示文本 end ---------- #
+
+# ---------- 右键操作列类型 start ---------- #
+EDIT_COL_TYPE_TITLE = '编辑列类型 [{}]'
+EDIT_COL_TYPE_ICON = '编辑列类型'
+DEL_COL_TYPE_TITLE = '删除列类型 [{}]'
+DEL_COL_TYPE_ICON = '删除列类型'
+DEL_COL_TYPE_PROMPT = '是否要删除列类型 [{}]？'
+DEL_ALL_COL_TYPE_TITLE = '删除所有列类型'
+DEL_ALL_COL_TYPE_ICON = '删除所有列类型'
+DEL_ALL_COL_TYPE_PROMPT = '是否要删除当前数据源下所有列类型？'
+# ---------- 右键操作列类型 end ---------- #
+
+# ---------- 数据源列类型表头展示文本 start ---------- #
+DS_COL_TYPE_TABLE_HEADER = ['选择', '数据源列类型', '映射列名称', '映射类型', '引包声明']
+# ---------- 数据源列类型表头展示文本 end ---------- #
+
 # ---------- 操作数据源时提示语 start ---------- #
 NAME_UNCHANGED_PROMPT = "名称无变化"
 # ---------- 操作数据源时提示语 end ---------- #
@@ -269,6 +355,10 @@ ADD_DS_ACTION = '添加数据源'
 ADD_DS_ACTION_TIP = '添加数据源'
 REFRESH_ACTION = '刷新'
 REFRESH_ACTION_TIP = '刷新当前数据源类型信息'
+TYPE_ACTION = '类型映射'
+TYPE_ACTION_TIP = '管理数据源类型映射'
+TEMPLATE_ACTION = '模板设置'
+TEMPLATE_ACTION_TIP = '查看模板、修改模板、新建模板等操作'
 CLEAR_DATA_ACTION = '清空选择'
 CLEAR_DATA_ACTION_TIP = '清空当前数据源类型已选数据'
 GENERATE_ACTION = '生成'
