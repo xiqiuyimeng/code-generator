@@ -3,8 +3,9 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog, QPushButton
 
-from src.constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
-    CHOOSE_STRUCT_FILE_TEXT, PRETTY_STRUCT_TEXT
+from src.constant.ds_dialog_constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
+    CHOOSE_STRUCT_FILE_TEXT, PRETTY_STRUCT_TEXT, QUERY_STRUCT_BOX_TITLE, READ_STRUCT_FILE_BOX_TITLE, \
+    PRETTY_STRUCT_BOX_TITLE, EDIT_STRUCT_BOX_TITLE, ADD_STRUCT_BOX_TITLE
 from src.constant.icon_enum import get_icon
 from src.service.async_func.async_struct_task import PrettyStructExecutor
 from src.service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor, \
@@ -94,7 +95,7 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.pretty_button.setText(PRETTY_STRUCT_TEXT.format(self.struct_type.display_name))
 
     def get_read_storage_executor(self, callback):
-        return QueryStructExecutor(self.dialog_data, callback, self, self)
+        return QueryStructExecutor(self.dialog_data, self, self, QUERY_STRUCT_BOX_TITLE, callback)
 
     def setup_echo_other_data(self):
         # 数据回显
@@ -133,8 +134,9 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         if file_url[0]:
             self.struct_file_url_linedit.setText(file_url[0])
             # 异步读取文件内容，回显到内容区域
-            self.read_file_executor = ReadFileExecutor(file_url[0], self.struct_type.display_name,
-                                                       self, self, self.append_plain_text)
+            self.read_file_executor = ReadFileExecutor(file_url[0], self.struct_type.display_name, self, self,
+                                                       READ_STRUCT_FILE_BOX_TITLE.format(self.struct_type.display_name),
+                                                       self.append_plain_text)
             self.read_file_executor.start()
 
     def append_plain_text(self, index, text):
@@ -145,7 +147,8 @@ class AbstractStructDialog(AbstractDsInfoDialog):
     def pretty_func(self):
         self.pretty_executor = PrettyStructExecutor(
             self.new_dialog_data.content, self.struct_type.beautifier_executor,
-            self, self, self.struct_text_input.setPlainText
+            self, self, PRETTY_STRUCT_BOX_TITLE.format(self.struct_type.display_name),
+            self.struct_text_input.setPlainText
         )
         self.pretty_executor.start()
 
@@ -158,13 +161,15 @@ class AbstractStructDialog(AbstractDsInfoDialog):
             self.new_dialog_data.id = self.dialog_data.id
             self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
             self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
+            title = EDIT_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
             self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
-                                                           self.edit_post_process)
+                                                           title, self.edit_post_process)
             self.edit_struct_executor.start()
         else:
             # 新增操作
+            title = ADD_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
             self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
-                                                         self, self, self.save_post_process)
+                                                         self, self, title, self.save_post_process)
             self.add_struct_executor.start()
 
     def save_post_process(self, opened_item_record):

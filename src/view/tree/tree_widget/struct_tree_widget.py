@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from src.constant.tree_constant import LIST_ALL_STRUCT_BOX_TITLE
 from src.service.async_func.async_struct_task import ListStructExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.util.tree_node import TreeData
@@ -28,8 +29,9 @@ class StructTreeWidget(AbstractTreeWidget):
         # 如果还没初始化过，再执行初始化
         if self.list_struct_executor is Ellipsis:
             # 初始化数据
-            self.list_struct_executor = ListStructExecutor(self.reopen_items, self.reopen_tab,
-                                                           self.reopen_end, self.main_window, self.main_window)
+            self.list_struct_executor = ListStructExecutor(self.reopen_items, self.reopen_tab, self.main_window,
+                                                           self.main_window, LIST_ALL_STRUCT_BOX_TITLE,
+                                                           self.reopen_end, self.reopen_end)
             self.reopening_flag = True
             self.list_struct_executor.start()
 

@@ -2,7 +2,7 @@
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QToolBar, QMenu
 
-from src.constant.constant import SWITCH_ACTION, ADD_DS_ACTION, ADD_DS_ACTION_TIP
+from src.constant.bar_constant import SWITCH_ACTION, ADD_DS_ACTION, ADD_DS_ACTION_TIP
 from src.view.bar.bar_action import *
 from src.view.custom_widget.draggable_widget import DraggableWidget
 

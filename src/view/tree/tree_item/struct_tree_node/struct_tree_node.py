@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from src.constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
+from src.constant.tree_constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
     OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
-    CANCEL_REFRESH_STRUCT_ACTION
-from src.service.async_func.async_struct_task import OpenStructExecutor, RefreshStructExecutor
+    CANCEL_REFRESH_STRUCT_ACTION, OPEN_STRUCT_BOX_TITLE, DEL_STRUCT_BOX_TITLE, REFRESH_STRUCT_BOX_TITLE
 from src.service.async_func.async_struct_task import DelStructExecutor
+from src.service.async_func.async_struct_task import OpenStructExecutor, RefreshStructExecutor
 from src.view.box.message_box import pop_question
 from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
 from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data, \
@@ -37,6 +37,7 @@ class StructTreeNode(AbstractStructTreeNode):
             self.is_opening = True
             self.tree_widget.get_item_node(self.item.parent()).add_opening_child_count()
             self.open_struct_executor = OpenStructExecutor(self.item, self.window,
+                                                           OPEN_STRUCT_BOX_TITLE,
                                                            self.open_item_ui,
                                                            self.open_item_fail)
             self.open_struct_executor.start()
@@ -140,8 +141,9 @@ class StructTreeNode(AbstractStructTreeNode):
     def del_struct(self):
         # 删除结构体后，应该对同级别的其他项进行重排序
         reorder_items = self.get_need_reorder_items()
-        self.del_struct_executor = DelStructExecutor(self.item, get_item_opened_record(self.item),
-                                                     reorder_items, self.del_struct_callback, self.window)
+        self.del_struct_executor = DelStructExecutor(get_item_opened_record(self.item), reorder_items,
+                                                     self.item, self.window, DEL_STRUCT_BOX_TITLE,
+                                                     self.del_struct_callback)
         self.del_struct_executor.start()
 
     def del_struct_callback(self):
@@ -172,8 +174,10 @@ class StructTreeNode(AbstractStructTreeNode):
         # 如果不存在打开表，那么无需处理
         if not opened_tab:
             return
-        self.refresh_struct_executor = RefreshStructExecutor(self.tree_widget, self.item, self.window,
-                                                             opened_tab.table_tab, self.refresh_success)
+        self.refresh_struct_executor = RefreshStructExecutor(opened_tab.table_tab, self.tree_widget,
+                                                             self.item, self.window,
+                                                             REFRESH_STRUCT_BOX_TITLE,
+                                                             self.refresh_success)
         self.refresh_struct_executor.start()
 
     def refresh_success(self, table_tab):

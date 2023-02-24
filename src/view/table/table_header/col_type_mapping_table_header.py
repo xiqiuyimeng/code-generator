@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QAbstractItemView
 
-from src.constant.constant import DS_COL_TYPE_TABLE_HEADER, DEFAULT_MAPPING_GROUP_TITLE
+from src.constant.table_constant import DS_COL_TYPE_TABLE_HEADER, DEFAULT_MAPPING_GROUP_TITLE
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
 

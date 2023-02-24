@@ -2,10 +2,10 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QToolButton, QMenu, QAction
 
-from src.constant.constant import TYPE_MAPPING_TABLE_HEADER_LABELS, TYPE_MAPPING_OPERATION_ICON, \
+from src.constant.icon_enum import get_icon
+from src.constant.table_constant import TYPE_MAPPING_TABLE_HEADER_LABELS, TYPE_MAPPING_OPERATION_ICON, \
     TYPE_MAPPING_OPERATION_TEXT, TYPE_MAPPING_CAT_EDIT_TEXT, TYPE_MAPPING_CAT_EDIT_ICON, TYPE_MAPPING_REMOVE_TEXT, \
     TYPE_MAPPING_REMOVE_ICON
-from src.constant.icon_enum import get_icon
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
 
 _author_ = 'luwt'

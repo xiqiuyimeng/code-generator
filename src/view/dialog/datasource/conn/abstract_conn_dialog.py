@@ -4,7 +4,8 @@ import dataclasses
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QPushButton
 
-from src.constant.constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT
+from src.constant.ds_dialog_constant import SAVE_CONN_BOX_TITLE, TEST_CONN_BOX_TITLE, CONN_NAME_TEXT, \
+    TEST_CONN_BTN_TEXT, QUERY_CONN_BOX_TITLE
 from src.service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor, QueryConnInfoExecutor
 from src.service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from src.service.system_storage.conn_sqlite import SqlConnection
@@ -95,13 +96,14 @@ class AbstractConnDialog(AbstractDsInfoDialog):
     def connect_conn_info_signal(self): ...
 
     def get_read_storage_executor(self, callback):
-        return QueryConnInfoExecutor(self.dialog_data, callback, self, self)
+        return QueryConnInfoExecutor(self.dialog_data, self, self, QUERY_CONN_BOX_TITLE, callback)
 
     def get_old_name(self) -> str:
         return self.dialog_data.conn_name
 
     def test_connection(self):
-        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self.conn_type, self, self)
+        self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self.conn_type, self,
+                                                              self, TEST_CONN_BOX_TITLE)
         self.test_conn_executor.start()
 
     def save_func(self):
@@ -110,12 +112,14 @@ class AbstractConnDialog(AbstractDsInfoDialog):
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
             self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name
-            self.edit_conn_executor = EditConnExecutor(self.new_dialog_data, self, self,
-                                                       self.edit_post_process, self.name_changed)
+            self.edit_conn_executor = EditConnExecutor(self.new_dialog_data, self.name_changed,
+                                                       self, self, SAVE_CONN_BOX_TITLE,
+                                                       self.edit_post_process)
             self.edit_conn_executor.start()
         else:
             # 新增操作
-            self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self, self, self.save_post_process)
+            self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self, self,
+                                                     SAVE_CONN_BOX_TITLE, self.save_post_process)
             self.add_conn_executor.start()
 
     def save_post_process(self, opened_item_record):

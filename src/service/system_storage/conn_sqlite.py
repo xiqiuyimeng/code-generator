@@ -58,8 +58,3 @@ class ConnSqlite(SqliteBasic):
     def get_conn_id_types(self):
         rows = self._do_select(conn_sql_dict.get('select_id_type'), SqlConnection())
         return list(map(lambda x: SqlConnection(**x), rows.as_dict()))
-
-    def check_name_available(self, sql_conn):
-        """检查连接名称是否可用，名称必须唯一"""
-        result = self.select_count(sql_conn)
-        return result == 0

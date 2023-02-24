@@ -1,12 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
 import ctypes
+import sys
 
 from PyQt5 import QtWidgets
 
-import sys
+from src.logger.log import logger as log
 from src.service.read_qrc.read_config import read_qss
 from src.view.window.main_window import MainWindow
-from src.logger.log import logger as log
+
 # 引入静态资源
 from static import image_rc
 # 引入pyinstaller打包使用的过渡图程序，打包的时候需要放开

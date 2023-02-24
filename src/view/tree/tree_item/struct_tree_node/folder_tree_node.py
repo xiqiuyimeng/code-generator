@@ -2,12 +2,14 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu
 
-from src.constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
-    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_FOLDER_ACTION, \
-    CANCEL_REFRESH_FOLDER_ACTION
+from src.constant.bar_constant import ADD_DS_ACTION
+from src.constant.ds_type_constant import FOLDER_TYPE
 from src.constant.icon_enum import get_icon
-from src.service.async_func.async_struct_task import RefreshFolderExecutor
+from src.constant.tree_constant import ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
+    DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, REFRESH_FOLDER_ACTION, \
+    CANCEL_REFRESH_FOLDER_ACTION, DEL_FOLDER_BOX_TITLE
 from src.service.async_func.async_struct_task import DelFolderExecutor
+from src.service.async_func.async_struct_task import RefreshFolderExecutor
 from src.view.bar.bar_action import add_structure_ds_actions
 from src.view.box.message_box import pop_question, pop_fail
 from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
@@ -143,7 +145,8 @@ class FolderTreeNode(AbstractStructTreeNode):
         self.get_child_tab_indexes_and_ids(self.item, tab_indexes, tab_ids)
         # 获取所有子节点的 opened id 和 存在 tab
         self.del_folder_executor = DelFolderExecutor(self.item_name, reorder_items, tab_indexes, tab_ids,
-                                                     self.del_folder_callback, self.item, self.window)
+                                                     self.del_folder_callback, self.item, self.window,
+                                                     DEL_FOLDER_BOX_TITLE)
         self.del_folder_executor.start()
 
     def del_folder_callback(self, tab_indexes):

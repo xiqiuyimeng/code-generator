@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QTreeWidgetItem, QAction
 
-from src.constant.constant import CLOSE_REFRESHING_NODE_PROMPT, CLOSE_REFRESHING_CHILD_NODE_PROMPT, \
-    CLOSE_OPENING_CHILD_NODE_PROMPT
 from src.constant.icon_enum import get_icon
+from src.constant.tree_constant import CLOSE_REFRESHING_NODE_PROMPT, CLOSE_REFRESHING_CHILD_NODE_PROMPT, \
+    CLOSE_OPENING_CHILD_NODE_PROMPT
 from src.view.tab.tab_ui import TabTableUI
 from src.view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, \
     get_add_del_data

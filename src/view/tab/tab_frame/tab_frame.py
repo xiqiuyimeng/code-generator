@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
 
-from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
+from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.view.tab.tab_widget.tab_widget import TabWidget, SqlTabWidget, StructTabWidget
 
 _author_ = 'luwt'

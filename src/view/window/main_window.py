@@ -2,8 +2,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar
 
-from src.constant.constant import SWITCH_DS_CATEGORY_TITLE, DS_CATEGORY_NO_CHANGE_MSG
 from src.constant.icon_enum import get_icon
+from src.constant.window_constant import SWITCH_DS_CATEGORY_TITLE, DS_CATEGORY_NO_CHANGE_MSG
 from src.service.async_func.async_ds_category_task import InitDsCategoryExecutor, SwitchDsCategoryExecutor
 from src.service.system_storage.ds_category_sqlite import DsCategory
 from src.service.util.ds_category_util import get_current_ds_category

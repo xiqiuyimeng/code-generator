@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QPushButton, QFileDialog
 
-from src.constant.constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
+from src.constant.ds_dialog_constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
 

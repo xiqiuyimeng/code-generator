@@ -2,16 +2,16 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.constant import SAVE_CONN_TITLE, SAVE_CONN_SUCCESS_PROMPT, \
-    SAVE_CONN_FAIL_PROMPT, DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, DEL_CONN_TITLE, \
-    LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT, LIST_ALL_CONN_TITLE
+from src.constant.ds_dialog_constant import SAVE_CONN_SUCCESS_PROMPT, SAVE_CONN_FAIL_PROMPT
+from src.constant.tree_constant import CLOSE_CONN_BOX_TITLE, DEL_CONN_BOX_TITLE, CLOSE_DB_BOX_TITLE, \
+    DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from src.service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
 from src.service.system_storage.conn_type import get_conn_type_by_type
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
 from src.service.system_storage.sqlite_abc import transactional
 from src.view.box.message_box import pop_ok
@@ -48,16 +48,16 @@ class AddConnWorker(ThreadWorkerABC):
 
 class AddConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, connection: SqlConnection, masked_widget, window, callback):
+    def __init__(self, connection: SqlConnection, *args):
         self.connection = connection
-        super().__init__(masked_widget, window, SAVE_CONN_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddConnWorker(self.connection)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
-               SAVE_CONN_TITLE, self.window)
+               self.error_box_title, self.window)
         super().success_post_process(*args)
 
 
@@ -110,7 +110,7 @@ class DelConnExecutor(IconMovieThreadExecutor):
         self.tab_indexes = tab_indexes
         self.tab_ids = tab_ids
         self.callback = callback
-        super().__init__(item, window, DEL_CONN_TITLE)
+        super().__init__(item, window, DEL_CONN_BOX_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
         # 获取要删除的节点对象
@@ -164,17 +164,17 @@ class EditConnWorker(ThreadWorkerABC):
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, connection: SqlConnection, masked_widget, window, callback, name_changed):
+    def __init__(self, connection: SqlConnection, name_changed, *args):
         self.connection = connection
         self.name_changed = name_changed
-        super().__init__(masked_widget, window, SAVE_CONN_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditConnWorker(self.connection, self.name_changed)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
-               SAVE_CONN_TITLE, self.window)
+               self.error_box_title, self.window)
         super().success_post_process(*args)
 
 
@@ -234,16 +234,15 @@ class ListConnWorker(ThreadWorkerABC):
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, masked_widget, window, opened_items_callback,
-                 opened_tab_callback, reopen_end_callback):
-        super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE,
-                         reopen_end_callback, reopen_end_callback)
+    def __init__(self, opened_items_callback, opened_tab_callback, *args):
+        super().__init__(*args)
 
         self.worker.opened_items_signal.connect(opened_items_callback)
         self.worker.tab_info_signal.connect(opened_tab_callback)
 
     def get_worker(self) -> ListConnWorker:
         return ListConnWorker()
+
 
 # ---------------------------------------- 获取所有连接 end ---------------------------------------- #
 
@@ -270,9 +269,9 @@ class QueryConnInfoWorker(ThreadWorkerABC):
 
 class QueryConnInfoExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, conn_id, callback, masked_widget, window):
+    def __init__(self, conn_id, *args):
         self.conn_id = conn_id
-        super().__init__(masked_widget, window, '查询连接信息', callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return QueryConnInfoWorker(self.conn_id)
@@ -318,13 +317,15 @@ class CloseConnExecutor(IconMovieThreadExecutor):
         self.tab_ids = tab_ids
         self.close_for_edit = close_for_edit
         self.callback = callback
-        super().__init__(item, window, '关闭连接')
+        super().__init__(item, window, CLOSE_CONN_BOX_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return CloseConnDBWorker(f'关闭连接 [{self.conn_name}] 失败', self.child_opened_ids, self.tab_ids)
+        return CloseConnDBWorker(f'{CLOSE_CONN_BOX_TITLE} [{self.conn_name}] 失败',
+                                 self.child_opened_ids, self.tab_ids)
 
     def success_post_process(self, *args):
         self.callback(self.tab_indexes, self.close_for_edit)
+
 
 # ---------------------------------------- 关闭连接 end ---------------------------------------- #
 
@@ -340,10 +341,11 @@ class CloseDBExecutor(IconMovieThreadExecutor):
         self.tab_indexes = tab_indexes
         self.tab_ids = tab_ids
         self.callback = callback
-        super().__init__(item, window, '关闭数据库')
+        super().__init__(item, window, CLOSE_DB_BOX_TITLE)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return CloseConnDBWorker(f'关闭数据库 [{self.db_name}] 失败', self.child_opened_ids, self.tab_ids)
+        return CloseConnDBWorker(f'{CLOSE_DB_BOX_TITLE} [{self.db_name}] 失败',
+                                 self.child_opened_ids, self.tab_ids)
 
     def success_post_process(self, *args):
         self.callback(self.tab_indexes)

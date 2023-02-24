@@ -2,7 +2,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
-from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY, LOCATION_TXT, CREATE_NEW_FOLDER
+from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
+from src.constant.tree_constant import LOCATION_TXT, CREATE_NEW_FOLDER
 from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
 from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget

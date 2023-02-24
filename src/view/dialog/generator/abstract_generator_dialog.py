@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QGridLayout, QPushButton, QLabel
 
-from src.constant.constant import RESELECT_TXT, CHOOSE_TEMPLATE_TXT
+from src.constant.generator_dialog_constant import RESELECT_TXT, CHOOSE_TEMPLATE_TXT
 from src.view.custom_widget.draggable_widget import DraggableDialog
 from src.view.tree.tree_widget.abstract_tree_widget import DisplayTreeWidget
 

@@ -2,18 +2,19 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.constant import ADD_FOLDER_TITLE, EDIT_FOLDER_TITLE, DEL_STRUCT_TITLE, FOLDER_TYPE
+from src.constant.ds_type_constant import FOLDER_TYPE
+from src.constant.tree_constant import REFRESH_FOLDER_BOX_TITLE
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     RefreshMovieThreadExecutor
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab, DsTableTabSqlite
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, CheckedEnum
 from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.struct_sqlite import StructSqlite, StructInfo
 from src.service.system_storage.struct_type import FolderTypeEnum, get_struct_type
-from src.service.util.struct_util import StructParser
+from src.service.util.struct_util import *
 from src.view.box.message_box import pop_ok
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_children_opened_ids, get_item_opened_tab
 
@@ -52,19 +53,17 @@ class AddStructWorker(ThreadWorkerABC):
 
 class AddStructExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, struct_info: StructInfo,
-                 parent_opened_item: OpenedTreeItem,
-                 masked_widget, window, callback):
+    def __init__(self, struct_info: StructInfo, parent_opened_item: OpenedTreeItem, *args):
         self.struct_info = struct_info
         self.parent_opened_item = parent_opened_item
-        super().__init__(masked_widget, window, f'保存{struct_info.struct_type}', callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddStructWorker(self.struct_info, self.parent_opened_item)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.struct_info.struct_name}]\n保存{self.struct_info.struct_type}成功',
-               f'保存{self.struct_info.struct_type}', self.window)
+               self.error_box_title, self.window)
         super().success_post_process(*args)
 
 
@@ -100,10 +99,10 @@ class DelStructWorker(ThreadWorkerABC):
 
 class DelStructExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, item, opened_item, reorder_items, callback, window):
+    def __init__(self, opened_item, reorder_items, *args):
         self.opened_item = opened_item
         self.reorder_items = reorder_items
-        super().__init__(item, window, DEL_STRUCT_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return DelStructWorker(self.opened_item, self.reorder_items)
@@ -138,16 +137,16 @@ class EditStructWorker(ThreadWorkerABC):
 
 class EditStructExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, struct_info: StructInfo, masked_widget, window, callback):
+    def __init__(self, struct_info: StructInfo, *args):
         self.struct_info = struct_info
-        super().__init__(masked_widget, window, f'修改{struct_info.struct_type}', callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditStructWorker(self.struct_info)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.struct_info.struct_name}]\n修改{self.struct_info.struct_type}成功',
-               f'修改{self.struct_info.struct_type}', self.window)
+               self.error_box_title, self.window)
         super().success_post_process(*args)
 
 
@@ -177,9 +176,9 @@ class QueryStructWorker(ThreadWorkerABC):
 
 class QueryStructExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, opened_struct_id, callback, masked_widget, window):
+    def __init__(self, opened_struct_id, *args):
         self.opened_struct_id = opened_struct_id
-        super().__init__(masked_widget, window, '查询结构体', callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return QueryStructWorker(self.opened_struct_id)
@@ -242,8 +241,8 @@ class ListStructWorker(ThreadWorkerABC):
 
 class ListStructExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, reopen_items_callback, reopen_tab_callback, reopen_end_callback, masked_widget, window):
-        super().__init__(masked_widget, window, '获取所有结构体列表', reopen_end_callback, reopen_end_callback)
+    def __init__(self, reopen_items_callback, reopen_tab_callback, *args):
+        super().__init__(*args)
 
         self.reopen_items_callback = reopen_items_callback
         self.reopen_tab_callback = reopen_tab_callback
@@ -283,17 +282,17 @@ class AddFolderWorker(ThreadWorkerABC):
 
 class AddFolderExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, folder_name, parent_id, level, masked_widget, window, callback):
+    def __init__(self, folder_name, parent_id, level, *args):
         self.folder_name = folder_name
         self.parent_id = parent_id
         self.level = level
-        super().__init__(masked_widget, window, ADD_FOLDER_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddFolderWorker(self.folder_name, self.parent_id, self.level)
 
     def success_post_process(self, *args):
-        pop_ok(f'[{self.folder_name}]\n添加文件夹成功', ADD_FOLDER_TITLE, self.window)
+        pop_ok(f'[{self.folder_name}]\n添加文件夹成功', self.error_box_title, self.window)
         super().success_post_process(*args)
 
 
@@ -320,15 +319,15 @@ class EditFolderWorker(ThreadWorkerABC):
 
 class EditFolderExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, folder_item: OpenedTreeItem, masked_widget, window, callback):
+    def __init__(self, folder_item: OpenedTreeItem, *args):
         self.folder_item = folder_item
-        super().__init__(masked_widget, window, EDIT_FOLDER_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditFolderWorker(self.folder_item)
 
     def success_post_process(self, *args):
-        pop_ok(f'[{self.folder_item.item_name}]\n编辑文件夹成功', EDIT_FOLDER_TITLE, self.window)
+        pop_ok(f'[{self.folder_item.item_name}]\n编辑文件夹成功', self.error_box_title, self.window)
         super().success_post_process(*args)
 
 
@@ -372,13 +371,13 @@ class DelFolderWorker(ThreadWorkerABC):
 class DelFolderExecutor(IconMovieThreadExecutor):
 
     def __init__(self, folder_name, reorder_items, tab_indexes,
-                 tab_ids, callback, item, window):
+                 tab_ids, callback, *args):
         self.folder_name = folder_name
         self.reorder_items = reorder_items
         self.tab_indexes = tab_indexes
         self.tab_ids = tab_ids
         self.callback = callback
-        super().__init__(item, window, '删除文件夹')
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         # 获取要删除的节点对象
@@ -419,10 +418,10 @@ class ReadFileWorker(ThreadWorkerABC):
 
 class ReadFileExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, file_url, struct_type, masked_widget, window, callback):
+    def __init__(self, file_url, struct_type, *args):
         self.file_url = file_url
         self.struct_type = struct_type
-        super().__init__(masked_widget, window, f'读取{self.struct_type}文件', callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return ReadFileWorker(self.file_url, self.struct_type)
@@ -454,10 +453,10 @@ class PrettyStructWorker(ThreadWorkerABC):
 
 class PrettyStructExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, data, beautifier_executor_type, masked_widget, window, callback):
+    def __init__(self, data, beautifier_executor_type, *args):
         self.data = data
         self.beautifier_executor_type = beautifier_executor_type
-        super().__init__(masked_widget, window, '美化结构体', callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return PrettyStructWorker(self.data, self.beautifier_executor_type)
@@ -515,9 +514,9 @@ class OpenStructWorker(ThreadWorkerABC):
 
 class OpenStructExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, item, window, callback, fail_callback):
+    def __init__(self, item, *args):
         self.item = item
-        super().__init__(item, window, '打开结构体', callback, fail_callback)
+        super().__init__(item, *args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return OpenStructWorker(get_item_opened_record(self.item))
@@ -572,9 +571,9 @@ class RefreshStructWorker(ThreadWorkerABC):
 
 class RefreshStructExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, tree_widget, item, window, table_tab, success_callback):
+    def __init__(self, table_tab, *args):
         self.table_tab = table_tab
-        super().__init__(tree_widget, item, window, '刷新结构体', success_callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return RefreshStructWorker(get_item_opened_record(self.item), self.table_tab)
@@ -639,7 +638,7 @@ class RefreshFolderExecutor(RefreshMovieThreadExecutor):
         # 如果没有需要刷新的结构体节点，那么直接结束
         if not self.struct_items:
             return
-        super().__init__(tree_widget, item, window, '刷新文件夹')
+        super().__init__(tree_widget, item, window, REFRESH_FOLDER_BOX_TITLE)
 
         self.worker.refresh_item_signal.connect(refresh_item_callback)
 

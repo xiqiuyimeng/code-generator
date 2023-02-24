@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
+from src.constant.ds_dialog_constant import ADD_FOLDER_BOX_TITLE, EDIT_FOLDER_BOX_TITLE
 from src.service.async_func.async_struct_task import AddFolderExecutor, EditFolderExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.view.dialog.name_check_dialog import NameCheckDialog
@@ -40,14 +41,15 @@ class FolderDialog(NameCheckDialog):
         # 存在id，说明是编辑
         if self.dialog_data.id:
             self.dialog_data.item_name = new_folder_name
-            self.edit_folder_executor = EditFolderExecutor(self.dialog_data, self,
-                                                           self, self.edit_post_process)
+            self.edit_folder_executor = EditFolderExecutor(self.dialog_data, self, self,
+                                                           EDIT_FOLDER_BOX_TITLE,
+                                                           self.edit_post_process)
             self.edit_folder_executor.start()
         else:
             # 新增操作
             self.add_folder_executor = AddFolderExecutor(new_folder_name, self.parent_folder_item.id,
                                                          self.parent_folder_item.level + 1, self, self,
-                                                         self.save_post_process)
+                                                         ADD_FOLDER_BOX_TITLE, self.save_post_process)
             self.add_folder_executor.start()
 
     def save_post_process(self, opened_item_record):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
+from src.constant.window_constant import SWITCH_DS_CATEGORY_TITLE
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.ds_category_sqlite import DsCategorySqlite, DsCategory, DsCategoryEnum
@@ -18,10 +19,11 @@ class InitDsCategoryWorker(ThreadWorkerABC):
 
     @transactional
     def do_run(self):
-        log.info("读取数据源种类列表")
+        log.info('读取数据源种类列表')
         ds_categories = self.get_ds_categories()
         # 返回数据
         self.success_signal.emit(ds_categories)
+        log.info('读取数据源种类列表成功')
 
     def get_ds_categories(self):
         ds_categories = DsCategorySqlite().select_by_order(DsCategory())
@@ -34,12 +36,13 @@ class InitDsCategoryWorker(ThreadWorkerABC):
 
     def init_ds_categories(self):
         # 上述条件不满足，则进行初始化，将库里原有数据清空，初始化数据
-        log.info("数据源种类列表数据初始化")
+        log.info('数据源种类列表数据初始化')
         DsCategorySqlite().drop_table()
         ds_categories = list()
         for ds_category in DsCategoryEnum:
             ds_categories.append(ds_category.value)
         DsCategorySqlite().batch_insert(ds_categories)
+        log.info('数据源种类列表数据初始化成功')
         return self.get_ds_categories()
 
 
@@ -60,12 +63,13 @@ class SwitchDsCategoryWorker(InitDsCategoryWorker):
         self.switch_ds_category = switch_ds_category
 
     def do_run(self):
-        log.info(f'切换数据源种类 ==> {self.switch_ds_category}')
+        log.info(f'{SWITCH_DS_CATEGORY_TITLE} {self.switch_ds_category}')
         DsCategorySqlite().switch_ds_category(self.switch_ds_category)
         super().do_run()
+        log.info(f'{SWITCH_DS_CATEGORY_TITLE} {self.switch_ds_category} 成功')
 
     def do_exception(self, e: Exception):
-        err_msg = '切换数据源种类失败'
+        err_msg = f'{SWITCH_DS_CATEGORY_TITLE} {self.switch_ds_category} 失败'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 

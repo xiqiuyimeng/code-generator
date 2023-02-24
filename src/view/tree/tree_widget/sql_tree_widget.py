@@ -2,7 +2,7 @@
 """
 sql数据源树结构
 """
-
+from src.constant.tree_constant import LIST_ALL_CONN_BOX_TITLE
 from src.service.async_func.async_sql_conn_task import ListConnExecutor
 from src.service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
 from src.service.util.tree_node import TreeData
@@ -31,10 +31,9 @@ class SqlTreeWidget(AbstractTreeWidget):
         if self.list_conn_executor is Ellipsis:
             self.reopening_flag = True
             # 初始化数据
-            self.list_conn_executor = ListConnExecutor(self.main_window, self.main_window,
-                                                       self.reopen_items,
-                                                       self.reopen_tab,
-                                                       self.reopen_end)
+            self.list_conn_executor = ListConnExecutor(self.reopen_items, self.reopen_tab, self.main_window,
+                                                       self.main_window, LIST_ALL_CONN_BOX_TITLE,
+                                                       self.reopen_end, self.reopen_end)
             self.list_conn_executor.start()
 
     def get_current_tab_widget(self) -> TabWidget:

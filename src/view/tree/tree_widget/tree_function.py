@@ -5,9 +5,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
-from src.constant.constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
-    EDIT_STRUCT_DIALOG_TITLE, CREATE_NEW_FOLDER, FOLDER_TYPE, EDIT_FOLDER_NAME
+from src.constant.ds_type_constant import FOLDER_TYPE
 from src.constant.icon_enum import get_icon
+from src.constant.tree_constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
+    EDIT_STRUCT_DIALOG_TITLE, CREATE_NEW_FOLDER, EDIT_FOLDER_NAME
 from src.service.system_storage.conn_type import get_conn_dialog
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_type import get_struct_dialog, FolderTypeEnum

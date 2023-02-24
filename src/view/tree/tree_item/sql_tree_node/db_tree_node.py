@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from src.constant.constant import NO_TBS_PROMPT, CANCEL_OPEN_DB_ACTION, OPEN_DB_ACTION, CLOSE_DB_ACTION, \
-    SELECT_ALL_TB_ACTION, UNSELECT_TB_ACTION, CLOSE_DB_PROMPT, OPEN_DB_TITLE, REFRESH_DB_ACTION, \
-    CANCEL_REFRESH_DB_ACTION
+from src.constant.tree_constant import OPEN_DB_BOX_TITLE, NO_TBS_PROMPT, CLOSE_DB_ACTION, CLOSE_DB_PROMPT, \
+    CANCEL_OPEN_DB_ACTION, CANCEL_REFRESH_DB_ACTION, UNSELECT_TB_ACTION, SELECT_ALL_TB_ACTION, OPEN_DB_ACTION, \
+    REFRESH_DB_ACTION, REFRESH_DB_BOX_TITLE
 from src.service.async_func.async_sql_conn_task import CloseDBExecutor
 from src.service.async_func.async_sql_ds_task import OpenDBExecutor, RefreshDBExecutor
 from src.view.box.message_box import pop_fail, pop_question
@@ -32,7 +32,7 @@ class DBTreeNode(AbstractSqlTreeNode):
             # 设置正在打开中状态
             self.is_opening = True
             self.tree_widget.get_item_node(self.item.parent()).add_opening_child_count()
-            self.open_db_executor = OpenDBExecutor(self.item, self.window,
+            self.open_db_executor = OpenDBExecutor(self.item, self.window, OPEN_DB_BOX_TITLE,
                                                    self.open_item_ui, self.open_item_fail)
             self.open_db_executor.start()
         else:
@@ -47,7 +47,7 @@ class DBTreeNode(AbstractSqlTreeNode):
             self.tree_widget.set_selected_focus(self.item)
         else:
             pop_fail(NO_TBS_PROMPT.format(self.item.parent().text(0), self.item_name),
-                     OPEN_DB_TITLE, self.window)
+                     OPEN_DB_BOX_TITLE, self.window)
 
     def reopen_item(self, opened_items):
         # 打开库下的表节点
@@ -164,9 +164,8 @@ class DBTreeNode(AbstractSqlTreeNode):
             pop_fail(refresh_prompt.format(self.item_name),
                      REFRESH_DB_ACTION.format(self.item_name), self.window)
             return
-        self.refresh_db_executor = RefreshDBExecutor(self.tree_widget, self.item, self.window,
-                                                     self.refresh_tables_callback,
-                                                     self.refresh_cols_callback)
+        self.refresh_db_executor = RefreshDBExecutor(self.refresh_tables_callback, self.refresh_cols_callback,
+                                                     self.tree_widget, self.item, self.window, REFRESH_DB_BOX_TITLE)
         self.refresh_db_executor.start()
 
     def refresh_tables_callback(self, table_changed_dict: dict, refresh_executor=None):

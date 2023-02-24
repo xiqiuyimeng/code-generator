@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from src.constant.constant import STRUCTURE_CONFIRM_SELECTED_HEADER_TXT, STRUCT_COL_ICON
+from src.constant.ds_type_constant import STRUCT_COL_ICON
+from src.constant.generator_dialog_constant import STRUCTURE_CONFIRM_SELECTED_HEADER_TXT
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog

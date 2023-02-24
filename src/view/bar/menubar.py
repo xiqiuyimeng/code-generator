@@ -4,7 +4,7 @@
 """
 from PyQt5.QtWidgets import QMenuBar, QMenu
 
-from src.constant.constant import FILE_MENU, HELP_MENU, SWITCH_ACTION, ADD_DS_ACTION
+from src.constant.bar_constant import FILE_MENU, HELP_MENU, SWITCH_ACTION, ADD_DS_ACTION
 from src.view.bar.bar_action import *
 
 _author_ = 'luwt'

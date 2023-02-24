@@ -6,6 +6,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QPushButton, QHBoxLayout
 
+from src.constant.bar_constant import GENERATOR_TITLE
 from src.view.custom_widget.draggable_widget import DraggableWidget
 
 _author_ = 'luwt'
@@ -25,7 +26,7 @@ class TitleBar(DraggableWidget):
         self.icon = QLabel()
         self.icon.setPixmap(QPixmap(":/icon/exec.png").scaled(self.title_height, self.title_height))
         # 标题栏文字
-        self.main_title = QLabel("代码生成器")
+        self.main_title = QLabel(GENERATOR_TITLE)
         self.main_title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.main_title.setFixedHeight(self.title_height)
         self.main_title.setObjectName("main_title")

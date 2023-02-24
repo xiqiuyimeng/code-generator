@@ -3,9 +3,9 @@ from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
-from src.constant.constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
-    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, CLOSE_TABLE_TITLE, \
-    TABLE_CLOSE_WITH_REFRESHING
+from src.constant.tab_constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
+    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, TABLE_CLOSE_WITH_REFRESHING
+from src.constant.tree_constant import CLOSE_TABLE_BOX_TITLE
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab
 from src.view.box.message_box import pop_fail
 from src.view.tree.tree_item.tree_item_func import set_item_opened_tab
@@ -144,7 +144,7 @@ class TabBar(QTabBar):
             if partially_checked_tables:
                 prompt_list.append(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format('\n'.join(partially_checked_tables)))
             # 弹窗提示
-            pop_fail('\n\n'.join(prompt_list), CLOSE_TABLE_TITLE, self.main_window)
+            pop_fail('\n\n'.join(prompt_list), CLOSE_TABLE_BOX_TITLE, self.main_window)
         return not (partially_checked_tables or refreshing_tables)
 
     def partially_checked_table_prompt(self, tab_widget) -> str: ...

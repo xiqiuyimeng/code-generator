@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from src.constant.constant import MYSQL_DEFAULT_HOST, MYSQL_DEFAULT_PORT, MYSQL_DEFAULT_USER
+from src.constant.ds_dialog_constant import MYSQL_DEFAULT_HOST, MYSQL_DEFAULT_PORT, MYSQL_DEFAULT_USER
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog
 

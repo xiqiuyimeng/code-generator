@@ -3,8 +3,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QWidget, QHBoxLayout, QToolButton
 
-from src.constant.constant import TABLE_HEADER_LABELS, EXPAND_CHILD_TABLE, COLLAPSE_CHILD_TABLE
 from src.constant.icon_enum import get_icon
+from src.constant.table_constant import DS_TABLE_HEADER_LABELS, EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
 from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.view.custom_widget.check_box import CheckBox
@@ -44,14 +44,14 @@ class AbstractDsColTableWidget(AbstractTableWidget):
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
 
         # 设置表格列数
-        self.setColumnCount(len(TABLE_HEADER_LABELS))
+        self.setColumnCount(6)
         # 实例化自定义表头
         self.table_header = CheckBoxHeader(parent=self, batch_callback=self.set_batch_operating)
         self.table_header.setObjectName("table_header")
         # 设置表头
         self.setHorizontalHeader(self.table_header)
         # 设置表头字段
-        self.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
+        self.setHorizontalHeaderLabels(DS_TABLE_HEADER_LABELS)
         # 设置表头列宽度，第一列全选列
         self.horizontalHeader().resizeSection(0, 80)
         # 第二列字段列，根据大小自动调整宽度
@@ -159,7 +159,7 @@ class AbstractDsColTableWidget(AbstractTableWidget):
         # 如果存在子项，就添加一个展开按钮，连接打开子表方法
         if col_data.children:
             add_child_table_button = QToolButton()
-            add_child_table_button.setIcon(get_icon(EXPAND_CHILD_TABLE))
+            add_child_table_button.setIcon(get_icon(EXPAND_CHILD_TABLE_ICON))
             add_child_table_button.clicked.connect(
                 lambda: self.add_child_table_func(col_data, row_index))
 
@@ -195,15 +195,15 @@ class AbstractDsColTableWidget(AbstractTableWidget):
         # 如果是重新打开表，渲染界面，那么直接插入新的字表
         if reopen:
             self.add_child_table(row_index, col_data)
-            button.setIcon(get_icon(COLLAPSE_CHILD_TABLE))
+            button.setIcon(get_icon(COLLAPSE_CHILD_TABLE_ICON))
         else:
             # 如果表格已经显示，再次点击应该隐藏子表
             if col_data.expanded:
-                button.setIcon(get_icon(EXPAND_CHILD_TABLE))
+                button.setIcon(get_icon(EXPAND_CHILD_TABLE_ICON))
                 self.hideRow(row_index)
                 col_data.expanded = 0
             else:
-                button.setIcon(get_icon(COLLAPSE_CHILD_TABLE))
+                button.setIcon(get_icon(COLLAPSE_CHILD_TABLE_ICON))
                 col_data.expanded = 1
                 # 如果存在子表，但是被隐藏了，展示即可，否则应该创建表
                 if col_data.has_child_table:

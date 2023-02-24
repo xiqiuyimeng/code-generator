@@ -2,7 +2,6 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.constant import ADD_COL_TYPE_LIST_TITLE
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
@@ -23,6 +22,7 @@ class SaveDsColTypeWorker(ThreadWorkerABC):
 
     @transactional
     def do_run(self):
+        log.info('保存数据源列类型')
         col_type_sqlite = DsColTypeSqlite()
         # 首先清空数据
         col_type_sqlite.truncate_table()
@@ -39,8 +39,8 @@ class SaveDsColTypeWorker(ThreadWorkerABC):
                 ds_col_types.extend(col_type_sqlite.batch_add_ds_col_types(col_types, ds_types[index].id))
         if ds_col_types:
             col_type_sqlite.batch_insert(ds_col_types)
-        log.info("保存数据源列类型成功")
         self.success_signal.emit()
+        log.info('保存数据源列类型成功')
 
     def do_exception(self, e: Exception):
         err_msg = '保存数据源列类型列表失败'
@@ -58,7 +58,7 @@ class SaveDsColTypeExecutor(LoadingMaskThreadExecutor):
         return SaveDsColTypeWorker(self.ds_col_type_dict)
 
     def success_post_process(self, *args):
-        pop_ok('保存数据源列类型成功', ADD_COL_TYPE_LIST_TITLE, self.window)
+        pop_ok('保存数据源列类型成功', self.error_box_title, self.window)
         super().success_post_process(*args)
 
 # ----------------------- 添加列类型 end ----------------------- #
@@ -70,14 +70,14 @@ class ListDsColTypeWorker(ThreadWorkerABC):
     success_signal = pyqtSignal(dict)
 
     def do_run(self):
-        log.info("开始读取列类型列表")
+        log.info('开始读取列类型列表')
         # 读取数据库中缓存的列类型列表
         ds_col_types = DsColTypeSqlite().get_all_ds_col_types()
         if ds_col_types:
             self.success_signal.emit(ds_col_types)
         else:
             self.success_signal.emit(dict())
-        log.info("读取列类型列表成功")
+        log.info('读取列类型列表成功')
 
     def do_exception(self, e: Exception):
         err_msg = '读取列类型列表失败'

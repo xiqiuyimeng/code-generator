@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, QVariant
 
-from src.constant.constant import CANCEL_OPEN_TABLE_ACTION, OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, \
-    CANCEL_REFRESH_TB_ACTION
+from src.constant.tree_constant import OPEN_TB_BOX_TITLE, CANCEL_OPEN_TABLE_ACTION, CANCEL_REFRESH_TB_ACTION, \
+    OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, REFRESH_TB_BOX_TITLE
 from src.service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
 from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
 from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, \
@@ -34,7 +34,8 @@ class TableTreeNode(AbstractSqlTreeNode):
             self.hide_check_box()
             # 向上传递正在打开节点数变化
             self.tree_widget.get_item_node(self.item.parent()).add_opening_child_count()
-            self.open_tb_executor = OpenTBExecutor(self.item, self.window, self.open_item_ui, self.open_item_fail)
+            self.open_tb_executor = OpenTBExecutor(self.item, self.window, OPEN_TB_BOX_TITLE,
+                                                   self.open_item_ui, self.open_item_fail)
             self.open_tb_executor.start()
 
     def open_item_ui(self, table_tab):
@@ -124,7 +125,8 @@ class TableTreeNode(AbstractSqlTreeNode):
             return
         # 刷新表
         self.refresh_tb_executor = RefreshTBExecutor(self.tree_widget, self.item, self.window,
-                                                     self.refresh_success, self.refresh_fail)
+                                                     REFRESH_TB_BOX_TITLE, self.refresh_success,
+                                                     self.refresh_fail)
         self.refresh_tb_executor.start()
 
     def refresh_success(self, table_tab):

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton, QListWidgetItem, QStackedWidget, QHBoxLayout, QLabel
 
-from src.constant.constant import DS_COL_TYPE_LIST_TITLE, DS_COL_TYPE_LIST_BOX_TITLE, SYNC_DS_TYPE_BUTTON_TEXT, \
-    ADD_DS_COL_TYPE_BUTTON_TEXT, ADD_COL_TYPE_LIST_TITLE, ADD_DS_COL_TYPE_NO_DS_TYPE, ADD_DS_COL_TYPE_TITLE, \
-    SAVE_DATA_TIPS
+from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_LIST_TITLE, DS_COL_TYPE_LIST_BOX_TITLE, \
+    SYNC_DS_TYPE_BUTTON_TEXT, ADD_DS_COL_TYPE_BUTTON_TEXT, ADD_COL_TYPE_LIST_TITLE, ADD_DS_COL_TYPE_NO_DS_TYPE, \
+    ADD_DS_COL_TYPE_TITLE, SAVE_DATA_TIPS
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor, SaveDsColTypeExecutor
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.struct_type import StructTypeEnum

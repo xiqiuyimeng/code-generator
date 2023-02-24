@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton
 
-from src.constant.constant import OK_BTN_TEXT
+from src.constant.dialog_constant import OK_BTN_TEXT
 from src.view.dialog.custom_dialog import CustomDialog
 
 _author_ = 'luwt'

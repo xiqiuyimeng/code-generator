@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.constant.constant import JSON_TYPE, JSON_DISPLAY_NAME, FOLDER_TYPE, FOLDER_DISPLAY_NAME
+from src.constant.ds_type_constant import JSON_TYPE, JSON_DISPLAY_NAME, FOLDER_TYPE, FOLDER_DISPLAY_NAME
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:06'

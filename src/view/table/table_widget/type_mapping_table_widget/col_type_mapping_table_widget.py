@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, pyqtSignal
 
-from src.constant.constant import DEL_COL_TYPE_MAPPING_GROUP_TITLE, DEL_COL_TYPE_MAPPING_GROUP_PROMPT, \
+from src.constant.table_constant import DEL_MAPPING_GROUP_BOX_TITLE, DEL_MAPPING_GROUP_PROMPT, \
     DEL_COL_TYPE_MAPPING_PROMPT, DEL_COL_TYPE_MAPPING_TITLE
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMapping
 from src.view.box.message_box import pop_question
@@ -246,8 +246,8 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
         if self.header_widget.max_group_num == 0:
             return
         group_title = self.header_widget.get_mapping_group_title(self.columnCount() - 1)
-        if not pop_question(DEL_COL_TYPE_MAPPING_GROUP_PROMPT.format(group_title),
-                            DEL_COL_TYPE_MAPPING_GROUP_TITLE, self):
+        if not pop_question(DEL_MAPPING_GROUP_PROMPT.format(group_title),
+                            DEL_MAPPING_GROUP_BOX_TITLE, self):
             return
         # 移除最后一个映射组
         column_count = self.columnCount()

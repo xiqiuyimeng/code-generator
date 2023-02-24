@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.constant import MYSQL_CHECK_DB_SQL, MYSQL_CHECK_TB_SQL
+from src.constant.sql_constant import MYSQL_CHECK_DB_SQL, MYSQL_CHECK_TB_SQL
 from src.service.sql_ds_executor.db_executor import InternetDBExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
 
-from src.constant.constant import NAME_AVAILABLE, NAME_EXISTS, NAME_UNCHANGED_PROMPT, NAME_MAX_LENGTH_PLACEHOLDER_TEXT
+from src.constant.dialog_constant import NAME_AVAILABLE, NAME_EXISTS, NAME_UNCHANGED_PROMPT, \
+    NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.constant.icon_enum import get_icon
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.service.read_qrc.read_config import read_qss
@@ -36,7 +37,8 @@ class NameCheckDialog(CustomSaveDialog):
 
         super().__init__(screen_rect, dialog_title)
 
-    def get_new_dialog_data(self) -> BasicSqliteDTO: ...
+    def get_new_dialog_data(self) -> BasicSqliteDTO:
+        ...
 
     def setup_content_ui(self):
         self.setup_name_form()
@@ -57,14 +59,16 @@ class NameCheckDialog(CustomSaveDialog):
         self.name_checker = QLabel(self.frame)
         self.name_layout.addRow(self.placeholder_blank, self.name_checker)
 
-    def setup_other_content_ui(self): ...
+    def setup_other_content_ui(self):
+        ...
 
     def connect_other_signal(self):
         self.name_input.textEdited.connect(self.check_name_available)
         self.name_input.textEdited.connect(self.check_input)
         self.connect_child_signal()
 
-    def connect_child_signal(self): ...
+    def connect_child_signal(self):
+        ...
 
     def check_name_available(self, name):
         if name:
@@ -111,7 +115,8 @@ class NameCheckDialog(CustomSaveDialog):
         else:
             self.init_lineedit_button_status()
 
-    def get_read_storage_executor(self, callback) -> LoadingMaskThreadExecutor: ...
+    def get_read_storage_executor(self, callback) -> LoadingMaskThreadExecutor:
+        ...
 
     def set_old_dialog_data(self, dialog_data):
         self.dialog_data = dialog_data
@@ -126,13 +131,15 @@ class NameCheckDialog(CustomSaveDialog):
         self.name_input.setMaxLength(50)
         self.setup_other_input_limit_rule()
 
-    def setup_other_input_limit_rule(self): ...
+    def setup_other_input_limit_rule(self):
+        ...
 
     def setup_placeholder_text(self):
         self.name_input.setPlaceholderText(NAME_MAX_LENGTH_PLACEHOLDER_TEXT)
         self.setup_other_placeholder_text()
 
-    def setup_other_placeholder_text(self): ...
+    def setup_other_placeholder_text(self):
+        ...
 
     def setup_lineedit_value(self):
         if self.check_edit():
@@ -151,11 +158,14 @@ class NameCheckDialog(CustomSaveDialog):
         self.name_input.setText(self.old_name)
         self.setup_echo_other_data()
 
-    def get_old_name(self) -> str: ...
+    def get_old_name(self) -> str:
+        ...
 
-    def setup_echo_other_data(self): ...
+    def setup_echo_other_data(self):
+        ...
 
-    def setup_default_value(self): ...
+    def setup_default_value(self):
+        ...
 
     def check_input(self):
         # 收集用户输入数据
@@ -173,12 +183,17 @@ class NameCheckDialog(CustomSaveDialog):
             self.save_button.setDisabled(True)
             self.init_other_button_status()
 
-    def collect_input(self): ...
+    def collect_input(self):
+        ...
 
-    def button_available(self) -> bool: ...
+    def button_available(self) -> bool:
+        ...
 
-    def set_other_button_available(self): ...
+    def set_other_button_available(self):
+        ...
 
-    def check_data_changed(self) -> bool: ...
+    def check_data_changed(self) -> bool:
+        ...
 
-    def init_other_button_status(self): ...
+    def init_other_button_status(self):
+        ...

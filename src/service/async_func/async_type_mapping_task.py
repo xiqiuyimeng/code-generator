@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.constant import ADD_TYPE_MAPPING_TITLE, EDIT_TYPE_MAPPING_TITLE, READ_TYPE_MAPPING_TITLE, \
-    TYPE_MAPPING_BOX_TITLE, DEL_TYPE_MAPPING_TITLE
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMappingSqlite
@@ -44,9 +42,9 @@ class ReadTypeMappingWorker(ThreadWorkerABC):
 
 class ReadTypeMappingExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, type_mapping_id, callback, *args):
+    def __init__(self, type_mapping_id, *args):
         self.type_mapping_id = type_mapping_id
-        super().__init__(*args, READ_TYPE_MAPPING_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return ReadTypeMappingWorker(self.type_mapping_id)
@@ -83,16 +81,16 @@ class AddTypeMappingWorker(ThreadWorkerABC):
 
 class AddTypeMappingExecutor(LoadingMaskThreadExecutor):
     
-    def __init__(self, type_mapping: TypeMapping, callback, *args):
+    def __init__(self, type_mapping: TypeMapping, *args):
         self.type_mapping = type_mapping
-        super().__init__(*args, ADD_TYPE_MAPPING_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddTypeMappingWorker(self.type_mapping)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.type_mapping.mapping_name}]\n保存成功',
-               ADD_TYPE_MAPPING_TITLE, self.window)
+               self.error_box_title, self.window)
         super().success_post_process(*args)
 
 # ----------------------- 添加类型映射 end ----------------------- #
@@ -124,16 +122,16 @@ class EditTypeMappingWorker(ThreadWorkerABC):
 
 class EditTypeMappingExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, type_mapping: TypeMapping, callback, *args):
+    def __init__(self, type_mapping: TypeMapping, *args):
         self.type_mapping = type_mapping
-        super().__init__(*args, EDIT_TYPE_MAPPING_TITLE, callback)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditTypeMappingWorker(self.type_mapping)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.type_mapping.mapping_name}]\n保存成功',
-               EDIT_TYPE_MAPPING_TITLE, self.window)
+               self.error_box_title, self.window)
         super().success_post_process(*args)
 
 # ----------------------- 编辑类型映射 end ----------------------- #
@@ -165,18 +163,17 @@ class DelTypeMappingWorker(ThreadWorkerABC):
 
 class DelTypeMappingExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, type_mapping_id, type_mapping_name, row_index, callback, *args):
+    def __init__(self, type_mapping_id, type_mapping_name, row_index, *args):
         self.type_mapping_id = type_mapping_id
         self.type_mapping_name = type_mapping_name
         self.row_index = row_index
-        self.callback = callback
-        super().__init__(*args, DEL_TYPE_MAPPING_TITLE)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return DelTypeMappingWorker(self.type_mapping_id, self.type_mapping_name)
 
     def success_post_process(self, *args):
-        self.callback(self.row_index)
+        self.success_callback(self.row_index)
 
 # ----------------------- 删除类型映射 end ----------------------- #
 
@@ -200,9 +197,6 @@ class ListTypeMappingWorker(ThreadWorkerABC):
 
 
 class ListTypeMappingExecutor(LoadingMaskThreadExecutor):
-
-    def __init__(self, callback, *args):
-        super().__init__(*args, TYPE_MAPPING_BOX_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return ListTypeMappingWorker()

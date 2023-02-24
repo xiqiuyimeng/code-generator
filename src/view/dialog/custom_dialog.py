@@ -2,7 +2,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QFrame, QLabel, QGridLayout, QPushButton
 
-from src.constant.constant import QUIT_BTN_TEXT
+from src.constant.dialog_constant import QUIT_BTN_TEXT
 from src.view.custom_widget.draggable_widget import DraggableDialog
 
 _author_ = 'luwt'

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QLineEdit
 
-from src.constant.constant import ORACLE_DEFAULT_HOST, ORACLE_DEFAULT_PORT, ORACLE_DEFAULT_SERVICE_NAME, \
+from src.constant.ds_dialog_constant import ORACLE_DEFAULT_HOST, ORACLE_DEFAULT_PORT, ORACLE_DEFAULT_SERVICE_NAME, \
     SERVICE_NAME_TEXT, SERVICE_NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.service.system_storage.conn_type import ConnType, ConnTypeEnum
 from src.view.dialog.datasource.conn.internet_conn_dialog import InternetConnDialog

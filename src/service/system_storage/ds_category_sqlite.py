@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.constant.constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
+from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
 
 _author_ = 'luwt'

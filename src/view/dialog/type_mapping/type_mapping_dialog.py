@@ -3,12 +3,13 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QFormLayout, QTextEdit, QHBoxLayout, QStackedWidget, QWidget, \
     QVBoxLayout, QGridLayout, QPushButton, QSpacerItem, QFrame
 
-from src.constant.constant import TYPE_MAPPING_TITLE, TYPE_MAPPING_NAME, DS_TYPE_TEXT, \
+from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_TITLE, TYPE_MAPPING_NAME, DS_TYPE_TEXT, \
     TYPE_MAPPING_COMMENT_TEXT, TYPE_MAPPING_INFO_TEXT, TYPE_MAPPING_COL_TABLE_TEXT, SYNC_DS_COL_TYPE_BTN_TEXT, \
-    ADD_COL_TYPE_MAPPING_BTN_TEXT, DEL_COL_TYPE_MAPPING_BTN_TEXT, ADD_COL_TYPE_MAPPING_GROUP_BTN_TEXT, \
-    DEL_COL_TYPE_MAPPING_GROUP_BTN_TEXT, SAVE_DATA_TIPS, DS_COL_TYPE_LIST_BOX_TITLE, NO_COL_TYPES_PROMPT, \
+    ADD_COL_TYPE_MAPPING_BTN_TEXT, DEL_COL_TYPE_MAPPING_BTN_TEXT, ADD_MAPPING_GROUP_BTN_TEXT, \
+    DEL_MAPPING_GROUP_BTN_TEXT, NO_COL_TYPES_PROMPT, \
     GET_COL_TYPES_TITLE, NO_DS_TYPE_PROMPT, GET_DS_TYPE_TITLE, CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT, \
-    CHECK_COL_TYPE_MAPPING_FRAGMENTARY_TITLE
+    CHECK_COL_TYPE_MAPPING_FRAGMENTARY_TITLE, READ_TYPE_MAPPING_BOX_TITLE, ADD_TYPE_MAPPING_BOX_TITLE, \
+    EDIT_TYPE_MAPPING_BOX_TITLE, SAVE_DATA_TIPS, DS_COL_TYPE_LIST_BOX_TITLE
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor
 from src.service.async_func.async_type_mapping_task import ReadTypeMappingExecutor, AddTypeMappingExecutor, \
     EditTypeMappingExecutor
@@ -197,8 +198,8 @@ class TypeMappingDetailDialog(NameCheckDialog):
         self.sync_ds_col_type_button.setText(SYNC_DS_COL_TYPE_BTN_TEXT)
         self.add_mapping_button.setText(ADD_COL_TYPE_MAPPING_BTN_TEXT)
         self.del_mapping_button.setText(DEL_COL_TYPE_MAPPING_BTN_TEXT)
-        self.add_mapping_group_button.setText(ADD_COL_TYPE_MAPPING_GROUP_BTN_TEXT)
-        self.del_mapping_group_button.setText(DEL_COL_TYPE_MAPPING_GROUP_BTN_TEXT)
+        self.add_mapping_group_button.setText(ADD_MAPPING_GROUP_BTN_TEXT)
+        self.del_mapping_group_button.setText(DEL_MAPPING_GROUP_BTN_TEXT)
 
     def connect_child_signal(self):
         self.list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
@@ -234,7 +235,7 @@ class TypeMappingDetailDialog(NameCheckDialog):
             pop_fail(NO_DS_TYPE_PROMPT, GET_DS_TYPE_TITLE, self.frame)
 
     def get_read_storage_executor(self, callback):
-        return ReadTypeMappingExecutor(self.dialog_data, callback, self, self)
+        return ReadTypeMappingExecutor(self.dialog_data, self, self, READ_TYPE_MAPPING_BOX_TITLE, callback)
 
     def init_lineedit_button_status(self):
         super().init_lineedit_button_status()
@@ -276,12 +277,14 @@ class TypeMappingDetailDialog(NameCheckDialog):
         # 如果存在原数据，说明是编辑
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
-            self.edit_type_mapping_executor = EditTypeMappingExecutor(self.new_dialog_data,
-                                                                      self.edit_post_process, self, self)
+            self.edit_type_mapping_executor = EditTypeMappingExecutor(self.new_dialog_data, self, self,
+                                                                      EDIT_TYPE_MAPPING_BOX_TITLE,
+                                                                      self.edit_post_process)
             self.edit_type_mapping_executor.start()
         else:
-            self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data,
-                                                                    self.add_post_process, self, self)
+            self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data, self, self,
+                                                                    ADD_TYPE_MAPPING_BOX_TITLE,
+                                                                    self.add_post_process)
             self.add_type_mapping_executor.start()
 
     def add_post_process(self):
@@ -298,7 +301,6 @@ class TypeMappingDetailDialog(NameCheckDialog):
         self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
                                                                self.list_col_type_callback)
         self.list_ds_col_type_executor.start()
-        # 控制删除按钮状态
 
     def list_col_type_callback(self, col_type_dict: dict):
         self.ds_col_type_dict = col_type_dict

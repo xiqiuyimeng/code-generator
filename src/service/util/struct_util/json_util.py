@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 
-from src.service.util.struct_util.data_type import get_data_type
 from src.service.system_storage.ds_table_col_info_sqlite import ColTypeEnum
+from src.service.util.struct_util.data_type import get_data_type
 from src.service.util.struct_util.struct_util import assemble_col_info, StructParser, StructBeautifier
 
 _author_ = 'luwt'

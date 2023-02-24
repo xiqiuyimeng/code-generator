@@ -2,19 +2,19 @@
 
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT, TEST_CONN_TITLE, OPEN_CONN_TITLE, \
-    OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, OPEN_DB_TITLE, \
-    OPEN_TB_TITLE, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT, \
-    REFRESH_TB_TITLE, REFRESH_DB_TITLE, REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT, REFRESH_CONN_TITLE, \
-    REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT
+from src.constant.ds_dialog_constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
+from src.constant.tree_constant import OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, REFRESH_CONN_BOX_TITLE, \
+    REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, \
+    REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, \
+    REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     RefreshMovieThreadExecutor
 from src.service.sql_ds_executor import *
 from src.service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem, \
     CheckedEnum
 from src.service.system_storage.sqlite_abc import transactional
@@ -64,25 +64,22 @@ class TestConnWorker(ConnWorkerABC):
 
 class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, connection: SqlConnection, conn_type, masked_widget, window):
+    def __init__(self, connection: SqlConnection, conn_type, *args):
         self.connection = connection
         # 临时创建一个 opened item 使用
         self.opened_record = OpenedTreeItem()
         self.opened_record.data_type = conn_type
-        super().__init__(masked_widget, window, TEST_CONN_TITLE)
+        super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return TestConnWorker(self.opened_record, self.connection)
 
     def success_post_process(self):
         pop_ok(f'[{self.connection.conn_name}]\n{TEST_CONN_SUCCESS_PROMPT}',
-               TEST_CONN_TITLE, self.window)
+               self.error_box_title, self.window)
 
 
 class TestConnIconMovieExecutor(IconMovieThreadExecutor):
-
-    def __init__(self, item, window, success_callback, fail_callback):
-        super().__init__(item, window, TEST_CONN_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return TestConnWorker(get_item_opened_record(self.item))
@@ -125,14 +122,12 @@ class OpenConnWorker(ConnWorkerABC):
 
 class OpenConnExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, item, window, success_callback, fail_callback):
-        super().__init__(item, window, OPEN_CONN_TITLE, success_callback, fail_callback)
-
     def get_worker(self) -> ThreadWorkerABC:
         return OpenConnWorker(get_item_opened_record(self.item))
 
 
 # ---------------------------------------- 打开连接 end ---------------------------------------- #
+
 
 # ---------------------------------------- 刷新连接 start ---------------------------------------- #
 
@@ -189,7 +184,7 @@ class RefreshConnExecutor(RefreshMovieThreadExecutor):
 
     def __init__(self, tree_widget, item, window, db_changed_callback, tb_changed_callback,
                  col_changed_callback, db_finished_callback):
-        super().__init__(tree_widget, item, window, REFRESH_CONN_TITLE)
+        super().__init__(tree_widget, item, window, REFRESH_CONN_BOX_TITLE)
 
         self.worker.db_changed_signal.connect(db_changed_callback)
         self.worker.table_changed_signal.connect(tb_changed_callback)
@@ -198,6 +193,7 @@ class RefreshConnExecutor(RefreshMovieThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return RefreshConnWorker(get_item_opened_record(self.item))
+
 
 # ---------------------------------------- 刷新连接 end ---------------------------------------- #
 
@@ -241,9 +237,6 @@ class OpenDBWorker(ConnWorkerABC):
 
 
 class OpenDBExecutor(IconMovieThreadExecutor):
-
-    def __init__(self, item, window, success_callback, fail_callback):
-        super().__init__(item, window, OPEN_DB_TITLE, success_callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return OpenDBWorker(get_item_opened_record(self.item.parent()), self.item.text(0),
@@ -296,8 +289,8 @@ class RefreshDBWorker(ConnWorkerABC):
 
 class RefreshDBExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, tree_widget, item, window, tb_changed_callback, col_changed_callback):
-        super().__init__(tree_widget, item, window, REFRESH_DB_TITLE)
+    def __init__(self, tb_changed_callback, col_changed_callback, *args):
+        super().__init__(*args)
 
         self.worker.table_changed_signal.connect(tb_changed_callback)
         self.worker.col_signal.connect(lambda col_result: col_changed_callback(*col_result))
@@ -352,14 +345,12 @@ class OpenTBWorker(ConnWorkerABC):
 
 class OpenTBExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, item, window, success_callback, fail_callback):
-        super().__init__(item, window, OPEN_TB_TITLE, success_callback, fail_callback)
-
     def get_worker(self) -> ThreadWorkerABC:
         opened_record = get_item_opened_record(self.item)
         return OpenTBWorker(get_item_opened_record(self.item.parent().parent()),
                             self.item.parent().text(0), self.item.text(0),
                             opened_record, opened_record.checked)
+
 
 # ---------------------------------------- 打开数据表 end ---------------------------------------- #
 
@@ -409,15 +400,11 @@ class RefreshTBWorker(ConnWorkerABC):
 
 class RefreshTBExecutor(RefreshMovieThreadExecutor):
 
-    def __init__(self, tree_widget, item, window, success_callback, fail_callback):
-        super().__init__(tree_widget, item, window, REFRESH_TB_TITLE, success_callback, fail_callback)
-
     def get_worker(self) -> ThreadWorkerABC:
         tab = get_item_opened_tab(self.item)
         return RefreshTBWorker(tab.table_tab if tab else None,
                                get_item_opened_record(self.item.parent().parent()),
                                self.item.parent().text(0), self.item.text(0),
                                get_item_opened_record(self.item))
-
 
 # ---------------------------------------- 刷新数据表 end ---------------------------------------- #

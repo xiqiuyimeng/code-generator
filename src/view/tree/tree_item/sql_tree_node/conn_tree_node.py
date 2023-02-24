@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QMenu
 
-from src.constant.constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, CANCEL_TEST_CONN_ACTION, \
-    TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, TEST_CONN_SUCCESS_PROMPT, TEST_CONN_TITLE, \
-    ADD_DS_ACTION, EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_CONN_ACTION, \
-    CANCEL_REFRESH_CONN_ACTION
+from src.constant.bar_constant import ADD_DS_ACTION
+from src.constant.ds_dialog_constant import TEST_CONN_BOX_TITLE, TEST_CONN_SUCCESS_PROMPT
 from src.constant.icon_enum import get_icon
+from src.constant.tree_constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, \
+    CANCEL_TEST_CONN_ACTION, TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, \
+    EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_CONN_ACTION, CANCEL_REFRESH_CONN_ACTION, \
+    OPEN_CONN_BOX_TITLE
 from src.service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
 from src.service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
 from src.view.bar.bar_action import add_sql_ds_actions
@@ -35,7 +37,7 @@ class ConnTreeNode(AbstractSqlTreeNode):
         if not self.is_opening and not self.item.childCount():
             # 设置正在打开中状态
             self.is_opening = True
-            self.open_conn_executor = OpenConnExecutor(self.item, self.window,
+            self.open_conn_executor = OpenConnExecutor(self.item, self.window, OPEN_CONN_BOX_TITLE,
                                                        self.open_item_ui, self.open_item_fail)
             self.open_conn_executor.start()
         else:
@@ -151,13 +153,13 @@ class ConnTreeNode(AbstractSqlTreeNode):
 
     def test_conn(self):
         self.is_testing = True
-        self.test_conn_executor = TestConnIconMovieExecutor(self.item, self.window,
+        self.test_conn_executor = TestConnIconMovieExecutor(self.item, self.window, TEST_CONN_BOX_TITLE,
                                                             self.test_conn_success, self.test_conn_fail)
         self.test_conn_executor.start()
 
     def test_conn_success(self):
         self.is_testing = False
-        pop_ok(f'[{self.item_name}]\n{TEST_CONN_SUCCESS_PROMPT}', TEST_CONN_TITLE, self.window)
+        pop_ok(f'[{self.item_name}]\n{TEST_CONN_SUCCESS_PROMPT}', TEST_CONN_BOX_TITLE, self.window)
 
     def test_conn_fail(self):
         self.is_testing = False

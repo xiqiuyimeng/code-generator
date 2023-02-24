@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton
 
-from src.constant.constant import TYPE_MAPPING_LIST_TITLE, DS_COL_TYPE_BUTTON_TEXT, ADD_TYPE_MAPPING_BUTTON_TEXT, \
-    DEL_TYPE_MAPPING_TITLE, DEL_TYPE_MAPPING_PROMPT
+from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_LIST_TITLE, DS_COL_TYPE_BUTTON_TEXT, \
+    ADD_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_BOX_TITLE, DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE
 from src.service.async_func.async_type_mapping_task import ListTypeMappingExecutor, DelTypeMappingExecutor
 from src.view.box.message_box import pop_question
 from src.view.dialog.custom_dialog import CustomDialog
@@ -79,16 +79,14 @@ class TypeMappingListTableDialog(CustomDialog):
         self.type_mapping_dialog.exec()
 
     def del_type_mapping(self, type_mapping_id, row_index, type_mapping_name):
-        if not pop_question(DEL_TYPE_MAPPING_PROMPT.format(type_mapping_name), DEL_TYPE_MAPPING_TITLE, self):
+        if not pop_question(DEL_TYPE_MAPPING_PROMPT.format(type_mapping_name), DEL_TYPE_MAPPING_BOX_TITLE, self):
             return
-        del_row_slot_func = self.type_mapping_table_widget.del_row
         self.del_type_mapping_executor = DelTypeMappingExecutor(type_mapping_id, type_mapping_name, row_index,
-                                                                del_row_slot_func, self, self)
+                                                                self, self, DEL_TYPE_MAPPING_BOX_TITLE,
+                                                                self.type_mapping_table_widget.del_row)
         self.del_type_mapping_executor.start()
 
     def post_process(self):
-        success_callback = self.type_mapping_table_widget.fill_table
-        self.list_type_mapping_executor = ListTypeMappingExecutor(success_callback, self, self)
+        self.list_type_mapping_executor = ListTypeMappingExecutor(self, self, TYPE_MAPPING_BOX_TITLE,
+                                                                  self.type_mapping_table_widget.fill_table)
         self.list_type_mapping_executor.start()
-
-

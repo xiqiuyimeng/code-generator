@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.constant import SQL_CONFIRM_SELECTED_HEADER_TXT
+from src.constant.generator_dialog_constant import SQL_CONFIRM_SELECTED_HEADER_TXT
 from src.constant.icon_enum import get_icon
 from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
 from src.view.tree.tree_widget.tree_function import make_display_tree_item
