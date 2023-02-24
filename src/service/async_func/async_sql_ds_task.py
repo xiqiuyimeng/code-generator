@@ -26,20 +26,6 @@ _author_ = 'luwt'
 _date_ = '2022/5/31 19:05'
 
 
-class SqlDSIconMovieThreadExecutor(IconMovieThreadExecutor):
-
-    def __init__(self, item, window, error_box_title, success_callback, fail_callback):
-        self.success_callback = success_callback
-        self.fail_callback = fail_callback
-        super().__init__(item, window, error_box_title)
-
-    def success_post_process(self, *args):
-        self.success_callback(*args)
-
-    def fail_post_process(self):
-        self.fail_callback()
-
-
 class ConnWorkerABC(ThreadWorkerABC):
 
     def __init__(self, conn_opened_record: OpenedTreeItem, connection: SqlConnection = None):
@@ -88,12 +74,12 @@ class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return TestConnWorker(self.opened_record, self.connection)
 
-    def success_post_process(self, *args):
+    def success_post_process(self):
         pop_ok(f'[{self.connection.conn_name}]\n{TEST_CONN_SUCCESS_PROMPT}',
                TEST_CONN_TITLE, self.window)
 
 
-class TestConnIconMovieExecutor(SqlDSIconMovieThreadExecutor):
+class TestConnIconMovieExecutor(IconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, TEST_CONN_TITLE, success_callback, fail_callback)
@@ -137,7 +123,7 @@ class OpenConnWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
+class OpenConnExecutor(IconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, OPEN_CONN_TITLE, success_callback, fail_callback)
@@ -151,14 +137,10 @@ class OpenConnExecutor(SqlDSIconMovieThreadExecutor):
 # ---------------------------------------- 刷新连接 start ---------------------------------------- #
 
 class RefreshConnWorker(ConnWorkerABC):
-    success_signal = pyqtSignal()
     db_changed_signal = pyqtSignal(dict)
     db_finished_signal = pyqtSignal(int)
     table_changed_signal = pyqtSignal(dict)
     col_signal = pyqtSignal(tuple)
-
-    def __init__(self, conn_opened_record: OpenedTreeItem):
-        super().__init__(conn_opened_record)
 
     def do_executor_func(self, executor: SqlDBExecutor):
         # 读取连接下的库名列表
@@ -258,7 +240,7 @@ class OpenDBWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
+class OpenDBExecutor(IconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, OPEN_DB_TITLE, success_callback, fail_callback)
@@ -274,7 +256,6 @@ class OpenDBExecutor(SqlDSIconMovieThreadExecutor):
 # ---------------------------------------- 刷新数据库 start ---------------------------------------- #
 
 class RefreshDBWorker(ConnWorkerABC):
-    success_signal = pyqtSignal()
     table_changed_signal = pyqtSignal(dict)
     col_signal = pyqtSignal(tuple)
 
@@ -369,7 +350,7 @@ class OpenTBWorker(ConnWorkerABC):
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
 
-class OpenTBExecutor(SqlDSIconMovieThreadExecutor):
+class OpenTBExecutor(IconMovieThreadExecutor):
 
     def __init__(self, item, window, success_callback, fail_callback):
         super().__init__(item, window, OPEN_TB_TITLE, success_callback, fail_callback)

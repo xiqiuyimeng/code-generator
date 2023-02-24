@@ -45,8 +45,8 @@ class MainWindow(QMainWindow):
         self.setup_ui()
 
         # 初始化 ds category
-        self.init_ds_category_executor = InitDsCategoryExecutor(self.setup_ui_by_ds_category,
-                                                                self, self, SWITCH_DS_CATEGORY_TITLE)
+        self.init_ds_category_executor = InitDsCategoryExecutor(self, self, SWITCH_DS_CATEGORY_TITLE,
+                                                                self.setup_ui_by_ds_category)
         self.init_ds_category_executor.start()
 
         # 切换数据源种类线程
@@ -114,8 +114,9 @@ class MainWindow(QMainWindow):
         ds_category = ds_category_action.text()
         # 切换数据源类型，如果类型一致，应提示
         if ds_category != self.current_ds_category.name:
-            self.switch_ds_category_executor = SwitchDsCategoryExecutor(ds_category, self.setup_ui_by_ds_category,
-                                                                        self, self, SWITCH_DS_CATEGORY_TITLE)
+            self.switch_ds_category_executor = SwitchDsCategoryExecutor(ds_category, self, self,
+                                                                        SWITCH_DS_CATEGORY_TITLE,
+                                                                        self.setup_ui_by_ds_category)
             self.switch_ds_category_executor.start()
         else:
             pop_ok(DS_CATEGORY_NO_CHANGE_MSG.format(ds_category), SWITCH_DS_CATEGORY_TITLE, self)

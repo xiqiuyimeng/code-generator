@@ -153,11 +153,11 @@ class DsColTypeDialog(CustomSaveDialog):
         col_types.append(col_type)
 
     def save_func(self):
-        self.save_ds_col_type_executor = SaveDsColTypeExecutor(self.ds_col_type_dict, self.close, self,
-                                                               self, ADD_COL_TYPE_LIST_TITLE)
+        self.save_ds_col_type_executor = SaveDsColTypeExecutor(self.ds_col_type_dict, self, self,
+                                                               ADD_COL_TYPE_LIST_TITLE, self.close)
         self.save_ds_col_type_executor.start()
 
     def post_process(self):
-        self.list_ds_col_type_executor = ListDsColTypeExecutor(self.list_col_type_callback, self,
-                                                               self, DS_COL_TYPE_LIST_BOX_TITLE)
+        self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
+                                                               self.list_col_type_callback)
         self.list_ds_col_type_executor.start()

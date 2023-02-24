@@ -57,8 +57,7 @@ class AddStructExecutor(LoadingMaskThreadExecutor):
                  masked_widget, window, callback):
         self.struct_info = struct_info
         self.parent_opened_item = parent_opened_item
-        self.callback = callback
-        super().__init__(masked_widget, window, f'保存{struct_info.struct_type}')
+        super().__init__(masked_widget, window, f'保存{struct_info.struct_type}', callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddStructWorker(self.struct_info, self.parent_opened_item)
@@ -66,7 +65,7 @@ class AddStructExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         pop_ok(f'[{self.struct_info.struct_name}]\n保存{self.struct_info.struct_type}成功',
                f'保存{self.struct_info.struct_type}', self.window)
-        self.callback(*args)
+        super().success_post_process(*args)
 
 
 # ---------------------------------------- 添加结构体 end ---------------------------------------- #
@@ -104,15 +103,10 @@ class DelStructExecutor(IconMovieThreadExecutor):
     def __init__(self, item, opened_item, reorder_items, callback, window):
         self.opened_item = opened_item
         self.reorder_items = reorder_items
-        self.callback = callback
-        super().__init__(item, window, DEL_STRUCT_TITLE)
+        super().__init__(item, window, DEL_STRUCT_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return DelStructWorker(self.opened_item, self.reorder_items)
-    
-    def success_post_process(self, *args):
-        self.callback()
-
 
 # ---------------------------------------- 删除结构体 end ---------------------------------------- #
 
@@ -146,8 +140,7 @@ class EditStructExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, struct_info: StructInfo, masked_widget, window, callback):
         self.struct_info = struct_info
-        self.callback = callback
-        super().__init__(masked_widget, window, f'修改{struct_info.struct_type}')
+        super().__init__(masked_widget, window, f'修改{struct_info.struct_type}', callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditStructWorker(self.struct_info)
@@ -155,7 +148,7 @@ class EditStructExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         pop_ok(f'[{self.struct_info.struct_name}]\n修改{self.struct_info.struct_type}成功',
                f'修改{self.struct_info.struct_type}', self.window)
-        self.callback(*args)
+        super().success_post_process(*args)
 
 
 # ---------------------------------------- 编辑结构体 end ---------------------------------------- #
@@ -186,14 +179,10 @@ class QueryStructExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, opened_struct_id, callback, masked_widget, window):
         self.opened_struct_id = opened_struct_id
-        self.callback = callback
-        super().__init__(masked_widget, window, '查询结构体')
+        super().__init__(masked_widget, window, '查询结构体', callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return QueryStructWorker(self.opened_struct_id)
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 # ---------------------------------------- 查询结构体 end ---------------------------------------- #
 
@@ -254,8 +243,7 @@ class ListStructWorker(ThreadWorkerABC):
 class ListStructExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, reopen_items_callback, reopen_tab_callback, reopen_end_callback, masked_widget, window):
-        self.reopen_end_callback = reopen_end_callback
-        super().__init__(masked_widget, window, '获取所有结构体列表')
+        super().__init__(masked_widget, window, '获取所有结构体列表', reopen_end_callback, reopen_end_callback)
 
         self.reopen_items_callback = reopen_items_callback
         self.reopen_tab_callback = reopen_tab_callback
@@ -265,13 +253,6 @@ class ListStructExecutor(LoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return ListStructWorker()
-
-    def success_post_process(self):
-        self.reopen_end_callback()
-
-    def fail_post_process(self):
-        self.reopen_end_callback()
-
 
 # ---------------------------------------- 获取所有结构体 end ---------------------------------------- #
 
@@ -306,15 +287,14 @@ class AddFolderExecutor(LoadingMaskThreadExecutor):
         self.folder_name = folder_name
         self.parent_id = parent_id
         self.level = level
-        self.callback = callback
-        super().__init__(masked_widget, window, ADD_FOLDER_TITLE)
+        super().__init__(masked_widget, window, ADD_FOLDER_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddFolderWorker(self.folder_name, self.parent_id, self.level)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.folder_name}]\n添加文件夹成功', ADD_FOLDER_TITLE, self.window)
-        self.callback(*args)
+        super().success_post_process(*args)
 
 
 # ---------------------------------------- 添加结构体文件夹 end ---------------------------------------- #
@@ -342,15 +322,14 @@ class EditFolderExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, folder_item: OpenedTreeItem, masked_widget, window, callback):
         self.folder_item = folder_item
-        self.callback = callback
-        super().__init__(masked_widget, window, EDIT_FOLDER_TITLE)
+        super().__init__(masked_widget, window, EDIT_FOLDER_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditFolderWorker(self.folder_item)
 
     def success_post_process(self, *args):
         pop_ok(f'[{self.folder_item.item_name}]\n编辑文件夹成功', EDIT_FOLDER_TITLE, self.window)
-        self.callback(*args)
+        super().success_post_process(*args)
 
 
 # ---------------------------------------- 编辑结构体文件夹 end ---------------------------------------- #
@@ -443,14 +422,10 @@ class ReadFileExecutor(LoadingMaskThreadExecutor):
     def __init__(self, file_url, struct_type, masked_widget, window, callback):
         self.file_url = file_url
         self.struct_type = struct_type
-        self.callback = callback
-        super().__init__(masked_widget, window, f'读取{self.struct_type}文件')
+        super().__init__(masked_widget, window, f'读取{self.struct_type}文件', callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return ReadFileWorker(self.file_url, self.struct_type)
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 # ---------------------------------------- 异步读取文件 end ---------------------------------------- #
 
@@ -482,15 +457,10 @@ class PrettyStructExecutor(LoadingMaskThreadExecutor):
     def __init__(self, data, beautifier_executor_type, masked_widget, window, callback):
         self.data = data
         self.beautifier_executor_type = beautifier_executor_type
-        self.callback = callback
-        super().__init__(masked_widget, window, f'美化结构体')
+        super().__init__(masked_widget, window, '美化结构体', callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return PrettyStructWorker(self.data, self.beautifier_executor_type)
-
-    def success_post_process(self, *args):
-        self.callback(*args)
-
 
 # ---------------------------------------- 异步美化结构体 end ---------------------------------------- #
 
@@ -547,18 +517,10 @@ class OpenStructExecutor(IconMovieThreadExecutor):
 
     def __init__(self, item, window, callback, fail_callback):
         self.item = item
-        self.callback = callback
-        self.fail_callback = fail_callback
-        super().__init__(item, window, '打开结构体')
+        super().__init__(item, window, '打开结构体', callback, fail_callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return OpenStructWorker(get_item_opened_record(self.item))
-
-    def success_post_process(self, *args):
-        self.callback(*args)
-
-    def fail_post_process(self):
-        self.fail_callback()
 
 # ---------------------------------------- 打开结构体 end ---------------------------------------- #
 
@@ -576,7 +538,6 @@ class RefreshStructWorker(ThreadWorkerABC):
         self.struct_info = ...
 
     def do_run(self):
-        """重写run方法，实现刷新逻辑"""
         # 读取结构体内容
         self.struct_info = StructSqlite().get_struct_info(self.table_tab.parent_opened_id)
         if self.struct_info:

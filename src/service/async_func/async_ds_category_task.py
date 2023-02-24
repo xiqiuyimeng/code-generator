@@ -45,15 +45,8 @@ class InitDsCategoryWorker(ThreadWorkerABC):
 
 class InitDsCategoryExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, callback, *args):
-        self.callback = callback
-        super().__init__(*args)
-
     def get_worker(self) -> ThreadWorkerABC:
         return InitDsCategoryWorker()
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 
 # ----------------------- 初始化 datasource category end ----------------------- #
@@ -79,15 +72,11 @@ class SwitchDsCategoryWorker(InitDsCategoryWorker):
 
 class SwitchDsCategoryExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, switch_ds_category, callback, *args):
+    def __init__(self, switch_ds_category, *args):
         self.switch_ds_category = switch_ds_category
-        self.callback = callback
         super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
         return SwitchDsCategoryWorker(self.switch_ds_category)
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 # ----------------------- 切换 datasource category end ----------------------- #

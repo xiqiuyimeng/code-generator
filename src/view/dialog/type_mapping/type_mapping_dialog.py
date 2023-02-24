@@ -295,8 +295,8 @@ class TypeMappingDetailDialog(NameCheckDialog):
     def post_process(self):
         super().post_process()
         # 获取数据源列类型
-        self.list_ds_col_type_executor = ListDsColTypeExecutor(self.list_col_type_callback, self,
-                                                               self, DS_COL_TYPE_LIST_BOX_TITLE)
+        self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
+                                                               self.list_col_type_callback)
         self.list_ds_col_type_executor.start()
         # 控制删除按钮状态
 

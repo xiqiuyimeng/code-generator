@@ -46,14 +46,10 @@ class ReadTypeMappingExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, type_mapping_id, callback, *args):
         self.type_mapping_id = type_mapping_id
-        self.callback = callback
-        super().__init__(*args, READ_TYPE_MAPPING_TITLE)
+        super().__init__(*args, READ_TYPE_MAPPING_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return ReadTypeMappingWorker(self.type_mapping_id)
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 # ----------------------- 读取类型映射信息 end ----------------------- #
 
@@ -89,8 +85,7 @@ class AddTypeMappingExecutor(LoadingMaskThreadExecutor):
     
     def __init__(self, type_mapping: TypeMapping, callback, *args):
         self.type_mapping = type_mapping
-        self.callback = callback
-        super().__init__(*args, ADD_TYPE_MAPPING_TITLE)
+        super().__init__(*args, ADD_TYPE_MAPPING_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddTypeMappingWorker(self.type_mapping)
@@ -98,7 +93,7 @@ class AddTypeMappingExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         pop_ok(f'[{self.type_mapping.mapping_name}]\n保存成功',
                ADD_TYPE_MAPPING_TITLE, self.window)
-        self.callback()
+        super().success_post_process(*args)
 
 # ----------------------- 添加类型映射 end ----------------------- #
 
@@ -131,8 +126,7 @@ class EditTypeMappingExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, type_mapping: TypeMapping, callback, *args):
         self.type_mapping = type_mapping
-        self.callback = callback
-        super().__init__(*args, EDIT_TYPE_MAPPING_TITLE)
+        super().__init__(*args, EDIT_TYPE_MAPPING_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditTypeMappingWorker(self.type_mapping)
@@ -140,7 +134,7 @@ class EditTypeMappingExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         pop_ok(f'[{self.type_mapping.mapping_name}]\n保存成功',
                EDIT_TYPE_MAPPING_TITLE, self.window)
-        self.callback(*args)
+        super().success_post_process(*args)
 
 # ----------------------- 编辑类型映射 end ----------------------- #
 
@@ -208,13 +202,9 @@ class ListTypeMappingWorker(ThreadWorkerABC):
 class ListTypeMappingExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, callback, *args):
-        self.callback = callback
-        super().__init__(*args, TYPE_MAPPING_BOX_TITLE)
+        super().__init__(*args, TYPE_MAPPING_BOX_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return ListTypeMappingWorker()
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 # ----------------------- 获取类型映射列表 end ----------------------- #

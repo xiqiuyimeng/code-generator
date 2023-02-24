@@ -50,9 +50,7 @@ class AddConnExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, connection: SqlConnection, masked_widget, window, callback):
         self.connection = connection
-        # 回调函数
-        self.callback = callback
-        super().__init__(masked_widget, window, SAVE_CONN_TITLE)
+        super().__init__(masked_widget, window, SAVE_CONN_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return AddConnWorker(self.connection)
@@ -60,7 +58,7 @@ class AddConnExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
                SAVE_CONN_TITLE, self.window)
-        self.callback(*args)
+        super().success_post_process(*args)
 
 
 # ---------------------------------------- 添加连接 end ---------------------------------------- #
@@ -168,9 +166,8 @@ class EditConnExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, connection: SqlConnection, masked_widget, window, callback, name_changed):
         self.connection = connection
-        self.callback = callback
         self.name_changed = name_changed
-        super().__init__(masked_widget, window, SAVE_CONN_TITLE)
+        super().__init__(masked_widget, window, SAVE_CONN_TITLE, callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return EditConnWorker(self.connection, self.name_changed)
@@ -178,7 +175,7 @@ class EditConnExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         pop_ok(f'[{self.connection.conn_name}]\n{SAVE_CONN_SUCCESS_PROMPT}',
                SAVE_CONN_TITLE, self.window)
-        self.callback()
+        super().success_post_process(*args)
 
 
 # ---------------------------------------- 编辑连接 end ---------------------------------------- #
@@ -239,20 +236,14 @@ class ListConnExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, masked_widget, window, opened_items_callback,
                  opened_tab_callback, reopen_end_callback):
-        self.reopen_end_callback = reopen_end_callback
-        super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE)
+        super().__init__(masked_widget, window, LIST_ALL_CONN_TITLE,
+                         reopen_end_callback, reopen_end_callback)
 
         self.worker.opened_items_signal.connect(opened_items_callback)
         self.worker.tab_info_signal.connect(opened_tab_callback)
 
     def get_worker(self) -> ListConnWorker:
         return ListConnWorker()
-
-    def success_post_process(self):
-        self.reopen_end_callback()
-
-    def fail_post_process(self):
-        self.reopen_end_callback()
 
 # ---------------------------------------- 获取所有连接 end ---------------------------------------- #
 
@@ -281,14 +272,10 @@ class QueryConnInfoExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, conn_id, callback, masked_widget, window):
         self.conn_id = conn_id
-        self.callback = callback
-        super().__init__(masked_widget, window, '查询连接信息')
+        super().__init__(masked_widget, window, '查询连接信息', callback)
 
     def get_worker(self) -> ThreadWorkerABC:
         return QueryConnInfoWorker(self.conn_id)
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 
 # ---------------------------------------- 获取连接信息 end ---------------------------------------- #

@@ -50,9 +50,8 @@ class SaveDsColTypeWorker(ThreadWorkerABC):
 
 class SaveDsColTypeExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, ds_col_type_dict, callback, *args):
+    def __init__(self, ds_col_type_dict, *args):
         self.ds_col_type_dict = ds_col_type_dict
-        self.callback = callback
         super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
@@ -60,7 +59,7 @@ class SaveDsColTypeExecutor(LoadingMaskThreadExecutor):
 
     def success_post_process(self, *args):
         pop_ok('保存数据源列类型成功', ADD_COL_TYPE_LIST_TITLE, self.window)
-        self.callback()
+        super().success_post_process(*args)
 
 # ----------------------- 添加列类型 end ----------------------- #
 
@@ -88,14 +87,7 @@ class ListDsColTypeWorker(ThreadWorkerABC):
 
 class ListDsColTypeExecutor(LoadingMaskThreadExecutor):
 
-    def __init__(self, callback, *args):
-        self.callback = callback
-        super().__init__(*args)
-
     def get_worker(self) -> ThreadWorkerABC:
         return ListDsColTypeWorker()
-
-    def success_post_process(self, *args):
-        self.callback(*args)
 
 # ----------------------- 获取列类型列表 end ----------------------- #

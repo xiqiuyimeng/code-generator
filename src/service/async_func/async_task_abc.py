@@ -53,10 +53,14 @@ class ThreadWorkerABC(QThread):
 class ThreadExecutorABC(QObject):
     """对应 ThreadWorkerABC 设定，负责管理调度异步任务，与view交互工作"""
 
-    def __init__(self, window, error_box_title):
+    def __init__(self, window, error_box_title, success_callback=None, fail_callback=None):
         super().__init__()
         self.window = window
         self.error_box_title = error_box_title
+        # 执行成功的回调函数
+        self.success_callback = success_callback
+        # 执行失败的回调函数
+        self.fail_callback = fail_callback
 
         # 异步任务开始前的准备工作
         self.pre_process()
@@ -103,9 +107,13 @@ class ThreadExecutorABC(QObject):
         """通用后置处理，任务结束后的一些通用工作"""
         pass
 
-    def success_post_process(self, *args): ...
+    def success_post_process(self, *args):
+        if self.success_callback:
+            self.success_callback(*args)
 
-    def fail_post_process(self): ...
+    def fail_post_process(self):
+        if self.fail_callback:
+            self.fail_callback()
 
 
 # ----------------------- loading mask thread worker manager ABC -----------------------
@@ -153,17 +161,15 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
     """支持使用多个动画，用于多组树节点icon movie + 对应tab的 masked widget，根据给定的item，对所有子节点处理"""
 
-    def __init__(self, item, window, error_box_title, success_callback=None, fail_callback=None):
+    def __init__(self, item, window, *args):
         self.item = item
-        self.success_callback = success_callback
-        self.fail_callback = fail_callback
         self.tab_widget = ...
         self.loading_gif = ":/gif/loading.gif"
         self.icon_movie = QMovie(":/gif/loading_simple.gif")
         # 首先获取 item 下所有的子节点，key -> item id, value -> item item_icon tab_dict
         self.item_dict = dict()
         self.get_item_dict(item, window)
-        super().__init__(window, error_box_title)
+        super().__init__(window, *args)
 
     def get_item_dict(self, item, window):
         # 设置 item 标志
@@ -246,14 +252,6 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
             self.tab_widget.setTabIcon(self.tab_widget.indexOf(tab_dict.get('tab')), tab_icon)
         item.setIcon(0, item_icon)
         self.item_post_process(item)
-
-    def success_post_process(self, *args):
-        if self.success_callback:
-            self.success_callback(*args)
-
-    def fail_post_process(self):
-        if self.fail_callback:
-            self.fail_callback()
 
     def item_pre_process(self, item): ...
 
