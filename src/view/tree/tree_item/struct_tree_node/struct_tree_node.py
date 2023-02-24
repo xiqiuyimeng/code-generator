@@ -3,7 +3,7 @@
 from src.constant.constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
     OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
     CANCEL_REFRESH_STRUCT_ACTION
-from src.service.async_func.async_struct_executor.async_struct_executor import OpenStructExecutor, RefreshStructExecutor
+from src.service.async_func.async_struct_task import OpenStructExecutor, RefreshStructExecutor
 from src.service.async_func.async_struct_task import DelStructExecutor
 from src.view.box.message_box import pop_question
 from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode

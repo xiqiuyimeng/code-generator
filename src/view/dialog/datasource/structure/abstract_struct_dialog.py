@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog
 from src.constant.constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
     CHOOSE_STRUCT_FILE_TEXT, PRETTY_STRUCT_TEXT
 from src.constant.icon_enum import get_icon
-from src.service.async_func.async_struct_executor.async_struct_executor import PrettyStructExecutor
+from src.service.async_func.async_struct_task import PrettyStructExecutor
 from src.service.async_func.async_struct_task import ReadFileExecutor, AddStructExecutor, EditStructExecutor, \
     QueryStructExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem

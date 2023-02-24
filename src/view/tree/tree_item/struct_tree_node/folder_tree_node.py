@@ -6,7 +6,7 @@ from src.constant.constant import ADD_DS_ACTION, ADD_STRUCT_ACTION, CREATE_NEW_F
     DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, FOLDER_TYPE, REFRESH_FOLDER_ACTION, \
     CANCEL_REFRESH_FOLDER_ACTION
 from src.constant.icon_enum import get_icon
-from src.service.async_func.async_struct_executor.async_struct_executor import RefreshFolderExecutor
+from src.service.async_func.async_struct_task import RefreshFolderExecutor
 from src.service.async_func.async_struct_task import DelFolderExecutor
 from src.view.bar.bar_action import add_structure_ds_actions
 from src.view.box.message_box import pop_question, pop_fail
