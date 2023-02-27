@@ -30,13 +30,13 @@ class SaveDsColTypeWorker(ThreadWorkerABC):
         ds_types, ds_col_types = list(), list()
         for order, ds_type in enumerate(self.ds_col_type_dict.keys(), start=1):
             # 添加数据源类型
-            ds_types.append(col_type_sqlite.add_ds_type(ds_type, order))
+            ds_types.append(col_type_sqlite.assemble_ds_type(ds_type, order))
         # 批量保存数据源类型
         col_type_sqlite.batch_insert(ds_types)
 
         for index, col_types in enumerate(self.ds_col_type_dict.values()):
             if col_types:
-                ds_col_types.extend(col_type_sqlite.batch_add_ds_col_types(col_types, ds_types[index].id))
+                ds_col_types.extend(col_type_sqlite.batch_assemble_ds_col_types(col_types, ds_types[index].id))
         if ds_col_types:
             col_type_sqlite.batch_insert(ds_col_types)
         self.success_signal.emit()

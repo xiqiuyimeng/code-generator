@@ -2,10 +2,12 @@
 import ctypes
 import sys
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
+from PyQt5.QtCore import Qt
 
 from src.logger.log import logger as log
 from src.service.read_qrc.read_config import read_qss
+from src.service.util.init_util import init_data
 from src.view.window.main_window import MainWindow
 
 # 引入静态资源
@@ -20,7 +22,15 @@ _date_ = '2022/5/11 10:33'
 if __name__ == "__main__":
     log.info("**********生成器启动**********")
     app = QtWidgets.QApplication(sys.argv)
+    splash = QtWidgets.QSplashScreen(
+        QtGui.QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+    )
+    splash.showMessage("加载中...", Qt.AlignHCenter | Qt.AlignBottom)
+    # 显示启动界面
+    splash.show()
     QtWidgets.qApp.processEvents()
+    # 后台数据初始化
+    init_data()
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())
@@ -29,6 +39,7 @@ if __name__ == "__main__":
     # 声明AppUserModelID，否则windows认为这是python子程序，无法使用自定义任务栏图标
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("generator")
     ui.show()
+    splash.finish(ui)
     app.exec_()
     log.info("**********生成器退出**********\n")
     sys.exit()

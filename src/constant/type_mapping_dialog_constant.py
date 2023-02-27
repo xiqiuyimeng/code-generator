@@ -6,11 +6,9 @@ _date_ = '2023/2/24 16:42'
 
 # 数据源列类型
 DS_COL_TYPE_LIST_TITLE = '数据源列类型列表'
-SYNC_DS_TYPE_BUTTON_TEXT = '同步数据源类型'
 ADD_DS_COL_TYPE_BUTTON_TEXT = '添加数据源列类型'
 ADD_DS_COL_TYPE_TITLE = '添加数据源列类型'
 
-ADD_DS_COL_TYPE_NO_DS_TYPE = '当前没有数据源类型，请先同步数据源类型，再添加数据源列类型！'
 DS_COL_TYPE_LIST_BOX_TITLE = '读取数据源列类型列表'
 ADD_COL_TYPE_LIST_TITLE = '保存数据源列类型列表'
 

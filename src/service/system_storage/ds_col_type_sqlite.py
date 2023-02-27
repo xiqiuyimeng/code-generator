@@ -22,7 +22,9 @@ ds_col_type_sql_dict = {
     update_time datetime
     );''',
     'truncate': f'delete from {table_name}',
-    'delete_children': f'delete from {table_name} where parent_id = :parent_id'
+    'delete_children': f'delete from {table_name} where parent_id = :parent_id',
+    'delete_children_by_parent_ids': f'delete from {table_name} where parent_id in ',
+    'get_ds_type': f'select * from {table_name} where parent_id = 0',
 }
 
 
@@ -69,7 +71,7 @@ class DsColTypeSqlite(SqliteBasic):
         log.info(f'清空表{self.table_name}成功')
 
     @staticmethod
-    def add_ds_type(ds_type, item_order):
+    def assemble_ds_type(ds_type, item_order):
         ds_col_type = DsColType()
         ds_col_type.ds_col_type = ds_type
         ds_col_type.parent_id = 0
@@ -77,7 +79,7 @@ class DsColTypeSqlite(SqliteBasic):
         return ds_col_type
 
     @staticmethod
-    def batch_add_ds_col_types(col_types, parent_id):
+    def batch_assemble_ds_col_types(col_types, parent_id):
         ds_col_types = list()
         for order, col_type in enumerate(col_types, start=1):
             ds_col_type = DsColType()
@@ -111,5 +113,19 @@ class DsColTypeSqlite(SqliteBasic):
                 get_db_conn().query(delete_children_sql, **{'parent_id': ds_type_obj.id})
                 # 批量插入：新的列类型 + 已经存在的列类型，这样可以进行排序
                 all_col_types = sorted(col_types | exists_col_type_set)
-                new_col_types = self.batch_add_ds_col_types(all_col_types, ds_type_obj.id)
+                new_col_types = self.batch_assemble_ds_col_types(all_col_types, ds_type_obj.id)
                 self.batch_insert(new_col_types)
+
+    def get_ds_types(self):
+        log.info(f'查询{self.table_name}中所有数据源类型')
+        sql = ds_col_type_sql_dict.get('get_ds_type')
+        ds_type_rows = get_db_conn().query(sql)
+        return list(map(lambda x: DsColType(**x), ds_type_rows.as_dict()))
+
+    def batch_delete_ds_types(self, ds_type_ids):
+        # 首先删除数据源类型
+        self.batch_delete(ds_type_ids)
+        # 再删除列类型
+        parent_ids = ','.join(map(lambda x: str(x), ds_type_ids))
+        delete_col_type_sql = f"{ds_col_type_sql_dict.get('delete_children_by_parent_ids')}({parent_ids})"
+        get_db_conn().query(delete_col_type_sql)

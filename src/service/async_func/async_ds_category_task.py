@@ -5,8 +5,7 @@ from src.constant.window_constant import SWITCH_DS_CATEGORY_TITLE
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.ds_category_sqlite import DsCategorySqlite, DsCategory, DsCategoryEnum
-from src.service.system_storage.sqlite_abc import transactional, get_sqlite_sequence
-from src.service.util.db_id_generator import init_id_generator
+from src.service.system_storage.sqlite_abc import transactional
 from src.service.util.ds_category_util import get_current_ds_category
 
 _author_ = 'luwt'
@@ -30,8 +29,6 @@ class InitDsCategoryWorker(ThreadWorkerABC):
         # 如果不能查到数据，或数据不正确，都应重新初始化
         if not ds_categories or not get_current_ds_category(ds_categories):
             return self.init_ds_categories()
-        # 初始化id生成器
-        init_id_generator(get_sqlite_sequence)
         return ds_categories
 
     def init_ds_categories(self):

@@ -2,12 +2,8 @@
 from PyQt5.QtWidgets import QPushButton, QListWidgetItem, QStackedWidget, QHBoxLayout, QLabel
 
 from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_LIST_TITLE, DS_COL_TYPE_LIST_BOX_TITLE, \
-    SYNC_DS_TYPE_BUTTON_TEXT, ADD_DS_COL_TYPE_BUTTON_TEXT, ADD_COL_TYPE_LIST_TITLE, ADD_DS_COL_TYPE_NO_DS_TYPE, \
-    ADD_DS_COL_TYPE_TITLE, SAVE_DATA_TIPS
+    ADD_DS_COL_TYPE_BUTTON_TEXT, ADD_COL_TYPE_LIST_TITLE, ADD_DS_COL_TYPE_TITLE, SAVE_DATA_TIPS
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor, SaveDsColTypeExecutor
-from src.service.system_storage.conn_type import ConnTypeEnum
-from src.service.system_storage.struct_type import StructTypeEnum
-from src.view.box.message_box import pop_fail
 from src.view.dialog.custom_save_dialog import CustomSaveDialog
 from src.view.dialog.type_mapping.save_ds_col_type_dialog import SaveDsColTypeDialog
 from src.view.list_widget.col_type_list_widget import ColTypeListWidget
@@ -22,8 +18,6 @@ class DsColTypeDialog(CustomSaveDialog):
 
     def __init__(self, screen_rect):
         self.ds_col_type_dict: dict = ...
-        # 同步数据源类型
-        self.sync_ds_type_button: QPushButton = ...
         # 添加新的数据源列类型按钮
         self.add_ds_col_type_button: QPushButton = ...
         # 读取数据源列类型列表执行器
@@ -61,68 +55,18 @@ class DsColTypeDialog(CustomSaveDialog):
         self._layout.addWidget(self.stacked_widget)
 
     def setup_other_button(self):
-        self.sync_ds_type_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.sync_ds_type_button, 0, 0, 1, 1)
         self.add_ds_col_type_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.add_ds_col_type_button, 0, 1, 1, 1)
+        self.button_layout.addWidget(self.add_ds_col_type_button, 0, 0, 1, 1)
 
     def setup_other_label_text(self):
-        self.sync_ds_type_button.setText(SYNC_DS_TYPE_BUTTON_TEXT)
         self.add_ds_col_type_button.setText(ADD_DS_COL_TYPE_BUTTON_TEXT)
 
     def connect_other_signal(self):
         self.ds_type_list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
-        self.sync_ds_type_button.clicked.connect(self.sync_ds_types)
         self.add_ds_col_type_button.clicked.connect(self.add_ds_type_item)
 
-    def sync_ds_types(self):
-        # 同步最新的数据源类型
-        if self.ds_col_type_dict is Ellipsis:
-            self.ds_col_type_dict = dict()
-        # 所有的数据源类型字典
-        all_ds_type_dict = dict()
-        for conn_type in ConnTypeEnum:
-            conn_type_name = conn_type.value.display_name
-            all_ds_type_dict[conn_type_name] = self.ds_col_type_dict.get(conn_type_name, list())
-        for struct_type in StructTypeEnum:
-            struct_type_name = struct_type.value.display_name
-            all_ds_type_dict[struct_type_name] = self.ds_col_type_dict.get(struct_type_name, list())
-
-        self.ds_col_type_dict = all_ds_type_dict
-        # 清空列表控件和堆栈式窗口
-        self.ds_type_list_widget.clear()
-        self.clear_stacked_widget()
-        # 以最新的数据源类型来渲染列表
-        self.fill_ds_types()
-        self.fill_col_types()
-
-    def clear_stacked_widget(self):
-        if self.stacked_widget.count():
-            for index in range(self.stacked_widget.count()):
-                child_widget = self.stacked_widget.widget(0)
-                self.stacked_widget.removeWidget(child_widget)
-
-    def fill_ds_types(self):
-        self.ds_type_list_widget.fill_list_widget(self.ds_col_type_dict.keys())
-        self.ds_type_list_widget.setCurrentRow(0)
-
-    def fill_col_types(self):
-        for col_types in self.ds_col_type_dict.values():
-            col_type_list_widget = ColTypeListWidget(col_types, self.open_save_col_type_dialog, self.frame)
-            [col_type_list_widget.addItem(col_type) for col_type in col_types]
-            self.stacked_widget.addWidget(col_type_list_widget)
-
-    def list_col_type_callback(self, col_type_dict: dict):
-        if col_type_dict:
-            self.ds_col_type_dict = col_type_dict
-            self.fill_ds_types()
-            self.fill_col_types()
-
     def add_ds_type_item(self):
-        if self.ds_type_list_widget.currentRow() < 0:
-            pop_fail(ADD_DS_COL_TYPE_NO_DS_TYPE, ADD_DS_COL_TYPE_TITLE, self)
-        else:
-            self.open_save_col_type_dialog(ADD_DS_COL_TYPE_TITLE)
+        self.open_save_col_type_dialog(ADD_DS_COL_TYPE_TITLE)
 
     def open_save_col_type_dialog(self, dialog_title, col_type=None):
         current_ds_type = self.ds_type_list_widget.currentItem().text()
@@ -161,3 +105,19 @@ class DsColTypeDialog(CustomSaveDialog):
         self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
                                                                self.list_col_type_callback)
         self.list_ds_col_type_executor.start()
+
+    def list_col_type_callback(self, col_type_dict: dict):
+        if col_type_dict:
+            self.ds_col_type_dict = col_type_dict
+            self.fill_ds_types()
+            self.fill_col_types()
+
+    def fill_ds_types(self):
+        self.ds_type_list_widget.fill_list_widget(self.ds_col_type_dict.keys())
+        self.ds_type_list_widget.setCurrentRow(0)
+
+    def fill_col_types(self):
+        for col_types in self.ds_col_type_dict.values():
+            col_type_list_widget = ColTypeListWidget(col_types, self.open_save_col_type_dialog, self.frame)
+            [col_type_list_widget.addItem(col_type) for col_type in col_types]
+            self.stacked_widget.addWidget(col_type_list_widget)
