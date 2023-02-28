@@ -40,14 +40,16 @@ class AbstractConnDialog(AbstractDsInfoDialog):
         super().__init__(dialog_title.format(self.conn_type.display_name), screen_rect,
                          conn_name_list, conn_id)
 
+    def get_conn_type(self) -> ConnType: ...
+
     def get_new_dialog_data(self):
         return SqlConnection()
+
+    # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.4, self.parent_screen_rect.height() * 0.5)
-
-    def get_conn_type(self) -> ConnType: ...
 
     def setup_other_button(self):
         # 按钮部分
@@ -63,14 +65,9 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     def setup_conn_info_label(self): ...
 
-    def button_available(self) -> bool:
-        return self.new_dialog_data.conn_name \
-                and all(dataclasses.astuple(self.conn_info)) \
-                and self.name_available
+    # ------------------------------ 创建ui界面 end ------------------------------ #
 
-    def check_data_changed(self) -> bool:
-        self.new_dialog_data.construct_conn_info()
-        return self.new_dialog_data != self.dialog_data
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def collect_input(self):
         self.new_dialog_data.conn_name = self.name_input.text()
@@ -82,29 +79,32 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     def collect_conn_info_input(self) -> tuple: ...
 
-    def init_other_button_status(self):
-        self.test_conn_button.setDisabled(True)
+    def button_available(self) -> bool:
+        return self.new_dialog_data.conn_name \
+                and all(dataclasses.astuple(self.conn_info)) \
+                and self.name_available
 
     def set_other_button_available(self):
         self.test_conn_button.setDisabled(False)
+
+    def check_data_changed(self) -> bool:
+        self.new_dialog_data.construct_conn_info()
+        return self.new_dialog_data != self.dialog_data
+
+    def init_other_button_status(self):
+        self.test_conn_button.setDisabled(True)
 
     def connect_child_signal(self):
         self.test_conn_button.clicked.connect(self.test_connection)
         # 连接信息相关的信号槽连接
         self.connect_conn_info_signal()
 
-    def connect_conn_info_signal(self): ...
-
-    def get_read_storage_executor(self, callback):
-        return QueryConnInfoExecutor(self.dialog_data, self, self, QUERY_CONN_BOX_TITLE, callback)
-
-    def get_old_name(self) -> str:
-        return self.dialog_data.conn_name
-
     def test_connection(self):
         self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self.conn_type, self,
                                                               self, TEST_CONN_BOX_TITLE)
         self.test_conn_executor.start()
+
+    def connect_conn_info_signal(self): ...
 
     def save_func(self):
         self.new_dialog_data.construct_conn_info()
@@ -129,3 +129,15 @@ class AbstractConnDialog(AbstractDsInfoDialog):
     def edit_post_process(self):
         self.conn_changed.emit(self.new_dialog_data.conn_name)
         self.close()
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def get_read_storage_executor(self, callback):
+        return QueryConnInfoExecutor(self.dialog_data, self, self, QUERY_CONN_BOX_TITLE, callback)
+
+    def get_old_name(self) -> str:
+        return self.dialog_data.conn_name
+
+    # ------------------------------ 后置处理 end ------------------------------ #

@@ -14,6 +14,8 @@ class CustomSaveDialog(CustomDialog):
         self.save_button: QPushButton = ...
         super().__init__(*args, **kwargs)
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def setup_button_ui(self):
         super().setup_button_ui()
         self.save_button = QPushButton(self.frame)
@@ -24,8 +26,15 @@ class CustomSaveDialog(CustomDialog):
         self.save_button.setText(OK_BTN_TEXT)
         super().setup_label_text()
 
+    # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
+
     def connect_signal(self):
-        self.save_button.clicked.connect(self.save_func)
+        # 先执行其他信号槽操作，最后执行保存
         super().connect_signal()
+        self.save_button.clicked.connect(self.save_func)
 
     def save_func(self): ...
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #

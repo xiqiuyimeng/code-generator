@@ -57,14 +57,16 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.frame_layout.setStretch(2, 4)
         self.frame_layout.setStretch(3, 1)
 
+    def get_struct_type(self) -> StructType: ...
+
     def get_new_dialog_data(self):
         return StructInfo()
+
+    # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.8)
-
-    def get_struct_type(self) -> StructType: ...
 
     def setup_ds_content_info_ui(self):
         # 结构体信息布局
@@ -94,19 +96,34 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_text_label.setText(STRUCTURE_CONTENT_TEXT.format(self.struct_type.display_name))
         self.pretty_button.setText(PRETTY_STRUCT_TEXT.format(self.struct_type.display_name))
 
-    def get_read_storage_executor(self, callback):
-        return QueryStructExecutor(self.dialog_data, self, self, QUERY_STRUCT_BOX_TITLE, callback)
+    # ------------------------------ 创建ui界面 end ------------------------------ #
 
-    def setup_echo_other_data(self):
-        # 数据回显
-        self.struct_file_url_linedit.setText(self.dialog_data.file_url)
-        self.struct_text_input.setPlainText(self.dialog_data.content)
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
-    def button_available(self) -> bool:
-        return all((self.new_dialog_data.struct_name, self.new_dialog_data.content)) and self.name_available
+    def save_func(self):
+        # 原数据存在，说明是编辑
+        if self.dialog_data:
+            self.new_dialog_data.id = self.dialog_data.id
+            self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
+            self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
+            title = EDIT_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
+            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
+                                                           title, self.edit_post_process)
+            self.edit_struct_executor.start()
+        else:
+            # 新增操作
+            title = ADD_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
+            self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
+                                                         self, self, title, self.save_post_process)
+            self.add_struct_executor.start()
 
-    def check_data_changed(self) -> bool:
-        return self.new_dialog_data != self.dialog_data
+    def save_post_process(self, opened_item_record):
+        self.struct_saved.emit(opened_item_record)
+        self.close()
+
+    def edit_post_process(self):
+        self.struct_changed.emit(self.new_dialog_data.struct_name)
+        self.close()
 
     def collect_input(self):
         # 根据参数构建结构体信息对象
@@ -117,11 +134,17 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         file_url = self.struct_file_url_linedit.text()
         self.new_dialog_data.file_url = file_url
 
-    def init_other_button_status(self):
-        self.pretty_button.setDisabled(True)
+    def button_available(self) -> bool:
+        return all((self.new_dialog_data.struct_name, self.new_dialog_data.content)) and self.name_available
 
     def set_other_button_available(self):
         self.pretty_button.setDisabled(False)
+
+    def check_data_changed(self) -> bool:
+        return self.new_dialog_data != self.dialog_data
+
+    def init_other_button_status(self):
+        self.pretty_button.setDisabled(True)
 
     def connect_child_signal(self):
         self.struct_file_action.triggered.connect(self.choose_file)
@@ -152,30 +175,19 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         )
         self.pretty_executor.start()
 
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def get_read_storage_executor(self, callback):
+        return QueryStructExecutor(self.dialog_data, self, self, QUERY_STRUCT_BOX_TITLE, callback)
+
     def get_old_name(self) -> str:
         return self.dialog_data.struct_name
 
-    def save_func(self):
-        # 原数据存在，说明是编辑
-        if self.dialog_data:
-            self.new_dialog_data.id = self.dialog_data.id
-            self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
-            self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
-            title = EDIT_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
-            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
-                                                           title, self.edit_post_process)
-            self.edit_struct_executor.start()
-        else:
-            # 新增操作
-            title = ADD_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
-            self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
-                                                         self, self, title, self.save_post_process)
-            self.add_struct_executor.start()
+    def setup_echo_other_data(self):
+        # 数据回显
+        self.struct_file_url_linedit.setText(self.dialog_data.file_url)
+        self.struct_text_input.setPlainText(self.dialog_data.content)
 
-    def save_post_process(self, opened_item_record):
-        self.struct_saved.emit(opened_item_record)
-        self.close()
-
-    def edit_post_process(self):
-        self.struct_changed.emit(self.new_dialog_data.struct_name)
-        self.close()
+    # ------------------------------ 后置处理 end ------------------------------ #

@@ -35,6 +35,8 @@ class CustomDialog(DraggableDialog):
         # 后置处理
         self.post_process()
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def setup_ui(self):
         # 计算窗口大小
         self.resize_dialog()
@@ -92,10 +94,20 @@ class CustomDialog(DraggableDialog):
 
     def setup_other_label_text(self): ...
 
+    # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
+
     def connect_signal(self):
         self.quit_button.clicked.connect(self.close)
         self.connect_other_signal()
 
     def connect_other_signal(self): ...
 
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
     def post_process(self): ...
+
+    # ------------------------------ 后置处理 end ------------------------------ #

@@ -13,7 +13,11 @@ class MysqlConnDialog(InternetConnDialog):
     def get_conn_type(self):
         return ConnTypeEnum.mysql.value
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def setup_default_value(self):
         self.host_value.setText(MYSQL_DEFAULT_HOST)
         self.port_value.setText(MYSQL_DEFAULT_PORT)
         self.user_value.setText(MYSQL_DEFAULT_USER)
+
+    # ------------------------------ 创建ui界面 end ------------------------------ #

@@ -34,6 +34,8 @@ class TypeMappingListTableDialog(CustomDialog):
         self.type_mapping_dialog: TypeMappingDetailDialog = ...
         super().__init__(screen_rect, TYPE_MAPPING_LIST_TITLE, quit_button_row_index=4)
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
@@ -52,6 +54,10 @@ class TypeMappingListTableDialog(CustomDialog):
     def setup_other_label_text(self):
         self.open_ds_col_type_button.setText(DS_COL_TYPE_BUTTON_TEXT)
         self.add_type_mapping_button.setText(ADD_TYPE_MAPPING_BUTTON_TEXT)
+
+    # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def connect_other_signal(self):
         self.open_ds_col_type_button.clicked.connect(self.open_ds_col_type_list_dialog)
@@ -86,7 +92,13 @@ class TypeMappingListTableDialog(CustomDialog):
                                                                 self.type_mapping_table_widget.del_row)
         self.del_type_mapping_executor.start()
 
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
     def post_process(self):
         self.list_type_mapping_executor = ListTypeMappingExecutor(self, self, TYPE_MAPPING_BOX_TITLE,
                                                                   self.type_mapping_table_widget.fill_table)
         self.list_type_mapping_executor.start()
+
+    # ------------------------------ 后置处理 end ------------------------------ #

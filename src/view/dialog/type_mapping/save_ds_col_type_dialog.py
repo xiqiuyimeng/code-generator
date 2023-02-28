@@ -15,14 +15,14 @@ class SaveDsColTypeDialog(NameCheckDialog):
     def __init__(self, screen_rect, dialog_title, col_type_list, col_type=None):
         super().__init__(screen_rect, dialog_title, col_type_list, col_type, read_storage=False)
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def resize_dialog(self):
         self.resize(self.parent_screen_rect.width() * 0.3, self.parent_screen_rect.height() * 0.2)
 
-    def check_edit(self):
-        return self.dialog_data
+    # ------------------------------ 创建ui界面 end ------------------------------ #
 
-    def get_old_name(self) -> str:
-        return self.dialog_data
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def button_available(self) -> bool:
         return self.name_input.displayText() and self.name_available
@@ -37,3 +37,15 @@ class SaveDsColTypeDialog(NameCheckDialog):
         else:
             self.add_col_type_signal.emit(self.name_input.displayText())
         self.close()
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def check_edit(self):
+        return self.dialog_data
+
+    def get_old_name(self) -> str:
+        return self.dialog_data
+
+    # ------------------------------ 后置处理 end ------------------------------ #

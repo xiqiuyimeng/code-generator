@@ -40,6 +40,8 @@ class NameCheckDialog(CustomSaveDialog):
     def get_new_dialog_data(self) -> BasicSqliteDTO:
         ...
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def setup_content_ui(self):
         self.setup_name_form()
         self.frame_layout.addLayout(self.name_layout)
@@ -62,13 +64,14 @@ class NameCheckDialog(CustomSaveDialog):
     def setup_other_content_ui(self):
         ...
 
+    # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
+
     def connect_other_signal(self):
         self.name_input.textEdited.connect(self.check_name_available)
         self.name_input.textEdited.connect(self.check_input)
         self.connect_child_signal()
-
-    def connect_child_signal(self):
-        ...
 
     def check_name_available(self, name):
         if name:
@@ -105,68 +108,6 @@ class NameCheckDialog(CustomSaveDialog):
         else:
             return name not in self.name_list
 
-    def post_process(self):
-        self.setup_input_limit_rule()
-        self.setup_placeholder_text()
-        # 如果读取数据库，那么打开线程执行器
-        if self.read_storage:
-            self.read_storage_executor = self.get_read_storage_executor(self.set_old_dialog_data)
-            self.read_storage_executor.start()
-        else:
-            self.init_lineedit_button_status()
-
-    def get_read_storage_executor(self, callback) -> LoadingMaskThreadExecutor:
-        ...
-
-    def set_old_dialog_data(self, dialog_data):
-        self.dialog_data = dialog_data
-        self.init_lineedit_button_status()
-
-    def init_lineedit_button_status(self):
-        self.setup_lineedit_value()
-        self.check_input()
-
-    def setup_input_limit_rule(self):
-        # 设置名称最多可输入50字
-        self.name_input.setMaxLength(50)
-        self.setup_other_input_limit_rule()
-
-    def setup_other_input_limit_rule(self):
-        ...
-
-    def setup_placeholder_text(self):
-        self.name_input.setPlaceholderText(NAME_MAX_LENGTH_PLACEHOLDER_TEXT)
-        self.setup_other_placeholder_text()
-
-    def setup_other_placeholder_text(self):
-        ...
-
-    def setup_lineedit_value(self):
-        if self.check_edit():
-            # 数据回显
-            self.setup_echo_data()
-        else:
-            # 默认值展示
-            self.setup_default_value()
-
-    def check_edit(self):
-        """判断是否是编辑"""
-        return self.dialog_data and self.dialog_data.id
-
-    def setup_echo_data(self):
-        self.old_name = self.get_old_name()
-        self.name_input.setText(self.old_name)
-        self.setup_echo_other_data()
-
-    def get_old_name(self) -> str:
-        ...
-
-    def setup_echo_other_data(self):
-        ...
-
-    def setup_default_value(self):
-        ...
-
     def check_input(self):
         # 收集用户输入数据
         self.collect_input()
@@ -197,3 +138,74 @@ class NameCheckDialog(CustomSaveDialog):
 
     def init_other_button_status(self):
         ...
+
+    def connect_child_signal(self):
+        ...
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        self.setup_input_limit_rule()
+        self.setup_placeholder_text()
+        # 如果读取数据库，那么打开线程执行器
+        if self.read_storage:
+            self.read_storage_executor = self.get_read_storage_executor(self.set_old_dialog_data)
+            self.read_storage_executor.start()
+        else:
+            self.init_lineedit_button_status()
+
+    def setup_input_limit_rule(self):
+        # 设置名称最多可输入50字
+        self.name_input.setMaxLength(50)
+        self.setup_other_input_limit_rule()
+
+    def setup_other_input_limit_rule(self):
+        ...
+
+    def setup_placeholder_text(self):
+        self.name_input.setPlaceholderText(NAME_MAX_LENGTH_PLACEHOLDER_TEXT)
+        self.setup_other_placeholder_text()
+
+    def setup_other_placeholder_text(self):
+        ...
+
+    def get_read_storage_executor(self, callback) -> LoadingMaskThreadExecutor:
+        ...
+
+    def set_old_dialog_data(self, dialog_data):
+        self.dialog_data = dialog_data
+        self.init_lineedit_button_status()
+
+    def init_lineedit_button_status(self):
+        self.setup_lineedit_value()
+        self.check_input()
+
+    def setup_lineedit_value(self):
+        if self.check_edit():
+            # 数据回显
+            self.setup_echo_data()
+        else:
+            # 默认值展示
+            self.setup_default_value()
+
+    def check_edit(self):
+        """判断是否是编辑"""
+        return self.dialog_data and self.dialog_data.id
+
+    def setup_echo_data(self):
+        self.old_name = self.get_old_name()
+        self.name_input.setText(self.old_name)
+        self.setup_echo_other_data()
+
+    def get_old_name(self) -> str:
+        ...
+
+    def setup_echo_other_data(self):
+        ...
+
+    def setup_default_value(self):
+        ...
+
+    # ------------------------------ 后置处理 end ------------------------------ #

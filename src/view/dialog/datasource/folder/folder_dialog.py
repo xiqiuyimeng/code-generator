@@ -24,17 +24,14 @@ class FolderDialog(NameCheckDialog):
         # 框架布局，分四部分，第一部分：标题部分，第二部分：文件夹名称表单，第三部分：按钮部分
         super().__init__(screen_rect, dialog_title, folder_name_list, opened_folder_item, read_storage=False)
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def resize_dialog(self):
         self.resize(self.parent_screen_rect.width() * 0.3, self.parent_screen_rect.height() * 0.3)
 
-    def get_old_name(self) -> str:
-        return self.dialog_data.item_name
+    # ------------------------------ 创建ui界面 end ------------------------------ #
 
-    def button_available(self) -> bool:
-        return self.name_input.displayText() and self.name_available
-
-    def check_data_changed(self) -> bool:
-        return self.dialog_data.item_name != self.name_input.displayText()
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def save_func(self):
         new_folder_name = self.name_input.displayText()
@@ -59,3 +56,18 @@ class FolderDialog(NameCheckDialog):
     def edit_post_process(self):
         self.edit_folder_signal.emit(self.dialog_data.item_name)
         self.close()
+
+    def button_available(self) -> bool:
+        return self.name_input.displayText() and self.name_available
+
+    def check_data_changed(self) -> bool:
+        return self.dialog_data.item_name != self.name_input.displayText()
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def get_old_name(self) -> str:
+        return self.dialog_data.item_name
+
+    # ------------------------------ 后置处理 end ------------------------------ #

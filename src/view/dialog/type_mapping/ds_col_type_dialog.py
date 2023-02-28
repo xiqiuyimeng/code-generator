@@ -34,6 +34,8 @@ class DsColTypeDialog(CustomSaveDialog):
         # 为了美观，将表格布局扩大，容纳5个元素，中间为空白占位label
         super().__init__(screen_rect, DS_COL_TYPE_LIST_TITLE, quit_button_row_index=4)
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
@@ -60,6 +62,10 @@ class DsColTypeDialog(CustomSaveDialog):
 
     def setup_other_label_text(self):
         self.add_ds_col_type_button.setText(ADD_DS_COL_TYPE_BUTTON_TEXT)
+
+    # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def connect_other_signal(self):
         self.ds_type_list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
@@ -101,6 +107,10 @@ class DsColTypeDialog(CustomSaveDialog):
                                                                ADD_COL_TYPE_LIST_TITLE, self.close)
         self.save_ds_col_type_executor.start()
 
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
     def post_process(self):
         self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
                                                                self.list_col_type_callback)
@@ -121,3 +131,5 @@ class DsColTypeDialog(CustomSaveDialog):
             col_type_list_widget = ColTypeListWidget(col_types, self.open_save_col_type_dialog, self.frame)
             [col_type_list_widget.addItem(col_type) for col_type in col_types]
             self.stacked_widget.addWidget(col_type_list_widget)
+
+    # ------------------------------ 后置处理 end ------------------------------ #

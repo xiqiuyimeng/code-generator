@@ -29,6 +29,8 @@ class InternetConnDialog(AbstractConnDialog):
         self.pwd_value: QLineEdit = ...
         super().__init__(*args)
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def setup_ds_content_info_ui(self):
         # 主体表单布局
         self.ds_info_layout = QFormLayout()
@@ -64,14 +66,9 @@ class InternetConnDialog(AbstractConnDialog):
 
     def setup_special_conn_info_label(self): ...
 
-    def setup_echo_other_data(self):
-        self.host_value.setText(self.dialog_data.conn_info_type.host)
-        self.port_value.setText(str(self.dialog_data.conn_info_type.port))
-        self.user_value.setText(self.dialog_data.conn_info_type.user)
-        self.pwd_value.setText(self.dialog_data.conn_info_type.pwd)
-        self.setup_echo_special_conn_info_data()
+    # ------------------------------ 创建ui界面 end ------------------------------ #
 
-    def setup_echo_special_conn_info_data(self): ...
+    # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def collect_conn_info_input(self):
         host = self.host_value.text()
@@ -85,6 +82,19 @@ class InternetConnDialog(AbstractConnDialog):
         return conn_param
 
     def collect_special_conn_info(self) -> tuple: ...
+
+    def connect_conn_info_signal(self):
+        self.host_value.textEdited.connect(self.check_input)
+        self.port_value.textEdited.connect(self.check_input)
+        self.user_value.textEdited.connect(self.check_input)
+        self.pwd_value.textEdited.connect(self.check_input)
+        self.connect_special_conn_info_signal()
+
+    def connect_special_conn_info_signal(self): ...
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
 
     def setup_other_input_limit_rule(self):
         # 设置端口号只能输入数字
@@ -106,11 +116,13 @@ class InternetConnDialog(AbstractConnDialog):
 
     def setup_special_conn_info_placeholder_text(self): ...
 
-    def connect_conn_info_signal(self):
-        self.host_value.textEdited.connect(self.check_input)
-        self.port_value.textEdited.connect(self.check_input)
-        self.user_value.textEdited.connect(self.check_input)
-        self.pwd_value.textEdited.connect(self.check_input)
-        self.connect_special_conn_info_signal()
+    def setup_echo_other_data(self):
+        self.host_value.setText(self.dialog_data.conn_info_type.host)
+        self.port_value.setText(str(self.dialog_data.conn_info_type.port))
+        self.user_value.setText(self.dialog_data.conn_info_type.user)
+        self.pwd_value.setText(self.dialog_data.conn_info_type.pwd)
+        self.setup_echo_special_conn_info_data()
 
-    def connect_special_conn_info_signal(self): ...
+    def setup_echo_special_conn_info_data(self): ...
+
+    # ------------------------------ 后置处理 end ------------------------------ #

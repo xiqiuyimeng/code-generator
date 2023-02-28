@@ -91,6 +91,8 @@ class TypeMappingDetailDialog(NameCheckDialog):
     def get_new_dialog_data(self) -> TypeMapping:
         return TypeMapping()
 
+    # ------------------------------ 创建ui界面 start ------------------------------ #
+
     def resize_dialog(self):
         self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
 
@@ -201,6 +203,24 @@ class TypeMappingDetailDialog(NameCheckDialog):
         self.add_mapping_group_button.setText(ADD_MAPPING_GROUP_BTN_TEXT)
         self.del_mapping_group_button.setText(DEL_MAPPING_GROUP_BTN_TEXT)
 
+    # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def collect_input(self):
+        # 收集基本信息数据
+        self.new_dialog_data.mapping_name = self.name_input.text()
+        self.new_dialog_data.ds_type = self.ds_type_combo_box.currentText()
+        self.new_dialog_data.comment = self.type_mapping_comment_text_edit.toPlainText()
+        self.new_dialog_data.max_col_type_group_num = self.col_type_table_widget.header_widget.max_group_num
+        self.new_dialog_data.type_mapping_cols = self.col_type_table_widget.collect_data()
+
+    def button_available(self) -> bool:
+        return all((self.new_dialog_data.mapping_name, self.new_dialog_data.ds_type, self.name_available))
+
+    def check_data_changed(self) -> bool:
+        return True
+
     def connect_child_signal(self):
         self.list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
         self.ds_type_combo_box.currentIndexChanged.connect(self.check_input)
@@ -221,6 +241,16 @@ class TypeMappingDetailDialog(NameCheckDialog):
         # 删除映射组
         self.del_mapping_group_button.clicked.connect(self.col_type_table_widget.del_type_mapping_group)
 
+    def set_del_mapping_button_available(self, checked):
+        self.del_mapping_button.setDisabled(not checked)
+
+    def set_del_mapping_group_button_available(self, max_group_num):
+        # 删除类型映射组按钮，根据是否存在额外组来决定
+        if max_group_num > 0:
+            self.del_mapping_group_button.setDisabled(False)
+        else:
+            self.del_mapping_group_button.setDisabled(True)
+
     def sync_ds_col_types(self):
         """根据数据源类型获取所有的列类型，如果获取不到，弹窗提示应维护数据源列类型数据"""
         ds_type = self.ds_type_combo_box.currentText()
@@ -233,37 +263,6 @@ class TypeMappingDetailDialog(NameCheckDialog):
         else:
             # 如果还未选择数据源类型，提示
             pop_fail(NO_DS_TYPE_PROMPT, GET_DS_TYPE_TITLE, self.frame)
-
-    def get_read_storage_executor(self, callback):
-        return ReadTypeMappingExecutor(self.dialog_data, self, self, READ_TYPE_MAPPING_BOX_TITLE, callback)
-
-    def init_lineedit_button_status(self):
-        super().init_lineedit_button_status()
-        # 设置删除按钮状态
-        self.init_del_button_status()
-
-    def get_old_name(self) -> str:
-        return self.dialog_data.mapping_name
-
-    def setup_echo_other_data(self):
-        self.ds_type_combo_box.echo_ds_type(self.dialog_data.ds_type)
-        self.type_mapping_comment_text_edit.setPlainText(self.dialog_data.comment)
-        # 回显表格数据
-        self.col_type_table_widget.fill_table(self.dialog_data)
-
-    def collect_input(self):
-        # 收集基本信息数据
-        self.new_dialog_data.mapping_name = self.name_input.text()
-        self.new_dialog_data.ds_type = self.ds_type_combo_box.currentText()
-        self.new_dialog_data.comment = self.type_mapping_comment_text_edit.toPlainText()
-        self.new_dialog_data.max_col_type_group_num = self.col_type_table_widget.header_widget.max_group_num
-        self.new_dialog_data.type_mapping_cols = self.col_type_table_widget.collect_data()
-
-    def button_available(self) -> bool:
-        return all((self.new_dialog_data.mapping_name, self.new_dialog_data.ds_type, self.name_available))
-
-    def check_data_changed(self) -> bool:
-        return True
 
     def save_func(self):
         # 检查表格中数据是否可以提交
@@ -295,6 +294,10 @@ class TypeMappingDetailDialog(NameCheckDialog):
         self.edit_type_mapping_signal.emit(self.new_dialog_data)
         self.close()
 
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
     def post_process(self):
         super().post_process()
         # 获取数据源列类型
@@ -305,18 +308,27 @@ class TypeMappingDetailDialog(NameCheckDialog):
     def list_col_type_callback(self, col_type_dict: dict):
         self.ds_col_type_dict = col_type_dict
 
+    def get_read_storage_executor(self, callback):
+        return ReadTypeMappingExecutor(self.dialog_data, self, self, READ_TYPE_MAPPING_BOX_TITLE, callback)
+
+    def init_lineedit_button_status(self):
+        super().init_lineedit_button_status()
+        # 设置删除按钮状态
+        self.init_del_button_status()
+
     def init_del_button_status(self):
         # 删除类型映射按钮，初始应该是不可用状态
         self.set_del_mapping_button_available(False)
         # 删除类型映射组按钮状态
         self.set_del_mapping_group_button_available(self.col_type_table_widget.header_widget.max_group_num)
 
-    def set_del_mapping_button_available(self, checked):
-        self.del_mapping_button.setDisabled(not checked)
+    def get_old_name(self) -> str:
+        return self.dialog_data.mapping_name
 
-    def set_del_mapping_group_button_available(self, max_group_num):
-        # 删除类型映射组按钮，根据是否存在额外组来决定
-        if max_group_num > 0:
-            self.del_mapping_group_button.setDisabled(False)
-        else:
-            self.del_mapping_group_button.setDisabled(True)
+    def setup_echo_other_data(self):
+        self.ds_type_combo_box.echo_ds_type(self.dialog_data.ds_type)
+        self.type_mapping_comment_text_edit.setPlainText(self.dialog_data.comment)
+        # 回显表格数据
+        self.col_type_table_widget.fill_table(self.dialog_data)
+
+    # ------------------------------ 后置处理 end ------------------------------ #
