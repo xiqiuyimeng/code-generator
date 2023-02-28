@@ -32,24 +32,6 @@ class AbstractColTypeMappingTableWidget(AbstractTableWidget):
         self.viewport().stackUnder(self.header_widget)
         self.header_widget.show()
 
-    def calculate_header_check_state(self):
-        check_state_set = set()
-        for row_idx in range(self.rowCount()):
-            check_state_set.add(self.cellWidget(row_idx, 0).check_box.checkState())
-        check_box = self.header_widget.cellWidget(0, 0).check_box
-        if len(check_state_set) == 2:
-            header_check_state = Qt.PartiallyChecked
-        elif len(check_state_set) == 1:
-            header_check_state = check_state_set.pop()
-        else:
-            header_check_state = Qt.Unchecked
-        check_box.setCheckState(header_check_state)
-        # 发射表头复选框变化信号
-        self.header_widget.header_check_changed.emit(header_check_state)
-
-    def check_all_rows(self, check_state):
-        [self.cellWidget(row_idx, 0).check_box.setCheckState(check_state) for row_idx in range(self.rowCount())]
-
     def remove_row(self):
         rm_index_list = list()
         for row in range(self.rowCount()):
@@ -84,7 +66,7 @@ class ColTypeMappingFrozenTableWidget(AbstractColTypeMappingTableWidget):
 
     def setup_header(self):
         # 创建表头控件
-        self.header_widget = ColTypeMappingFrozenTableHeader(self.parent())
+        self.header_widget = ColTypeMappingFrozenTableHeader(self, self.parent())
 
     def resizeEvent(self, e) -> None:
         # 设置表头位置，resize 方法在表格展示的时候会调用，
@@ -110,7 +92,7 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
 
     def setup_header(self):
         # 创建表头控件
-        self.header_widget = ColTypeMappingTableHeader(self.parent())
+        self.header_widget = ColTypeMappingTableHeader(self, self.parent())
 
     def setup_frozen_table(self):
         if self.frozen_column_table is Ellipsis:
@@ -123,7 +105,7 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
 
             self.verticalScrollBar().valueChanged.connect(self.frozen_column_table.verticalScrollBar().setValue)
             # 连接冻结表头的信号
-            self.frozen_column_table.header_widget.header_clicked.connect(self.check_all_and_frozen_rows)
+            self.frozen_column_table.header_widget.header_clicked.connect(self.link_header_check_state)
             # 转发信号
             self.frozen_column_table.header_widget.header_check_changed.connect(self.header_check_changed.emit)
 
@@ -134,10 +116,9 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
                                              self.columnWidth(0) + self.columnWidth(1),
                                              self.geometry().height() - self.horizontalScrollBar().height())
 
-    def check_all_and_frozen_rows(self, check_state):
-        # 冻结表的表头全选时，应该将冻结表所有行全选，并将底表所有行全选
-        self.frozen_column_table.check_all_rows(check_state)
-        self.check_all_rows(check_state)
+    def link_header_check_state(self, check_state):
+        # 冻结表表头复选框状态变化，应该联动底表复选框状态
+        self.header_widget.link_header_check_state(check_state)
 
     def resizeEvent(self, e) -> None:
         # 设置表头位置，resize 方法在表格展示的时候会调用，
@@ -152,11 +133,6 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
         super().resizeEvent(e)
 
     def connect_other_signal(self):
-        # 联动表头滚动条
-        self.horizontalScrollBar().valueChanged.connect(self.header_widget.horizontalScrollBar().setValue)
-        self.header_widget.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBar().setValue)
-        # 连接表头点击信号
-        self.header_widget.header_clicked.connect(self.check_all_rows)
         # 转发信号
         self.header_widget.header_check_changed.connect(self.header_check_changed.emit)
         # 连接单元格变化信号
@@ -196,8 +172,8 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
 
     def calculate_header_checked(self):
         if self.frozen_column_table is not Ellipsis:
-            self.frozen_column_table.calculate_header_check_state()
-        self.calculate_header_check_state()
+            self.frozen_column_table.header_widget.calculate_header_check_state()
+        self.header_widget.calculate_header_check_state()
 
     def _sync_last_mapping_col_text(self, row):
         # 同步上一个映射列名称到当前列下面单元格，需要保持映射列名称一致
