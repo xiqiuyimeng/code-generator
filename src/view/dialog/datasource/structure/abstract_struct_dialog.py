@@ -100,30 +100,13 @@ class AbstractStructDialog(AbstractDsInfoDialog):
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
-    def save_func(self):
-        # 原数据存在，说明是编辑
-        if self.dialog_data:
-            self.new_dialog_data.id = self.dialog_data.id
-            self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
-            self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
-            title = EDIT_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
-            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
-                                                           title, self.edit_post_process)
-            self.edit_struct_executor.start()
+    def check_input(self):
+        super().check_input()
+        # 自定义方法，实现美化按钮是否可用的逻辑
+        if self.new_dialog_data.content:
+            self.pretty_button.setDisabled(False)
         else:
-            # 新增操作
-            title = ADD_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
-            self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
-                                                         self, self, title, self.save_post_process)
-            self.add_struct_executor.start()
-
-    def save_post_process(self, opened_item_record):
-        self.struct_saved.emit(opened_item_record)
-        self.close()
-
-    def edit_post_process(self):
-        self.struct_changed.emit(self.new_dialog_data.struct_name)
-        self.close()
+            self.pretty_button.setDisabled(True)
 
     def collect_input(self):
         # 根据参数构建结构体信息对象
@@ -137,14 +120,8 @@ class AbstractStructDialog(AbstractDsInfoDialog):
     def button_available(self) -> bool:
         return all((self.new_dialog_data.struct_name, self.new_dialog_data.content)) and self.name_available
 
-    def set_other_button_available(self):
-        self.pretty_button.setDisabled(False)
-
     def check_data_changed(self) -> bool:
         return self.new_dialog_data != self.dialog_data
-
-    def init_other_button_status(self):
-        self.pretty_button.setDisabled(True)
 
     def connect_child_signal(self):
         self.struct_file_action.triggered.connect(self.choose_file)
@@ -174,6 +151,31 @@ class AbstractStructDialog(AbstractDsInfoDialog):
             self.struct_text_input.setPlainText
         )
         self.pretty_executor.start()
+
+    def save_func(self):
+        # 原数据存在，说明是编辑
+        if self.dialog_data:
+            self.new_dialog_data.id = self.dialog_data.id
+            self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
+            self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
+            title = EDIT_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
+            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
+                                                           title, self.edit_post_process)
+            self.edit_struct_executor.start()
+        else:
+            # 新增操作
+            title = ADD_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
+            self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
+                                                         self, self, title, self.save_post_process)
+            self.add_struct_executor.start()
+
+    def save_post_process(self, opened_item_record):
+        self.struct_saved.emit(opened_item_record)
+        self.close()
+
+    def edit_post_process(self):
+        self.struct_changed.emit(self.new_dialog_data.struct_name)
+        self.close()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

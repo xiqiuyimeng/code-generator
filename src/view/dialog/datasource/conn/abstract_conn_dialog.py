@@ -69,6 +69,14 @@ class AbstractConnDialog(AbstractDsInfoDialog):
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
+    def check_input(self):
+        super().check_input()
+        # 实现测试连接按钮是否可用的逻辑
+        if all(dataclasses.astuple(self.conn_info)):
+            self.test_conn_button.setDisabled(False)
+        else:
+            self.test_conn_button.setDisabled(True)
+
     def collect_input(self):
         self.new_dialog_data.conn_name = self.name_input.text()
         conn_param = self.collect_conn_info_input()
@@ -84,15 +92,9 @@ class AbstractConnDialog(AbstractDsInfoDialog):
                 and all(dataclasses.astuple(self.conn_info)) \
                 and self.name_available
 
-    def set_other_button_available(self):
-        self.test_conn_button.setDisabled(False)
-
     def check_data_changed(self) -> bool:
         self.new_dialog_data.construct_conn_info()
         return self.new_dialog_data != self.dialog_data
-
-    def init_other_button_status(self):
-        self.test_conn_button.setDisabled(True)
 
     def connect_child_signal(self):
         self.test_conn_button.clicked.connect(self.test_connection)
