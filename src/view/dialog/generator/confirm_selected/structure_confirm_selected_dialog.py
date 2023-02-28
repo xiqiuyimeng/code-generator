@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from src.constant.ds_type_constant import STRUCT_COL_ICON
-from src.constant.generator_dialog_constant import STRUCTURE_CONFIRM_SELECTED_HEADER_TXT
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
@@ -15,9 +14,6 @@ class StructureConfirmSelectedDialog(AbstractDisplaySelectedDialog):
     def __init__(self, selected_data, *args):
         self.selected_data = selected_data
         super().__init__(*args)
-
-    def get_header_text(self) -> str:
-        return STRUCTURE_CONFIRM_SELECTED_HEADER_TXT
 
     def setup_tree_ui(self):
         # 读取已选中数据，填充树结构

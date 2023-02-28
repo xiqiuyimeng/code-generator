@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from src.constant.generator_dialog_constant import SQL_CONFIRM_SELECTED_HEADER_TXT
 from src.constant.icon_enum import get_icon
 from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
 from src.view.tree.tree_widget.tree_function import make_display_tree_item
@@ -14,9 +13,6 @@ class SqlConfirmSelectedDialog(AbstractDisplaySelectedDialog):
         self.selected_data = selected_data
         self.icon_names = ('db_icon_name', 'tb_icon_name', 'col_icon_name')
         super().__init__(*args)
-
-    def get_header_text(self) -> str:
-        return SQL_CONFIRM_SELECTED_HEADER_TXT
 
     def setup_tree_ui(self):
         # 读取已选中数据，填充树结构
