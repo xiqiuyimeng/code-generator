@@ -22,7 +22,7 @@ type_mapping_col_sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_by_parent_id': f'delete from {table_name} where parent_id = :parent_id'
+    'delete_by_parent_ids': f'delete from {table_name} where parent_id in '
 }
 
 
@@ -65,7 +65,7 @@ class ColTypeMappingSqlite(SqliteBasic):
     @transactional
     def edit_col_type_mappings(self, col_type_mappings, parent_id):
         # 首先删除原数据
-        self.delete_by_parent_id(parent_id)
+        self.delete_by_parent_ids((parent_id, ))
         # 插入新数据
         if col_type_mappings:
             for order, col_type_mapping in enumerate(col_type_mappings, start=1):
@@ -73,7 +73,8 @@ class ColTypeMappingSqlite(SqliteBasic):
                 col_type_mapping.parent_id = parent_id
             self.batch_insert(col_type_mappings)
 
-    def delete_by_parent_id(self, parent_id):
-        sql = type_mapping_col_sql_dict.get('delete_by_parent_id')
-        get_db_conn().query(sql, **{'parent_id': parent_id})
-        log.info(f'{self.table_name} 根据parent_id: {parent_id} 删除')
+    def delete_by_parent_ids(self, parent_ids):
+        ids_str = ','.join(map(lambda x: str(x), parent_ids))
+        sql = f"{type_mapping_col_sql_dict.get('delete_by_parent_ids')} ({ids_str})"
+        get_db_conn().query(sql)
+        log.info(f'{self.table_name} 根据parent_id: {parent_ids} 删除')

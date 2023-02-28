@@ -124,8 +124,7 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
         # 设置表头位置，resize 方法在表格展示的时候会调用，
         # 由于table frame的layout已经清空了边距，所以表头起始点无需移位
         self.header_widget.setGeometry(self.frameWidth(), self.frameWidth(),
-                                       self.viewport().width(),
-                                       self.horizontalHeader().height())
+                                       self.viewport().width(), self.horizontalHeader().height())
         # 如果冻结表格存在，同步位置（在回显数据时需要，因为回显数据会处理表结构，也就是会创建冻结表格，并且创建在表格展示之前，
         # 导致其获取到的位置不对，需要在展示表格的时候，更新一次）
         if self.frozen_column_table is not Ellipsis:

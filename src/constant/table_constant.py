@@ -15,7 +15,7 @@ EXPAND_CHILD_TABLE_ICON = '展开子表'
 COLLAPSE_CHILD_TABLE_ICON = '折叠子表'
 
 # 类型映射表头
-TYPE_MAPPING_TABLE_HEADER_LABELS = ['序号', '类型映射名称', '数据源类型', '备注', '创建时间', '修改时间', '操作']
+TYPE_MAPPING_TABLE_HEADER_LABELS = ['类型映射名称', '数据源类型', '备注', '创建时间', '修改时间', '操作']
 
 # 类型映射表格，操作列按钮
 TYPE_MAPPING_OPERATION_TEXT = '操作'

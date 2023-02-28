@@ -21,8 +21,10 @@ ADD_TYPE_MAPPING_BUTTON_TEXT = '添加类型映射'
 TYPE_MAPPING_BOX_TITLE = '读取类型映射列表'
 ADD_TYPE_MAPPING_BOX_TITLE = '添加类型映射'
 EDIT_TYPE_MAPPING_BOX_TITLE = '编辑类型映射'
+DEL_TYPE_MAPPING_BUTTON_TEXT = '删除类型映射'
 DEL_TYPE_MAPPING_BOX_TITLE = '删除类型映射'
 DEL_TYPE_MAPPING_PROMPT = '类型映射：{}\n确认删除类型映射吗？'
+BATCH_DEL_TYPE_MAPPING_PROMPT = '已选择{}个类型映射\n确认删除选中的类型映射吗？'
 
 # 类型映射详情页
 TYPE_MAPPING_TITLE = '类型映射信息'

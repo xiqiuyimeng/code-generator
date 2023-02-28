@@ -44,4 +44,6 @@ def make_checkbox_num_widget(row_index, clicked_slot_func):
         check_box.click_state_changed.connect(lambda check_state: clicked_slot_func(check_state))
     elif len(inspect.signature(clicked_slot_func).parameters) == 2:
         check_box.click_state_changed.connect(lambda check_state: clicked_slot_func(check_state, check_label.text()))
+    else:
+        check_box.click_state_changed.connect(lambda: clicked_slot_func())
     return table_check_widget

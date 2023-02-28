@@ -141,22 +141,22 @@ class EditTypeMappingExecutor(LoadingMaskThreadExecutor):
 
 class DelTypeMappingWorker(ThreadWorkerABC):
 
-    def __init__(self, type_mapping_id, type_mapping_name):
+    def __init__(self, type_mapping_ids, type_mapping_names):
         super().__init__()
-        self.type_mapping_id = type_mapping_id
-        self.type_mapping_name = type_mapping_name
+        self.type_mapping_ids = type_mapping_ids
+        self.type_mapping_names = type_mapping_names
 
     @transactional
     def do_run(self):
-        log.info(f'开始删除类型映射 [{self.type_mapping_name}]')
+        log.info(f'开始删除类型映射 [{self.type_mapping_names}]')
         # 首先删除类型映射
-        TypeMappingSqlite().delete(self.type_mapping_id)
-        ColTypeMappingSqlite().delete_by_parent_id(self.type_mapping_id)
+        TypeMappingSqlite().batch_delete(self.type_mapping_ids)
+        ColTypeMappingSqlite().delete_by_parent_ids(self.type_mapping_ids)
         self.success_signal.emit()
-        log.info(f'删除类型映射 [{self.type_mapping_name}] 成功')
+        log.info(f'删除类型映射 [{self.type_mapping_names}] 成功')
 
     def do_exception(self, e: Exception):
-        err_msg = f'删除类型映射 [{self.type_mapping_name}] 失败'
+        err_msg = f'删除类型映射 [{self.type_mapping_names}] 失败'
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
@@ -170,10 +170,21 @@ class DelTypeMappingExecutor(LoadingMaskThreadExecutor):
         super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelTypeMappingWorker(self.type_mapping_id, self.type_mapping_name)
+        return DelTypeMappingWorker((self.type_mapping_id, ), (self.type_mapping_name, ))
 
     def success_post_process(self, *args):
         self.success_callback(self.row_index)
+
+
+class BatchDelTypeMappingExecutor(LoadingMaskThreadExecutor):
+
+    def __init__(self, type_mapping_ids, type_mapping_names, *args):
+        self.type_mapping_ids = type_mapping_ids
+        self.type_mapping_names = type_mapping_names
+        super().__init__(*args)
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return DelTypeMappingWorker(self.type_mapping_ids, self.type_mapping_names)
 
 # ----------------------- 删除类型映射 end ----------------------- #
 
