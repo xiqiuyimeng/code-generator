@@ -44,7 +44,7 @@ class AbstractTreeNode:
         # 记录tab对象
         set_item_opened_tab(self.item, tab)
         # 连接表头复选框变化信号
-        tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
+        tab.table_frame.table_widget.table_header.header_check_changed.connect(
             lambda check_state: check_state_func(check_state))
         return tab
 
@@ -71,7 +71,7 @@ class AbstractTreeNode:
             if tab:
                 tab.refresh_ui(table_tab)
                 # 连接表头复选框变化信号
-                tab.table_frame.table_widget.table_header.header_check_state_changed.connect(
+                tab.table_frame.table_widget.table_header.header_check_changed.connect(
                     lambda check_state: check_state_func(check_state))
         # 清空选中数据
         del_data = get_add_del_data(self.item)

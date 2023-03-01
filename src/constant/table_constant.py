@@ -8,7 +8,7 @@ _date_ = '2023/2/24 12:32'
 TABLE_HEADER_FIRST_COL_LABEL = '全选'
 
 # 数据源表格表头
-DS_TABLE_HEADER_LABELS = ["全选", "字段名", "数据类型", "完整数据类型", "主键", "备注"]
+DS_TABLE_HEADER_LABELS = ["字段名", "数据类型", "完整数据类型", "主键", "备注"]
 
 # 数据源表格存在子表时，增加按钮
 EXPAND_CHILD_TABLE_ICON = '展开子表'

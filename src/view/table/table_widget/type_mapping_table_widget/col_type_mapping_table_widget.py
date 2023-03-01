@@ -149,11 +149,11 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
         row = self.rowCount()
         if self.frozen_column_table is not Ellipsis:
             self._sync_frozen_col_data()
-            self.frozen_column_table.insertRow(row)
+            self.frozen_column_table.insert_row(row)
             check_box_num_widget = make_checkbox_num_widget(row + 1, self.check_box_clicked_slot)
             self.frozen_column_table.setCellWidget(row, 0, check_box_num_widget)
             self.frozen_column_table.setItem(row, 1, self.make_item())
-        self.insertRow(row)
+        self.insert_row(row)
         self.setCellWidget(row, 0, make_checkbox_num_widget(row + 1, self.check_box_clicked_slot))
         # 设置每个单元格
         [self.setItem(row, col, self.make_item()) for col in range(self.columnCount())]
@@ -162,10 +162,10 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
         # 同步上一行所有映射列名称数据
         self._sync_last_mapping_col_text(row)
 
-    def check_box_clicked_slot(self, check_state, row):
+    def check_box_clicked_slot(self, check_state, row_num):
         # 如果冻结表格存在，那么当前点击的复选框，应当是冻结表，所以需要同步复选框状态到底表
         if self.frozen_column_table is not Ellipsis:
-            self.cellWidget(int(row) - 1, 0).check_box.setCheckState(check_state)
+            self.cellWidget(int(row_num) - 1, 0).check_box.setCheckState(check_state)
         # 计算表头复选框状态
         self.calculate_header_checked()
 
@@ -239,7 +239,7 @@ class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
         # 如果当前表已经插入过行，冻结列表格需要同步插入，并拷贝数据
         if row > self.frozen_column_table.rowCount():
             for idx in range(self.frozen_column_table.rowCount(), row):
-                self.frozen_column_table.insertRow(idx)
+                self.frozen_column_table.insert_row(idx)
                 checkbox_num_widget = make_checkbox_num_widget(idx + 1, self.check_box_clicked_slot)
                 # 复制底表复选框状态
                 checkbox_num_widget.check_box.setCheckState(self.cellWidget(idx, 0).check_box.checkState())

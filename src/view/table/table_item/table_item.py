@@ -26,17 +26,17 @@ class TableWidgetItem(QTableWidgetItem):
         super().setText(text)
 
 
-def make_checkbox_num_widget(row_index, clicked_slot_func):
-    table_check_widget = QWidget()
-    check_layout = QHBoxLayout(table_check_widget)
+def make_checkbox_num_widget(label_text, clicked_slot_func):
+    check_num_widget = QWidget()
+    check_layout = QHBoxLayout(check_num_widget)
     check_box = CheckBox()
-    setattr(table_check_widget, 'check_box', check_box)
+    setattr(check_num_widget, 'check_box', check_box)
     check_layout.addWidget(check_box)
     check_layout.setContentsMargins(0, 0, 0, 0)
     check_layout.setAlignment(check_box, Qt.AlignRight)
     check_label = QLabel()
-    setattr(table_check_widget, 'check_label', check_label)
-    check_label.setText(str(row_index))
+    setattr(check_num_widget, 'check_label', check_label)
+    check_label.setText(str(label_text))
     check_layout.addWidget(check_label)
     check_layout.setAlignment(check_label, Qt.AlignCenter)
     # 连接信号槽，获取方法签名，如果形参是一个，传递选中状态，如果是两个，传递选中状态和序号
@@ -46,4 +46,11 @@ def make_checkbox_num_widget(row_index, clicked_slot_func):
         check_box.click_state_changed.connect(lambda check_state: clicked_slot_func(check_state, check_label.text()))
     else:
         check_box.click_state_changed.connect(lambda: clicked_slot_func())
-    return table_check_widget
+    return check_num_widget
+
+
+def make_checkbox_num_widget_with_button(label_text, clicked_slot_func, button):
+    checkbox_num_widget = make_checkbox_num_widget(label_text, clicked_slot_func)
+    checkbox_num_widget.layout().addWidget(button)
+    setattr(checkbox_num_widget, 'button', button)
+    return checkbox_num_widget

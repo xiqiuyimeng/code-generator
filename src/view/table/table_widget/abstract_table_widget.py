@@ -49,10 +49,10 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         self.entered.connect(self.show_tool_tip)
         self.connect_other_signal()
 
-    def connect_other_signal(self): ...
-
     def show_tool_tip(self, model_index):
         self.setToolTip(model_index.data())
+
+    def connect_other_signal(self): ...
 
     def make_item(self, text=None):
         item = TableWidgetItem(self)
@@ -63,4 +63,9 @@ class AbstractTableWidget(QTableWidget, ScrollableWidget):
         # 设置编辑器代理
         self.text_input_delegate = TextInputDelegate()
         [self.setItemDelegateForColumn(col, self.text_input_delegate) for col in columns]
+
+    def insert_row(self, row_index):
+        self.insertRow(row_index)
+        # 行高设为原行高的1.5倍，主要为了美观
+        self.setRowHeight(row_index, round(self.rowHeight(row_index) * 1.5))
 

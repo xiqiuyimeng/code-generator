@@ -62,10 +62,13 @@ class AbstractTableHeader(AbstractTableWidget):
     def setup_item_span(self): ...
 
     def setup_items(self):
-        checkbox_num_widget = make_checkbox_num_widget(TABLE_HEADER_FIRST_COL_LABEL, self.click_header_checkbox)
+        checkbox_num_widget = self.get_checkbox_num_widget()
         self.setCellWidget(0, 0, checkbox_num_widget)
         self.check_box = checkbox_num_widget.check_box
         self.setup_header_items()
+
+    def get_checkbox_num_widget(self):
+        return make_checkbox_num_widget(TABLE_HEADER_FIRST_COL_LABEL, self.click_header_checkbox)
 
     def click_header_checkbox(self, check_state):
         # 更改子项复选框状态
@@ -80,16 +83,20 @@ class AbstractTableHeader(AbstractTableWidget):
         # 设置正在批量处理标志位
         self.batch_operating = True
         for row_idx in range(self.parent_table.rowCount()):
-            check_box = self.parent_table.cellWidget(row_idx, 0).check_box
-            if check_box.checkState() != check_state:
-                check_box.setCheckState(check_state)
+            cell_widget = self.parent_table.cellWidget(row_idx, 0)
+            if hasattr(cell_widget, 'check_box'):
+                check_box = self.parent_table.cellWidget(row_idx, 0).check_box
+                if check_box.checkState() != check_state:
+                    check_box.setCheckState(check_state)
         self.batch_operating = False
 
     def calculate_header_check_state(self):
         """根据父表中所有复选框的状态，计算表头复选框状态"""
         check_state_set = set()
         for row_idx in range(self.parent_table.rowCount()):
-            check_state_set.add(self.parent_table.cellWidget(row_idx, 0).check_box.checkState())
+            cell_widget = self.parent_table.cellWidget(row_idx, 0)
+            if hasattr(cell_widget, 'check_box'):
+                check_state_set.add(cell_widget.check_box.checkState())
         if len(check_state_set) == 2:
             header_check_state = Qt.PartiallyChecked
         elif len(check_state_set) == 1:

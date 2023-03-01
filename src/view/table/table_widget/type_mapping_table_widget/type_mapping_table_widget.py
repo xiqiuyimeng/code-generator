@@ -6,7 +6,7 @@ from src.constant.icon_enum import get_icon
 from src.constant.table_constant import TYPE_MAPPING_TABLE_HEADER_LABELS, TYPE_MAPPING_OPERATION_ICON, \
     TYPE_MAPPING_OPERATION_TEXT, TYPE_MAPPING_CAT_EDIT_TEXT, TYPE_MAPPING_CAT_EDIT_ICON, TYPE_MAPPING_REMOVE_TEXT, \
     TYPE_MAPPING_REMOVE_ICON
-from src.view.table.table_header.normal_check_box_table_header import CheckBoxHeader
+from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
 
@@ -45,6 +45,7 @@ class TypeMappingTableWidget(AbstractTableWidget):
     def resizeEvent(self, e) -> None:
         self.header_widget.setGeometry(self.frameWidth(), self.frameWidth(),
                                        self.viewport().width(), self.horizontalHeader().height())
+        super().resizeEvent(e)
 
     def fill_table(self, cols):
         self.cols = cols
@@ -52,7 +53,7 @@ class TypeMappingTableWidget(AbstractTableWidget):
             self._do_add_row(col, i)
 
     def _do_add_row(self, type_mapping, row_index):
-        self.insertRow(row_index)
+        self.insert_row(row_index)
         checkbox_num_widget = make_checkbox_num_widget(row_index + 1,
                                                        self.header_widget.calculate_header_check_state)
         order_item = checkbox_num_widget.check_label
@@ -66,9 +67,6 @@ class TypeMappingTableWidget(AbstractTableWidget):
         # 添加操作按钮
         self.setCellWidget(row_index, 6, self.make_operation_buttons(order_item, type_mapping.id,
                                                                      type_mapping.mapping_name))
-
-        # 行高设为原行高的1.5倍，主要为了美观
-        self.setRowHeight(row_index, round(self.rowHeight(row_index) * 1.5))
 
     def make_operation_buttons(self, order_item, type_mapping_id, mapping_name):
         """

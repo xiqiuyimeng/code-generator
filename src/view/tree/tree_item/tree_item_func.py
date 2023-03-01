@@ -30,7 +30,7 @@ def link_table_checkbox(tree_item, check_state):
     tab = get_item_opened_tab(tree_item)
     if tab:
         table_widget = tab.table_frame.table_widget
-        table_widget.table_header.change_header_state(check_state)
+        table_widget.table_header.link_header_check_state(check_state)
         # 批量处理数据保存
         table_widget.batch_deal_checked(check_state)
 

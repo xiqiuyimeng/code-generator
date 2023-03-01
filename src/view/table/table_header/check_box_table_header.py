@@ -1,133 +1,29 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt, QRect
-from PyQt5.QtWidgets import QHeaderView, QStyleOptionButton, QStyle
+from PyQt5.QtWidgets import QLabel
+
+from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
+from src.view.table.table_header.abstract_table_header import AbstractTableHeader
+from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
 
 _author_ = 'luwt'
-_date_ = '2022/5/10 15:12'
+_date_ = '2023/2/28 17:27'
 
 
-class CheckBoxHeader(QHeaderView):
-    """自定义复选框表头类"""
+class CheckBoxHeader(AbstractTableHeader):
+    """普通复选框表头"""
 
-    # 自定义 表头复选框状态变化信号，主要用于向上传递选中状态，例如子表表头变化，传递给父表
-    header_check_state_changed = pyqtSignal(int)
-    # 点击表头复选框信号
-    header_clicked = pyqtSignal(int)
-    # 这4个变量控制列头复选框的样式，位置以及大小
-    _x_offset = 3
-    _y_offset = 0
-    _width = 20
-    _height = 20
+    def __init__(self, header_labels, parent_table):
+        self.header_labels = header_labels
+        # 表头1行
+        super().__init__(1, len(header_labels) + 1, parent_table, parent_table)
 
-    def __init__(self, orientation=Qt.Horizontal, parent=None, batch_callback=None):
-        super(CheckBoxHeader, self).__init__(orientation, parent)
-        # 标识未选中状态
-        self.check_state = Qt.Unchecked
-        # 用来放所有复选框
-        self.checkbox_list = list()
-        self.batch_callback = batch_callback
-        # 设置表头字体加粗
-        font = self.font()
-        # 比原字体略大一点
-        font.setPointSize(font.pointSize() + 1)
-        font.setBold(True)
-        self.setFont(font)
+    def setup_header_items(self):
+        [self.setItem(0, col, self.make_item(header_text))
+         for col, header_text in enumerate(self.header_labels, start=1)]
 
-    def paintSection(self, painter, rect, index):
-        painter.save()
-        super(CheckBoxHeader, self).paintSection(painter, rect, index)
-        painter.restore()
 
-        self._y_offset = int((rect.height() - self._width) >> 1)
+class CheckBoxHeaderWithButton(CheckBoxHeader):
 
-        if index == 0:
-            option = QStyleOptionButton()
-            option.rect = QRect(rect.x() + self._x_offset, rect.y() + self._y_offset, self._width, self._height)
-            option.state = QStyle.State_Enabled | QStyle.State_Active
-            if self.check_state == Qt.Checked:
-                option.state |= QStyle.State_On
-            elif self.check_state == Qt.PartiallyChecked:
-                option.state |= QStyle.State_NoChange
-            elif self.check_state == Qt.Unchecked:
-                option.state |= QStyle.State_Off
-            self.style().drawControl(QStyle.CE_CheckBox, option, painter)
-
-    def mousePressEvent(self, event):
-        index = self.logicalIndexAt(event.pos())
-        if index == 0:
-            x = self.sectionPosition(index)
-            if x + self._x_offset < event.pos().x() < x + self._x_offset + self._width \
-                    and self._y_offset < event.pos().y() < self._y_offset + self._height:
-                # 鼠标点击只有两种状态，全选和未选中
-                # 如果之前的状态是未选中或部分选中，那么点击后，应该是全选
-                if self.check_state == Qt.Unchecked or self.check_state == Qt.PartiallyChecked:
-                    self.check_state = Qt.Checked
-                # 如果之前的状态是选中，点击后应该是未选中
-                elif self.check_state == Qt.Checked:
-                    self.check_state = Qt.Unchecked
-                # 将表格的所有行复选框状态变更为表头复选框状态
-                self.change_state(self.check_state)
-                # 当用户点击了行表头复选框，发射表头点击信号 header_clicked
-                self.header_clicked.emit(self.check_state)
-                self.header_check_state_changed.emit(self.check_state)
-                self.updateSection(0)
-        super(CheckBoxHeader, self).mousePressEvent(event)
-
-    # 仅仅作为修改所有单元格复选框状态的方法，不作为槽方法
-    def change_state(self, check_state):
-        # 如果设置了批量处理回调，那么设置正在批量处理标志位
-        if self.batch_callback:
-            self.batch_callback(True)
-        # 如果行表头复选框为勾选状态
-        if check_state == Qt.Checked:
-            # 将所有的复选框都设为勾选状态
-            for checkbox in self.checkbox_list:
-                if checkbox.checkState() != Qt.Checked:
-                    checkbox.setCheckState(Qt.Checked)
-        elif check_state == Qt.Unchecked:
-            for checkbox in self.checkbox_list:
-                if checkbox.checkState() != Qt.Unchecked:
-                    checkbox.setCheckState(Qt.Unchecked)
-        if self.batch_callback:
-            self.batch_callback(False)
-
-    def set_header_checked(self, check_state):
-        if check_state == Qt.Unchecked:
-            self.check_state = Qt.Unchecked
-            # 更新表头控件
-            self.updateSection(0)
-        elif check_state == Qt.PartiallyChecked:
-            self.check_state = Qt.PartiallyChecked
-            # 更新表头控件
-            self.updateSection(0)
-        elif check_state == Qt.Checked:
-            self.check_state = Qt.Checked
-            # 更新表头控件
-            self.updateSection(0)
-
-    def change_header_state(self, check_state):
-        # 1.由树节点调用，当点击树节点复选框时，联动表复选框，2.点击子表所在父行复选框，触发子表复选框变化
-        self.set_header_checked(check_state)
-        self.change_state(check_state)
-
-    def link_header_checked(self):
-        # 判断列表中所有项的选中状态，以决定表头复选框状态
-        len_checked_list = len(list(filter(lambda x: x.checkState() == Qt.Checked, self.checkbox_list)))
-        len_partially_checked_list = len(list(filter(
-            lambda x: x.checkState() == Qt.PartiallyChecked, self.checkbox_list)))
-        len_checkbox = len(self.checkbox_list)
-        check_state = Qt.Unchecked
-        if len_checked_list == len_checkbox:
-            check_state = Qt.Checked
-        elif len_checked_list == 0:
-            # 如果没有全选复选框，存在部分选中复选框，那么应该为部分选中状态，否则为未选中
-            if len_partially_checked_list:
-                check_state = Qt.PartiallyChecked
-            else:
-                check_state = Qt.Unchecked
-        elif len_checked_list < len_checkbox:
-            check_state = Qt.PartiallyChecked
-        self.set_header_checked(check_state)
-        # 发射当前选中状态信号
-        self.header_check_state_changed.emit(check_state)
-
+    def get_checkbox_num_widget(self):
+        return make_checkbox_num_widget_with_button(TABLE_HEADER_FIRST_COL_LABEL,
+                                                    self.click_header_checkbox, QLabel())

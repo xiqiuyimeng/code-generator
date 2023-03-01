@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 
+from src.view.table.table_header.check_box_table_header import CheckBoxHeader
+from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.ds_table_widget.abstract_ds_col_table_widget import AbstractDsColTableWidget
 from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
@@ -8,6 +11,22 @@ _date_ = '2022/5/10 15:25'
 
 
 class SqlDsColTableWidget(AbstractDsColTableWidget):
+
+    def get_header(self, header_labels):
+        return CheckBoxHeader(header_labels, self)
+
+    def make_checkbox_num_widget(self, row_index, col_data):
+        return make_checkbox_num_widget(row_index + 1, self.click_row_checkbox)
+
+    def fill_post_process(self):
+        checked_list = list()
+        # 循环设置选中项
+        for row, col in enumerate(self.cols):
+            if col.checked:
+                checked_list.append(col)
+                self.cellWidget(row, 0).check_box.setCheckState(Qt.Checked)
+        # 将选中项保存到选中树结构中
+        self.add_checked_data(checked_list)
 
     def add_checked_data(self, cols):
         add_data = get_add_del_data(self.tree_item)
