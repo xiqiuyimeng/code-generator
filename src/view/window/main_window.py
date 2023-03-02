@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         # 设置窗口无边框，点击任务栏图标，可以实现隐藏和显示
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint
-                            | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
+                            | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         # 按当前分辨率计算窗口大小
         self.resize(self.desktop_screen_rect.width() * 0.6, self.desktop_screen_rect.height() * 0.75)
         # 不透明度
