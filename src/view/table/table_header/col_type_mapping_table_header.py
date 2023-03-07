@@ -3,6 +3,8 @@ from PyQt5.QtCore import pyqtSignal
 
 from src.constant.table_constant import DS_COL_TYPE_TABLE_HEADER, DEFAULT_MAPPING_GROUP_TITLE
 from src.view.table.table_header.abstract_table_header import AbstractTableHeader
+from src.view.table.table_header.table_header_style_delegate import TableHeaderStyleDelegate, \
+    ColTypeMappingTableHeaderStyleDelegate
 
 _author_ = 'luwt'
 _date_ = '2023/2/16 17:41'
@@ -31,6 +33,11 @@ class AbstractColTypeMappingTableHeader(AbstractTableHeader):
 
 class ColTypeMappingFrozenTableHeader(AbstractColTypeMappingTableHeader):
 
+    def __init__(self, *args):
+        super().__init__(*args)
+        # 设置代理
+        self.setItemDelegate(TableHeaderStyleDelegate())
+
     def setup_header_items(self):
         super().setup_header_items()
         # 隐藏前两列之后所有列
@@ -42,6 +49,8 @@ class ColTypeMappingTableHeader(AbstractColTypeMappingTableHeader):
     def __init__(self, *args):
         self.max_group_num = 0
         super().__init__(*args)
+        # 设置代理
+        self.setItemDelegate(ColTypeMappingTableHeaderStyleDelegate())
 
     def setup_other_item_span(self):
         # 合并列

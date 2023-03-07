@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QLabel
 
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
 from src.view.table.table_header.abstract_table_header import AbstractTableHeader
+from src.view.table.table_header.table_header_style_delegate import TableHeaderStyleDelegate
 from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
 
 _author_ = 'luwt'
@@ -16,6 +17,8 @@ class CheckBoxHeader(AbstractTableHeader):
         self.header_labels = header_labels
         # 表头1行
         super().__init__(1, len(header_labels) + 1, parent_table, parent_table)
+        # 设置代理
+        self.setItemDelegate(TableHeaderStyleDelegate())
 
     def setup_header_items(self):
         [self.setItem(0, col, self.make_item(header_text))

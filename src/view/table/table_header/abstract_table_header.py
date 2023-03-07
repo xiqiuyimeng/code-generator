@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QAbstractItemView
 
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
 from src.view.custom_widget.check_box import CheckBox
-from src.view.table.table_header.table_header_style_delegate import TableHeaderStyleDelegate
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
 
@@ -26,8 +25,6 @@ class AbstractTableHeader(AbstractTableWidget):
         # 是否正在批量操作
         self.batch_operating = False
         super().__init__(*args)
-        # 设置代理
-        self.setItemDelegate(TableHeaderStyleDelegate())
 
     def setup_other_ui(self):
         # 表头隐藏
