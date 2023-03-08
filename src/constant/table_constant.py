@@ -17,15 +17,15 @@ COLLAPSE_CHILD_TABLE_ICON = '折叠子表'
 # 类型映射表头
 TYPE_MAPPING_TABLE_HEADER_LABELS = ['类型映射名称', '数据源类型', '备注', '创建时间', '修改时间', '操作']
 
-# 类型映射表格，操作列按钮
-TYPE_MAPPING_OPERATION_TEXT = '操作'
-TYPE_MAPPING_CAT_EDIT_TEXT = '查看编辑'
+# 表格，操作列按钮
+ROW_OPERATION_TEXT = '操作'
+ROW_CAT_EDIT_TEXT = '查看编辑'
 
-TYPE_MAPPING_OPERATION_ICON = '类型映射列表操作'
-TYPE_MAPPING_CAT_EDIT_ICON = '类型映射列表操作：查看编辑'
+ROW_OPERATION_ICON = '表格行操作icon'
+ROW_CAT_EDIT_ICON = '表格行操作icon：查看编辑'
 
-TYPE_MAPPING_REMOVE_TEXT = '删除'
-TYPE_MAPPING_REMOVE_ICON = '类型映射列表操作：删除'
+ROW_DEL_TEXT = '删除'
+ROW_DEL_ICON = '表格行操作icon：删除'
 
 # 数据源列类型映射表格表头
 DS_COL_TYPE_TABLE_HEADER = ['数据源列类型', '映射列名称', '映射类型', '引包声明']

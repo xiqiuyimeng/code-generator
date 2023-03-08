@@ -10,8 +10,8 @@ from src.constant.ds_type_constant import SQLITE_DISPLAY_NAME, SQLITE_DB, SQLITE
     MYSQL_DB, MYSQL_TB, MYSQL_COL, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL, FOLDER_TYPE, \
     JSON_DISPLAY_NAME, STRUCT_COL_ICON
 from src.constant.list_constant import EDIT_COL_TYPE_ICON, DEL_COL_TYPE_ICON, DEL_ALL_COL_TYPE_ICON
-from src.constant.table_constant import TYPE_MAPPING_OPERATION_ICON, TYPE_MAPPING_CAT_EDIT_ICON, \
-    TYPE_MAPPING_REMOVE_ICON, EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
+from src.constant.table_constant import ROW_OPERATION_ICON, ROW_CAT_EDIT_ICON, \
+    ROW_DEL_ICON, EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
 from src.constant.tree_constant import OPEN_CONN_ACTION, CANCEL_OPEN_CONN_ACTION, REFRESH_CONN_ACTION, \
     CANCEL_REFRESH_CONN_ACTION, CLOSE_CONN_ACTION, TEST_CONN_ACTION, CANCEL_TEST_CONN_ACTION, ADD_CONN_ACTION, \
     EDIT_CONN_ACTION, DEL_CONN_ACTION, OPEN_DB_ACTION, CANCEL_OPEN_DB_ACTION, CLOSE_DB_ACTION, SELECT_ALL_TB_ACTION, \
@@ -129,10 +129,10 @@ class IconEnum(Enum):
     rename_folder_icon = RENAME_FOLDER_ACTION, ':/icon/exec.png'
     del_folder_icon = DEL_FOLDER_ACTION, ':/icon/remove.png'
 
-    # 类型映射对话框 icon
-    type_mapping_operation_icon = TYPE_MAPPING_OPERATION_ICON, ':/icon/right.png'
-    type_mapping_cat_edit_icon = TYPE_MAPPING_CAT_EDIT_ICON, ':/icon/exec.png'
-    type_mapping_remove_icon = TYPE_MAPPING_REMOVE_ICON, ':/icon/remove.png'
+    # 通用表格最后一列操作 icon
+    row_operation_icon = ROW_OPERATION_ICON, ':/icon/right.png'
+    row_cat_edit_icon = ROW_CAT_EDIT_ICON, ':/icon/exec.png'
+    row_del_icon = ROW_DEL_ICON, ':/icon/remove.png'
 
 
 def get_icon_path(name):
