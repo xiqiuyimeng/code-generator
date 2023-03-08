@@ -18,6 +18,10 @@ _date_ = '2022/5/10 15:25'
 
 class StructDsColTableWidget(AbstractDsColTableWidget):
 
+    def __init__(self, *args, parent_table=None):
+        self.parent_table: AbstractDsColTableWidget = parent_table
+        super().__init__(*args)
+
     def get_header(self, header_labels):
         return CheckBoxHeaderWithButton(header_labels, self)
 
@@ -111,7 +115,7 @@ class StructDsColTableWidget(AbstractDsColTableWidget):
         child_widget.setLayout(child_layout)
         # 创建子表格
         child_table = StructDsColTableWidget(self.main_window, self.tree_widget, child_widget,
-                                             col_data.children, self)
+                                             col_data.children, parent_table=self)
         child_widget.child_table = child_table
         child_layout.addWidget(child_table)
 

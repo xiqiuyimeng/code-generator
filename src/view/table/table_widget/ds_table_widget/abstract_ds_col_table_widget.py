@@ -16,7 +16,7 @@ _date_ = '2022/12/6 15:50'
 
 class AbstractDsColTableWidget(AbstractTableWidget):
 
-    def __init__(self, main_window, tree_widget, parent, cols, parent_table=None):
+    def __init__(self, main_window, tree_widget, parent, cols):
         self.main_window = main_window
         self.tree_widget = tree_widget
         self.cols = cols
@@ -27,7 +27,6 @@ class AbstractDsColTableWidget(AbstractTableWidget):
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
-        self.parent_table: AbstractDsColTableWidget = parent_table
         # 保存代理引用
         self.combox_delegate = ...
         super().__init__(parent)
@@ -50,13 +49,10 @@ class AbstractDsColTableWidget(AbstractTableWidget):
 
         # 设置表头列宽度，第一列全选列
         self.horizontalHeader().resizeSection(0, 80)
-        self.table_header.horizontalHeader().resizeSection(0, 80)
         # 第二列字段列，根据大小自动调整宽度
         self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        self.table_header.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         # 最后备注列拉伸到最大
         self.horizontalHeader().setStretchLastSection(True)
-        self.table_header.horizontalHeader().setStretchLastSection(True)
 
         # 设置第五列（是否是主键）combox代理项，在编辑时触发
         self.combox_delegate = ComboboxDelegate()
@@ -69,6 +65,9 @@ class AbstractDsColTableWidget(AbstractTableWidget):
     def resizeEvent(self, e) -> None:
         self.table_header.setGeometry(self.frameWidth(), self.frameWidth(), self.viewport().width(),
                                       self.horizontalHeader().height())
+        # 表头每列的宽度，应该跟表格内每列宽度一致
+        [self.table_header.horizontalHeader().resizeSection(col, self.columnWidth(col))
+         for col in range(self.columnCount())]
         super().resizeEvent(e)
 
     def connect_other_signal(self):

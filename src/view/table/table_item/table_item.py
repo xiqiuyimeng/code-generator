@@ -52,5 +52,9 @@ def make_checkbox_num_widget(label_text, clicked_slot_func):
 def make_checkbox_num_widget_with_button(label_text, clicked_slot_func, button):
     checkbox_num_widget = make_checkbox_num_widget(label_text, clicked_slot_func)
     checkbox_num_widget.layout().addWidget(button)
+    # 设置三个部件等宽排列
+    checkbox_num_widget.layout().setStretch(0, 1)
+    checkbox_num_widget.layout().setStretch(1, 1)
+    checkbox_num_widget.layout().setStretch(2, 1)
     setattr(checkbox_num_widget, 'button', button)
     return checkbox_num_widget
