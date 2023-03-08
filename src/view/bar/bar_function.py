@@ -5,7 +5,7 @@ from src.constant.generator_dialog_constant import SQL_CONFIRM_SELECTED_HEADER_T
 from src.view.box.message_box import pop_ok
 from src.view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
 from src.view.dialog.generator.confirm_selected.structure_confirm_selected_dialog import StructureConfirmSelectedDialog
-from src.view.dialog.type_mapping.type_mapping_table_dialog import TypeMappingListTableDialog
+from src.view.dialog.type_mapping.type_mapping_dialog import TypeMappingDialog
 from src.view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
 
 _author_ = 'luwt'
@@ -45,7 +45,7 @@ def refresh(main_window):
 
 def open_type_mapping_dialog(main_window):
     """打开类型映射对话框"""
-    TypeMappingListTableDialog(main_window.geometry()).exec()
+    TypeMappingDialog(main_window.geometry()).exec()
 
 
 def generate(main_window):

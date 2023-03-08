@@ -13,10 +13,6 @@ _author_ = 'luwt'
 _date_ = '2023/2/13 15:15'
 
 
-class ColTypeStackedListWidget(AbstractListWidget):
-    pass
-
-
 class ColTypeListWidget(AbstractListWidget):
 
     def __init__(self, col_types, edit_col_type_func, *args):
