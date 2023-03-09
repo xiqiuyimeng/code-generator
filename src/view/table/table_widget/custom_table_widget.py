@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QAbstractItemView, QToolButton, QMenu, QAction, QHea
 from src.constant.icon_enum import get_icon
 from src.constant.table_constant import ROW_OPERATION_ICON, \
     ROW_OPERATION_TEXT, ROW_CAT_EDIT_TEXT, ROW_CAT_EDIT_ICON, ROW_DEL_TEXT, \
-    ROW_DEL_ICON
+    ROW_DEL_ICON, OPERATION_HEADER_LABEL
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
@@ -22,6 +22,8 @@ class CustomTableWidget(AbstractTableWidget):
 
     def __init__(self, header_labels, *args):
         self.header_labels = header_labels
+        # 添加上最后一列，操作列
+        self.header_labels.append(OPERATION_HEADER_LABEL)
         # 表头控件
         self.header_widget: CheckBoxHeader = ...
         super().__init__(*args)
