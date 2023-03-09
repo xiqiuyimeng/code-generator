@@ -12,7 +12,7 @@ class TypeMappingTableWidget(CustomTableWidget):
     def __init__(self, *args):
         super().__init__(TYPE_MAPPING_TABLE_HEADER_LABELS, *args)
 
-    def _do_fill_row(self, row_index, type_mapping, fill_create_time=True):
+    def do_fill_row(self, row_index, type_mapping, fill_create_time=True):
         self.setItem(row_index, 1, self.make_item(type_mapping.mapping_name))
         self.setItem(row_index, 2, self.make_item(type_mapping.ds_type))
         self.setItem(row_index, 3, self.make_item(type_mapping.comment))

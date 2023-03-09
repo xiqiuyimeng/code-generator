@@ -61,11 +61,11 @@ class CustomTableWidget(AbstractTableWidget):
         order_item = checkbox_num_widget.check_label
         setattr(order_item, 'row_id', row_data.id)
         self.setCellWidget(row_index, 0, checkbox_num_widget)
-        self._do_fill_row(row_index, row_data)
+        self.do_fill_row(row_index, row_data)
         # 最后一列添加操作按钮
         self.setCellWidget(row_index, self.columnCount() - 1, self.make_operation_buttons(order_item, row_data.id))
 
-    def _do_fill_row(self, row_index, row_data, fill_create_time=True): ...
+    def do_fill_row(self, row_index, row_data, fill_create_time=True): ...
 
     def make_operation_buttons(self, order_item, row_id):
         """
@@ -114,7 +114,7 @@ class CustomTableWidget(AbstractTableWidget):
 
     def edit_row(self, *args):
         # 重新渲染数据
-        self._do_fill_row(*args, fill_create_time=False)
+        self.do_fill_row(*args, fill_create_time=False)
 
     def get_all_checked_id_names(self):
         checked_ids, checked_names = list(), list()
