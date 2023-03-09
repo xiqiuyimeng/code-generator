@@ -109,6 +109,8 @@ class CustomTableWidget(AbstractTableWidget):
         self.removeRow(row)
         # 移除行后，需要重新构建序号
         self.resort_row(row)
+        # 删除行后，重新计算表头复选框状态
+        self.header_widget.calculate_header_check_state()
 
     def resort_row(self, row=0):
         for row_index in range(row, self.rowCount()):
@@ -133,5 +135,7 @@ class CustomTableWidget(AbstractTableWidget):
         for row_index in reversed(range(self.rowCount())):
             if self.cellWidget(row_index, 0).check_box.checkState():
                 self.removeRow(row_index)
+        # 行序号重排序
         self.resort_row()
+        # 删除行后，重新计算表头复选框状态
         self.header_widget.calculate_header_check_state()

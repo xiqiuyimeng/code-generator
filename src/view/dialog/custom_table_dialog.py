@@ -95,7 +95,11 @@ class CustomTableDialog(CustomDialog):
     def get_del_executor(self, row_id, item_name, row_index, del_title) -> LoadingMaskThreadExecutor: ...
 
     def set_del_btn_available(self, checked):
-        self.del_row_button.setDisabled(not checked)
+        # 如果表格存在行，删除按钮状态根据传入状态变化，否则应该置为不可用
+        if self.table_widget.rowCount():
+            self.del_row_button.setDisabled(not checked)
+        else:
+            self.del_row_button.setDisabled(True)
 
     def del_rows(self):
         # 收集所有选中项数据，进行删除
