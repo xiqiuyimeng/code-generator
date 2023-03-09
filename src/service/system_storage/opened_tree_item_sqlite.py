@@ -10,7 +10,7 @@ _date_ = '2022/10/2 9:31'
 
 table_name = 'opened_tree_item'
 
-opened_item_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     item_name char(100) default null,
@@ -80,7 +80,7 @@ class CheckedEnum(Enum):
 class OpenedTreeItemSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, opened_item_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def open_item(self, opened_item_id):
         opened_item = OpenedTreeItem()
@@ -205,6 +205,6 @@ class OpenedTreeItemSqlite(SqliteBasic):
 
     @staticmethod
     def get_max_level(ds_category):
-        max_level_sql = f'{opened_item_sql_dict.get("max_level")}"{ds_category}"'
+        max_level_sql = f'{sql_dict.get("max_level")}"{ds_category}"'
         result = get_db_conn().query(max_level_sql).as_dict()
         return result[0].get('max_level') if result else -1

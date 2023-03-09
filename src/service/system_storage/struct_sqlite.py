@@ -10,7 +10,7 @@ _date_ = '2022/11/11 16:49'
 
 table_name = 'struct_info'
 
-struct_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     opened_item_id integer not null,
@@ -49,20 +49,20 @@ class StructInfo(BasicSqliteDTO):
 class StructSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, struct_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def select_list(self):
-        rows = self._do_select(struct_sql_dict.get('select_list'), StructInfo())
+        rows = self._do_select(sql_dict.get('select_list'), StructInfo())
         return list(map(lambda x: StructInfo(**x), rows.all()))
 
     def delete_by_opened_item_id(self, opened_item_id):
-        sql = f"{struct_sql_dict.get('delete_by_opened_item_id')}{opened_item_id}"
+        sql = f"{sql_dict.get('delete_by_opened_item_id')}{opened_item_id}"
         get_db_conn().query(sql)
         log.info(f'删除[{self.table_name}]语句 ==> {sql}')
 
     def delete_by_opened_item_ids(self, opened_item_ids):
         opened_item_id_list = ", ".join(map(lambda x: str(x), opened_item_ids))
-        sql = f"{struct_sql_dict.get('delete_by_opened_item_ids')}({opened_item_id_list})"
+        sql = f"{sql_dict.get('delete_by_opened_item_ids')}({opened_item_id_list})"
         get_db_conn().query(sql)
         log.info(f'删除[{self.table_name}]语句 ==> {sql}')
 

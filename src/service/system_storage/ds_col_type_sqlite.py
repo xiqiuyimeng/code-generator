@@ -12,7 +12,7 @@ _date_ = '2023/2/12 19:28'
 
 table_name = 'ds_col_type'
 
-ds_col_type_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     ds_col_type char(20) not null,
@@ -43,7 +43,7 @@ class DsColType(BasicSqliteDTO):
 class DsColTypeSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, ds_col_type_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def get_all_ds_col_types(self):
         ds_col_types = self.select(DsColType(), order_by='parent_id')
@@ -64,7 +64,7 @@ class DsColTypeSqlite(SqliteBasic):
 
     @transactional
     def truncate_table(self):
-        truncate_sql = ds_col_type_sql_dict.get('truncate')
+        truncate_sql = sql_dict.get('truncate')
         get_db_conn().query(truncate_sql)
         # 将id 生成器重置
         update_id_generator(table_name)
@@ -109,7 +109,7 @@ class DsColTypeSqlite(SqliteBasic):
             dff_set = col_types - exists_col_type_set
             if dff_set:
                 # 移除当前数据源类型下所有列类型
-                delete_children_sql = ds_col_type_sql_dict.get('delete_children')
+                delete_children_sql = sql_dict.get('delete_children')
                 get_db_conn().query(delete_children_sql, **{'parent_id': ds_type_obj.id})
                 # 批量插入：新的列类型 + 已经存在的列类型，这样可以进行排序
                 all_col_types = sorted(col_types | exists_col_type_set)
@@ -118,7 +118,7 @@ class DsColTypeSqlite(SqliteBasic):
 
     def get_ds_types(self):
         log.info(f'查询{self.table_name}中所有数据源类型')
-        sql = ds_col_type_sql_dict.get('get_ds_type')
+        sql = sql_dict.get('get_ds_type')
         ds_type_rows = get_db_conn().query(sql)
         return list(map(lambda x: DsColType(**x), ds_type_rows.as_dict()))
 
@@ -127,5 +127,5 @@ class DsColTypeSqlite(SqliteBasic):
         self.batch_delete(ds_type_ids)
         # 再删除列类型
         parent_ids = ','.join(map(lambda x: str(x), ds_type_ids))
-        delete_col_type_sql = f"{ds_col_type_sql_dict.get('delete_children_by_parent_ids')}({parent_ids})"
+        delete_col_type_sql = f"{sql_dict.get('delete_children_by_parent_ids')}({parent_ids})"
         get_db_conn().query(delete_col_type_sql)

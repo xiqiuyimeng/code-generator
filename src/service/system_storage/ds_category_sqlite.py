@@ -10,7 +10,7 @@ _date_ = '2022/9/15 17:43'
 
 table_name = 'ds_category'
 
-ds_category_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     name char(10) not null,
@@ -53,11 +53,11 @@ class DsCategoryEnum(Enum):
 class DsCategorySqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, ds_category_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     @staticmethod
     def drop_table():
-        get_db_conn().query(ds_category_sql_dict.get('drop'))
+        get_db_conn().query(sql_dict.get('drop'))
 
     @transactional
     def switch_ds_category(self, target_ds_category):

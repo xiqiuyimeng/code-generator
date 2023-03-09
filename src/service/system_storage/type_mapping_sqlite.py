@@ -9,7 +9,7 @@ _date_ = '2023/2/12 11:46'
 
 table_name = 'type_mapping'
 
-type_mapping_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     mapping_name char(50) not null,
@@ -44,7 +44,7 @@ class TypeMapping(BasicSqliteDTO):
 class TypeMappingSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, type_mapping_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def save_type_mapping(self, type_mapping):
         type_mapping.item_order = self.get_max_order()

@@ -12,7 +12,7 @@ _date_ = '2022/5/11 10:26'
 
 table_name = 'sql_connection'
 
-conn_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     conn_name char(50) not null,
@@ -53,8 +53,8 @@ class SqlConnection(BasicSqliteDTO):
 class ConnSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, conn_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def get_conn_id_types(self):
-        rows = self._do_select(conn_sql_dict.get('select_id_type'), SqlConnection())
+        rows = self._do_select(sql_dict.get('select_id_type'), SqlConnection())
         return list(map(lambda x: SqlConnection(**x), rows.as_dict()))

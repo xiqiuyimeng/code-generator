@@ -12,7 +12,7 @@ _date_ = '2022/10/8 12:30'
 
 table_name = 'ds_table_tab'
 
-ds_table_tab_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     parent_opened_id integer not null,
@@ -58,7 +58,7 @@ class CurrentEnum(Enum):
 class DsTableTabSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, ds_table_tab_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def add_tab(self, opened_table_item):
         self.change_other_not_current(opened_table_item.ds_category)
@@ -94,7 +94,7 @@ class DsTableTabSqlite(SqliteBasic):
     def remove_tab(self, tab):
         self.delete(tab.id)
         # 调整order，找出排序在删除项之后的，向前整体移动一位
-        move_order_forward_sql = ds_table_tab_sql_dict.get('move_order_forward')
+        move_order_forward_sql = sql_dict.get('move_order_forward')
         param = {
             'item_order': tab.item_order,
             'ds_category': tab.ds_category
@@ -105,6 +105,6 @@ class DsTableTabSqlite(SqliteBasic):
 
     @staticmethod
     def select_by_opened_ids(opened_ids):
-        sql = f"{ds_table_tab_sql_dict.get('select_by_opened_ids')} ({', '.join(opened_ids)})"
+        sql = f"{sql_dict.get('select_by_opened_ids')} ({', '.join(opened_ids)})"
         rows = get_db_conn().query(sql)
         return list(map(lambda x: DsTableTab(**x), rows.as_dict()))

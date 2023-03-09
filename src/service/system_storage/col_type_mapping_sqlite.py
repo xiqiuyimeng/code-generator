@@ -9,7 +9,7 @@ _date_ = '2023/2/12 11:46'
 
 table_name = 'col_type_mapping'
 
-type_mapping_col_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     ds_col_type char(20) not null,
@@ -49,7 +49,7 @@ class ColTypeMapping(BasicSqliteDTO):
 class ColTypeMappingSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, type_mapping_col_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def get_by_parent_id(self, parent_id):
         param = ColTypeMapping()
@@ -75,6 +75,6 @@ class ColTypeMappingSqlite(SqliteBasic):
 
     def delete_by_parent_ids(self, parent_ids):
         ids_str = ','.join(map(lambda x: str(x), parent_ids))
-        sql = f"{type_mapping_col_sql_dict.get('delete_by_parent_ids')} ({ids_str})"
+        sql = f"{sql_dict.get('delete_by_parent_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据parent_id: {parent_ids} 删除')

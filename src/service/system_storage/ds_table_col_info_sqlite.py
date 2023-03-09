@@ -12,7 +12,7 @@ _date_ = '2022/10/8 12:32'
 
 table_name = 'ds_table_col_info'
 
-ds_table_col_info_sql_dict = {
+sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer PRIMARY KEY autoincrement,
     col_name char(50) not null,
@@ -92,7 +92,7 @@ class DsTableColInfo(BasicSqliteDTO):
 class DsTableColInfoSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, ds_table_col_info_sql_dict)
+        super().__init__(table_name, sql_dict)
 
     def save_cols(self, columns, parent_tab_id, check_state, ds_type,
                   parent_id=None, ds_col_type_sqlite=None):
@@ -118,14 +118,14 @@ class DsTableColInfoSqlite(SqliteBasic):
 
     @staticmethod
     def delete_by_parent_tab_id(parent_tab_id):
-        delete_sql = f"{ds_table_col_info_sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
+        delete_sql = f"{sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
         get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")
 
     @staticmethod
     def delete_by_parent_tab_ids(parent_tab_ids):
         parent_tab_id_list = ", ".join(map(lambda x: str(x), parent_tab_ids))
-        delete_sql = f"{ds_table_col_info_sql_dict.get('delete_by_parent_tab_ids')}({parent_tab_id_list})"
+        delete_sql = f"{sql_dict.get('delete_by_parent_tab_ids')}({parent_tab_id_list})"
         get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")
 
