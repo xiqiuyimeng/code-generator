@@ -206,7 +206,11 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         self.del_mapping_group_button.clicked.connect(self.col_type_table_widget.del_type_mapping_group)
 
     def set_del_mapping_button_available(self, checked):
-        self.del_mapping_button.setDisabled(not checked)
+        # 当表格存在行，再动态渲染删除映射按钮状态，否则置为不可用
+        if self.col_type_table_widget.rowCount():
+            self.del_mapping_button.setDisabled(not checked)
+        else:
+            self.del_mapping_button.setDisabled(True)
 
     def set_del_mapping_group_button_available(self, max_group_num):
         # 删除类型映射组按钮，根据是否存在额外组来决定
