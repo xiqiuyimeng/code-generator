@@ -51,6 +51,26 @@ class CustomTableDialog(CustomDialog):
 
     def make_table_widget(self): ...
 
+    def setup_other_button(self):
+        # 第一个按钮位置，如果没有返回按钮，那么就将添加按钮移动到第一个按钮的位置
+        first_button = self.setup_first_button()
+        if first_button:
+            self.button_layout.addWidget(first_button, 0, 0, 1, 1)
+
+            self.add_row_button = QPushButton(self.frame)
+            self.button_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
+
+            self.button_layout.addWidget(self.placeholder_blank, 0, 2, 1, 1)
+        else:
+            self.add_row_button = QPushButton(self.frame)
+            self.button_layout.addWidget(self.add_row_button, 0, 0, 1, 1)
+
+            self.button_layout.addWidget(self.placeholder_blank, 0, 2, 1, 2)
+        self.del_row_button = QPushButton(self.frame)
+        self.button_layout.addWidget(self.del_row_button, 0, 3, 1, 1)
+
+    def setup_first_button(self) -> QPushButton: ...
+
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #

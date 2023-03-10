@@ -30,15 +30,9 @@ class TypeMappingDialog(CustomTableDialog):
     def make_table_widget(self):
         self.table_widget = TypeMappingTableWidget(self.table_frame)
 
-    def setup_other_button(self):
+    def setup_first_button(self) -> QPushButton:
         self.open_ds_col_type_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.open_ds_col_type_button, 0, 0, 1, 1)
-        self.add_row_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
-
-        self.button_layout.addWidget(self.placeholder_blank, 0, 2, 1, 1)
-        self.del_row_button = QPushButton(self.frame)
-        self.button_layout.addWidget(self.del_row_button, 0, 3, 1, 1)
+        return self.open_ds_col_type_button
 
     def setup_other_label_text(self):
         self.open_ds_col_type_button.setText(DS_COL_TYPE_BUTTON_TEXT)
