@@ -51,8 +51,8 @@ class CustomStackedWidgetDialog(NameCheckDialog):
         self.stacked_widget = QStackedWidget(self.frame)
         self.stacked_layout.addWidget(self.stacked_widget)
 
-        self.stacked_layout.setStretch(0, 1)
-        self.stacked_layout.setStretch(1, 5)
+        self.stacked_layout.setStretch(0, 3)
+        self.stacked_layout.setStretch(1, 20)
 
         # 填充右侧堆栈式窗口
         self.fill_stacked_widget()
