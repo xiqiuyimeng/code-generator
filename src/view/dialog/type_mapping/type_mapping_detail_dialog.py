@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QLabel, QFormLayout, QTextEdit, QHBoxLayout, QWidget, \
-    QVBoxLayout, QGridLayout, QPushButton, QSpacerItem, QFrame
+from PyQt5.QtWidgets import QLabel, QFormLayout, QTextEdit, QHBoxLayout, QWidget, QVBoxLayout, \
+    QGridLayout, QPushButton, QSpacerItem, QFrame
 
 from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_TITLE, TYPE_MAPPING_NAME, DS_TYPE_TEXT, \
     TYPE_MAPPING_COMMENT_TEXT, TYPE_MAPPING_INFO_TEXT, TYPE_MAPPING_COL_TABLE_TEXT, SYNC_DS_COL_TYPE_BTN_TEXT, \
@@ -32,7 +32,7 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         self.dialog_data: TypeMapping = ...
         self.new_dialog_data: TypeMapping = ...
 
-        # 类型映射信息控件
+        # 第一个窗口，类型映射信息窗口
         self.mapping_info_widget: QWidget = ...
         self.mapping_info_layout: QVBoxLayout = ...
         # 基本信息输入表单的布局
@@ -46,7 +46,7 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         self.type_mapping_comment_label: QLabel = ...
         self.type_mapping_comment_text_edit: QTextEdit = ...
 
-        # 列类型映射表格父控件
+        # 第二个窗口，列类型映射表格窗口
         self.col_type_widget: QWidget = ...
         self.col_type_layout: QVBoxLayout = ...
         # 数据源列类型映射表格上方按钮区布局
@@ -97,18 +97,17 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         self.mapping_info_layout = QVBoxLayout()
         self.mapping_info_widget.setLayout(self.mapping_info_layout)
         # 基本信息输入表单
-        self.setup_type_mapping_info_ui()
+        self.setup_mapping_info_widget()
 
         # 第二个窗口，类型映射列类型表格
         self.col_type_widget = QWidget(self.frame)
         self.stacked_widget.addWidget(self.col_type_widget)
         self.col_type_layout = QVBoxLayout()
         self.col_type_widget.setLayout(self.col_type_layout)
-
         # 类型映射，列类型表格
         self.setup_col_type_widget()
 
-    def setup_type_mapping_info_ui(self):
+    def setup_mapping_info_widget(self):
         # 构建映射名称输入表单
         self.setup_name_form()
         self.type_mapping_info_layout = QHBoxLayout()
@@ -188,7 +187,6 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
 
     def connect_child_signal(self):
         self.ds_type_combo_box.currentIndexChanged.connect(self.check_input)
-        self.type_mapping_comment_text_edit.textChanged.connect(self.check_input)
         # 连接表格信号，动态渲染删除类型映射按钮状态
         self.col_type_table_widget.header_check_changed.connect(self.set_del_mapping_button_available)
         # 连接表头信号，动态渲染删除类型映射组按钮状态

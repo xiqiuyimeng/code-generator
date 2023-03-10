@@ -3,9 +3,8 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QAbstractItemView, QToolButton, QMenu, QAction, QHeaderView
 
 from src.constant.icon_enum import get_icon
-from src.constant.table_constant import ROW_OPERATION_ICON, \
-    ROW_OPERATION_TEXT, ROW_CAT_EDIT_TEXT, ROW_CAT_EDIT_ICON, ROW_DEL_TEXT, \
-    ROW_DEL_ICON, OPERATION_HEADER_LABEL
+from src.constant.table_constant import ROW_OPERATION_ICON, ROW_OPERATION_TEXT, ROW_CAT_EDIT_TEXT, \
+    ROW_CAT_EDIT_ICON, ROW_DEL_TEXT, ROW_DEL_ICON, OPERATION_HEADER_LABEL
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
@@ -21,9 +20,9 @@ class CustomTableWidget(AbstractTableWidget):
     row_del_signal = pyqtSignal(int, int, str)
 
     def __init__(self, header_labels, *args):
-        self.header_labels = header_labels
-        # 添加上最后一列，操作列
-        self.header_labels.append(OPERATION_HEADER_LABEL)
+        # 添加上最后一列，操作列，这里不能对 header_labels 直接 append，
+        # 因为引用的是同一个列表，如果直接添加的话，会导致原数据的变化，打开多次表，产生多个操作列。
+        self.header_labels = [*header_labels, OPERATION_HEADER_LABEL]
         # 表头控件
         self.header_widget: CheckBoxHeader = ...
         super().__init__(*args)
@@ -58,8 +57,7 @@ class CustomTableWidget(AbstractTableWidget):
 
     def _do_add_row(self, row_data, row_index):
         self.insert_row(row_index)
-        checkbox_num_widget = make_checkbox_num_widget(row_index + 1,
-                                                       self.header_widget.calculate_header_check_state)
+        checkbox_num_widget = make_checkbox_num_widget(row_index + 1, self.header_widget.calculate_header_check_state)
         order_item = checkbox_num_widget.check_label
         setattr(order_item, 'row_id', row_data.id)
         self.setCellWidget(row_index, 0, checkbox_num_widget)
