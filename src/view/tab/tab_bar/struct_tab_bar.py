@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from src.view.tab.tab_bar.tab_bar import TabBar
+from src.view.tab.tab_bar.tab_bar import DsTabBar
 
 _author_ = 'luwt'
 _date_ = '2022/12/7 12:40'
 
 
-class StructTabBar(TabBar):
+class StructTabBar(DsTabBar):
 
     def partially_checked_table_prompt(self, tab_widget) -> str:
         return f'表：{tab_widget.tree_item.text(0)}'

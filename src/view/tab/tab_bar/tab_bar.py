@@ -4,7 +4,8 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
 
 from src.constant.tab_constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
-    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, TABLE_CLOSE_WITH_REFRESHING
+    CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, TABLE_CLOSE_WITH_REFRESHING, \
+    RIGHT_CLICK_MENU_NAMES
 from src.constant.tree_constant import CLOSE_TABLE_BOX_TITLE
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab
 from src.view.box.message_box import pop_fail
@@ -14,17 +15,12 @@ _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'
 
 
-class TabBar(QTabBar):
+class AbstractTabBar(QTabBar):
 
-    remove_tab_signal = pyqtSignal(DsTableTab)
-
-    def __init__(self, parent: QTabWidget, main_window):
+    def __init__(self, parent: QTabWidget):
         """tab bar index按照从左到右变大的顺序,0,1,2..."""
         super().__init__(parent=parent)
         self.parent = parent
-        self.main_window = main_window
-        self.is_moving = False
-        self.current_changed = False
         # tab_bar在tab页过多时，开启滚动按钮
         self.setUsesScrollButtons(True)
         # 选项卡增加关闭按钮
@@ -38,19 +34,6 @@ class TabBar(QTabBar):
         self.customContextMenuRequested.connect(self.right_click_menu)
         # 关闭选项卡事件
         self.tabCloseRequested.connect(self.close_current_tab)
-
-    def mousePressEvent(self, event):
-        # 如果按下了鼠标左键，将标志位设置为true
-        if event.button() == Qt.LeftButton:
-            self.is_moving = True
-        super().mousePressEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        if hasattr(self, "is_moving"):
-            # 鼠标按键松开，恢复标志位
-            self.is_moving = False
-            self.sort_tab()
-        super().mouseReleaseEvent(event)
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         # 当事件的对象是tab bar时，并且是气泡提示事件
@@ -66,10 +49,8 @@ class TabBar(QTabBar):
     def right_click_menu(self, pos):
         """tab bar弹出右键菜单"""
         index = self.tabAt(pos)
-        menu_names = [CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS,
-                      CLOSE_TABS_TO_THE_LEFT, CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX]
         menu = QMenu()
-        [menu.addAction(QAction(option, menu)) for option in menu_names]
+        [menu.addAction(QAction(option, menu)) for option in RIGHT_CLICK_MENU_NAMES]
         # 右键菜单点击事件
         menu.triggered.connect(lambda action: self.handle_menu_func(action, index))
         # 右键菜单弹出位置跟随焦点位置
@@ -91,10 +72,12 @@ class TabBar(QTabBar):
             # 当前页置顶
             self.setCurrentIndex(index)
 
+    def check_tab_allow_close(self, *args) -> bool:
+        # 检查是否允许关闭
+        return True
+
     def close_current_tab(self, index):
-        # 检查表的选中状态
-        if self.table_allow_close((index,)):
-            # 删除当前tab
+        if self.check_tab_allow_close((index, )):
             self.remove_tab(index)
 
     def close_other_tabs(self, index):
@@ -102,7 +85,7 @@ class TabBar(QTabBar):
         left_index_list = list(range(0, index))
         # 右侧的index
         right_index_list = list(range(index + 1, self.count()))
-        if self.table_allow_close((*left_index_list, *right_index_list)):
+        if self.check_tab_allow_close((*left_index_list, *right_index_list)):
             # 删除其他tab，先删除右边的，因为在删除的过程中，index会发生变化，所以要从大到小删除
             [self.remove_tab(idx) for idx in reversed(right_index_list)]
             # 再删除左边的
@@ -110,25 +93,51 @@ class TabBar(QTabBar):
 
     def close_all_tabs(self):
         index_list = range(0, self.count())
-        # 删除所有tab
-        if self.table_allow_close(index_list):
+        if self.check_tab_allow_close(index_list):
+            # 删除所有tab
             [self.remove_tab(idx) for idx in reversed(index_list)]
 
     def close_tabs_to_left(self, index):
         # 左侧的index
         left_index_list = range(0, index)
-        # 关闭标签页左边所有tab
-        if self.table_allow_close(left_index_list):
+        if self.check_tab_allow_close(left_index_list):
+            # 关闭标签页左边所有tab
             [self.remove_tab(idx) for idx in reversed(left_index_list)]
 
     def close_tabs_to_right(self, index):
         # 右侧的index
         right_index_list = range(index + 1, self.count())
-        # 关闭标签页右边所有tab
-        if self.table_allow_close(right_index_list):
+        if self.check_tab_allow_close(right_index_list):
+            # 关闭标签页右边所有tab
             [self.remove_tab(idx) for idx in reversed(right_index_list)]
 
-    def table_allow_close(self, indexes):
+    def remove_tab(self, index):
+        self.parent.removeTab(index)
+
+
+class DsTabBar(AbstractTabBar):
+    remove_tab_signal = pyqtSignal(DsTableTab)
+
+    def __init__(self, parent: QTabWidget, main_window):
+        self.main_window = main_window
+        self.is_moving = False
+        self.current_changed = False
+        super().__init__(parent=parent)
+
+    def mousePressEvent(self, event):
+        # 如果按下了鼠标左键，将标志位设置为true
+        if event.button() == Qt.LeftButton:
+            self.is_moving = True
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if hasattr(self, "is_moving"):
+            # 鼠标按键松开，恢复标志位
+            self.is_moving = False
+            self.sort_tab()
+        super().mouseReleaseEvent(event)
+
+    def check_tab_allow_close(self, indexes):
         """根据索引，检查表是否都可以关闭，检查规则是：是否存在部分选中的表，如果部分选中则不可关闭，正在刷新的表也不可关闭"""
         partially_checked_tables, refreshing_tables = list(), list()
         for index in indexes:

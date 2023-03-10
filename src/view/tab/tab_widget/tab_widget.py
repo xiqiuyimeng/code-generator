@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QTabWidget
 from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.view.tab.tab_bar.sql_tab_bar import SqlTabBar
 from src.view.tab.tab_bar.struct_tab_bar import StructTabBar
-from src.view.tab.tab_bar.tab_bar import TabBar
+from src.view.tab.tab_bar.tab_bar import DsTabBar
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:37'
@@ -27,7 +27,7 @@ class TabWidget(QTabWidget):
     def get_current_widget(self):
         return self.currentWidget()
 
-    def get_tab_bar(self, window) -> TabBar: ...
+    def get_tab_bar(self, window) -> DsTabBar: ...
 
     def connect_signal(self):
         # 删除tab页信号
@@ -38,12 +38,12 @@ class TabWidget(QTabWidget):
 
 class SqlTabWidget(TabWidget):
 
-    def get_tab_bar(self, window) -> TabBar:
+    def get_tab_bar(self, window) -> DsTabBar:
         return SqlTabBar(self, window)
 
 
 class StructTabWidget(TabWidget):
 
-    def get_tab_bar(self, window) -> TabBar:
+    def get_tab_bar(self, window) -> DsTabBar:
         return StructTabBar(self, window)
 
