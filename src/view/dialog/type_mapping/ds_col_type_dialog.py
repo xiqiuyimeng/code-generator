@@ -5,7 +5,7 @@ from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_LIST_TITLE, DS
     ADD_DS_COL_TYPE_BUTTON_TEXT, ADD_COL_TYPE_LIST_TITLE, ADD_DS_COL_TYPE_TITLE, SAVE_DATA_TIPS
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor, SaveDsColTypeExecutor
 from src.view.dialog.custom_save_dialog import CustomSaveDialog
-from src.view.dialog.type_mapping.save_ds_col_type_dialog import SaveDsColTypeDialog
+from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
 from src.view.list_widget.col_type_list_widget import ColTypeListWidget
 from src.view.list_widget.ds_type_list_widget import DsTypeListWidget
 
@@ -30,7 +30,7 @@ class DsColTypeDialog(CustomSaveDialog):
         self.stacked_widget: QStackedWidget = ...
         self.ds_type_list_widget: DsTypeListWidget = ...
         # 添加编辑数据源列类型项对话框
-        self.save_ds_col_type_dialog: SaveDsColTypeDialog = ...
+        self.save_ds_col_type_dialog: SimpleNameCheckDialog = ...
         # 为了美观，将表格布局扩大，容纳5个元素，中间为空白占位label
         super().__init__(screen_rect, DS_COL_TYPE_LIST_TITLE, quit_button_row_index=4)
 
@@ -77,14 +77,12 @@ class DsColTypeDialog(CustomSaveDialog):
     def open_save_col_type_dialog(self, dialog_title, col_type=None):
         current_ds_type = self.ds_type_list_widget.currentItem().text()
         # 打开添加数据源列类型对话框
-        self.save_ds_col_type_dialog = SaveDsColTypeDialog(self.parent_screen_rect,
-                                                           dialog_title,
-                                                           self.ds_col_type_dict.get(current_ds_type),
-                                                           col_type)
+        self.save_ds_col_type_dialog = SimpleNameCheckDialog(self.parent_screen_rect, dialog_title,
+                                                             self.ds_col_type_dict.get(current_ds_type), col_type)
         if col_type:
-            self.save_ds_col_type_dialog.edit_col_type_signal.connect(self.edit_ds_col_type)
+            self.save_ds_col_type_dialog.edit_name_signal.connect(self.edit_ds_col_type)
         else:
-            self.save_ds_col_type_dialog.add_col_type_signal.connect(self.add_ds_col_type)
+            self.save_ds_col_type_dialog.add_name_signal.connect(self.add_ds_col_type)
         self.save_ds_col_type_dialog.exec()
 
     def edit_ds_col_type(self, col_type):
