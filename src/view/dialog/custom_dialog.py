@@ -48,6 +48,8 @@ class CustomDialog(DraggableDialog):
         # self.setAttribute(Qt.WA_TranslucentBackground, True)
 
         self.dialog_layout = QVBoxLayout(self)
+        self.dialog_layout.setContentsMargins(0, 0, 0, 0)
+        self.dialog_layout.setSpacing(0)
         self.frame = QFrame(self)
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)

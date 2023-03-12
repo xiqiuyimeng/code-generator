@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         self.main_layout = QVBoxLayout(self.main_widget)
         # 设置所有间距为0
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(10, 0, 0, 0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         self.init_bars()
 

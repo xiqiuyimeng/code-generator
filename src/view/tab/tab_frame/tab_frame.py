@@ -27,6 +27,7 @@ class AbstractTabFrame(QFrame):
         self.setObjectName('tab_frame')
 
         self._layout = QVBoxLayout(self)
+        self._layout.setContentsMargins(0, 0, 0, 0)
 
         self.tab_widget = self.get_tab_widget(window)
         self.tab_widget.setObjectName("tab_widget")

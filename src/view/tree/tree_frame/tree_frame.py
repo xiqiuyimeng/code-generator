@@ -31,6 +31,7 @@ class AbstractTreeFrame(QFrame):
         self.setObjectName('tree_frame')
 
         self._layout = QVBoxLayout(self)
+        self._layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout = QHBoxLayout()
         self._layout.addLayout(self.header_layout)
 
