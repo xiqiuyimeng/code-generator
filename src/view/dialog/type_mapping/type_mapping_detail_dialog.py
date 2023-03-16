@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QLabel, QFormLayout, QTextEdit, QHBoxLayout, QWidget, QVBoxLayout, \
+from PyQt5.QtWidgets import QLabel, QFormLayout, QHBoxLayout, QWidget, QVBoxLayout, \
     QGridLayout, QPushButton, QSpacerItem, QFrame
 
 from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_TITLE, TYPE_MAPPING_NAME, DS_TYPE_TEXT, \
@@ -16,6 +16,7 @@ from src.service.async_func.async_type_mapping_task import ReadTypeMappingExecut
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.ds_type_combo_box import DsTypeComboBox
+from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.custom_stacked_widget_dialog import CustomStackedWidgetDialog
 from src.view.table.table_widget.type_mapping_table_widget.col_type_mapping_table_widget import \
     ColTypeMappingTableWidget
@@ -44,7 +45,7 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         # 数据源类型映射备注输入布局
         self.type_mapping_comment_layout: QFormLayout = ...
         self.type_mapping_comment_label: QLabel = ...
-        self.type_mapping_comment_text_edit: QTextEdit = ...
+        self.type_mapping_comment_text_edit: TextEditor = ...
 
         # 第二个窗口，列类型映射表格窗口
         self.col_type_widget: QWidget = ...
@@ -126,7 +127,7 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         # 备注文本输入框
         self.type_mapping_comment_layout = QFormLayout()
         self.type_mapping_comment_label = QLabel(self.frame)
-        self.type_mapping_comment_text_edit = QTextEdit(self.frame)
+        self.type_mapping_comment_text_edit = TextEditor(self.frame)
         self.type_mapping_comment_layout.addRow(self.type_mapping_comment_label,
                                                 self.type_mapping_comment_text_edit)
         self.mapping_info_layout.addLayout(self.type_mapping_comment_layout)

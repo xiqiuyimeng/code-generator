@@ -100,7 +100,8 @@ class NameCheckDialog(CustomSaveDialog):
             self.name_input.setStyleSheet(read_qss())
             self.name_checker.setStyleSheet(read_qss())
             self.name_checker.setText('')
-            self.name_input.removeAction(self.name_check_action)
+            if self.name_check_action is not Ellipsis:
+                self.name_input.removeAction(self.name_check_action)
 
     def check_available(self, name):
         if self.old_name:

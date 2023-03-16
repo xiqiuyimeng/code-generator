@@ -13,7 +13,8 @@ from src.service.async_func.async_struct_task import ReadFileExecutor, AddStruct
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_sqlite import StructInfo
 from src.service.system_storage.struct_type import StructType
-from src.view.custom_widget.scrollable_widget import ScrollableTextEdit
+from src.view.custom_widget.syntax_highlighter.abstract_syntax_highlighter import AbstractSyntaxHighLighter
+from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
 
 _author_ = 'luwt'
@@ -38,7 +39,8 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_file_url_linedit: QLineEdit = ...
         self.struct_file_action: QAction = ...
         self.struct_text_label: QLabel = ...
-        self.struct_text_input: ScrollableTextEdit = ...
+        self.struct_text_input: TextEditor = ...
+        self.struct_text_syntax_highlighter: AbstractSyntaxHighLighter = ...
         self.pretty_button: QPushButton = ...
 
         self.read_file_executor: ReadFileExecutor = ...
@@ -81,8 +83,13 @@ class AbstractStructDialog(AbstractDsInfoDialog):
 
         # 结构体内容文本框
         self.struct_text_label = QLabel(self.frame)
-        self.struct_text_input = ScrollableTextEdit(self.frame)
+        self.struct_text_input = TextEditor(self.frame)
+        # 构建语法高亮器
+        self.struct_text_syntax_highlighter = self.get_syntax_highlighter()
+        self.struct_text_syntax_highlighter.setDocument(self.struct_text_input.document())
         self.ds_info_layout.addRow(self.struct_text_label, self.struct_text_input)
+
+    def get_syntax_highlighter(self) -> AbstractSyntaxHighLighter: ...
 
     def setup_other_button(self):
         # 按钮部分

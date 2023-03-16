@@ -69,3 +69,5 @@ class ScrollableTextEdit(QPlainTextEdit, ScrollableWidget):
             tc.insertText("    ")
             return
         super().keyPressEvent(e)
+        # 因为拦截了按键事件，所以需要再手动调用滚动部件的按键事件，实现shift 滚轮水平滚动
+        ScrollableWidget.keyPressEvent(self, e)

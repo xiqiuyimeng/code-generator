@@ -69,10 +69,7 @@ class DsColTypeDialog(CustomSaveDialog):
 
     def connect_other_signal(self):
         self.ds_type_list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
-        self.add_ds_col_type_button.clicked.connect(self.add_ds_type_item)
-
-    def add_ds_type_item(self):
-        self.open_save_col_type_dialog(ADD_DS_COL_TYPE_TITLE)
+        self.add_ds_col_type_button.clicked.connect(lambda: self.open_save_col_type_dialog(ADD_DS_COL_TYPE_TITLE))
 
     def open_save_col_type_dialog(self, dialog_title, col_type=None):
         current_ds_type = self.ds_type_list_widget.currentItem().text()
