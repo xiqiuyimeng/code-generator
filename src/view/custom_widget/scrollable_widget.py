@@ -71,3 +71,14 @@ class ScrollableTextEdit(QPlainTextEdit, ScrollableWidget):
         super().keyPressEvent(e)
         # 因为拦截了按键事件，所以需要再手动调用滚动部件的按键事件，实现shift 滚轮水平滚动
         ScrollableWidget.keyPressEvent(self, e)
+
+    def wheelEvent(self, e: QtGui.QWheelEvent):
+        """实现ctrl + 滚轮缩放功能"""
+        if e.modifiers() == Qt.ControlModifier:
+            if e.angleDelta().y() > 0:
+                # 放大
+                self.zoomIn()
+            else:
+                self.zoomOut()
+        else:
+            ScrollableWidget.wheelEvent(self, e)
