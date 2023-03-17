@@ -23,6 +23,8 @@ class CentralWidget(QWidget):
 
         # 竖直方向的分割器
         self.horizontal_splitter.setOrientation(Qt.Horizontal)
+        # 设置拉伸时，不覆盖子控件，也就是不会隐藏控件
+        self.horizontal_splitter.setChildrenCollapsible(False)
         self._layout.addWidget(self.horizontal_splitter)
 
         self.frame_dict = dict()
