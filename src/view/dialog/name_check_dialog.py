@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction
 
-from src.constant.dialog_constant import NAME_AVAILABLE, NAME_EXISTS, NAME_UNCHANGED_PROMPT, \
-    NAME_MAX_LENGTH_PLACEHOLDER_TEXT
-from src.constant.icon_enum import get_icon
+from src.constant.dialog_constant import NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
-from src.service.read_qrc.read_config import read_qss
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO
 from src.view.dialog.custom_save_dialog import CustomSaveDialog
+from src.view.dialog.dialog_func import set_name_input_style, reset_name_input_style
 
 _author_ = 'luwt'
 _date_ = '2022/11/22 9:02'
@@ -51,7 +49,6 @@ class NameCheckDialog(CustomSaveDialog):
         self.name_layout = QFormLayout()
 
         self.name_label = QLabel(self.frame)
-        self.name_label.setObjectName('name_label')
 
         self.name_input = QLineEdit(self.frame)
         self.name_input.setObjectName('name_input')
@@ -74,34 +71,14 @@ class NameCheckDialog(CustomSaveDialog):
         self.connect_child_signal()
 
     def check_name_available(self, name):
+        if self.name_check_action is Ellipsis:
+            self.name_check_action = QAction()
         if name:
             self.name_available = self.check_available(name)
-            if self.name_available:
-                # 如果名称无变化，提示
-                if self.old_name == name:
-                    prompt = NAME_UNCHANGED_PROMPT
-                else:
-                    prompt = NAME_AVAILABLE.format(name)
-                style = "color:green"
-                # 重载样式表
-                self.name_input.setStyleSheet(read_qss())
-                icon = get_icon(NAME_AVAILABLE)
-            else:
-                prompt = NAME_EXISTS.format(name)
-                style = "color:red"
-                self.name_input.setStyleSheet("#name_input{border-color:red;color:red}")
-                icon = get_icon(NAME_EXISTS)
-            self.name_check_action = QAction()
-            self.name_check_action.setIcon(icon)
-            self.name_input.addAction(self.name_check_action, QLineEdit.ActionPosition.TrailingPosition)
-            self.name_checker.setText(prompt)
-            self.name_checker.setStyleSheet(style)
+            set_name_input_style(self.name_available, name, self.old_name, 'name_input',
+                                 self.name_input, self.name_check_action, self.name_checker)
         else:
-            self.name_input.setStyleSheet(read_qss())
-            self.name_checker.setStyleSheet(read_qss())
-            self.name_checker.setText('')
-            if self.name_check_action is not Ellipsis:
-                self.name_input.removeAction(self.name_check_action)
+            reset_name_input_style(self.name_input, self.name_checker, self.name_check_action)
 
     def check_available(self, name):
         if self.old_name:
