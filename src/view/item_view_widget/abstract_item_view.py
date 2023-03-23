@@ -13,10 +13,6 @@ class AbstractItemView(QAbstractItemView, ScrollableWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        # 设置接受拖入
-        self.setAcceptDrops(True)
-        # 设置开启拖拽
-        self.setDragEnabled(True)
         # 设置无边框
         self.setFrameShape(QFrame.NoFrame)
         # 统一设置图标大小
