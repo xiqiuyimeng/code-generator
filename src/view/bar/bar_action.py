@@ -10,7 +10,7 @@ from src.constant.icon_enum import get_icon
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.struct_type import StructTypeEnum
 from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh, \
-    open_type_mapping_dialog
+    open_type_mapping_dialog, open_template_dialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -81,6 +81,7 @@ def add_type_mapping_action(main_window):
 def add_template_action(main_window):
     template_action = QAction(get_icon(TEMPLATE_ACTION), TEMPLATE_ACTION, main_window)
     template_action.setStatusTip(TEMPLATE_ACTION_TIP)
+    template_action.triggered.connect(lambda: open_template_dialog(main_window))
     return template_action
 
 

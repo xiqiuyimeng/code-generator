@@ -19,3 +19,9 @@ DEL_ALL_ITEMS_PROMPT = '是否要删除当前列表中所有的{}？'
 
 COL_TYPE_NAME = '列类型'
 EDIT_DS_COL_TYPE_TITLE = '编辑数据源列类型'
+
+TEMPLATE_TYPE_NAME = '模板文件'
+EDIT_FILE_BOX_TITLE = '编辑模板文件'
+
+VALUE_RANGE_TYPE_NAME = '下拉列表值'
+EDIT_VALUE_RANGE_BOX_TITLE = '编辑下拉列表值'
