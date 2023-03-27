@@ -175,7 +175,13 @@ class StructDsColTableWidget(AbstractDsColTableWidget):
             child_table.batch_deal_checked(checked)
         # 当前列数据如果存在子项并且还没有创建子表，应该同步子项选中状态并保存
         elif not self.cols[row].has_child_table and self.cols[row].children:
-            self.batch_update_check_state(self.cols[row].children, checked)
+            # 递归处理
+            self.recursive_update_children_checked(self.cols[row].children, checked)
+
+    def recursive_update_children_checked(self, cols, checked):
+        self.batch_update_check_state(cols, checked)
+        [self.recursive_update_children_checked(cols[child_row].children, checked)
+         for child_row in range(len(cols)) if cols[child_row].children]
 
     def get_add_del_col_data(self, add_del_data, checked_cols):
         """根据选中数据获取表层次的数据，由于选择的列数据是最底层，所以需要依次推导出上一层节点，构造层次数据"""
