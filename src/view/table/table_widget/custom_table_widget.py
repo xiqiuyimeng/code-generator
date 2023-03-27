@@ -59,11 +59,12 @@ class CustomTableWidget(AbstractTableWidget):
         self.insert_row(row_index)
         checkbox_num_widget = make_checkbox_num_widget(row_index + 1, self.header_widget.calculate_header_check_state)
         order_item = checkbox_num_widget.check_label
-        setattr(order_item, 'row_id', row_data.id)
+        setattr(order_item, 'row_data', row_data)
         self.setCellWidget(row_index, 0, checkbox_num_widget)
         self.do_fill_row(row_index, row_data)
         # 最后一列添加操作按钮
-        self.setCellWidget(row_index, self.columnCount() - 1, self.make_operation_buttons(order_item, row_data.id))
+        row_id = row_data.id if row_data.id else -1
+        self.setCellWidget(row_index, self.columnCount() - 1, self.make_operation_buttons(order_item, row_id))
 
     def do_fill_row(self, row_index, row_data, fill_create_time=True): ...
 
@@ -114,9 +115,12 @@ class CustomTableWidget(AbstractTableWidget):
         for row_index in range(row, self.rowCount()):
             self.cellWidget(row_index, 0).check_label.setText(str(row_index + 1))
 
-    def edit_row(self, *args):
+    def edit_row(self, row_index, row_data):
         # 重新渲染数据
-        self.do_fill_row(*args, fill_create_time=False)
+        check_num_widget = self.cellWidget(row_index, 0)
+        order_item = check_num_widget.check_label
+        setattr(order_item, 'row_data', row_data)
+        self.do_fill_row(row_index, row_data, fill_create_time=False)
 
     def get_all_checked_id_names(self):
         checked_ids, checked_names = list(), list()
@@ -124,7 +128,7 @@ class CustomTableWidget(AbstractTableWidget):
             check_num_widget = self.cellWidget(row_idx, 0)
             # 如果选中，收集到列表中
             if check_num_widget.check_box.checkState():
-                checked_ids.append(int(check_num_widget.check_label.row_id))
+                checked_ids.append(int(check_num_widget.check_label.row_data.id))
                 checked_names.append(self.item(row_idx, 1).text())
         return checked_ids, checked_names
 

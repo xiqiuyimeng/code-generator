@@ -18,7 +18,7 @@ class ComboboxDelegate(QItemDelegate):
     def createEditor(self, parent: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex) -> QWidget:
         """创建编辑器，只有在编辑时才会触发，编辑器控件选择combox"""
         combox = QComboBox(parent)
-        [combox.addItem(value) for value in self.value_list]
+        combox.addItems(self.value_list)
         combox.setCurrentIndex(self.default_idx)
         return combox
 
