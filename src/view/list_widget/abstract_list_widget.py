@@ -14,6 +14,12 @@ class AbstractListWidget(SmartSearcherListWidget, AbstractItemView):
         super().__init__(*args)
         # 设置列表项间距
         self.setSpacing(5)
+
+
+class AbstractDraggableListWidget(AbstractListWidget):
+    
+    def __init__(self, *args):
+        super().__init__(*args)
         # 设置接受拖入
         self.setAcceptDrops(True)
         # 设置开启拖拽

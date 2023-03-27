@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QFormLayout, QHBoxLayout, QWidget, QVBoxLayout, \
-    QGridLayout, QPushButton, QSpacerItem, QFrame
+    QGridLayout, QPushButton, QFrame
 
 from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_TITLE, TYPE_MAPPING_NAME, DS_TYPE_TEXT, \
     TYPE_MAPPING_COMMENT_TEXT, TYPE_MAPPING_INFO_TEXT, TYPE_MAPPING_COL_TABLE_TEXT, SYNC_DS_COL_TYPE_BTN_TEXT, \
@@ -113,7 +113,7 @@ class TypeMappingDetailDialog(CustomStackedWidgetDialog):
         self.setup_name_form()
         self.type_mapping_info_layout = QHBoxLayout()
         self.type_mapping_info_layout.addLayout(self.name_layout)
-        self.type_mapping_info_layout.addSpacerItem(QSpacerItem(20, 1))
+        self.type_mapping_info_layout.addSpacing(50)
 
         # 构建数据源类型下拉框
         self.ds_type_combo_box_layout = QFormLayout()
