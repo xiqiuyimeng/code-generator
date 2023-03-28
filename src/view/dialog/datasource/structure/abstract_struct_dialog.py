@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QFileDialog, QPushButton
 
 from src.constant.ds_dialog_constant import STRUCTURE_NAME_TEXT, STRUCTURE_FILE_URL_TEXT, STRUCTURE_CONTENT_TEXT, \
@@ -187,6 +187,13 @@ class AbstractStructDialog(AbstractDsInfoDialog):
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
     # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.pretty_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def get_read_storage_executor(self, callback):
         return QueryStructExecutor(self.dialog_data, self, self, QUERY_STRUCT_BOX_TITLE, callback)
