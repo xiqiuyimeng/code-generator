@@ -180,7 +180,7 @@ class DelTemplateExecutor(LoadingMaskThreadExecutor):
         super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelTemplateWorker((self.template_id,), (self.template_name,))
+        return DelTemplateWorker((self.template_id, ), (self.template_name, ))
 
     def success_post_process(self, *args):
         self.success_callback(self.row_index)

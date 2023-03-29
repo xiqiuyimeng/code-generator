@@ -15,6 +15,17 @@ DEL_TEMPLATE_BTN_TEXT = '删除模板'
 
 # 模板常用方法对话框
 TEMPLATE_FUNC_TITLE = '模板常用方法'
+TEMPLATE_FUNC_LIST_TITLE = '模板常用方法列表'
+TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT = '方法名将自动根据方法体解析，不可重复'
+CREATE_NEW_FUNC_BTN_TEXT = '创建方法'
+CREATE_NEW_FUNC_TITLE = '创建方法'
+TEST_FUNC_BTN_TEXT = '测试方法'
+CREATE_FUNC_BOX_TITLE = '创建方法'
+EDIT_FUNC_BOX_TITLE = '编辑方法'
+# 删除方法对话框标题
+DEL_TEMPLATE_FUNC_BOX_TITLE = '删除模板方法'
+CLEAR_TEMPLATE_FUNC_BOX_TITLE = '清空模板方法'
+
 
 # 删除模板消息对话框标题
 DEL_TEMPLATE_BOX_TITLE = '删除模板'
