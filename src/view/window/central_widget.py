@@ -5,8 +5,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSplitter
 
-from src.view.tab.tab_frame.tab_frame import get_tab_frame
-from src.view.tree.tree_frame.tree_frame import get_tree_frame
+from src.view.frame.datasource.tab_frame import get_tab_frame
+from src.view.frame.datasource.tree_frame import get_tree_frame
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 10:10'

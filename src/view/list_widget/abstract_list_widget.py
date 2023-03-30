@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtGui import QDropEvent
 
-from src.view.item_view_widget.abstract_item_view import AbstractItemView
+from src.view.custom_widget.abstract_item_view import AbstractItemView
 from src.view.searcher.smart_item_view import SmartSearcherListWidget
 
 _author_ = 'luwt'

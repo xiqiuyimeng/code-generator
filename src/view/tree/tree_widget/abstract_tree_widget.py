@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 
 from src.service.async_func.async_item_changed_task import ItemChangedExecutor
-from src.view.item_view_widget.abstract_item_view import AbstractItemView
+from src.view.custom_widget.abstract_item_view import AbstractItemView
 from src.view.searcher.smart_item_view import SmartSearcherTreeWidget
 from src.view.tab.tab_ui import TabTableUI
 from src.view.tab.tab_widget.tab_widget import TabWidget
