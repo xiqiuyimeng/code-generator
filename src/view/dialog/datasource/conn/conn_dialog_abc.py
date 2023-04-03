@@ -11,13 +11,13 @@ from src.service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from src.service.system_storage.conn_sqlite import SqlConnection
 from src.service.system_storage.conn_type import *
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from src.view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
+from src.view.dialog.datasource.ds_dialog_abc import DsInfoDialogABC
 
 _author_ = 'luwt'
 _date_ = '2022/5/29 17:55'
 
 
-class AbstractConnDialog(AbstractDsInfoDialog):
+class ConnDialogABC(DsInfoDialogABC):
     """连接对话框抽象类，整体对话框结构应为四部分：标题区、连接名表单区、连接信息表单区、按钮区"""
 
     conn_saved = pyqtSignal(OpenedTreeItem)

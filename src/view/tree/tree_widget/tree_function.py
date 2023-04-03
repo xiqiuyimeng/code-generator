@@ -90,7 +90,7 @@ def show_conn_dialog(sql_type, tree_widget, conn_id, title, screen_rect):
     conn_items = tree_widget.get_top_level_items()
     conn_name_list = list(map(lambda conn_item: get_item_opened_record(conn_item).item_name, conn_items))
     # 根据类型，动态获取对话框
-    dialog: AbstractConnDialog = globals()[get_conn_dialog(sql_type)](title, screen_rect, conn_name_list, conn_id)
+    dialog: ConnDialogABC = globals()[get_conn_dialog(sql_type)](title, screen_rect, conn_name_list, conn_id)
     if title == ADD_CONN_DIALOG_TITLE:
         dialog.conn_saved.connect(lambda opened_conn_record: add_conn_tree_item(tree_widget, opened_conn_record))
 
@@ -254,10 +254,10 @@ def show_struct_dialog(struct_type, tree_widget, opened_struct_id, title, screen
     # 获取当前不允许重复的名称列表
     exists_struct_name_list = get_exists_struct_names(tree_widget, parent_opened_item, parent_item)
     # 根据类型，动态获取对话框
-    dialog: AbstractStructDialog = globals()[get_struct_dialog(struct_type)](title, screen_rect,
-                                                                             exists_struct_name_list,
-                                                                             opened_struct_id, tree_widget,
-                                                                             parent_opened_item)
+    dialog: StructDialogABC = globals()[get_struct_dialog(struct_type)](title, screen_rect,
+                                                                        exists_struct_name_list,
+                                                                        opened_struct_id, tree_widget,
+                                                                        parent_opened_item)
     if title == ADD_STRUCT_DIALOG_TITLE:
         dialog.struct_saved.connect(lambda opened_struct_record: add_struct_tree_item(
             tree_widget, parent_item, opened_struct_record, struct_type))

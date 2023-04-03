@@ -59,7 +59,7 @@ def get_item_icon(item):
         return item.icon()
 
 
-class ItemPainterAbstract(ABC):
+class ItemPainterABC(ABC):
 
     def __init__(self, item, margin_h, style, painter, visual_rect, *args):
         self.item = item
@@ -76,7 +76,7 @@ class ItemPainterAbstract(ABC):
     def paint_rect(self, rect): ...
 
 
-class CheckBoxItemPainter(ItemPainterAbstract):
+class CheckBoxItemPainter(ItemPainterABC):
 
     def __init__(self, item, margin_h, style, painter, visual_rect):
         super().__init__(item, margin_h, style, painter, visual_rect)
@@ -105,7 +105,7 @@ class CheckBoxItemPainter(ItemPainterAbstract):
         self.style.drawControl(QStyle.CE_CheckBox, opt, self.painter)
 
 
-class IconItemPainter(ItemPainterAbstract):
+class IconItemPainter(ItemPainterABC):
 
     def __init__(self, item, margin_h, style, painter, visual_rect, parent):
         super().__init__(item, margin_h, style, painter, visual_rect)
@@ -130,7 +130,7 @@ class IconItemPainter(ItemPainterAbstract):
         self.icon.paint(self.painter, rect, Qt.AlignVCenter | Qt.AlignLeft)
 
 
-class TextItemPainter(ItemPainterAbstract):
+class TextItemPainter(ItemPainterABC):
 
     def __init__(self, item_text, selected_flag, search_flag, search_item_records, *args):
         super().__init__(*args)

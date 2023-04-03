@@ -9,17 +9,17 @@ from src.constant.icon_enum import get_icon
 from src.constant.table_constant import EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
 from src.view.table.table_header.check_box_table_header import CheckBoxHeaderWithButton
 from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
-from src.view.table.table_widget.ds_table_widget.abstract_ds_col_table_widget import AbstractDsColTableWidget
+from src.view.table.table_widget.ds_table_widget.ds_col_table_widget_abc import DsColTableWidgetABC
 from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
 
 
-class StructDsColTableWidget(AbstractDsColTableWidget):
+class StructDsColTableWidget(DsColTableWidgetABC):
 
     def __init__(self, *args, parent_table=None):
-        self.parent_table: AbstractDsColTableWidget = parent_table
+        self.parent_table: DsColTableWidgetABC = parent_table
         super().__init__(*args)
 
     def get_header(self, header_labels):
@@ -136,7 +136,7 @@ class StructDsColTableWidget(AbstractDsColTableWidget):
 
     def resize_child_table_row(self, row_index):
         child_table_widget = self.cellWidget(row_index, 0)
-        child_table: AbstractDsColTableWidget = child_table_widget.child_table
+        child_table: DsColTableWidgetABC = child_table_widget.child_table
         # 子表的所有行的高度 = 所有未隐藏行的高度之和
         child_table_row_height = 0
         for row in range(child_table.rowCount()):

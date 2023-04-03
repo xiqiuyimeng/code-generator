@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QVariant
 from src.constant.tree_constant import OPEN_TB_BOX_TITLE, CANCEL_OPEN_TABLE_ACTION, CANCEL_REFRESH_TB_ACTION, \
     OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, REFRESH_TB_BOX_TITLE
 from src.service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
-from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, \
     link_table_checkbox, save_tree_data, get_add_del_data, get_item_opened_record
 
@@ -12,7 +12,7 @@ _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
 
 
-class TableTreeNode(AbstractSqlTreeNode):
+class TableTreeNode(SqlTreeNodeABC):
 
     def __init__(self, *args):
         super().__init__(*args)

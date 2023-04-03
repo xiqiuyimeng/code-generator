@@ -7,13 +7,13 @@ from src.constant.table_constant import ROW_OPERATION_ICON, ROW_OPERATION_TEXT, 
     ROW_CAT_EDIT_ICON, ROW_DEL_TEXT, ROW_DEL_ICON, OPERATION_HEADER_LABEL
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.table_widget_abc import TableWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/3/8 13:27'
 
 
-class CustomTableWidget(AbstractTableWidget):
+class CustomTableWidget(TableWidgetABC):
     # 编辑行信号，发送id和行序号
     row_edit_signal = pyqtSignal(int, int)
     # 删除行信号，发送id、行序号和第二列名称

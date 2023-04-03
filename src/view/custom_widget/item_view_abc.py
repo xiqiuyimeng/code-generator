@@ -9,7 +9,7 @@ _author_ = 'luwt'
 _date_ = '2023/2/13 15:38'
 
 
-class AbstractItemView(QAbstractItemView, ScrollableWidget):
+class ItemViewABC(QAbstractItemView, ScrollableWidget):
 
     def __init__(self, parent):
         super().__init__(parent)

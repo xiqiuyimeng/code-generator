@@ -17,7 +17,7 @@ def get_tab_frame(current_frame_name, frame_parent, window):
         return StructTabFrame(frame_parent, window)
 
 
-class AbstractTabFrame(QFrame):
+class TabFrameABC(QFrame):
     """tab frame抽象类"""
 
     def __init__(self, parent, window):
@@ -37,7 +37,7 @@ class AbstractTabFrame(QFrame):
     def get_tab_widget(self, window) -> TabWidget: ...
 
 
-class SqlTabFrame(AbstractTabFrame):
+class SqlTabFrame(TabFrameABC):
 
     def __init__(self, parent, window):
         super().__init__(parent, window)
@@ -48,7 +48,7 @@ class SqlTabFrame(AbstractTabFrame):
         return SqlTabWidget(self, window)
 
 
-class StructTabFrame(AbstractTabFrame):
+class StructTabFrame(TabFrameABC):
 
     def __init__(self, parent, window):
         super().__init__(parent, window)

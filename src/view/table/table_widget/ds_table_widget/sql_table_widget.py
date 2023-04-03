@@ -3,14 +3,14 @@ from PyQt5.QtCore import Qt
 
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
-from src.view.table.table_widget.ds_table_widget.abstract_ds_col_table_widget import AbstractDsColTableWidget
+from src.view.table.table_widget.ds_table_widget.ds_col_table_widget_abc import DsColTableWidgetABC
 from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 15:25'
 
 
-class SqlDsColTableWidget(AbstractDsColTableWidget):
+class SqlDsColTableWidget(DsColTableWidgetABC):
 
     def get_header(self, header_labels):
         return CheckBoxHeader(header_labels, self)

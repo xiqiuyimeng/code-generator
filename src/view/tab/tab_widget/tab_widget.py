@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QTabWidget
 from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.view.tab.tab_bar.sql_tab_bar import SqlTabBar
 from src.view.tab.tab_bar.struct_tab_bar import StructTabBar
-from src.view.tab.tab_bar.tab_bar import DsTabBar
+from src.view.tab.tab_bar.tab_bar_abc import DsTabBar
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:37'

@@ -12,7 +12,7 @@ from src.service.async_func.async_struct_task import DelFolderExecutor
 from src.service.async_func.async_struct_task import RefreshFolderExecutor
 from src.view.bar.bar_action import add_structure_ds_actions
 from src.view.box.message_box import pop_question, pop_fail
-from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
+from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
 from src.view.tree.tree_widget.tree_function import add_folder_func, edit_folder_func, add_struct_tree_item
 
@@ -20,7 +20,7 @@ _author_ = 'luwt'
 _date_ = '2022/12/2 12:08'
 
 
-class FolderTreeNode(AbstractStructTreeNode):
+class FolderTreeNode(StructTreeNodeABC):
 
     def __init__(self, *args):
         super().__init__(*args)

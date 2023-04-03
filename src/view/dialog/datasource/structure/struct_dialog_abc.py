@@ -13,15 +13,15 @@ from src.service.async_func.async_struct_task import ReadFileExecutor, AddStruct
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_sqlite import StructInfo
 from src.service.system_storage.struct_type import StructType
-from src.view.custom_widget.syntax_highlighter.abstract_syntax_highlighter import AbstractSyntaxHighLighter
+from src.view.custom_widget.syntax_highlighter.syntax_highlighter_abc import SyntaxHighLighterABC
 from src.view.custom_widget.text_editor import TextEditor
-from src.view.dialog.datasource.abstract_ds_dialog import AbstractDsInfoDialog
+from src.view.dialog.datasource.ds_dialog_abc import DsInfoDialogABC
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:46'
 
 
-class AbstractStructDialog(AbstractDsInfoDialog):
+class StructDialogABC(DsInfoDialogABC):
     struct_saved = pyqtSignal(OpenedTreeItem)
     struct_changed = pyqtSignal(str)
 
@@ -40,7 +40,7 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_file_action: QAction = ...
         self.struct_text_label: QLabel = ...
         self.struct_text_input: TextEditor = ...
-        self.struct_text_syntax_highlighter: AbstractSyntaxHighLighter = ...
+        self.struct_text_syntax_highlighter: SyntaxHighLighterABC = ...
         self.pretty_button: QPushButton = ...
 
         self.read_file_executor: ReadFileExecutor = ...
@@ -89,7 +89,7 @@ class AbstractStructDialog(AbstractDsInfoDialog):
         self.struct_text_syntax_highlighter.setDocument(self.struct_text_input.document())
         self.ds_info_layout.addRow(self.struct_text_label, self.struct_text_input)
 
-    def get_syntax_highlighter(self) -> AbstractSyntaxHighLighter: ...
+    def get_syntax_highlighter(self) -> SyntaxHighLighterABC: ...
 
     def setup_other_button(self):
         # 按钮部分

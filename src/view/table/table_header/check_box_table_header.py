@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QLabel
 
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
-from src.view.table.table_header.abstract_table_header import AbstractTableHeader
+from src.view.table.table_header.table_header_abc import TableHeaderABC
 from src.view.table.table_header.table_header_style_delegate import TableHeaderStyleDelegate
 from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
 
@@ -10,7 +10,7 @@ _author_ = 'luwt'
 _date_ = '2023/2/28 17:27'
 
 
-class CheckBoxHeader(AbstractTableHeader):
+class CheckBoxHeader(TableHeaderABC):
     """普通复选框表头"""
 
     def __init__(self, header_labels, parent_table):

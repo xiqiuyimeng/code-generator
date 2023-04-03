@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtGui import QDropEvent
 
-from src.view.custom_widget.abstract_item_view import AbstractItemView
+from src.view.custom_widget.item_view_abc import ItemViewABC
 from src.view.searcher.smart_item_view import SmartSearcherListWidget
 
 _author_ = 'luwt'
 _date_ = '2023/2/16 11:24'
 
 
-class AbstractListWidget(SmartSearcherListWidget, AbstractItemView):
+class ListWidgetABC(SmartSearcherListWidget, ItemViewABC):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -16,7 +16,7 @@ class AbstractListWidget(SmartSearcherListWidget, AbstractItemView):
         self.setSpacing(5)
 
 
-class AbstractDraggableListWidget(AbstractListWidget):
+class DraggableListWidgetABC(ListWidgetABC):
     
     def __init__(self, *args):
         super().__init__(*args)

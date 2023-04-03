@@ -8,13 +8,13 @@ from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item_delegate import ComboboxDelegate
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.table_widget_abc import TableWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2022/12/6 15:50'
 
 
-class AbstractDsColTableWidget(AbstractTableWidget):
+class DsColTableWidgetABC(TableWidgetABC):
 
     def __init__(self, main_window, tree_widget, parent, cols):
         self.main_window = main_window

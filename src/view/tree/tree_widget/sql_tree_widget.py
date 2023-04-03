@@ -8,15 +8,15 @@ from src.service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
 from src.service.util.tree_node import TreeData
 from src.view.tab.tab_widget.tab_widget import TabWidget
 from src.view.tree.tree_item.context import get_sql_tree_node
-from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
-from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
+from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
 from src.view.tree.tree_widget.tree_function import make_conn_tree_items
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:21'
 
 
-class SqlTreeWidget(AbstractTreeWidget):
+class SqlTreeWidget(TreeWidgetABC):
     """sql数据源树部件"""
 
     def __init__(self, parent, window):
@@ -52,5 +52,5 @@ class SqlTreeWidget(AbstractTreeWidget):
             # 如果是其他类型，按策略来执行
             self.reopen_tree_item(opened_items)
 
-    def get_item_node(self, item) -> AbstractSqlTreeNode:
+    def get_item_node(self, item) -> SqlTreeNodeABC:
         return get_sql_tree_node(item, self, self.main_window)

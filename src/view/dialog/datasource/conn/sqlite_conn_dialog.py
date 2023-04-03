@@ -3,13 +3,13 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QPushButton, QFileDi
 
 from src.constant.ds_dialog_constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
 from src.service.system_storage.conn_type import ConnTypeEnum
-from src.view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
+from src.view.dialog.datasource.conn.conn_dialog_abc import ConnDialogABC
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 19:31'
 
 
-class SqliteConnDialog(AbstractConnDialog):
+class SqliteConnDialog(ConnDialogABC):
 
     def __init__(self, *args):
         self.file_url_label: QLabel = ...

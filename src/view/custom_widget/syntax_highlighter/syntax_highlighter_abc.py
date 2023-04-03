@@ -7,7 +7,7 @@ _author_ = 'luwt'
 _date_ = '2023/3/15 15:25'
 
 
-class AbstractSyntaxHighLighter(QSyntaxHighlighter):
+class SyntaxHighLighterABC(QSyntaxHighlighter):
 
     def __init__(self, parent=None):
         super().__init__(parent)

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButto
 
 from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.constant.tree_constant import LOCATION_TXT, CREATE_NEW_FOLDER
-from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
 from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget
 from src.view.tree.tree_widget.tree_function import add_folder_func
@@ -21,7 +21,7 @@ def get_tree_frame(current_frame_name, frame_parent, window):
         return StructureTreeFrame(frame_parent, window)
 
 
-class AbstractTreeFrame(QFrame):
+class TreeFrameABC(QFrame):
     """树结构frame抽象类"""
 
     def __init__(self, parent, window):
@@ -59,10 +59,10 @@ class AbstractTreeFrame(QFrame):
 
     def get_header_text(self) -> str: ...
 
-    def get_tree_widget(self, window) -> AbstractTreeWidget: ...
+    def get_tree_widget(self, window) -> TreeWidgetABC: ...
 
 
-class SqlTreeFrame(AbstractTreeFrame):
+class SqlTreeFrame(TreeFrameABC):
     """sql数据源列表frame"""
 
     def __init__(self, parent, window):
@@ -77,7 +77,7 @@ class SqlTreeFrame(AbstractTreeFrame):
         return SqlTreeWidget(self, window)
 
 
-class StructureTreeFrame(AbstractTreeFrame):
+class StructureTreeFrame(TreeFrameABC):
     """结构体数据源列表frame"""
 
     def __init__(self, parent, window):

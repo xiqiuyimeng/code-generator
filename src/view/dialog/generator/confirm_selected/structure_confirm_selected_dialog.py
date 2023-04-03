@@ -2,14 +2,14 @@
 from src.constant.ds_type_constant import STRUCT_COL_ICON
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
+from src.view.dialog.generator.generator_dialog import DisplaySelectedDialogABC
 from src.view.tree.tree_widget.tree_function import make_display_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/11/1 10:30'
 
 
-class StructureConfirmSelectedDialog(AbstractDisplaySelectedDialog):
+class StructureConfirmSelectedDialog(DisplaySelectedDialogABC):
 
     def __init__(self, selected_data, *args):
         self.selected_data = selected_data

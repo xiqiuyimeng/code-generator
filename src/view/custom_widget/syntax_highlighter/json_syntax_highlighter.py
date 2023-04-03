@@ -2,13 +2,13 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCharFormat
 
-from src.view.custom_widget.syntax_highlighter.abstract_syntax_highlighter import AbstractSyntaxHighLighter
+from src.view.custom_widget.syntax_highlighter.syntax_highlighter_abc import SyntaxHighLighterABC
 
 _author_ = 'luwt'
 _date_ = '2023/3/15 16:38'
 
 
-class JsonSyntaxHighLighter(AbstractSyntaxHighLighter):
+class JsonSyntaxHighLighter(SyntaxHighLighterABC):
 
     def add_mappings(self):
         # json 保留字

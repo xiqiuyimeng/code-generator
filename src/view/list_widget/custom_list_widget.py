@@ -6,13 +6,13 @@ from src.constant.list_constant import EDIT_ITEM_ACTION, EDIT_LIST_ITEM_ICON, DE
     DEL_ITEM_PROMPT, DEL_ALL_ITEMS_ACTION, DEL_ALL_LIST_ITEMS_ICON, DEL_ALL_ITEMS_PROMPT, DEL_ITEM_BOX_TITLE, \
     DEL_ALL_ITEMS_BOX_TITLE
 from src.view.box.message_box import pop_question
-from src.view.list_widget.abstract_list_widget import AbstractListWidget
+from src.view.list_widget.list_widget_abc import ListWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/3/24 15:15'
 
 
-class CustomListWidget(AbstractListWidget):
+class CustomListWidget(ListWidgetABC):
 
     def __init__(self, item_type_name, *args):
         self.item_type_name = item_type_name

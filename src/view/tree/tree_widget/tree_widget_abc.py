@@ -13,11 +13,11 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 
 from src.service.async_func.async_item_changed_task import ItemChangedExecutor
-from src.view.custom_widget.abstract_item_view import AbstractItemView
+from src.view.custom_widget.item_view_abc import ItemViewABC
 from src.view.searcher.smart_item_view import SmartSearcherTreeWidget
 from src.view.tab.tab_ui import TabTableUI
 from src.view.tab.tab_widget.tab_widget import TabWidget
-from src.view.tree.tree_item.abstract_tree_node import AbstractTreeNode
+from src.view.tree.tree_item.tree_node_abc import TreeNodeABC
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, link_table_checkbox, get_item_opened_tab, \
     recursive_get_add_del_data
 
@@ -25,7 +25,7 @@ _author_ = 'luwt'
 _date_ = '2022/9/14 15:48'
 
 
-class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
+class DisplayTreeWidget(SmartSearcherTreeWidget, ItemViewABC):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -35,7 +35,7 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
         # 先调用智能搜索的按键检测方法
         super().keyPressEvent(event)
         # 再调用统一元素视图中的方法
-        AbstractItemView.keyPressEvent(self, event)
+        ItemViewABC.keyPressEvent(self, event)
 
     def paintEvent(self, e) -> None:
         self.resize_header_width()
@@ -46,7 +46,7 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, AbstractItemView):
         self.header().setMinimumSectionSize(self.sizeHintForColumn(0))
 
 
-class AbstractTreeWidget(DisplayTreeWidget):
+class TreeWidgetABC(DisplayTreeWidget):
     # 定义信号，发送点击复选框的树节点
     item_checkbox_clicked = pyqtSignal(QTreeWidgetItem)
 
@@ -249,5 +249,5 @@ class AbstractTreeWidget(DisplayTreeWidget):
     def get_current_tab_widget(self) -> TabWidget:
         ...
 
-    def get_item_node(self, item) -> AbstractTreeNode:
+    def get_item_node(self, item) -> TreeNodeABC:
         ...

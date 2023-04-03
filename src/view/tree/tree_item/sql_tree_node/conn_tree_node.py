@@ -12,7 +12,7 @@ from src.service.async_func.async_sql_conn_task import DelConnExecutor, CloseCon
 from src.service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
 from src.view.bar.bar_action import add_sql_ds_actions
 from src.view.box.message_box import pop_ok, pop_question, pop_fail
-from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
     get_item_opened_tab, refresh_tree_item_callback
@@ -22,7 +22,7 @@ _author_ = 'luwt'
 _date_ = '2022/7/6 22:04'
 
 
-class ConnTreeNode(AbstractSqlTreeNode):
+class ConnTreeNode(SqlTreeNodeABC):
 
     def __init__(self, *args):
         super().__init__(*args)

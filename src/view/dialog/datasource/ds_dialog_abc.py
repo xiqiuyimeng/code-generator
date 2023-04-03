@@ -5,7 +5,7 @@ _author_ = 'luwt'
 _date_ = '2022/5/29 17:55'
 
 
-class AbstractDsInfoDialog(NameCheckDialog):
+class DsInfoDialogABC(NameCheckDialog):
     """数据源对话框抽象类，整体对话框结构应为四部分：标题区、名称表单区、数据源信息表单区、按钮区"""
 
     def __init__(self, dialog_title, screen_rect, ds_name_list, data_id=None):

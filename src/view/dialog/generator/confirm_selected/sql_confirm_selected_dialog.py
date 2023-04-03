@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from src.constant.icon_enum import get_icon
-from src.view.dialog.generator.abstract_generator_dialog import AbstractDisplaySelectedDialog
+from src.view.dialog.generator.generator_dialog import DisplaySelectedDialogABC
 from src.view.tree.tree_widget.tree_function import make_display_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/11/1 9:12'
 
 
-class SqlConfirmSelectedDialog(AbstractDisplaySelectedDialog):
+class SqlConfirmSelectedDialog(DisplaySelectedDialogABC):
 
     def __init__(self, selected_data, *args):
         self.selected_data = selected_data

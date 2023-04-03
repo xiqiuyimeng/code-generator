@@ -10,7 +10,7 @@ _author_ = 'luwt'
 _date_ = '2023/2/13 11:38'
 
 
-class AbstractTableWidget(QTableWidget, ScrollableWidget):
+class TableWidgetABC(QTableWidget, ScrollableWidget):
 
     def __init__(self, parent):
         super().__init__(parent)

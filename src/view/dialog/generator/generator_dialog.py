@@ -3,13 +3,13 @@ from PyQt5.QtWidgets import QPushButton
 
 from src.constant.generator_dialog_constant import RESELECT_TXT, CHOOSE_TEMPLATE_TXT
 from src.view.dialog.custom_dialog import CustomDialog
-from src.view.tree.tree_widget.abstract_tree_widget import DisplayTreeWidget
+from src.view.tree.tree_widget.tree_widget_abc import DisplayTreeWidget
 
 _author_ = 'luwt'
 _date_ = '2022/10/31 11:47'
 
 
-class AbstractDisplaySelectedDialog(CustomDialog):
+class DisplaySelectedDialogABC(CustomDialog):
 
     def __init__(self, *args):
         self.display_tree_widget = ...

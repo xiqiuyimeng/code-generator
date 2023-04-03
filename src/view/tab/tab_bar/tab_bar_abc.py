@@ -15,7 +15,7 @@ _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'
 
 
-class AbstractTabBar(QTabBar):
+class TabBarABC(QTabBar):
 
     def __init__(self, parent: QTabWidget):
         """tab bar index按照从左到右变大的顺序,0,1,2..."""
@@ -115,7 +115,7 @@ class AbstractTabBar(QTabBar):
         self.parent.removeTab(index)
 
 
-class DsTabBar(AbstractTabBar):
+class DsTabBar(TabBarABC):
     remove_tab_signal = pyqtSignal(DsTableTab)
 
     def __init__(self, parent: QTabWidget, main_window):

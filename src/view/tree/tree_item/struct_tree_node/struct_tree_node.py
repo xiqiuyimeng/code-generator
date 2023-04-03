@@ -6,7 +6,7 @@ from src.constant.tree_constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CA
 from src.service.async_func.async_struct_task import DelStructExecutor
 from src.service.async_func.async_struct_task import OpenStructExecutor, RefreshStructExecutor
 from src.view.box.message_box import pop_question
-from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
+from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
 from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, get_add_del_data, \
     get_item_opened_record
 from src.view.tree.tree_widget.tree_function import edit_struct_func
@@ -15,7 +15,7 @@ _author_ = 'luwt'
 _date_ = '2022/12/2 12:09'
 
 
-class StructTreeNode(AbstractStructTreeNode):
+class StructTreeNode(StructTreeNodeABC):
 
     def __init__(self, *args):
         super().__init__(*args)

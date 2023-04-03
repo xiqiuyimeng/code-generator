@@ -2,7 +2,7 @@
 from PyQt5.QtCore import pyqtSignal
 
 from src.constant.table_constant import DS_COL_TYPE_TABLE_HEADER, DEFAULT_MAPPING_GROUP_TITLE
-from src.view.table.table_header.abstract_table_header import AbstractTableHeader
+from src.view.table.table_header.table_header_abc import TableHeaderABC
 from src.view.table.table_header.table_header_style_delegate import TableHeaderStyleDelegate, \
     ColTypeMappingTableHeaderStyleDelegate
 
@@ -10,7 +10,7 @@ _author_ = 'luwt'
 _date_ = '2023/2/16 17:41'
 
 
-class AbstractColTypeMappingTableHeader(AbstractTableHeader):
+class ColTypeMappingTableHeaderABC(TableHeaderABC):
     # 组号变化信号
     group_num_changed = pyqtSignal(int)
 
@@ -31,7 +31,7 @@ class AbstractColTypeMappingTableHeader(AbstractTableHeader):
     def setup_other_item_span(self): ...
 
 
-class ColTypeMappingFrozenTableHeader(AbstractColTypeMappingTableHeader):
+class ColTypeMappingFrozenTableHeader(ColTypeMappingTableHeaderABC):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -44,7 +44,7 @@ class ColTypeMappingFrozenTableHeader(AbstractColTypeMappingTableHeader):
         [self.setColumnHidden(col, True) for col in range(2, self.columnCount())]
 
 
-class ColTypeMappingTableHeader(AbstractColTypeMappingTableHeader):
+class ColTypeMappingTableHeader(ColTypeMappingTableHeaderABC):
 
     def __init__(self, *args):
         self.max_group_num = 0

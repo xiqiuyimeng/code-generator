@@ -5,13 +5,13 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit
 from src.constant.ds_dialog_constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, \
     PORT_INPUT_PLACEHOLDER_TEXT, HOST_MAX_LENGTH_PLACEHOLDER_TEXT, USER_MAX_LENGTH_PLACEHOLDER_TEXT, \
     PWD_MAX_LENGTH_PLACEHOLDER_TEXT
-from src.view.dialog.datasource.conn.abstract_conn_dialog import AbstractConnDialog
+from src.view.dialog.datasource.conn.conn_dialog_abc import ConnDialogABC
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 18:05'
 
 
-class InternetConnDialog(AbstractConnDialog):
+class InternetConnDialog(ConnDialogABC):
     """
     网络连接数据库类型对话框，通过网络通信连接的数据库，
     必然包括：主机地址、端口、用户名、密码，

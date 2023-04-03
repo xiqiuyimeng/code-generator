@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QStackedWidget, QSpacerItem
 
 from src.constant.type_mapping_dialog_constant import SAVE_DATA_TIPS
 from src.view.dialog.name_check_dialog import NameCheckDialog
-from src.view.list_widget.abstract_list_widget import AbstractListWidget
+from src.view.list_widget.list_widget_abc import ListWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/2/13 14:47'
@@ -18,7 +18,7 @@ class CustomStackedWidgetDialog(NameCheckDialog):
         self.save_data_tips_label: QLabel = ...
 
         # 左侧列表控件
-        self.list_widget: AbstractListWidget = ...
+        self.list_widget: ListWidgetABC = ...
 
         # 堆栈式窗口
         self.stacked_widget: QStackedWidget = ...
@@ -41,7 +41,7 @@ class CustomStackedWidgetDialog(NameCheckDialog):
         self.stacked_layout = QHBoxLayout(self.frame)
         self.frame_layout.addLayout(self.stacked_layout)
 
-        self.list_widget = AbstractListWidget(self.frame)
+        self.list_widget = ListWidgetABC(self.frame)
         # 填充左边列表项
         self.fill_list_widget()
         self.list_widget.setCurrentRow(0)

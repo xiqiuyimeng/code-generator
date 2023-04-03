@@ -5,15 +5,15 @@ from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.util.tree_node import TreeData
 from src.view.tab.tab_widget.tab_widget import TabWidget
 from src.view.tree.tree_item.context import get_struct_tree_node
-from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
-from src.view.tree.tree_widget.abstract_tree_widget import AbstractTreeWidget
+from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
+from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
 from src.view.tree.tree_widget.tree_function import add_struct_tree_item
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:10'
 
 
-class StructTreeWidget(AbstractTreeWidget):
+class StructTreeWidget(TreeWidgetABC):
     """结构体数据源树结构"""
 
     def __init__(self, parent, window):
@@ -55,5 +55,5 @@ class StructTreeWidget(AbstractTreeWidget):
     def link_parent_node(self, item, parent_item=None):
         self.get_item_node(item).link_parent_node(parent_item)
 
-    def get_item_node(self, item) -> AbstractStructTreeNode:
+    def get_item_node(self, item) -> StructTreeNodeABC:
         return get_struct_tree_node(item, self, self.main_window)

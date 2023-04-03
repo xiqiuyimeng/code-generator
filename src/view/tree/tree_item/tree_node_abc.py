@@ -12,7 +12,7 @@ _author_ = 'luwt'
 _date_ = '2022/12/2 11:36'
 
 
-class AbstractTreeNode:
+class TreeNodeABC:
 
     def __new__(cls, item: QTreeWidgetItem, tree_widget, window):
         if not hasattr(item, 'tree_node'):

@@ -5,19 +5,19 @@ from PyQt5.QtWidgets import QAbstractItemView
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
 from src.view.custom_widget.check_box import CheckBox
 from src.view.table.table_item.table_item import make_checkbox_num_widget
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.table_widget_abc import TableWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/2/28 14:18'
 
 
-class AbstractTableHeader(AbstractTableWidget):
+class TableHeaderABC(TableWidgetABC):
     # 表头复选框点击信号
     header_clicked = pyqtSignal(int)
     # 表头复选框变化信号
     header_check_changed = pyqtSignal(int)
 
-    def __init__(self, row_count, column_count, parent_table: AbstractTableWidget, *args):
+    def __init__(self, row_count, column_count, parent_table: TableWidgetABC, *args):
         self.row_count = row_count
         self.column_count = column_count
         self.parent_table = parent_table

@@ -6,19 +6,19 @@ from src.constant.table_constant import DEL_MAPPING_GROUP_BOX_TITLE, DEL_MAPPING
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMapping
 from src.view.box.message_box import pop_question
 from src.view.table.table_header.col_type_mapping_table_header import ColTypeMappingTableHeader, \
-    AbstractColTypeMappingTableHeader, ColTypeMappingFrozenTableHeader
+    ColTypeMappingTableHeaderABC, ColTypeMappingFrozenTableHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
-from src.view.table.table_widget.abstract_table_widget import AbstractTableWidget
+from src.view.table.table_widget.table_widget_abc import TableWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/2/15 18:05'
 
 
-class AbstractColTypeMappingTableWidget(AbstractTableWidget):
+class ColTypeMappingTableWidgetABC(TableWidgetABC):
     
     def __init__(self, *args):
         # 表头控件
-        self.header_widget: AbstractColTypeMappingTableHeader = ...
+        self.header_widget: ColTypeMappingTableHeaderABC = ...
         super().__init__(*args)
 
     def setup_other_ui(self):
@@ -50,7 +50,7 @@ class AbstractColTypeMappingTableWidget(AbstractTableWidget):
     def setup_header(self): ...
 
 
-class ColTypeMappingFrozenTableWidget(AbstractColTypeMappingTableWidget):
+class ColTypeMappingFrozenTableWidget(ColTypeMappingTableWidgetABC):
 
     def setup_other_ui(self):
         super().setup_other_ui()
@@ -77,7 +77,7 @@ class ColTypeMappingFrozenTableWidget(AbstractColTypeMappingTableWidget):
         super().resizeEvent(e)
 
 
-class ColTypeMappingTableWidget(AbstractColTypeMappingTableWidget):
+class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     # 表头复选框状态变化信号
     header_check_changed = pyqtSignal(int)
 

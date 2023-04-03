@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from src.service.system_storage.struct_type import FolderTypeEnum
-from src.view.tree.tree_item.sql_tree_node.abstract_sql_tree_node import AbstractSqlTreeNode
+from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_item.sql_tree_node.conn_tree_node import ConnTreeNode
 from src.view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
 from src.view.tree.tree_item.sql_tree_node.table_tree_node import TableTreeNode
-from src.view.tree.tree_item.struct_tree_node.abstract_struct_tree_node import AbstractStructTreeNode
+from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
 from src.view.tree.tree_item.struct_tree_node.folder_tree_node import FolderTreeNode
 from src.view.tree.tree_item.struct_tree_node.struct_tree_node import StructTreeNode
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record
@@ -13,7 +13,7 @@ _author_ = 'luwt'
 _date_ = '2022/7/6 22:03'
 
 
-def get_sql_tree_node(item, tree_widget, window) -> AbstractSqlTreeNode:
+def get_sql_tree_node(item, tree_widget, window) -> SqlTreeNodeABC:
     """
     获取树节点对应的实例化对象。
     树结构：
@@ -35,7 +35,7 @@ def get_sql_tree_node(item, tree_widget, window) -> AbstractSqlTreeNode:
         return TableTreeNode(item, tree_widget, window)
 
 
-def get_struct_tree_node(item, tree_widget, window) -> AbstractStructTreeNode:
+def get_struct_tree_node(item, tree_widget, window) -> StructTreeNodeABC:
     """
     获取结构体树节点对象，结构体树节点分为两种：文件夹节点、结构体节点
     """
