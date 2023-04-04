@@ -10,15 +10,13 @@ from src.constant.icon_enum import get_icon
 from src.constant.tree_constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
     EDIT_STRUCT_DIALOG_TITLE, CREATE_NEW_FOLDER, EDIT_FOLDER_NAME
 from src.service.system_storage.conn_type import get_conn_dialog
-from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_type import get_struct_dialog, FolderTypeEnum
 from src.service.util.tree_node import TreeData
-from src.view.dialog.datasource.conn import *
-from src.view.dialog.datasource.folder.folder_dialog import FolderDialog
-from src.view.dialog.datasource.structure import *
+from src.view.dialog.datasource.conn_dialog import *
+from src.view.dialog.datasource.struct_dialog import *
 from src.view.tree.tree_item.tree_item import TreeWidgetItem
-from src.view.tree.tree_item.tree_item_func import set_item_opened_record, \
-    get_item_opened_record, get_children_items, get_add_del_data
+from src.view.tree.tree_item.tree_item_func import set_item_opened_record, get_item_opened_record, \
+    get_children_items, get_add_del_data
 
 _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
@@ -92,10 +90,10 @@ def show_conn_dialog(sql_type, tree_widget, conn_id, title, screen_rect):
     # 根据类型，动态获取对话框
     dialog: ConnDialogABC = globals()[get_conn_dialog(sql_type)](title, screen_rect, conn_name_list, conn_id)
     if title == ADD_CONN_DIALOG_TITLE:
-        dialog.conn_saved.connect(lambda opened_conn_record: add_conn_tree_item(tree_widget, opened_conn_record))
+        dialog.save_signal.connect(lambda opened_conn_record: add_conn_tree_item(tree_widget, opened_conn_record))
 
     elif title == EDIT_CONN_DIALOG_TITLE:
-        dialog.conn_changed.connect(lambda conn_name: update_conn_tree_item(tree_widget, conn_name))
+        dialog.edit_signal.connect(lambda conn_name: update_conn_tree_item(tree_widget, conn_name))
     dialog.exec()
 
 
@@ -259,11 +257,11 @@ def show_struct_dialog(struct_type, tree_widget, opened_struct_id, title, screen
                                                                         opened_struct_id, tree_widget,
                                                                         parent_opened_item)
     if title == ADD_STRUCT_DIALOG_TITLE:
-        dialog.struct_saved.connect(lambda opened_struct_record: add_struct_tree_item(
+        dialog.save_signal.connect(lambda opened_struct_record: add_struct_tree_item(
             tree_widget, parent_item, opened_struct_record, struct_type))
 
     elif title == EDIT_STRUCT_DIALOG_TITLE:
-        dialog.struct_changed.connect(lambda struct_name: update_struct_tree_item(tree_widget, struct_name))
+        dialog.edit_signal.connect(lambda struct_name: update_struct_tree_item(tree_widget, struct_name))
     dialog.exec()
 
 
@@ -304,16 +302,12 @@ def show_folder_dialog(screen_rect, tree_widget, parent_opened_item, dialog_titl
     # 根据节点层次，获取子节点，得到当前不允许重复的名称列表
     exists_folder_name_list = get_exists_struct_names(tree_widget, parent_opened_item, parent_item)
     # 打开对话框
-    folder_dialog = FolderDialog(screen_rect, dialog_title, exists_folder_name_list,
-                                 folder_info, parent_opened_item)
+    folder_dialog = FolderDialog(dialog_title, screen_rect, exists_folder_name_list, folder_info, parent_opened_item)
     if dialog_title == CREATE_NEW_FOLDER:
-        folder_dialog.save_folder_signal.connect(
-            lambda folder_item: add_struct_tree_item(tree_widget, parent_item, folder_item, FOLDER_TYPE)
-        )
+        folder_dialog.save_signal.connect(lambda folder_item:
+                                          add_struct_tree_item(tree_widget, parent_item, folder_item, FOLDER_TYPE))
     elif dialog_title == EDIT_FOLDER_NAME:
-        folder_dialog.edit_folder_signal.connect(
-            lambda folder_name: update_struct_tree_item(tree_widget, folder_name)
-        )
+        folder_dialog.edit_signal.connect(lambda folder_name: update_struct_tree_item(tree_widget, folder_name))
     folder_dialog.exec()
 
 

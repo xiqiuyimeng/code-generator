@@ -18,7 +18,7 @@ def get_tree_frame(current_frame_name, frame_parent, window):
     if current_frame_name == SQL_DS_CATEGORY:
         return SqlTreeFrame(frame_parent, window)
     elif current_frame_name == STRUCT_DS_CATEGORY:
-        return StructureTreeFrame(frame_parent, window)
+        return StructTreeFrame(frame_parent, window)
 
 
 class TreeFrameABC(QFrame):
@@ -77,7 +77,7 @@ class SqlTreeFrame(TreeFrameABC):
         return SqlTreeWidget(self, window)
 
 
-class StructureTreeFrame(TreeFrameABC):
+class StructTreeFrame(TreeFrameABC):
     """结构体数据源列表frame"""
 
     def __init__(self, parent, window):

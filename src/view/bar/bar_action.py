@@ -9,7 +9,7 @@ from src.constant.bar_constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.struct_type import StructTypeEnum
-from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_structure_dialog, refresh, \
+from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_struct_dialog, refresh, \
     open_type_mapping_dialog, open_template_dialog
 
 _author_ = 'luwt'
@@ -31,7 +31,7 @@ def add_ds_actions(parent_menu, main_window):
     if main_window.current_ds_category.name == SQL_DS_CATEGORY:
         add_sql_ds_actions(parent_menu, main_window)
     elif main_window.current_ds_category.name == STRUCT_DS_CATEGORY:
-        add_structure_ds_actions(parent_menu, main_window)
+        add_struct_ds_actions(parent_menu, main_window)
 
 
 def add_sql_ds_actions(parent_menu, main_window):
@@ -44,13 +44,13 @@ def add_sql_ds_actions(parent_menu, main_window):
         parent_menu.addAction(add_action)
 
 
-def add_structure_ds_actions(parent_menu, main_window, parent_opened_item=None, parent_item=None):
-    parent_menu.triggered.connect(lambda action: open_structure_dialog(action, main_window.struct_tree_widget,
-                                                                       main_window.geometry(), parent_opened_item,
-                                                                       parent_item))
-    for structure_type in StructTypeEnum:
-        structure_type_name = structure_type.value.display_name
-        add_action = QAction(get_icon(structure_type_name), structure_type_name, main_window)
+def add_struct_ds_actions(parent_menu, main_window, parent_opened_item=None, parent_item=None):
+    parent_menu.triggered.connect(lambda action: open_struct_dialog(action, main_window.struct_tree_widget,
+                                                                    main_window.geometry(), parent_opened_item,
+                                                                    parent_item))
+    for struct_type in StructTypeEnum:
+        struct_type_name = struct_type.value.display_name
+        add_action = QAction(get_icon(struct_type_name), struct_type_name, main_window)
         parent_menu.addAction(add_action)
 
 

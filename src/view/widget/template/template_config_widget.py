@@ -66,10 +66,10 @@ class TemplateConfigWidget(QWidget):
         self.config_row_dialog = TemplateConfigDialog(self.parent_screen_rect, config_names,
                                                       config_var_names, config_data)
         if config_data:
-            self.config_row_dialog.edit_config_signal.connect(lambda template_config:
-                                                              self.config_table.edit_row(row_index, template_config))
+            self.config_row_dialog.edit_signal.connect(lambda template_config:
+                                                       self.config_table.edit_row(row_index, template_config))
         else:
-            self.config_row_dialog.add_config_signal.connect(self.config_table.add_row)
+            self.config_row_dialog.save_signal.connect(self.config_table.add_row)
         self.config_row_dialog.exec()
 
     def set_remove_btn_available(self, checked):

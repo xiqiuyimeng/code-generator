@@ -10,7 +10,7 @@ from src.constant.tree_constant import ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTI
     CANCEL_REFRESH_FOLDER_ACTION, DEL_FOLDER_BOX_TITLE
 from src.service.async_func.async_struct_task import DelFolderExecutor
 from src.service.async_func.async_struct_task import RefreshFolderExecutor
-from src.view.bar.bar_action import add_structure_ds_actions
+from src.view.bar.bar_action import add_struct_ds_actions
 from src.view.box.message_box import pop_question, pop_fail
 from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_item_opened_tab
@@ -42,7 +42,7 @@ class FolderTreeNode(StructTreeNodeABC):
         add_struct_menu = QMenu(ADD_STRUCT_ACTION, menu)
         add_struct_menu.setIcon(get_icon(ADD_DS_ACTION))
         # 二级菜单
-        add_structure_ds_actions(add_struct_menu, self.window, get_item_opened_record(self.item), self.item)
+        add_struct_ds_actions(add_struct_menu, self.window, get_item_opened_record(self.item), self.item)
         menu.addMenu(add_struct_menu)
         menu.addSeparator()
 

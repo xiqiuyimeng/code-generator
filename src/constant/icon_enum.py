@@ -102,7 +102,7 @@ class IconEnum(Enum):
 
     # ds category icon
     sql_ds_icon = SQL_DS_CATEGORY, ':/icon/add.png'
-    structure_ds_icon = STRUCT_DS_CATEGORY, ':/icon/add.png'
+    struct_ds_icon = STRUCT_DS_CATEGORY, ':/icon/add.png'
 
     # sql ds icon
     # sqlite
@@ -121,7 +121,7 @@ class IconEnum(Enum):
     sql_oracle_tb_icon = ORACLE_TB, ':/icon/table_icon.png'
     sql_oracle_col_icon = ORACLE_COL, ':/icon/column_icon.png'
 
-    # structure ds icon
+    # struct ds icon
     folder_icon = FOLDER_TYPE, ':/icon/template.png'
     json_type_icon = JSON_DISPLAY_NAME, ':/icon/exec.png'
     struct_col_icon = STRUCT_COL_ICON, ':/icon/column_icon.png'

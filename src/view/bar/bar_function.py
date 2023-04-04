@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-from src.constant.bar_constant import NO_SELECTED_DATA, GENERATE_ACTION, SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
-from src.constant.generator_dialog_constant import SQL_CONFIRM_SELECTED_HEADER_TXT, \
-    STRUCTURE_CONFIRM_SELECTED_HEADER_TXT
+from src.constant.bar_constant import NO_SELECTED_DATA, GENERATE_ACTION
 from src.view.box.message_box import pop_ok
-from src.view.dialog.generator.confirm_selected.sql_confirm_selected_dialog import SqlConfirmSelectedDialog
-from src.view.dialog.generator.confirm_selected.structure_confirm_selected_dialog import StructureConfirmSelectedDialog
+from src.view.dialog.generator.generator_dialog import GeneratorDialog
 from src.view.dialog.template.template_dialog import TemplateDialog
 from src.view.dialog.type_mapping.type_mapping_dialog import TypeMappingDialog
 from src.view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
@@ -23,8 +20,8 @@ def open_conn_dialog(sql_type_action, tree_widget, screen_rect):
     add_conn_func(sql_type_action.text(), tree_widget, screen_rect)
 
 
-def open_structure_dialog(struct_type_action, tree_widget, screen_rect,
-                          parent_opened_item, parent_item):
+def open_struct_dialog(struct_type_action, tree_widget, screen_rect,
+                       parent_opened_item, parent_item):
     """
     打开添加结构体子窗口
     :param struct_type_action: 用来标识结构体数据源类型
@@ -61,14 +58,9 @@ def generate(main_window):
     if not selected_data:
         pop_ok(NO_SELECTED_DATA, GENERATE_ACTION, main_window)
     else:
-        if main_window.current_ds_category.name == SQL_DS_CATEGORY:
-            confirm_selected_dialog = SqlConfirmSelectedDialog(selected_data, main_window.geometry(),
-                                                               SQL_CONFIRM_SELECTED_HEADER_TXT)
-            confirm_selected_dialog.exec()
-        elif main_window.current_ds_category.name == STRUCT_DS_CATEGORY:
-            confirm_selected_dialog = StructureConfirmSelectedDialog(selected_data, main_window.geometry(),
-                                                                     STRUCTURE_CONFIRM_SELECTED_HEADER_TXT)
-            confirm_selected_dialog.exec()
+        confirm_selected_dialog = GeneratorDialog(main_window.current_ds_category.name,
+                                                  selected_data, None, main_window.geometry())
+        confirm_selected_dialog.exec()
 
 
 def clear_data(main_window):

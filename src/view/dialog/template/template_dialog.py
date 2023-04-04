@@ -1,79 +1,24 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton
 
-from src.constant.template_dialog_constant import TEMPLATE_LIST_TITLE, TEMPLATE_LIST_BOX_TITLE, \
-    DEL_TEMPLATE_BOX_TITLE, DEL_TEMPLATE_PROMPT, BATCH_TEMPLATE_PROMPT, ADD_TEMPLATE_BTN_TEXT, \
-    DEL_TEMPLATE_BTN_TEXT, FUNC_DIALOG_BTN_TEXT
-from src.service.async_func.async_template_task import ListTemplateExecutor, DelTemplateExecutor, \
-    BatchDelTemplateExecutor
-from src.view.dialog.custom_table_dialog import CustomTableDialog
-from src.view.dialog.template.template_detail_dialog import TemplateDetailDialog
-from src.view.dialog.template.template_func_dialog import TemplateFuncDialog
-from src.view.table.table_widget.template_table_widget.template_table_widget import TemplateTableWidget
+from src.constant.template_dialog_constant import TEMPLATE_LIST_TITLE
+from src.view.dialog.custom_dialog_abc import CustomDialogABC
+from src.view.frame.template.template_dialog_frame import TemplateDialogFrame
 
 _author_ = 'luwt'
-_date_ = '2023/2/13 10:03'
+_date_ = '2023/4/3 17:55'
 
 
-class TemplateDialog(CustomTableDialog):
+class TemplateDialog(CustomDialogABC):
     """模板列表表格对话框"""
 
     def __init__(self, screen_rect):
-        # 打开常用方法对话框按钮
-        self.open_template_func_dialog_btn: QPushButton = ...
-        # 常用方法对话框
-        self.template_func_dialog: TemplateFuncDialog = ...
-        super().__init__(screen_rect, TEMPLATE_LIST_TITLE, quit_button_row_index=4)
+        self.frame: TemplateDialogFrame = ...
+        super().__init__(TEMPLATE_LIST_TITLE, screen_rect)
 
-    # ------------------------------ 创建ui界面 start ------------------------------ #
+    def resize_dialog(self):
+        # 当前窗口大小根据主窗口大小计算
+        self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
 
-    def make_table_widget(self):
-        self.table_widget = TemplateTableWidget(self.table_frame)
+    def get_frame(self) -> TemplateDialogFrame:
+        return TemplateDialogFrame(self, self.dialog_title)
 
-    def setup_first_button(self) -> QPushButton:
-        self.open_template_func_dialog_btn = QPushButton(self.frame)
-        return self.open_template_func_dialog_btn
-
-    def setup_other_label_text(self):
-        self.open_template_func_dialog_btn.setText(FUNC_DIALOG_BTN_TEXT)
-        self.add_row_button.setText(ADD_TEMPLATE_BTN_TEXT)
-        self.del_row_button.setText(DEL_TEMPLATE_BTN_TEXT)
-
-    # ------------------------------ 创建ui界面 end ------------------------------ #
-
-    # ------------------------------ 信号槽处理 start ------------------------------ #
-
-    def connect_special_signal(self):
-        self.open_template_func_dialog_btn.clicked.connect(self.open_template_func_dialog)
-
-    def open_template_func_dialog(self):
-        """打开模板常用方法对话框"""
-        self.template_func_dialog = TemplateFuncDialog(self.parent_screen_rect)
-        self.template_func_dialog.exec()
-
-    def get_row_data_dialog(self, row_id) -> TemplateDetailDialog:
-        template_names = list(map(lambda x: x.template_name, self.table_widget.cols))
-        return TemplateDetailDialog(self.parent_screen_rect, template_names, row_id)
-
-    def get_del_prompt_title(self):
-        return DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
-
-    def get_del_executor(self, row_id, item_name, row_index, del_title) -> DelTemplateExecutor:
-        return DelTemplateExecutor(row_id, item_name, row_index, self, self,
-                                   del_title, self.table_widget.del_row)
-
-    def get_batch_del_prompt_title(self):
-        return BATCH_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
-
-    def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTemplateExecutor:
-        return BatchDelTemplateExecutor(delete_ids, delete_names, self, self, del_title,
-                                        self.table_widget.del_rows)
-
-    # ------------------------------ 信号槽处理 end ------------------------------ #
-
-    # ------------------------------ 后置处理 start ------------------------------ #
-
-    def get_list_table_data_executor(self) -> ListTemplateExecutor:
-        return ListTemplateExecutor(self, self, TEMPLATE_LIST_BOX_TITLE, self.table_widget.fill_table)
-
-    # ------------------------------ 后置处理 end ------------------------------ #

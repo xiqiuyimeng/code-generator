@@ -36,9 +36,9 @@ ORACLE_DEFAULT_SERVICE_NAME = 'XE'
 
 # ---------- 结构体对话框中的展示文本 start ---------- #
 DEL_STRUCT_TITLE = '删除数据源'
-STRUCTURE_NAME_TEXT = "{}数据源名称："
-STRUCTURE_FILE_URL_TEXT = "{}文件地址： "
-STRUCTURE_CONTENT_TEXT = "{}数据源内容："
+STRUCT_NAME_TEXT = "{}数据源名称："
+STRUCT_FILE_URL_TEXT = "{}文件地址： "
+STRUCT_CONTENT_TEXT = "{}数据源内容："
 PRETTY_STRUCT_TEXT = '美化{}'
 CHOOSE_STRUCT_FILE_TEXT = "选择文件"
 SAVE_STRUCT_TITLE = '保存{}数据源'
