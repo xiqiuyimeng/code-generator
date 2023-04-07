@@ -3,7 +3,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QPushButton, QFileDialog, QComboBox, QGridLayout
 
-from src.constant.template_dialog_constant import CONFIG_DESC_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT
+from src.constant.template_dialog_constant import CONFIG_DESC_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT, \
+    OPEN_FILE_DIALOG_BUTTON_TXT, SELECT_DIRECTORY_TITLE
 from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.view.custom_widget.text_editor import TextEditor
 
@@ -62,6 +63,7 @@ class ConfigValueWidgetABC(QWidget):
 
     def set_text(self):
         if self.config.is_required:
+            # 必填项文本为 *，红色文本
             if self.required_label_palette is Ellipsis:
                 self.required_label_palette = QPalette()
                 self.required_label_palette.setColor(QPalette.WindowText, Qt.red)
@@ -115,13 +117,13 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
         self.config_layout.addWidget(self.open_file_dialog_button)
 
     def set_other_text(self):
-        self.open_file_dialog_button.setText('请选择文件夹')
+        self.open_file_dialog_button.setText(OPEN_FILE_DIALOG_BUTTON_TXT)
 
     def connect_signal(self):
         self.open_file_dialog_button.clicked.connect(self.open_dir_dialog)
 
     def open_dir_dialog(self):
-        exists_dir = QFileDialog.getExistingDirectory(self, "选择文件夹", "/", QFileDialog.ShowDirsOnly)
+        exists_dir = QFileDialog.getExistingDirectory(self, SELECT_DIRECTORY_TITLE, "/", QFileDialog.ShowDirsOnly)
         self.set_dir(exists_dir)
 
     def set_dir(self, exists_dir): ...

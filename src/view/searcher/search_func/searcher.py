@@ -48,7 +48,8 @@ class Searcher:
             self.search(text)
         elif key == Qt.Key_Backspace:
             self.backspace_search()
-        elif self.match_item_records and (key == Qt.Key_Up or key == Qt.Key_Down):
+        elif self.match_item_records and all(self.match_item_records) \
+                and (key == Qt.Key_Up or key == Qt.Key_Down):
             self.up_down_select_item(key)
         else:
             # 处理不了的情况，交由调用方处理

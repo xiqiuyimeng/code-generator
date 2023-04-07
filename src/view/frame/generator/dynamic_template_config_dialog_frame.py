@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
 
 from src.constant.generator_dialog_constant import BACK_TO_SELECT_TEMPLATE_TXT, GENERATE_TXT, PREVIEW_GENERATE_TXT
@@ -118,6 +119,14 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         self.preview_generate_button.clicked.connect(lambda: self.switch_frame(self.preview_generate_frame))
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        # 清除焦点
+        self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    # ------------------------------ 后置处理 end ------------------------------ #
 
     def switch_frame(self, frame):
         # 只要不是回退，都需要收集数据
