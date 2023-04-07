@@ -15,7 +15,7 @@ from src.service.util.db_id_generator import update_id_generator, get_id
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
 
-db_name = os.path.join(SYS_DB_PATH, f'generator_db')
+db_name = os.path.join(SYS_DB_PATH, 'generator_db')
 table_field_dict = dict()
 thread_id_db_dict = dict()
 # 批量操作数据库时，参数个数上限
@@ -76,6 +76,7 @@ def transactional(f):
             if allow_close_conn:
                 # 关闭当前事务创建的连接
                 conn.close()
+
     return do_transaction
 
 

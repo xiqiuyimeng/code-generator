@@ -57,18 +57,21 @@ LOCATE_FILE_BTN_TEXT = '定位'
 ADD_CONFIG_BTN_TEXT = '添加配置项'
 REMOVE_CONFIG_BTN_TEXT = '移除配置项'
 PREVIEW_CONFIG_BTN_TEXT = '预览模板配置页'
+PREVIEW_CONFIG_TITLE = '模板配置页预览'
+NO_TEMPLATE_CONFIG_ITEMS_TEXT = '暂未维护模板配置项'
 TEMPLATE_CONFIG_HEADER_LABELS = ['配置项名称', '输出变量名', '控件类型', '是否必填', '说明']
+TEMPLATE_CONFIG_LIST_BOX_TITLE = '模板配置列表'
 
 # 模板配置详情页
 TEMPLATE_CONFIG_TITLE_TEXT = '模板配置详情'
 
 # 控件类型
 CONFIG_INPUT_WIDGET_TYPE_DICT = {
-    '文本输入框': ('QLineEdit', 'from PyQt5.QtWidgets import QLineEdit'),
-    '文本输入框 + 文件夹对话框': ('QLineEdit,QFileDialog', 'from PyQt5.QtWidgets import QLineEdit, QFileDialog'),
-    '文本编辑区': ('TextEditor', 'from src.view.custom_widget.text_editor import TextEditor'),
-    '下拉框列表': ('QComboBox', 'from PyQt5.QtWidgets import QComboBox'),
-    '文件夹对话框': ('QFileDialog', 'from PyQt5.QtWidgets import QFileDialog'),
+    '文本输入框': 'LineEditConfigValueWidget',
+    '文本输入框 + 文件夹对话框': 'LineEditFileDialogConfigValueWidget',
+    '文本编辑区': 'TextEditorConfigValueWidget',
+    '下拉框列表': 'ComboBoxConfigValueWidget',
+    '文件夹对话框': 'FileDialogConfigValueWidget',
 }
 DEL_CONFIG_BOX_TITLE = '删除配置项'
 DEL_CONFIG_PROMPT = '配置项：{}\n确认删除配置项吗？'
@@ -89,3 +92,6 @@ IS_REQUIRED_TEXT = '是否必填：'
 ADD_VALUE_BTN_TEXT = '添加值'
 
 ADD_RANGE_VALUE_BOX_TITLE = '添加下拉列表值'
+
+NOT_FILL_ALL_REQUIRED_INPUT_TXT = '还有未完成的必填项，请完成所有必填项'
+REQUIRED_CHECK_BOX_TITLE = '必填项检查'

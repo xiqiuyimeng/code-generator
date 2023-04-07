@@ -2,7 +2,7 @@
 from src.constant.generator_dialog_constant import BACK_TO_SELECTED_DATA_TXT, CHOOSE_TEMPLATE_TXT
 from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_BOX_TITLE
 from src.service.async_func.async_type_mapping_task import ListTypeMappingExecutor
-from src.view.frame.generator.select_dialog_frame_abc import SelectDialogFrame
+from src.view.frame.generator.select_list.select_dialog_frame_abc import SelectDialogFrame
 
 _author_ = 'luwt'
 _date_ = '2023/4/4 16:35'

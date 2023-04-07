@@ -55,3 +55,5 @@ class ChainDialogFrameABC(DialogFrameABC):
 
     def set_next_frame(self, frame):
         self.next_frame = frame
+        # 先隐藏下一个框架
+        self.next_frame.hide()

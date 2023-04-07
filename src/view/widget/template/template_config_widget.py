@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QPushButton
 
 from src.constant.template_dialog_constant import ADD_CONFIG_BTN_TEXT, REMOVE_CONFIG_BTN_TEXT, PREVIEW_CONFIG_BTN_TEXT
 from src.view.dialog.template.template_config_dialog import TemplateConfigDialog
+from src.view.dialog.template.template_config_preview_dialog import TemplateConfigPreviewDialog
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import TemplateConfigTableWidget
 
 _author_ = 'luwt'
@@ -10,6 +11,7 @@ _date_ = '2023/3/21 17:06'
 
 
 class TemplateConfigWidget(QWidget):
+    """模板配置页，嵌入在堆栈式窗口中"""
 
     def __init__(self, parent_screen_rect):
         super().__init__()
@@ -19,6 +21,8 @@ class TemplateConfigWidget(QWidget):
         self.add_config_btn: QPushButton = ...
         self.remove_config_btn: QPushButton = ...
         self.preview_config_btn: QPushButton = ...
+        # 预览配置页
+        self.preview_config_dialog: TemplateConfigPreviewDialog = ...
         self.config_table: TemplateConfigTableWidget = ...
         self.config_row_dialog: TemplateConfigDialog = ...
 
@@ -79,7 +83,11 @@ class TemplateConfigWidget(QWidget):
         else:
             self.remove_config_btn.setDisabled(True)
 
-    def preview_template_config(self): ...
+    def preview_template_config(self):
+        # 预览配置页
+        self.preview_config_dialog = TemplateConfigPreviewDialog(self.parent_screen_rect,
+                                                                 self.config_table.collect_data())
+        self.preview_config_dialog.exec()
 
     def post_process(self):
         self.set_remove_btn_available(False)

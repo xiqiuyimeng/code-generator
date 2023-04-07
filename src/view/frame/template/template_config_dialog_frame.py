@@ -46,15 +46,19 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.is_required_combox: QComboBox = ...
         # 堆栈式窗口
         self.stacked_widget: QStackedWidget = ...
-        # 目前有三种窗口
+        # 目前有四种窗口
         self.input_widget: QWidget = ...
-        self.input_layout: QFormLayout = ...
+        self.input_layout: QGridLayout = ...
+        self.text_edit_widget: QWidget = ...
+        self.text_edit_layout: QGridLayout = ...
         self.combox_widget: QWidget = ...
         self.combox_layout: QGridLayout = ...
         self.choose_dir_widget: QWidget = ...
         # 默认值
         self.default_value_label: QLabel = ...
         self.default_value_input: QLineEdit = ...
+        self.default_text_edit_value_label: QLabel = ...
+        self.default_text_edit_value_input: TextEditor = ...
         self.default_value_combo_box_layout: QFormLayout = ...
         self.default_combox_value_label: QLabel = ...
         self.default_value_combo_box: QComboBox = ...
@@ -111,6 +115,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
         # 输入框窗口
         self.setup_input_widget()
+        # 文本编辑区窗口
+        self.setup_text_edit_widget()
         # 下拉框窗口
         self.setup_combox_widget()
         # 选择文件夹对话框窗口
@@ -118,16 +124,34 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
     def setup_input_widget(self):
         self.input_widget = QWidget()
-        self.input_layout = QFormLayout(self.input_widget)
+        self.input_layout = QGridLayout(self.input_widget)
         self.stacked_widget.addWidget(self.input_widget)
         # 默认值
         self.default_value_label = QLabel()
+        self.input_layout.addWidget(self.default_value_label, 0, 0, 1, 1)
         self.default_value_input = QLineEdit()
-        self.input_layout.addRow(self.default_value_label, self.default_value_input)
+        self.input_layout.addWidget(self.default_value_input, 0, 1, 1, 1)
         # 占位文本
         self.placeholder_label = QLabel()
+        self.input_layout.addWidget(self.placeholder_label, 1, 0, 1, 1)
         self.placeholder_input = QLineEdit()
-        self.input_layout.addRow(self.placeholder_label, self.placeholder_input)
+        self.input_layout.addWidget(self.placeholder_input, 1, 1, 1, 1)
+
+        self.input_layout.setColumnStretch(0, 2)
+        self.input_layout.setColumnStretch(1, 11)
+
+    def setup_text_edit_widget(self):
+        self.text_edit_widget = QWidget()
+        self.text_edit_layout = QGridLayout(self.text_edit_widget)
+        self.stacked_widget.addWidget(self.text_edit_widget)
+        # 默认值
+        self.default_text_edit_value_label = QLabel()
+        self.text_edit_layout.addWidget(self.default_text_edit_value_label, 0, 0, 1, 1)
+        self.default_text_edit_value_input = TextEditor()
+        self.text_edit_layout.addWidget(self.default_text_edit_value_input, 0, 1, 1, 1)
+
+        self.text_edit_layout.setColumnStretch(0, 2)
+        self.text_edit_layout.setColumnStretch(1, 11)
 
     def setup_combox_widget(self):
         self.combox_widget = QWidget()
@@ -168,6 +192,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.fill_combo_box()
 
         self.default_value_label.setText(DEFAULT_VALUE_TEXT)
+        self.default_text_edit_value_label.setText(DEFAULT_VALUE_TEXT)
         self.default_combox_value_label.setText(DEFAULT_VALUE_TEXT)
         self.placeholder_label.setText(PLACEHOLDER_TEXT)
         self.value_range_label.setText(VALUE_RANGE_TEXT)
@@ -188,6 +213,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     def connect_child_signal(self):
         self.connect_text_edit_signal()
         self.desc_input.textChanged.connect(self.check_input)
+        self.default_text_edit_value_input.textChanged.connect(self.check_input)
         self.is_required_combox.currentIndexChanged.connect(self.check_input)
         self.default_value_combo_box.currentIndexChanged.connect(self.check_input)
         self.value_combo_box.currentIndexChanged.connect(self.switch_stacked_widget)
@@ -225,7 +251,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         return (not self.dialog_data) or (self.echo_data_complete and self.new_dialog_data != self.dialog_data)
 
     def switch_stacked_widget(self, idx):
-        idx = idx - 2 if idx > 2 else 0
+        idx = idx - 1 if idx > 1 else 0
         self.stacked_widget.setCurrentIndex(idx)
         self.check_input()
 
@@ -266,12 +292,17 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.new_dialog_data.config_desc = self.desc_input.toPlainText()
         # 如果是文本输入类型控件，那么需要收集占位文本、默认值，如果是下拉框，收集默认值，下拉值列表
         current_widget_idx = self.value_combo_box.currentIndex()
-        if current_widget_idx <= 2:
+        if current_widget_idx <= 1:
             # 清除下拉值列表
             self.new_dialog_data.range_values = ''
             # 收集数据
             self.new_dialog_data.placeholder_text = self.placeholder_input.displayText()
             self.new_dialog_data.default_value = self.default_value_input.displayText()
+        elif current_widget_idx == 2:
+            # 清除下拉值列表、占位文本
+            self.new_dialog_data.placeholder_text = ''
+            self.new_dialog_data.range_values = ''
+            self.new_dialog_data.default_value = self.default_text_edit_value_input.toPlainText()
         elif current_widget_idx == 3:
             # 清除占位文本
             self.new_dialog_data.placeholder_text = ''
@@ -325,10 +356,13 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.desc_input.setPlainText(self.dialog_data.config_desc)
         # 如果是文本输入类型控件，那么需要回显占位文本、默认值，如果是下拉框，回显默认值，下拉值列表
         current_widget_idx = self.value_combo_box.currentIndex()
-        if current_widget_idx <= 2:
+        if current_widget_idx <= 1:
             # 回显数据
             self.placeholder_input.setText(self.dialog_data.placeholder_text)
             self.default_value_input.setText(self.dialog_data.default_value)
+        elif current_widget_idx == 2:
+            # 回显数据
+            self.default_text_edit_value_input.setPlainText(self.dialog_data.default_value)
         elif current_widget_idx == 3:
             # 回显数据
             range_values = self.dialog_data.range_values.split(',')

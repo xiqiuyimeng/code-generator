@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import pyqtSignal
+
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC
 from src.view.list_widget.list_widget_abc import ListWidgetABC
@@ -8,6 +10,8 @@ _date_ = '2023/4/4 17:01'
 
 
 class SelectDialogFrame(ChainDialogFrameABC):
+    """选择列表项对话框框架"""
+    data_changed_signal = pyqtSignal(object)
 
     def __init__(self, *args):
         self.data_list: list = ...
@@ -25,6 +29,18 @@ class SelectDialogFrame(ChainDialogFrameABC):
         self.frame_layout.addWidget(self.list_widget)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def connect_other_signal(self):
+        super().connect_other_signal()
+        # 当列表项变化时，发射信号
+        self.list_widget.currentRowChanged.connect(self.emit_row_data)
+
+    def emit_row_data(self, row):
+        self.data_changed_signal.emit(self.data_list[row])
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
 
     # ------------------------------ 后置处理 start ------------------------------ #
 

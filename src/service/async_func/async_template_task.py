@@ -5,7 +5,7 @@ from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
-from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite
+from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, TemplateConfig
 from src.service.system_storage.template_sqlite import TemplateSqlite, Template
 from src.view.box.message_box import pop_ok
 
@@ -222,5 +222,41 @@ class ListTemplateExecutor(LoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return ListTemplateWorker()
+
+# ----------------------- 获取模板列表 end ----------------------- #
+
+
+# ----------------------- 获取模板列表 start ----------------------- #
+
+class ListTemplateConfigWorker(ThreadWorkerABC):
+    success_signal = pyqtSignal(list)
+
+    def __init__(self, template_id):
+        super().__init__()
+        self.template_id = template_id
+
+    def do_run(self):
+        log.info(f"读取模板配置列表：{self.template_id}")
+        # 读取数据库中缓存的模板列表
+        param = TemplateConfig()
+        param.template_id = self.template_id
+        template_config_list = TemplateConfigSqlite().select_by_order(param)
+        self.success_signal.emit(template_config_list)
+        log.info(f"读取模板配置列表成功：{self.template_id}")
+
+    def do_exception(self, e: Exception):
+        err_msg = '读取模板配置列表失败'
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+
+
+class ListTemplateConfigExecutor(LoadingMaskThreadExecutor):
+
+    def __init__(self, template_id, *args):
+        self.template_id = template_id
+        super().__init__(*args)
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return ListTemplateConfigWorker(self.template_id)
 
 # ----------------------- 获取模板列表 end ----------------------- #
