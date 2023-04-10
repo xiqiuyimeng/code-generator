@@ -86,7 +86,7 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         self.content_scroll_area.set_canvas_widget(self.canvas_content_frame)
 
         # 在真实控件之上，增加一个空白label，允许布局拉伸label，以保持真实控件的固定高度，避免变形
-        self.canvas_content_frame_layout.addWidget(self.placeholder_blank)
+        self.canvas_content_frame_layout.addWidget(QLabel())
 
         if self.template_config_list:
             if not self.preview_mode:
@@ -100,7 +100,7 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
                     self.config_widget_list.append(config_value_widget)
 
         # 在真实控件之下，增加一个空白label，与上面的空白label对称，使得真实控件靠近中间
-        self.canvas_content_frame_layout.addWidget(self.placeholder_blank)
+        self.canvas_content_frame_layout.addWidget(QLabel())
 
     def setup_no_data_frame(self):
         self.no_data_frame = QFrame()
