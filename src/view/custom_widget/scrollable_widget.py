@@ -7,7 +7,7 @@ import re
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QAbstractScrollArea, QPlainTextEdit, QAbstractItemView
+from PyQt5.QtWidgets import QAbstractScrollArea, QPlainTextEdit, QAbstractItemView, QScrollArea, QFrame
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:18'
@@ -57,6 +57,22 @@ class ScrollableWidget(QAbstractScrollArea):
         # 当鼠标离开时，不再抓取键盘输入
         self.releaseKeyboard()
         super().leaveEvent(event)
+
+
+class ScrollArea(QScrollArea, ScrollableWidget):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        # 去除边框
+        self.setFrameShape(QFrame.NoFrame)
+        # 设置可以调节控件大小
+        self.setWidgetResizable(True)
+        # 垂直滚动条策略
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+    def set_canvas_widget(self, canvas_widget):
+        """设置画布部件，滚动区域的原理为：在画布之上进行滚动，像用放大镜看画布一样"""
+        self.setWidget(canvas_widget)
 
 
 class ScrollableTextEdit(QPlainTextEdit, ScrollableWidget):

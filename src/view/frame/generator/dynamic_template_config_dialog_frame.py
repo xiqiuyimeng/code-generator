@@ -7,8 +7,9 @@ from src.constant.template_dialog_constant import TEMPLATE_CONFIG_LIST_BOX_TITLE
     NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE
 from src.service.async_func.async_template_task import ListTemplateConfigExecutor
 from src.view.box.message_box import pop_fail
+from src.view.custom_widget.scrollable_widget import ScrollArea
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC
-from src.view.widget.template.config_value_widget import get_config_value_widget
+from src.view.widget.template.config_value_widget import get_config_value_widget, ConfigValueWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/4/6 9:09'
@@ -34,8 +35,9 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         self.no_data_frame: QFrame = ...
         self.no_data_layout: QVBoxLayout = ...
         self.no_data_label: QLabel = ...
-        self.content_frame: QFrame = ...
-        self.content_frame_layout: QFormLayout = ...
+        self.content_scroll_area: ScrollArea = ...
+        self.canvas_content_frame: QFrame = ...
+        self.canvas_content_frame_layout: QFormLayout = ...
         self.preview_generate_button: QPushButton = ...
         self.preview_generate_frame: ChainDialogFrameABC = ...
         self.list_template_config_executor: ListTemplateConfigExecutor = ...
@@ -69,23 +71,36 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
 
     def do_get_content_frame(self):
         if self.template_config_list:
-            self.setup_content_frame()
-            return self.content_frame
+            self.setup_content_scroll_area()
+            return self.content_scroll_area
         else:
             self.setup_no_data_frame()
             return self.no_data_frame
 
-    def setup_content_frame(self):
-        self.content_frame = QFrame()
-        self.content_frame_layout = QVBoxLayout(self.content_frame)
+    def setup_content_scroll_area(self):
+        self.content_scroll_area = ScrollArea()
+        # 画布控件
+        self.canvas_content_frame = QFrame()
+        self.canvas_content_frame_layout = QVBoxLayout(self.canvas_content_frame)
+        # 设置画布控件
+        self.content_scroll_area.set_canvas_widget(self.canvas_content_frame)
+
+        # 在真实控件之上，增加一个空白label，允许布局拉伸label，以保持真实控件的固定高度，避免变形
+        self.canvas_content_frame_layout.addWidget(self.placeholder_blank)
+
         if self.template_config_list:
             if not self.preview_mode:
                 self.config_widget_list = list()
             for config in self.template_config_list:
-                config_value_widget = get_config_value_widget(config)
-                self.content_frame_layout.addWidget(config_value_widget)
+                config_value_widget: ConfigValueWidgetABC = get_config_value_widget(config)
+                # 为了美观，将控件高度固定
+                config_value_widget.setFixedHeight(config_value_widget.sizeHint().height())
+                self.canvas_content_frame_layout.addWidget(config_value_widget)
                 if self.config_widget_list is not Ellipsis:
                     self.config_widget_list.append(config_value_widget)
+
+        # 在真实控件之下，增加一个空白label，与上面的空白label对称，使得真实控件靠近中间
+        self.canvas_content_frame_layout.addWidget(self.placeholder_blank)
 
     def setup_no_data_frame(self):
         self.no_data_frame = QFrame()
