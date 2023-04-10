@@ -3,6 +3,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QWidget
 
+from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.table_constant import DS_TABLE_HEADER_LABELS
 from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
@@ -101,7 +102,7 @@ class DsColTableWidgetABC(TableWidgetABC):
             self.setItem(i, 1, self.make_item(col.col_name))
             self.setItem(i, 2, self.make_item(col.data_type))
             self.setItem(i, 3, self.make_item(col.full_data_type))
-            self.setItem(i, 4, self.make_item('是' if col.is_pk else '否'))
+            self.setItem(i, 4, self.make_item(COMBO_BOX_YES_TXT if col.is_pk else COMBO_BOX_NO_TXT))
             self.setItem(i, 5, self.make_item(col.col_comment if col.col_comment else ''))
 
         # 后置处理
@@ -162,7 +163,7 @@ class DsColTableWidgetABC(TableWidgetABC):
             col_data.full_data_type = data
             modify_col_data.full_data_type = data
         elif col == 4:
-            is_pk = 1 if data == '是' else 0
+            is_pk = 1 if data == COMBO_BOX_YES_TXT else 0
             col_data.is_pk = is_pk
             modify_col_data.is_pk = is_pk
         elif col == 5:

@@ -4,6 +4,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QLabel, QLineEdit, QAction, QGridLayout, QComboBox, QStackedWidget, QWidget, QFormLayout, \
     QPushButton
 
+from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.template_dialog_constant import CONFIG_NAME_TEXT, VAR_NAME_TEXT, WIDGET_LABEL_TEXT, \
     CONFIG_DESC_TEXT, IS_REQUIRED_TEXT, DEFAULT_VALUE_TEXT, PLACEHOLDER_TEXT, VALUE_RANGE_TEXT, \
     ADD_VALUE_BTN_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT, ADD_RANGE_VALUE_BOX_TITLE, VAR_NAME_REG_RULE, \
@@ -92,12 +93,18 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.desc_label = QLabel()
         self.desc_input = TextEditor()
         self.name_layout.addRow(self.desc_label, self.desc_input)
+        # 名称表单布局左侧增加间距，因为堆栈式窗口本身会占据一定空间，所以会导致堆栈式窗口内的部件靠右
+        margins = self.name_layout.contentsMargins()
+        margins.setLeft(10)
+        self.name_layout.setContentsMargins(margins)
 
         self.widget_layout = QGridLayout()
         self.frame_layout.addLayout(self.widget_layout)
 
         # 配置项控件
         self.widget_label = QLabel()
+        # 增加左侧间距
+        self.widget_label.setContentsMargins(margins)
         self.widget_layout.addWidget(self.widget_label, 0, 0, 1, 1)
         self.value_combo_box = QComboBox()
         self.widget_layout.addWidget(self.value_combo_box, 0, 1, 1, 1)
@@ -202,8 +209,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.value_combo_box.addItems(CONFIG_INPUT_WIDGET_TYPE_DICT)
         self.value_combo_box.setCurrentIndex(0)
 
-        self.is_required_combox.addItem('是')
-        self.is_required_combox.addItem('否')
+        self.is_required_combox.addItem(COMBO_BOX_YES_TXT)
+        self.is_required_combox.addItem(COMBO_BOX_NO_TXT)
         self.is_required_combox.setCurrentIndex(0)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
@@ -288,7 +295,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.new_dialog_data.config_value_widget = self.value_combo_box.currentText()
         required_text = self.is_required_combox.currentText()
         self.new_dialog_data.is_required = RequiredEnum.required.value \
-            if required_text == '是' else RequiredEnum.not_required.value
+            if required_text == COMBO_BOX_YES_TXT else RequiredEnum.not_required.value
         self.new_dialog_data.config_desc = self.desc_input.toPlainText()
         # 如果是文本输入类型控件，那么需要收集占位文本、默认值，如果是下拉框，收集默认值，下拉值列表
         current_widget_idx = self.value_combo_box.currentIndex()
@@ -352,7 +359,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.old_var_name = self.dialog_data.output_var_name
         self.var_name_input.setText(self.old_var_name)
         self.value_combo_box.setCurrentText(self.dialog_data.config_value_widget)
-        self.is_required_combox.setCurrentText('是' if self.dialog_data.is_required else '否')
+        self.is_required_combox.setCurrentText(COMBO_BOX_YES_TXT
+                                               if self.dialog_data.is_required else COMBO_BOX_NO_TXT)
         self.desc_input.setPlainText(self.dialog_data.config_desc)
         # 如果是文本输入类型控件，那么需要回显占位文本、默认值，如果是下拉框，回显默认值，下拉值列表
         current_widget_idx = self.value_combo_box.currentIndex()

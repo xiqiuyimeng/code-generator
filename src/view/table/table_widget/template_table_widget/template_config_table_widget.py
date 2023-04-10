@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
+from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.template_dialog_constant import DEL_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, BATCH_DEL_CONFIG_PROMPT, \
     TEMPLATE_CONFIG_HEADER_LABELS
 from src.service.system_storage.template_config_sqlite import TemplateConfig
@@ -23,7 +24,8 @@ class TemplateConfigTableWidget(CustomTableWidget):
                       template_config.config_value_widget)
         for i in range(1, 4):
             self.setItem(row_index, i, self.make_item(data_tuple[i - 1]))
-        self.setItem(row_index, 4, self.make_item('是' if template_config.is_required else '否'))
+        self.setItem(row_index, 4, self.make_item(COMBO_BOX_YES_TXT
+                                                  if template_config.is_required else COMBO_BOX_NO_TXT))
         self.setItem(row_index, 5, self.make_item(template_config.config_desc))
 
     def emit_row_edit_signal(self, order_item, row_id):

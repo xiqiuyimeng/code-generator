@@ -77,14 +77,14 @@ DEL_CONFIG_BOX_TITLE = '删除配置项'
 DEL_CONFIG_PROMPT = '配置项：{}\n确认删除配置项吗？'
 BATCH_DEL_CONFIG_PROMPT = '已选择{}个配置项\n确认删除选中的配置项吗？'
 
-CONFIG_NAME_TEXT = ' 配置项名称：'
-VAR_NAME_TEXT = ' 输出变量名称：'
+CONFIG_NAME_TEXT = '配置项名称：'
+VAR_NAME_TEXT = '输出变量名称：'
 
 VAR_NAME_PLACEHOLDER_TEXT = '变量名称最多可输入50字符，须符合变量命名规则，以下划线或大小写字母开头'
 VAR_NAME_REG_RULE = r'[_a-zA-Z]\w*'
 
-WIDGET_LABEL_TEXT = ' 配置项控件：'
-CONFIG_DESC_TEXT = ' 配置项说明：'
+WIDGET_LABEL_TEXT = '配置项控件：'
+CONFIG_DESC_TEXT = '配置项说明：'
 DEFAULT_VALUE_TEXT = '默认值：'
 PLACEHOLDER_TEXT = '占位文本：'
 VALUE_RANGE_TEXT = '值列表：'

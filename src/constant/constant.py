@@ -13,3 +13,7 @@ SYS_DB_PATH = os.path.join(os.environ['USERPROFILE'], '.generator_db')
 
 
 DS_TYPE_COMBO_BOX_PLACEHOLDER_TXT = '请选择数据源类型'
+
+# 通用下拉框值：是、否
+COMBO_BOX_YES_TXT = '是'
+COMBO_BOX_NO_TXT = '否'
