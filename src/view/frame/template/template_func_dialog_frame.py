@@ -70,8 +70,8 @@ class TemplateFuncDialogFrame(DialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
-        self.list_func_executor = ListTemplateFuncExecutor(self, self, TEMPLATE_FUNC_LIST_TITLE,
-                                                           self.fill_list_widget)
+        self.list_func_executor = ListTemplateFuncExecutor(self.parent_dialog, self.parent_dialog,
+                                                           TEMPLATE_FUNC_LIST_TITLE, self.fill_list_widget)
         self.list_func_executor.start()
 
     def fill_list_widget(self, func_list):

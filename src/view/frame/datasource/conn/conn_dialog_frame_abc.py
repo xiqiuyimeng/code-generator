@@ -101,7 +101,8 @@ class ConnDialogFrameABC(DsDialogFrameABC):
 
     def test_connection(self):
         self.test_conn_executor = TestConnLoadingMaskExecutor(self.new_dialog_data, self.conn_type,
-                                                              self, self, TEST_CONN_BOX_TITLE)
+                                                              self.parent_dialog, self.parent_dialog,
+                                                              TEST_CONN_BOX_TITLE)
         self.test_conn_executor.start()
 
     def connect_conn_info_signal(self):
@@ -114,12 +115,12 @@ class ConnDialogFrameABC(DsDialogFrameABC):
             self.new_dialog_data.id = self.dialog_data.id
             self.name_changed = self.new_dialog_data.conn_name != self.dialog_data.conn_name
             self.edit_conn_executor = EditConnExecutor(self.new_dialog_data, self.name_changed,
-                                                       self, self, SAVE_CONN_BOX_TITLE,
-                                                       self.edit_post_process)
+                                                       self.parent_dialog, self.parent_dialog,
+                                                       SAVE_CONN_BOX_TITLE, self.edit_post_process)
             self.edit_conn_executor.start()
         else:
             # 新增操作
-            self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self, self,
+            self.add_conn_executor = AddConnExecutor(self.new_dialog_data, self.parent_dialog, self.parent_dialog,
                                                      SAVE_CONN_BOX_TITLE, self.save_post_process)
             self.add_conn_executor.start()
 
@@ -136,7 +137,8 @@ class ConnDialogFrameABC(DsDialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def get_read_storage_executor(self, callback):
-        return QueryConnInfoExecutor(self.dialog_data, self, self, QUERY_CONN_BOX_TITLE, callback)
+        return QueryConnInfoExecutor(self.dialog_data, self.parent_dialog, self.parent_dialog,
+                                     QUERY_CONN_BOX_TITLE, callback)
 
     def get_old_name(self) -> str:
         return self.dialog_data.conn_name

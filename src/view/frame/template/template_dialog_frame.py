@@ -58,21 +58,22 @@ class TemplateDialogFrame(TableDialogFrame):
         return DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
 
     def get_del_executor(self, row_id, item_name, row_index, del_title) -> DelTemplateExecutor:
-        return DelTemplateExecutor(row_id, item_name, row_index, self, self,
+        return DelTemplateExecutor(row_id, item_name, row_index, self.parent_dialog, self.parent_dialog,
                                    del_title, self.table_widget.del_row)
 
     def get_batch_del_prompt_title(self):
         return BATCH_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
 
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTemplateExecutor:
-        return BatchDelTemplateExecutor(delete_ids, delete_names, self, self, del_title,
-                                        self.table_widget.del_rows)
+        return BatchDelTemplateExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialogelf,
+                                        del_title, self.table_widget.del_rows)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def get_list_table_data_executor(self) -> ListTemplateExecutor:
-        return ListTemplateExecutor(self, self, TEMPLATE_LIST_BOX_TITLE, self.table_widget.fill_table)
+        return ListTemplateExecutor(self.parent_dialog, self.parent_dialog, TEMPLATE_LIST_BOX_TITLE,
+                                    self.table_widget.fill_table)
 
     # ------------------------------ 后置处理 end ------------------------------ #

@@ -239,13 +239,13 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 如果存在原数据，说明是编辑
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
-            self.edit_type_mapping_executor = EditTypeMappingExecutor(self.new_dialog_data, self, self,
-                                                                      EDIT_TYPE_MAPPING_BOX_TITLE,
+            self.edit_type_mapping_executor = EditTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
+                                                                      self.parent_dialog, EDIT_TYPE_MAPPING_BOX_TITLE,
                                                                       self.edit_post_process)
             self.edit_type_mapping_executor.start()
         else:
-            self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data, self, self,
-                                                                    ADD_TYPE_MAPPING_BOX_TITLE,
+            self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
+                                                                    self.parent_dialog, ADD_TYPE_MAPPING_BOX_TITLE,
                                                                     self.add_post_process)
             self.add_type_mapping_executor.start()
 
@@ -264,7 +264,8 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
     def post_process(self):
         super().post_process()
         # 获取数据源列类型
-        self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
+        self.list_ds_col_type_executor = ListDsColTypeExecutor(self.parent_dialog, self.parent_dialog,
+                                                               DS_COL_TYPE_LIST_BOX_TITLE,
                                                                self.list_col_type_callback)
         self.list_ds_col_type_executor.start()
 
@@ -272,7 +273,8 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.ds_col_type_dict = col_type_dict
 
     def get_read_storage_executor(self, callback):
-        return ReadTypeMappingExecutor(self.dialog_data, self, self, READ_TYPE_MAPPING_BOX_TITLE, callback)
+        return ReadTypeMappingExecutor(self.dialog_data, self.parent_dialog, self.parent_dialog,
+                                       READ_TYPE_MAPPING_BOX_TITLE, callback)
 
     def init_lineedit_button_status(self):
         super().init_lineedit_button_status()

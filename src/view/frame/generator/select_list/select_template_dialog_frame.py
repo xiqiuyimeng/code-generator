@@ -22,7 +22,8 @@ class SelectTemplateDialogFrame(SelectDialogFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def get_list_data_executor(self) -> ListTemplateExecutor:
-        return ListTemplateExecutor(self, self, TEMPLATE_LIST_BOX_TITLE, self.fill_list_widget)
+        return ListTemplateExecutor(self.parent_dialog, self.parent_dialog,
+                                    TEMPLATE_LIST_BOX_TITLE, self.fill_list_widget)
 
     def get_item_names(self) -> iter:
         return map(lambda x: x.template_name, self.data_list)

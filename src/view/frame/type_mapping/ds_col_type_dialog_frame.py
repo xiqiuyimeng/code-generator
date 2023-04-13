@@ -94,8 +94,8 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         col_types.append(col_type)
 
     def save_func(self):
-        self.save_ds_col_type_executor = SaveDsColTypeExecutor(self.ds_col_type_dict, self, self,
-                                                               ADD_COL_TYPE_LIST_TITLE,
+        self.save_ds_col_type_executor = SaveDsColTypeExecutor(self.ds_col_type_dict, self.parent_dialog,
+                                                               self.parent_dialog, ADD_COL_TYPE_LIST_TITLE,
                                                                self.parent_dialog.close)
         self.save_ds_col_type_executor.start()
 
@@ -104,7 +104,8 @@ class DsColTypeDialogFrame(SaveDialogFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
-        self.list_ds_col_type_executor = ListDsColTypeExecutor(self, self, DS_COL_TYPE_LIST_BOX_TITLE,
+        self.list_ds_col_type_executor = ListDsColTypeExecutor(self.parent_dialog, self.parent_dialog,
+                                                               DS_COL_TYPE_LIST_BOX_TITLE,
                                                                self.list_col_type_callback)
         self.list_ds_col_type_executor.start()
 

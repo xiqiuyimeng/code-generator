@@ -136,7 +136,8 @@ class StructDialogFrameABC(DsDialogFrameABC):
         if file_url[0]:
             self.struct_file_url_linedit.setText(file_url[0])
             # 异步读取文件内容，回显到内容区域
-            self.read_file_executor = ReadFileExecutor(file_url[0], self.struct_type.display_name, self, self,
+            self.read_file_executor = ReadFileExecutor(file_url[0], self.struct_type.display_name,
+                                                       self.parent_dialog, self.parent_dialog,
                                                        READ_STRUCT_FILE_BOX_TITLE.format(self.struct_type.display_name),
                                                        self.append_plain_text)
             self.read_file_executor.start()
@@ -148,7 +149,8 @@ class StructDialogFrameABC(DsDialogFrameABC):
 
     def pretty_func(self):
         self.pretty_executor = PrettyStructExecutor(self.new_dialog_data.content,
-                                                    self.struct_type.beautifier_executor, self, self,
+                                                    self.struct_type.beautifier_executor,
+                                                    self.parent_dialog, self.parent_dialog,
                                                     PRETTY_STRUCT_BOX_TITLE.format(self.struct_type.display_name),
                                                     self.struct_text_input.setPlainText)
         self.pretty_executor.start()
@@ -160,14 +162,15 @@ class StructDialogFrameABC(DsDialogFrameABC):
             self.new_dialog_data.opened_item_id = self.dialog_data.opened_item_id
             self.name_changed = self.new_dialog_data.struct_name != self.dialog_data.struct_name
             title = EDIT_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
-            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self, self,
-                                                           title, self.edit_post_process)
+            self.edit_struct_executor = EditStructExecutor(self.new_dialog_data, self.parent_dialog,
+                                                           self.parent_dialog, title, self.edit_post_process)
             self.edit_struct_executor.start()
         else:
             # 新增操作
             title = ADD_STRUCT_BOX_TITLE.format(self.new_dialog_data.struct_type)
             self.add_struct_executor = AddStructExecutor(self.new_dialog_data, self.parent_folder_item,
-                                                         self, self, title, self.save_post_process)
+                                                         self.parent_dialog, self.parent_dialog, title,
+                                                         self.save_post_process)
             self.add_struct_executor.start()
 
     def save_post_process(self, opened_item_record):
@@ -190,7 +193,8 @@ class StructDialogFrameABC(DsDialogFrameABC):
         self.pretty_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def get_read_storage_executor(self, callback):
-        return QueryStructExecutor(self.dialog_data, self, self, QUERY_STRUCT_BOX_TITLE, callback)
+        return QueryStructExecutor(self.dialog_data, self.parent_dialog, self.parent_dialog,
+                                   QUERY_STRUCT_BOX_TITLE, callback)
 
     def get_old_name(self) -> str:
         return self.dialog_data.struct_name

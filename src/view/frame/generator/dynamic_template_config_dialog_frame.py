@@ -171,7 +171,8 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
 
     def dynamic_render_content(self):
         # 根据 template_id 获取配置项
-        self.list_template_config_executor = ListTemplateConfigExecutor(self.template_id, self, self,
+        self.list_template_config_executor = ListTemplateConfigExecutor(self.template_id, self.parent_dialog,
+                                                                        self.parent_dialog,
                                                                         TEMPLATE_CONFIG_LIST_BOX_TITLE,
                                                                         self.render_content)
         self.list_template_config_executor.start()

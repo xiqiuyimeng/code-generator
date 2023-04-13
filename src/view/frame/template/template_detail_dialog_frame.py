@@ -223,12 +223,14 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         # 如果存在原数据，说明是编辑
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
-            self.edit_template_executor = EditTemplateExecutor(self.new_dialog_data, self, self,
-                                                               EDIT_TEMPLATE_BOX_TITLE, self.edit_post_process)
+            self.edit_template_executor = EditTemplateExecutor(self.new_dialog_data, self.parent_dialog,
+                                                               self.parent_dialog, EDIT_TEMPLATE_BOX_TITLE,
+                                                               self.edit_post_process)
             self.edit_template_executor.start()
         else:
-            self.add_template_executor = AddTemplateExecutor(self.new_dialog_data, self, self,
-                                                             ADD_TEMPLATE_BOX_TITLE, self.add_post_process)
+            self.add_template_executor = AddTemplateExecutor(self.new_dialog_data, self.parent_dialog,
+                                                             self.parent_dialog, ADD_TEMPLATE_BOX_TITLE,
+                                                             self.add_post_process)
             self.add_template_executor.start()
 
     def add_post_process(self):

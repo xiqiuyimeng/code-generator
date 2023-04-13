@@ -32,14 +32,15 @@ class FolderDialogFrame(NameCheckDialogFrame):
         # 存在id，说明是编辑
         if self.dialog_data.id:
             self.dialog_data.item_name = new_folder_name
-            self.edit_folder_executor = EditFolderExecutor(self.dialog_data, self, self,
+            self.edit_folder_executor = EditFolderExecutor(self.dialog_data, self.parent_dialog, self.parent_dialog,
                                                            EDIT_FOLDER_BOX_TITLE, self.edit_post_process)
             self.edit_folder_executor.start()
         else:
             # 新增操作
             self.add_folder_executor = AddFolderExecutor(new_folder_name, self.parent_folder_item.id,
-                                                         self.parent_folder_item.level + 1, self, self,
-                                                         ADD_FOLDER_BOX_TITLE, self.save_post_process)
+                                                         self.parent_folder_item.level + 1, self.parent_dialog,
+                                                         self.parent_dialog, ADD_FOLDER_BOX_TITLE,
+                                                         self.save_post_process)
             self.add_folder_executor.start()
 
     def save_post_process(self, opened_item_record):

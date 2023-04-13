@@ -59,21 +59,22 @@ class TypeMappingDialogFrame(TableDialogFrame):
         return DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE
 
     def get_del_executor(self, row_id, item_name, row_index, del_title) -> DelTypeMappingExecutor:
-        return DelTypeMappingExecutor(row_id, item_name, row_index, self, self,
+        return DelTypeMappingExecutor(row_id, item_name, row_index, self.parent_dialog, self.parent_dialog,
                                       del_title, self.table_widget.del_row)
 
     def get_batch_del_prompt_title(self):
         return BATCH_DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE
 
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTypeMappingExecutor:
-        return BatchDelTypeMappingExecutor(delete_ids, delete_names, self, self, del_title,
-                                           self.table_widget.del_rows)
+        return BatchDelTypeMappingExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
+                                           del_title, self.table_widget.del_rows)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def get_list_table_data_executor(self) -> ListTypeMappingExecutor:
-        return ListTypeMappingExecutor(self, self, TYPE_MAPPING_BOX_TITLE, self.table_widget.fill_table)
+        return ListTypeMappingExecutor(self.parent_dialog, self.parent_dialog, TYPE_MAPPING_BOX_TITLE,
+                                       self.table_widget.fill_table)
 
     # ------------------------------ 后置处理 end ------------------------------ #

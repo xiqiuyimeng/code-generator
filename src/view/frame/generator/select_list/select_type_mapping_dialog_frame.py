@@ -22,7 +22,8 @@ class SelectTypeMappingDialogFrame(SelectDialogFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def get_list_data_executor(self) -> ListTypeMappingExecutor:
-        return ListTypeMappingExecutor(self, self, TYPE_MAPPING_BOX_TITLE, self.fill_list_widget)
+        return ListTypeMappingExecutor(self.parent_dialog, self.parent_dialog,
+                                       TYPE_MAPPING_BOX_TITLE, self.fill_list_widget)
 
     def get_item_names(self) -> iter:
         return map(lambda x: x.mapping_name, self.data_list)

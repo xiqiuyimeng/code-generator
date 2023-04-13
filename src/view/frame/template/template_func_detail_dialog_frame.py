@@ -61,12 +61,14 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         # 如果存在原数据，说明是编辑
         if self.dialog_data:
             self.new_dialog_data.id = self.dialog_data.id
-            self.edit_func_executor = EditTemplateFuncExecutor(self.new_dialog_data, self, self,
-                                                               EDIT_FUNC_BOX_TITLE, self.edit_post_process)
+            self.edit_func_executor = EditTemplateFuncExecutor(self.new_dialog_data, self.parent_dialog,
+                                                               self.parent_dialog, EDIT_FUNC_BOX_TITLE,
+                                                               self.edit_post_process)
             self.edit_func_executor.start()
         else:
-            self.add_func_executor = AddTemplateFuncExecutor(self.new_dialog_data, self, self,
-                                                             CREATE_FUNC_BOX_TITLE, self.add_post_process)
+            self.add_func_executor = AddTemplateFuncExecutor(self.new_dialog_data, self.parent_dialog,
+                                                             self.parent_dialog, CREATE_FUNC_BOX_TITLE,
+                                                             self.add_post_process)
             self.add_func_executor.start()
 
     def add_post_process(self):
