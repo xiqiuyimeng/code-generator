@@ -86,8 +86,7 @@ class GeneratorDialog(CustomDialogABC):
         self.dynamic_var_config_frame = DynamicVarConfigDialogFrame(self.dialog_layout, self,
                                                                     FILL_TEMPLATE_VAR_CONFIG_HEADER_TXT,
                                                                     get_template_func=self.get_template)
-        # 变量配置框架数据只能是输出配置框架传递，避免两次读取数据库
-        self.dynamic_var_config_frame.read_db_data = False
+        # 动态模板变量配置框架
         self.dynamic_output_config_frame.set_next_frame(self.dynamic_var_config_frame)
         self.dynamic_var_config_frame.set_previous_frame(self.dynamic_output_config_frame)
 

@@ -42,22 +42,21 @@ class SelectDialogFrame(ChainDialogFrameABC):
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
-    # ------------------------------ 后置处理 start ------------------------------ #
-
-    def post_process(self):
-        self.list_data_executor = self.get_list_data_executor()
-        self.list_data_executor.start()
+    def show(self):
+        super().show()
+        # 如果数据不存在，读取数据库
+        if self.data_list is Ellipsis:
+            self.list_data_executor = self.get_list_data_executor()
+            self.list_data_executor.start()
 
     def get_list_data_executor(self) -> LoadingMaskThreadExecutor: ...
 
     def fill_list_widget(self, data_list):
         """填充页面列表，获取数据库数据以后的回调函数"""
+        self.data_list = data_list
         if data_list:
-            self.data_list = data_list
             self.list_widget.addItems(self.get_item_names())
             # 默认选中第一个元素
             self.list_widget.setCurrentRow(0)
 
     def get_item_names(self) -> iter: ...
-
-    # ------------------------------ 后置处理 end ------------------------------ #
