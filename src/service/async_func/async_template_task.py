@@ -33,6 +33,11 @@ class ReadTemplateWorker(ThreadWorkerABC):
         template.template_files = TemplateFileSqlite().get_by_template_id(self.template_id)
         template_config_list = TemplateConfigSqlite().get_by_template_id(self.template_id)
         template.output_config_list, template.var_config_list = template_config_list
+        # 将模板文件按关联的输出路径配置id分组
+        if template.template_files and template.output_config_list:
+            template_file_dict = dict([(tp_file.output_config_id, tp_file) for tp_file in template.template_files])
+            for output_config in template.output_config_list:
+                output_config.relevant_file_list = template_file_dict.get(output_config.id, list())
         self.success_signal.emit(template)
         log.info("读取模板详细信息成功")
 

@@ -54,6 +54,8 @@ class TemplateConfig(BasicSqliteDTO):
     default_value: str = field(init=False, default=None)
     # 控件为下拉框时，下拉列表值，逗号分隔
     range_values: str = field(init=False, default=None)
+    # 非数据库字段，统计关联的模板文件列表
+    relevant_file_list: list = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
