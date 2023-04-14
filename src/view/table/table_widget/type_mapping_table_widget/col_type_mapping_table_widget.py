@@ -24,7 +24,7 @@ class ColTypeMappingTableWidgetABC(TableWidgetABC):
     def setup_other_ui(self):
         self.set_column_count()
         # 第一列之后的所有列，设置表格编辑器代理
-        self.set_text_input_delegate(range(1, self.columnCount()))
+        self.set_text_input_delegate(range(2, self.columnCount()))
         self.setup_header()
         # 表头高度写死，表头有两行，所以高度定位表头行高度2倍
         self.horizontalHeader().setFixedHeight(self.header_widget.rowHeight(0) << 1)
@@ -84,6 +84,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def __init__(self, *args):
         # 冻结前两列的表格
         self.frozen_column_table: ColTypeMappingFrozenTableWidget = ...
+        self.need_sync_col_type = False
         super().__init__(*args)
 
     def set_column_count(self):
@@ -96,6 +97,9 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
     def setup_frozen_table(self):
         if self.frozen_column_table is Ellipsis:
+            # 开启同步列类型数据
+            self.need_sync_col_type = True
+            # 冻结表
             self.frozen_column_table = ColTypeMappingFrozenTableWidget(self.parent())
             # 设置冻结列表格的位置
             self.update_frozen_table_geometry()
@@ -108,6 +112,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             self.frozen_column_table.header_widget.header_clicked.connect(self.link_header_check_state)
             # 转发信号
             self.frozen_column_table.header_widget.header_check_changed.connect(self.header_check_changed.emit)
+            # 数据变化信号
+            self.frozen_column_table.cellChanged.connect(self.sync_col_type)
 
     def update_frozen_table_geometry(self):
         # 设置冻结列表格的位置，宽度保持两列宽度，高度应该减去水平滚动条的高度，
@@ -119,6 +125,10 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def link_header_check_state(self, check_state):
         # 冻结表表头复选框状态变化，应该联动底表复选框状态
         self.header_widget.link_header_check_state(check_state)
+
+    def sync_col_type(self, row, col):
+        if self.need_sync_col_type and col == 1:
+            self.item(row, col).setText(self.frozen_column_table.item(row, col).text())
 
     def resizeEvent(self, e) -> None:
         # 设置表头位置，resize 方法在表格展示的时候会调用，
@@ -148,11 +158,14 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         # 增加一个新的类型映射行
         row = self.rowCount()
         if self.frozen_column_table is not Ellipsis:
+            # 不需要向底表同步
+            self.need_sync_col_type = False
             self._sync_frozen_col_data()
             self.frozen_column_table.insert_row(row)
             check_box_num_widget = make_checkbox_num_widget(row + 1, self.check_box_clicked_slot)
             self.frozen_column_table.setCellWidget(row, 0, check_box_num_widget)
             self.frozen_column_table.setItem(row, 1, self.make_item())
+            self.need_sync_col_type = True
         self.insert_row(row)
         self.setCellWidget(row, 0, make_checkbox_num_widget(row + 1, self.check_box_clicked_slot))
         # 设置每个单元格
@@ -253,10 +266,12 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             else self.frozen_column_table.item(row, 1).text()
 
     def _set_col_type_item(self, row, col_type):
-        col_type_item = self.make_item(col_type)
         if self.frozen_column_table is not Ellipsis:
-            self.frozen_column_table.setItem(row, 1, col_type_item)
-        self.setItem(row, 1, col_type_item)
+            # 不需要向底表同步
+            self.need_sync_col_type = False
+            self.frozen_column_table.setItem(row, 1, self.make_item(col_type))
+            self.need_sync_col_type = True
+        self.setItem(row, 1, self.make_item(col_type))
 
     def sync_col_types(self, col_types):
         exists_col_types = list(map(lambda x: self._get_col_type(x), range(self.rowCount())))
@@ -268,7 +283,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
     def collect_data(self):
         # 收集数据，类型：list [ColTypeMapping]
-        col_type_mapping_data = list()
+        col_type_mapping_data: list[ColTypeMapping] = list()
         for row in range(self.rowCount()):
             if self.frozen_column_table is not Ellipsis:
                 col_type = self.frozen_column_table.item(row, 1).text()
@@ -341,7 +356,10 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             # 设置列类型
             if col_type_mapping.group_num == 0:
                 if self.frozen_column_table is not Ellipsis:
+                    # 不需要向底表同步
+                    self.need_sync_col_type = False
                     self.frozen_column_table.item(current_row, 1).setText(current_ds_col_type)
+                    self.need_sync_col_type = True
                 self.item(current_row, 1).setText(current_ds_col_type)
             # 后续按组来赋值，只需要给底表赋值即可
             start_col = col_type_mapping.group_num * 3 + 2
