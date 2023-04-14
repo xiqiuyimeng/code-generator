@@ -13,6 +13,11 @@ _author_ = 'luwt'
 _date_ = '2022/5/7 17:18'
 
 
+# 检测是否按下shift键，有的控件可能获取不到焦点，导致无法正常获取键盘按键，但是可以获取鼠标输入，
+# 所以只需要按下shift键，且鼠标滚轮事件触发，即可正常实现水平滚动
+press_shift = False
+
+
 class ScrollableWidget(QAbstractScrollArea):
 
     def __init__(self, parent=None):
@@ -21,11 +26,9 @@ class ScrollableWidget(QAbstractScrollArea):
             # 按像素滚动
             self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
             self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        # 检测是否按下shift键
-        self.press_shift = False
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
-        if self.press_shift:
+        if press_shift:
             # 如果是按下 shift 键进行鼠标滚轮滚动，执行水平滚动
             scroll_value = 10 if event.angleDelta().y() < 0 else -10
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() + scroll_value)
@@ -34,28 +37,26 @@ class ScrollableWidget(QAbstractScrollArea):
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == Qt.Key_Shift:
-            self.press_shift = True
+            global press_shift
+            press_shift = True
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == Qt.Key_Shift:
-            self.press_shift = False
+            global press_shift
+            press_shift = False
         super().keyReleaseEvent(event)
 
     def enterEvent(self, event):
         """设置滚动条在进入控件区域的时候显示"""
         self.verticalScrollBar().setHidden(False)
         self.horizontalScrollBar().setHidden(False)
-        # 当鼠标进入时，抓取键盘输入
-        self.grabKeyboard()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
         """设置滚动条在离开控件区域的时候隐藏"""
         self.verticalScrollBar().setHidden(True)
         self.horizontalScrollBar().setHidden(True)
-        # 当鼠标离开时，不再抓取键盘输入
-        self.releaseKeyboard()
         super().leaveEvent(event)
 
 
