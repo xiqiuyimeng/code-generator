@@ -3,18 +3,21 @@
 from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.constant.generator_dialog_constant import SQL_CONFIRM_SELECTED_HEADER_TXT, \
     STRUCT_CONFIRM_SELECTED_HEADER_TXT, SELECT_TYPE_MAPPING_HEADER_TXT, SELECT_TEMPLATE_HEADER_TXT, \
-    FILL_TEMPLATE_CONFIG_HEADER_TXT
+    FILL_TEMPLATE_OUTPUT_CONFIG_HEADER_TXT, FILL_TEMPLATE_VAR_CONFIG_HEADER_TXT
 from src.service.system_storage.template_sqlite import Template
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 from src.service.util.tree_node import TreeData
 from src.view.dialog.custom_dialog_abc import CustomDialogABC
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC
+from src.view.frame.generator.dynamic_render_template_config.dyanmic_var_config_dialog_frame import \
+    DynamicVarConfigDialogFrame
+from src.view.frame.generator.dynamic_render_template_config.dynamic_output_config_dialog_frame import \
+    DynamicOutputConfigDialogFrame
 from src.view.frame.generator.select_list.select_template_dialog_frame import SelectTemplateDialogFrame
 from src.view.frame.generator.select_list.select_type_mapping_dialog_frame import SelectTypeMappingDialogFrame
 from src.view.frame.generator.selected_data.selected_data_dialog_frame_abc import SelectedDataDialogFrameABC
 from src.view.frame.generator.selected_data.sql_selected_data_dialog_frame import SqlSelectedDataDialogFrame
 from src.view.frame.generator.selected_data.struct_selected_data_dialog_frame import StructSelectedDataDialogFrame
-from src.view.frame.generator.dynamic_template_config_dialog_frame import DynamicTemplateConfigDialogFrame
 
 _author_ = 'luwt'
 _date_ = '2022/10/31 11:47'
@@ -38,8 +41,10 @@ class GeneratorDialog(CustomDialogABC):
         self.select_type_mapping_frame: SelectTypeMappingDialogFrame = ...
         # 选择模板框架
         self.select_template_frame: SelectTemplateDialogFrame = ...
-        # 动态模板配置框架
-        self.dynamic_template_config_frame: DynamicTemplateConfigDialogFrame = ...
+        # 动态模板输出配置框架
+        self.dynamic_output_config_frame: DynamicOutputConfigDialogFrame = ...
+        # 动态模板变量配置框架
+        self.dynamic_var_config_frame: DynamicVarConfigDialogFrame = ...
 
         # 构建调用链
         self.setup_frame_chain()
@@ -70,12 +75,21 @@ class GeneratorDialog(CustomDialogABC):
         self.select_type_mapping_frame.set_next_frame(self.select_template_frame)
         self.select_template_frame.set_previous_frame(self.select_type_mapping_frame)
 
-        # 动态模板配置框架
-        self.dynamic_template_config_frame = DynamicTemplateConfigDialogFrame(self.dialog_layout, self,
-                                                                              FILL_TEMPLATE_CONFIG_HEADER_TXT,
-                                                                              get_template_func=self.get_template)
-        self.select_template_frame.set_next_frame(self.dynamic_template_config_frame)
-        self.dynamic_template_config_frame.set_previous_frame(self.select_template_frame)
+        # 动态模板输出配置框架
+        self.dynamic_output_config_frame = DynamicOutputConfigDialogFrame(self.dialog_layout, self,
+                                                                          FILL_TEMPLATE_OUTPUT_CONFIG_HEADER_TXT,
+                                                                          get_template_func=self.get_template)
+        self.select_template_frame.set_next_frame(self.dynamic_output_config_frame)
+        self.dynamic_output_config_frame.set_previous_frame(self.select_template_frame)
+
+        # 动态模板变量配置框架
+        self.dynamic_var_config_frame = DynamicVarConfigDialogFrame(self.dialog_layout, self,
+                                                                    FILL_TEMPLATE_VAR_CONFIG_HEADER_TXT,
+                                                                    get_template_func=self.get_template)
+        # 变量配置框架数据只能是输出配置框架传递，避免两次读取数据库
+        self.dynamic_var_config_frame.read_db_data = False
+        self.dynamic_output_config_frame.set_next_frame(self.dynamic_var_config_frame)
+        self.dynamic_var_config_frame.set_previous_frame(self.dynamic_output_config_frame)
 
         # 生成页面框架
 

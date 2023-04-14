@@ -29,8 +29,10 @@ class Template(BasicSqliteDTO):
     template_desc: str = field(init=False, default=None)
     # 模板文件列表
     template_files: list = field(init=False, default=None)
-    # 模板输入配置列表
-    template_config_list: list = field(init=False, default=None)
+    # 模板输出路径配置列表
+    output_config_list: list = field(init=False, default=None)
+    # 模板变量配置列表
+    var_config_list: list = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():

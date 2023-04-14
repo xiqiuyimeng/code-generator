@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter, QFrame, QPushButton, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter, QFrame, QPushButton, \
+    QListWidgetItem, QTabWidget
 
 from src.constant.template_dialog_constant import TEMPLATE_INFO_TEXT, TEMPLATE_CONFIG_TEXT, TEMPLATE_FILE_TEXT, \
     TEMPLATE_NAME, TEMPLATE_DESC, ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
-    EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE
+    EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
+    TEMPLATE_VAR_CONFIG_TAB_TEXT
 from src.service.async_func.async_template_task import AddTemplateExecutor, EditTemplateExecutor, ReadTemplateExecutor
 from src.service.system_storage.template_file_sqlite import TemplateFile
 from src.service.system_storage.template_sqlite import Template
@@ -14,7 +16,8 @@ from src.view.frame.stacked_dialog_frame import StackedDialogFrame
 from src.view.list_widget.list_item_func import get_template_file_data, set_template_file_data
 from src.view.list_widget.template_file_list_widget import TemplateFileListWidget
 from src.view.tab.tab_widget.template_file_tab_widget import TemplateFileTabWidget
-from src.view.widget.template.template_config_widget import TemplateConfigWidget
+from src.view.widget.template.template_ouput_config_widget import TemplateOutputConfigWidget
+from src.view.widget.template.template_var_config_widget import TemplateVarConfigWidget
 
 _author_ = 'luwt'
 _date_ = '2023/4/3 14:29'
@@ -36,7 +39,12 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.template_desc_label: QLabel = ...
         self.template_desc_text_edit: TextEditor = ...
 
-        # 第二个窗口，模板文件页窗口
+        # 第二个窗口，模板配置窗口
+        self.config_tab_widget: QTabWidget = ...
+        self.output_config_widget: TemplateOutputConfigWidget = ...
+        self.var_config_widget: TemplateVarConfigWidget = ...
+
+        # 第三个窗口，模板文件页窗口
         self.template_file_widget: QWidget = ...
         self.template_file_layout: QHBoxLayout = ...
         self.file_splitter: QSplitter = ...
@@ -53,9 +61,6 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.file_tab_layout: QVBoxLayout = ...
         self.file_tab_widget: TemplateFileTabWidget = ...
         self.file_name_check_dialog: SimpleNameCheckDialog = ...
-
-        # 第三个窗口，模板配置窗口
-        self.config_widget: TemplateConfigWidget = ...
 
         # 添加模板执行器
         self.add_template_executor: AddTemplateExecutor = ...
@@ -83,8 +88,9 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.setup_template_info_ui()
 
         # 第二个窗口，模板配置页
-        self.config_widget = TemplateConfigWidget(self.parent_dialog.parent_screen_rect)
-        self.stacked_widget.addWidget(self.config_widget)
+        self.config_tab_widget = QTabWidget(self)
+        self.stacked_widget.addWidget(self.config_tab_widget)
+        self.setup_template_config_ui()
 
         # 第三个窗口，模板文件页
         self.template_file_widget = QWidget(self)
@@ -92,7 +98,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.template_file_layout = QHBoxLayout()
         self.template_file_widget.setLayout(self.template_file_layout)
         # 模板文件页
-        self.setup_template_file_widget()
+        self.setup_template_file_ui()
 
     def setup_template_info_ui(self):
         # 构建模板名称输入表单
@@ -104,7 +110,15 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.template_desc_text_edit = TextEditor(self)
         self.name_layout.addRow(self.template_desc_label, self.template_desc_text_edit)
 
-    def setup_template_file_widget(self):
+    def setup_template_config_ui(self):
+        # 第一个页面为输出路径配置页
+        self.output_config_widget = TemplateOutputConfigWidget(self.parent_dialog.parent_screen_rect)
+        self.config_tab_widget.addTab(self.output_config_widget, TEMPLATE_OUTPUT_DIR_TAB_TEXT)
+        # 第二个页面为模板变量配置页
+        self.var_config_widget = TemplateVarConfigWidget(self.parent_dialog.parent_screen_rect)
+        self.config_tab_widget.addTab(self.var_config_widget, TEMPLATE_VAR_CONFIG_TAB_TEXT)
+
+    def setup_template_file_ui(self):
         # 构建模板文件页
         self.file_splitter = QSplitter(self)
         # 不隐藏控件
@@ -154,7 +168,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         # 收集模板文件数据
         self.new_dialog_data.template_files = self.file_list_widget.collect_template_files()
         # 收集模板配置数据
-        self.new_dialog_data.template_config_list = self.config_widget.config_table.collect_data()
+        self.new_dialog_data.output_config_list = self.output_config_widget.config_table.collect_data()
+        self.new_dialog_data.var_config_list = self.var_config_widget.config_table.collect_data()
 
     def button_available(self) -> bool:
         return all((self.new_dialog_data.template_name, self.name_available))
@@ -246,7 +261,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def get_read_storage_executor(self, callback):
-        return ReadTemplateExecutor(self.dialog_data, self, self, READ_TEMPLATE_BOX_TITLE, callback)
+        return ReadTemplateExecutor(self.dialog_data, self.parent_dialog, self.parent_dialog,
+                                    READ_TEMPLATE_BOX_TITLE, callback)
 
     def get_old_name(self) -> str:
         return self.dialog_data.template_name
@@ -268,6 +284,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
             current_tab_file = tuple(filter(lambda x: x.is_current_tab, reopen_tab_files))[0]
             self.file_tab_widget.setCurrentIndex(reopen_tab_files.index(current_tab_file))
         # 回显模板配置数据
-        self.config_widget.config_table.fill_table(self.dialog_data.template_config_list)
+        self.output_config_widget.config_table.fill_table(self.dialog_data.output_config_list)
+        self.var_config_widget.config_table.fill_table(self.dialog_data.var_config_list)
 
     # ------------------------------ 后置处理 end ------------------------------ #

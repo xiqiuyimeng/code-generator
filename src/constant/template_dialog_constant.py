@@ -53,17 +53,25 @@ ADD_FILE_BTN_TEXT = '新建模板文件'
 LOCATE_FILE_BTN_TEXT = '定位'
 
 # 模板配置页
+TEMPLATE_OUTPUT_DIR_TAB_TEXT = '模板输出路径配置详情'
+TEMPLATE_VAR_CONFIG_TAB_TEXT = '模板变量配置详情'
 # 按钮
 ADD_CONFIG_BTN_TEXT = '添加配置项'
 REMOVE_CONFIG_BTN_TEXT = '移除配置项'
 PREVIEW_CONFIG_BTN_TEXT = '预览模板配置页'
-PREVIEW_CONFIG_TITLE = '模板配置页预览'
+AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT = '生成文件输出路径配置'
+MAINTAIN_FILE_CONFIG_BTN_TEXT = '维护文件输出路径'
+
+PREVIEW_VAR_CONFIG_TITLE = '模板变量配置页预览'
+PREVIEW_OUTPUT_CONFIG_TITLE = '模板输出路径配置页预览'
 NO_TEMPLATE_CONFIG_ITEMS_TEXT = '暂未维护模板配置项'
-TEMPLATE_CONFIG_HEADER_LABELS = ['配置项名称', '输出变量名', '控件类型', '是否必填', '说明']
+TEMPLATE_VAR_CONFIG_HEADER_LABELS = ['配置项名称', '输出变量名', '控件类型', '是否必填', '说明']
+TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS = ['配置项名称', '输出变量名', '控件类型', '是否必填', '关联模板文件', '说明']
 TEMPLATE_CONFIG_LIST_BOX_TITLE = '模板配置列表'
 
 # 模板配置详情页
-TEMPLATE_CONFIG_TITLE_TEXT = '模板配置详情'
+TEMPLATE_OUTPUT_DIR_TITLE_TEXT = '模板输出路径配置详情'
+TEMPLATE_VAR_CONFIG_TITLE_TEXT = '模板变量配置详情'
 
 # 控件类型
 CONFIG_INPUT_WIDGET_TYPE_DICT = {
@@ -98,3 +106,7 @@ SELECT_DIRECTORY_TITLE = '选择文件夹'
 
 NOT_FILL_ALL_REQUIRED_INPUT_TXT = '还有未完成的必填项，请完成所有必填项'
 REQUIRED_CHECK_BOX_TITLE = '必填项检查'
+
+# 模板配置类型枚举值
+OUTPUT_DIR_TXT = '输出路径'
+TEMPLATE_VAR_TXT = '模板变量'

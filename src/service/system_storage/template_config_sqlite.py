@@ -16,7 +16,8 @@ sql_dict = {
     (id integer primary key autoincrement,
     template_id integer not null,
     config_name char(50) not null,
-    output_var_name char(50) not null,
+    config_type integer not null,
+    output_var_name char(50),
     config_value_widget char(20) not null,
     is_required integer not null,
     config_desc text,
@@ -37,6 +38,8 @@ class TemplateConfig(BasicSqliteDTO):
     template_id: int = field(init=False, default=None)
     # 配置项名称
     config_name: str = field(init=False, default=None)
+    # 配置项类型
+    config_type: int = field(init=False, default=None)
     # 输出的变量名
     output_var_name: str = field(init=False, default=None)
     # 配置输入项使用的控件，控件名称
@@ -57,6 +60,13 @@ class TemplateConfig(BasicSqliteDTO):
             setattr(self, k, v)
 
 
+class ConfigTypeEnum(Enum):
+    # 输出路径
+    output_dir = 0
+    # 模板变量
+    template_var = 1
+
+
 class RequiredEnum(Enum):
     not_required = 0
     required = 1
@@ -70,21 +80,30 @@ class TemplateConfigSqlite(SqliteBasic):
     def get_by_template_id(self, template_id):
         param = TemplateConfig()
         param.template_id = template_id
-        return self.select_by_order(param)
+        config_list = self.select_by_order(param)
+        # 根据类型分组
+        output_config_list, var_config_list = list(), list()
+        for config in config_list:
+            if config.config_type == ConfigTypeEnum.output_dir.value:
+                output_config_list.append(config)
+            elif config.config_type == ConfigTypeEnum.template_var.value:
+                var_config_list.append(config)
+        return output_config_list, var_config_list
 
-    def batch_add_config_list(self, template_id, config_list):
+    def batch_add_config_list(self, template_id, output_config_list, var_config_list):
+        config_list = [*output_config_list, *var_config_list]
         for idx, config in enumerate(config_list, start=1):
             config.template_id = template_id
             config.item_order = idx
         self.batch_insert(config_list)
 
     @transactional
-    def batch_edit_config_list(self, template_id, config_list):
+    def batch_edit_config_list(self, template_id, output_config_list, var_config_list):
         # 由于是低频操作，可以简单做，删除原有数据，插入新数据
         self.batch_del_config_list((template_id,))
         # 插入新数据
-        if config_list:
-            self.batch_add_config_list(template_id, config_list)
+        if output_config_list or var_config_list:
+            self.batch_add_config_list(template_id, output_config_list, var_config_list)
 
     def batch_del_config_list(self, template_ids):
         ids_str = ','.join(map(lambda x: str(x), template_ids))

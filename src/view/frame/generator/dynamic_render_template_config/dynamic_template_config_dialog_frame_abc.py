@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
+from PyQt5.QtWidgets import QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
 
-from src.constant.generator_dialog_constant import BACK_TO_SELECT_TEMPLATE_TXT, GENERATE_TXT, PREVIEW_GENERATE_TXT
 from src.constant.template_dialog_constant import TEMPLATE_CONFIG_LIST_BOX_TITLE, NO_TEMPLATE_CONFIG_ITEMS_TEXT, \
     NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE
 from src.service.async_func.async_template_task import ListTemplateConfigExecutor
@@ -15,16 +14,19 @@ _author_ = 'luwt'
 _date_ = '2023/4/6 9:09'
 
 
-class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
+class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
     """动态模板配置对话框框架，根据模板配置动态生成页面"""
 
-    def __init__(self, *args, get_template_func=None, template_config_list=None, preview_mode=False):
-        self.get_template_func = get_template_func
+    def __init__(self, *args, template_config_list=None, template=None, get_template_func=None,
+                 preview_mode=False, quit_button_row_index=3):
+        # 如果是预览模式，直接传递配置项列表
         self.template_config_list = template_config_list
+        # 当前模板，记录当前使用的模板，方便对比，判断是否需要重新渲染页面
+        self.template = template
+        # 获取模板的方法
+        self.get_template_func = get_template_func
         # 如果是预览模式，仅展示配置页效果，不添加按钮
         self.preview_mode = preview_mode
-        # 模板id值，默认0，主要作用是记录当前使用的模板，方便对比，判断是否需要重新渲染页面
-        self.template_id = 0
         # 配置项数据字典
         self.config_data_dict: dict = ...
         # 配置项列表
@@ -38,10 +40,8 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         self.content_scroll_area: ScrollArea = ...
         self.canvas_content_frame: QFrame = ...
         self.canvas_content_frame_layout: QFormLayout = ...
-        self.preview_generate_button: QPushButton = ...
-        self.preview_generate_frame: ChainDialogFrameABC = ...
         self.list_template_config_executor: ListTemplateConfigExecutor = ...
-        super().__init__(*args, 4)
+        super().__init__(*args, quit_button_row_index)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
@@ -51,31 +51,43 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         self.frame_layout.addWidget(self.stacked_widget)
         # 如果是预览模式，且配置列表不为空，直接渲染；实际生成过程中调用，渲染页面需要后置
         if self.preview_mode:
-            self.setup_stacked_ui()
+            content_frame = self.do_get_content_frame()
+            self.stacked_widget.addWidget(content_frame)
 
     def setup_stacked_ui(self):
+        # 设置堆栈式窗口的当前控件
         self.stacked_widget.setCurrentWidget(self.get_content_frame())
 
     def get_content_frame(self):
-        cache_content_frame_tuple = self.content_frame_dict.get(self.template_id)
+        # 首先从缓存中获取框架，如果获取不到，再进行创建
+        cache_content_frame_tuple = self.content_frame_dict.get(self.template.id)
         if not cache_content_frame_tuple:
             content_frame = self.do_get_content_frame()
             self.stacked_widget.addWidget(content_frame)
             cache_content_frame_tuple = content_frame, self.config_widget_list
             # 放入缓存
-            self.content_frame_dict[self.template_id] = cache_content_frame_tuple
+            self.content_frame_dict[self.template.id] = cache_content_frame_tuple
         else:
             # config_widget_list 赋值
             self.config_widget_list = cache_content_frame_tuple[1]
         return cache_content_frame_tuple[0]
 
     def do_get_content_frame(self):
-        if self.template_config_list:
+        # 如果配置项列表存在，根据配置项动态渲染页面，否则创建无数据页面
+        if self.get_config_list():
             self.setup_content_scroll_area()
             return self.content_scroll_area
         else:
             self.setup_no_data_frame()
             return self.no_data_frame
+
+    def get_config_list(self) -> list:
+        if self.preview_mode:
+            return self.template_config_list
+        else:
+            return self.do_get_config_list()
+
+    def do_get_config_list(self) -> list: ...
 
     def setup_content_scroll_area(self):
         self.content_scroll_area = ScrollArea()
@@ -88,10 +100,10 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         # 在真实控件之上，增加一个空白label，允许布局拉伸label，以保持真实控件的固定高度，避免变形
         self.canvas_content_frame_layout.addWidget(QLabel())
 
-        if self.template_config_list:
+        if self.get_config_list():
             if not self.preview_mode:
                 self.config_widget_list = list()
-            for config in self.template_config_list:
+            for config in self.get_config_list():
                 config_value_widget: ConfigValueWidgetABC = get_config_value_widget(config)
                 # 为了美观，将控件高度固定
                 config_value_widget.setFixedHeight(config_value_widget.sizeHint().height())
@@ -113,15 +125,16 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         if self.preview_mode:
             return
         super().setup_other_button()
-        self.preview_generate_button = QPushButton()
-        self.button_layout.addWidget(self.preview_generate_button, 0, 2, 1, 1)
+        self.do_set_other_button()
+
+    def do_set_other_button(self): ...
 
     def setup_other_label_text(self):
         if self.preview_mode:
             return
-        self.previous_frame_button.setText(BACK_TO_SELECT_TEMPLATE_TXT)
-        self.next_frame_button.setText(GENERATE_TXT)
-        self.preview_generate_button.setText(PREVIEW_GENERATE_TXT)
+        self.do_set_other_label_text()
+
+    def do_set_other_label_text(self): ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
@@ -131,7 +144,9 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
         if self.preview_mode:
             return
         super().connect_other_signal()
-        self.preview_generate_button.clicked.connect(lambda: self.switch_frame(self.preview_generate_frame))
+        self.do_connect_other_signal()
+
+    def do_connect_other_signal(self): ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
@@ -145,12 +160,12 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
 
     def switch_frame(self, frame):
         # 只要不是回退，都需要收集数据
-        if frame is not self.previous_frame:
+        if frame is not self.previous_frame and self.config_widget_list is not Ellipsis:
             self.config_data_dict = dict([(config.config.output_var_name, config.collect_data())
                                           for config in self.config_widget_list])
             # 找出必填的变量名称
             required_var_names = set(map(lambda x: x.output_var_name,
-                                         filter(lambda x: x.is_required, self.template_config_list)))
+                                         filter(lambda x: x.is_required, self.get_config_list())))
             if required_var_names:
                 # 如果还有未填完的值，提示
                 filled_var_names = set(map(lambda x: x[0], filter(lambda x: x[1], self.config_data_dict.items())))
@@ -162,24 +177,39 @@ class DynamicTemplateConfigDialogFrame(ChainDialogFrameABC):
     def show(self):
         super().show()
         # 当展示页面时，进行动态渲染页面
-        if self.get_template_func:
+        if not self.preview_mode and self.get_template_func:
             template = self.get_template_func()
-            if template is not Ellipsis and template.id != self.template_id:
-                # 记录当前使用的模板id
-                self.template_id = template.id
+            if template is Ellipsis:
+                return
+            if not self.template:
+                # 如果当前模板不存在，记录当前模板，动态渲染页面
+                self.template = template
                 self.dynamic_render_content()
+            else:
+                # 如果当前模板已经存在，且获取到的模板不是当前模板，首先查看是否已经渲染过，如果没有渲染过，需要重新渲染页面
+                if template.id != self.template.id:
+                    self.template = template
+                    if template.id in self.content_frame_dict:
+                        self.setup_stacked_ui()
+                    else:
+                        self.dynamic_render_content()
+                else:
+                    # 如果获取到的模板是当前模板，不需要读取数据库渲染
+                    self.setup_stacked_ui()
 
     def dynamic_render_content(self):
-        # 根据 template_id 获取配置项
-        self.list_template_config_executor = ListTemplateConfigExecutor(self.template_id, self.parent_dialog,
+        # 根据 template_id 获取配置项，之所以在这里读取模板配置数据，而不是在模板列表，是为了尽量减少空间占用
+        self.list_template_config_executor = ListTemplateConfigExecutor(self.template.id, self.parent_dialog,
                                                                         self.parent_dialog,
                                                                         TEMPLATE_CONFIG_LIST_BOX_TITLE,
                                                                         self.render_content)
         self.list_template_config_executor.start()
 
-    def render_content(self, template_config_list):
-        self.template_config_list = template_config_list
+    def render_content(self, output_config_list, var_config_list):
+        self.template.output_config_list = output_config_list
+        self.template.var_config_list = var_config_list
         self.setup_stacked_ui()
+        # 如果下一个框架依然拥有 template，传递值，避免下一个框架重复读取数据库
+        if hasattr(self.next_frame, 'template'):
+            setattr(self.next_frame, 'template', self.template)
 
-    def set_preview_generate_frame(self, frame):
-        self.preview_generate_frame = frame

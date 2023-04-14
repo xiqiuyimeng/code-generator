@@ -20,6 +20,7 @@ sql_dict = {
     tab_opened integer not null,
     is_current_tab integer,
     tab_item_order integer,
+    output_config_id integer,
     template_id integer not null,
     item_order integer not null,
     create_time datetime,
@@ -43,6 +44,8 @@ class TemplateFile(BasicSqliteDTO):
     is_current_tab: int = field(init=False, default=None)
     # tab页顺序
     tab_item_order: int = field(init=False, default=None)
+    # 文件输出路径配置项id
+    output_config_id: int = field(init=False, default=None)
     # 模板id，用来关联文件和模板
     template_id: int = field(init=False, default=None)
 

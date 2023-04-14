@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QPushButton
 from src.constant.template_dialog_constant import ADD_CONFIG_BTN_TEXT, REMOVE_CONFIG_BTN_TEXT, PREVIEW_CONFIG_BTN_TEXT
 from src.view.dialog.template.template_config_dialog import TemplateConfigDialog
 from src.view.dialog.template.template_config_preview_dialog import TemplateConfigPreviewDialog
-from src.view.table.table_widget.template_table_widget.template_config_table_widget import TemplateConfigTableWidget
+from src.view.table.table_widget.template_table_widget.template_config_table_widget import TemplateConfigTableWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2023/3/21 17:06'
@@ -13,8 +13,10 @@ _date_ = '2023/3/21 17:06'
 class TemplateConfigWidget(QWidget):
     """模板配置页，嵌入在堆栈式窗口中"""
 
-    def __init__(self, parent_screen_rect):
+    def __init__(self, config_type, parent_screen_rect):
         super().__init__()
+        # 配置类型
+        self.config_type = config_type
         self.parent_screen_rect = parent_screen_rect
         self.config_layout: QVBoxLayout = ...
         self.config_btn_layout: QGridLayout = ...
@@ -23,7 +25,7 @@ class TemplateConfigWidget(QWidget):
         self.preview_config_btn: QPushButton = ...
         # 预览配置页
         self.preview_config_dialog: TemplateConfigPreviewDialog = ...
-        self.config_table: TemplateConfigTableWidget = ...
+        self.config_table: TemplateConfigTableWidgetABC = ...
         self.config_row_dialog: TemplateConfigDialog = ...
 
         self.setup_ui()
@@ -43,14 +45,23 @@ class TemplateConfigWidget(QWidget):
         self.config_btn_layout.addWidget(self.remove_config_btn, 0, 1, 1, 1)
         self.preview_config_btn = QPushButton()
         self.config_btn_layout.addWidget(self.preview_config_btn, 0, 2, 1, 1)
+        self.setup_other_button_ui()
+
         # 第二部分，表格区
-        self.config_table = TemplateConfigTableWidget(self)
+        self.config_table = self.get_table_widget()
         self.config_layout.addWidget(self.config_table)
+
+    def setup_other_button_ui(self): ...
+
+    def get_table_widget(self) -> TemplateConfigTableWidgetABC: ...
 
     def setup_label_text(self):
         self.add_config_btn.setText(ADD_CONFIG_BTN_TEXT)
         self.remove_config_btn.setText(REMOVE_CONFIG_BTN_TEXT)
         self.preview_config_btn.setText(PREVIEW_CONFIG_BTN_TEXT)
+        self.setup_other_label_text()
+
+    def setup_other_label_text(self): ...
 
     def connect_signal(self):
         self.add_config_btn.clicked.connect(lambda: self.open_config_row_dialog())
@@ -63,12 +74,15 @@ class TemplateConfigWidget(QWidget):
         # 输出配置表头复选框状态变化信号
         self.config_table.header_widget.header_check_changed.connect(self.set_remove_btn_available)
         self.preview_config_btn.clicked.connect(self.preview_template_config)
+        self.connect_other_signal()
+
+    def connect_other_signal(self): ...
 
     def open_config_row_dialog(self, config_data=None, row_index=None):
         # 获取配置项名称列表、配置变量名称列表，这两项都不可以重复
         config_names, config_var_names = self.config_table.get_exists_names_and_var_names()
         self.config_row_dialog = TemplateConfigDialog(self.parent_screen_rect, config_names,
-                                                      config_var_names, config_data)
+                                                      config_var_names, self.config_type, config_data)
         if config_data:
             self.config_row_dialog.edit_signal.connect(lambda template_config:
                                                        self.config_table.edit_row(row_index, template_config))
@@ -84,10 +98,14 @@ class TemplateConfigWidget(QWidget):
             self.remove_config_btn.setDisabled(True)
 
     def preview_template_config(self):
+        # 收集数据
+        self.collect_template_config()
         # 预览配置页
-        self.preview_config_dialog = TemplateConfigPreviewDialog(self.parent_screen_rect,
+        self.preview_config_dialog = TemplateConfigPreviewDialog(self.parent_screen_rect, self.config_type,
                                                                  self.config_table.collect_data())
         self.preview_config_dialog.exec()
+
+    def collect_template_config(self): ...
 
     def post_process(self):
         self.set_remove_btn_available(False)

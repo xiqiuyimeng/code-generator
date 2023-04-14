@@ -25,8 +25,9 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     save_signal = pyqtSignal(TemplateConfig)
     edit_signal = pyqtSignal(TemplateConfig)
 
-    def __init__(self, parent_dialog, dialog_title, name_list, var_names, template_config=None):
+    def __init__(self, parent_dialog, dialog_title, name_list, var_names, config_type, template_config=None):
         self.var_names = var_names
+        self.config_type = config_type
         self.old_var_name: str = ...
         self.var_name_available: bool = ...
         self.var_name_label: QLabel = ...
@@ -290,6 +291,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.value_range_list_widget.addItem(value)
 
     def collect_input(self):
+        self.new_dialog_data.config_type = self.config_type
         self.new_dialog_data.config_name = self.name_input.displayText()
         self.new_dialog_data.output_var_name = self.var_name_input.displayText()
         self.new_dialog_data.config_value_widget = self.value_combo_box.currentText()

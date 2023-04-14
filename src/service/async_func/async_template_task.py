@@ -4,8 +4,8 @@ from PyQt5.QtCore import pyqtSignal
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.sqlite_abc import transactional
+from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
-from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, TemplateConfig
 from src.service.system_storage.template_sqlite import TemplateSqlite, Template
 from src.view.box.message_box import pop_ok
 
@@ -31,7 +31,8 @@ class ReadTemplateWorker(ThreadWorkerABC):
             raise Exception('未查询到模板信息')
         # 查询模板文件列表
         template.template_files = TemplateFileSqlite().get_by_template_id(self.template_id)
-        template.template_config_list = TemplateConfigSqlite().get_by_template_id(self.template_id)
+        template_config_list = TemplateConfigSqlite().get_by_template_id(self.template_id)
+        template.output_config_list, template.var_config_list = template_config_list
         self.success_signal.emit(template)
         log.info("读取模板详细信息成功")
 
@@ -71,9 +72,9 @@ class AddTemplateWorker(ThreadWorkerABC):
         if self.template.template_files:
             TemplateFileSqlite().batch_add_template_files(self.template.id, self.template.template_files)
         # 保存模板配置信息
-        if self.template.template_config_list:
-            TemplateConfigSqlite().batch_add_config_list(self.template.id,
-                                                         self.template.template_config_list)
+        if self.template.var_config_list:
+            TemplateConfigSqlite().batch_add_config_list(self.template.id, self.template.output_config_list,
+                                                         self.template.var_config_list)
         self.success_signal.emit()
         log.info(f'保存模板 [{self.template.template_name}] 成功')
 
@@ -117,8 +118,8 @@ class EditTemplateWorker(ThreadWorkerABC):
         # 处理模板文件列表
         TemplateFileSqlite().batch_edit_template_files(self.template.id, self.template.template_files)
         # 保存模板输入配置信息
-        TemplateConfigSqlite().batch_edit_config_list(self.template.id,
-                                                      self.template.template_config_list)
+        TemplateConfigSqlite().batch_edit_config_list(self.template.id, self.template.output_config_list,
+                                                      self.template.var_config_list)
         self.success_signal.emit()
         log.info(f'编辑模板信息 [{self.template.template_name}] 结束')
 
@@ -226,10 +227,10 @@ class ListTemplateExecutor(LoadingMaskThreadExecutor):
 # ----------------------- 获取模板列表 end ----------------------- #
 
 
-# ----------------------- 获取模板列表 start ----------------------- #
+# ----------------------- 获取模板配置列表 start ----------------------- #
 
 class ListTemplateConfigWorker(ThreadWorkerABC):
-    success_signal = pyqtSignal(list)
+    success_signal = pyqtSignal(list, list)
 
     def __init__(self, template_id):
         super().__init__()
@@ -238,10 +239,8 @@ class ListTemplateConfigWorker(ThreadWorkerABC):
     def do_run(self):
         log.info(f"读取模板配置列表：{self.template_id}")
         # 读取数据库中缓存的模板列表
-        param = TemplateConfig()
-        param.template_id = self.template_id
-        template_config_list = TemplateConfigSqlite().select_by_order(param)
-        self.success_signal.emit(template_config_list)
+        template_config_list = TemplateConfigSqlite().get_by_template_id(self.template_id)
+        self.success_signal.emit(*template_config_list)
         log.info(f"读取模板配置列表成功：{self.template_id}")
 
     def do_exception(self, e: Exception):
@@ -259,4 +258,4 @@ class ListTemplateConfigExecutor(LoadingMaskThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return ListTemplateConfigWorker(self.template_id)
 
-# ----------------------- 获取模板列表 end ----------------------- #
+# ----------------------- 获取模板配置列表 end ----------------------- #
