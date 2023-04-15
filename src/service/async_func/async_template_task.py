@@ -77,9 +77,8 @@ class AddTemplateWorker(ThreadWorkerABC):
         if self.template.template_files:
             TemplateFileSqlite().batch_add_template_files(self.template.id, self.template.template_files)
         # 保存模板配置信息
-        if self.template.var_config_list:
-            TemplateConfigSqlite().batch_add_config_list(self.template.id, self.template.output_config_list,
-                                                         self.template.var_config_list)
+        TemplateConfigSqlite().batch_add_config_list(self.template.id, self.template.output_config_list,
+                                                     self.template.var_config_list)
         self.success_signal.emit()
         log.info(f'保存模板 [{self.template.template_name}] 成功')
 

@@ -97,15 +97,15 @@ class TemplateConfigSqlite(SqliteBasic):
         for idx, config in enumerate(config_list, start=1):
             config.template_id = template_id
             config.item_order = idx
-        self.batch_insert(config_list)
+        if config_list:
+            self.batch_insert(config_list)
 
     @transactional
     def batch_edit_config_list(self, template_id, output_config_list, var_config_list):
         # 由于是低频操作，可以简单做，删除原有数据，插入新数据
         self.batch_del_config_list((template_id,))
         # 插入新数据
-        if output_config_list or var_config_list:
-            self.batch_add_config_list(template_id, output_config_list, var_config_list)
+        self.batch_add_config_list(template_id, output_config_list, var_config_list)
 
     def batch_del_config_list(self, template_ids):
         ids_str = ','.join(map(lambda x: str(x), template_ids))
