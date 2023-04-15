@@ -38,6 +38,7 @@ class TableFrameABC(QFrame):
         header_label_text = self.get_header_label_text()
         self.table_header_label.setText(header_label_text)
 
+        # 设置气泡提示内容
         parent.setToolTip(header_label_text)
 
         self._layout = QVBoxLayout(self)

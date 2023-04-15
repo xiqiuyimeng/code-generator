@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.template_dialog_constant import DEL_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, BATCH_DEL_CONFIG_PROMPT, \
-    TEMPLATE_VAR_CONFIG_HEADER_LABELS, TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS
+    TEMPLATE_VAR_CONFIG_HEADER_LABELS, TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS, IRRELEVANT_FILE_TOOL_TIP
 from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.view.box.message_box import pop_question
 from src.view.table.table_widget.custom_table_widget import CustomTableWidget
@@ -64,8 +64,22 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
 
     def get_row_fill_data_tuple(self, template_config) -> tuple:
         return template_config.config_name, template_config.output_var_name, template_config.config_value_widget,\
-            COMBO_BOX_YES_TXT if template_config.is_required else COMBO_BOX_NO_TXT, '绑定文件个数', \
+            COMBO_BOX_YES_TXT if template_config.is_required else COMBO_BOX_NO_TXT, \
+            len(template_config.relevant_file_list) if template_config.relevant_file_list else 0, \
             template_config.config_desc
+
+    def show_tool_tip(self, model_index):
+        # 如果是关联文件列，执行特定的气泡提示
+        if model_index.column() == 5:
+            # 获取关联文件列表
+            relevant_file_list = self.get_row_data(model_index.row()).relevant_file_list
+            if relevant_file_list:
+                tool_tip = ', \n'.join([tp_file.file_name for tp_file in relevant_file_list])
+            else:
+                tool_tip = IRRELEVANT_FILE_TOOL_TIP
+            self.setToolTip(tool_tip)
+        else:
+            super().show_tool_tip(model_index)
 
 
 class TemplateVarConfigTableWidget(TemplateConfigTableWidgetABC):

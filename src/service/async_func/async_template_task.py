@@ -35,9 +35,14 @@ class ReadTemplateWorker(ThreadWorkerABC):
         template.output_config_list, template.var_config_list = template_config_list
         # 将模板文件按关联的输出路径配置id分组
         if template.template_files and template.output_config_list:
-            template_file_dict = dict([(tp_file.output_config_id, tp_file) for tp_file in template.template_files])
+            template_file_dict = dict()
+            for tp_file in template.template_files:
+                file_list = template_file_dict.get(tp_file.output_config_id, list())
+                if not file_list:
+                    template_file_dict[tp_file.output_config_id] = file_list
+                file_list.append(tp_file)
             for output_config in template.output_config_list:
-                output_config.relevant_file_list = template_file_dict.get(output_config.id, list())
+                output_config.relevant_file_list = template_file_dict.get(output_config.id)
         self.success_signal.emit(template)
         log.info("读取模板详细信息成功")
 

@@ -110,3 +110,6 @@ REQUIRED_CHECK_BOX_TITLE = '必填项检查'
 # 模板配置类型枚举值
 OUTPUT_DIR_TXT = '输出路径'
 TEMPLATE_VAR_TXT = '模板变量'
+
+# 输出路径，关联文件，气泡提示
+IRRELEVANT_FILE_TOOL_TIP = '暂未关联模板文件！'

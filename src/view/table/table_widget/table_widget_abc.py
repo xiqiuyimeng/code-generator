@@ -56,7 +56,7 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
 
     def make_item(self, text=None):
         item = TableWidgetItem(self)
-        item.setText(text if text else '')
+        item.setText(str(text) if text is not None else '')
         return item
 
     def set_text_input_delegate(self, columns):
