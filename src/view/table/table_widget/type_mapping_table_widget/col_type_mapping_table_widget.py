@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QKeyEvent
 
 from src.constant.table_constant import DEL_MAPPING_GROUP_BOX_TITLE, DEL_MAPPING_GROUP_PROMPT, \
     DEL_COL_TYPE_MAPPING_PROMPT, DEL_COL_TYPE_MAPPING_TITLE
@@ -9,6 +10,7 @@ from src.view.table.table_header.col_type_mapping_table_header import ColTypeMap
     ColTypeMappingTableHeaderABC, ColTypeMappingFrozenTableHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.table_widget_abc import TableWidgetABC
+from view.custom_widget.scrollable_widget import ScrollableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/2/15 18:05'
@@ -86,6 +88,17 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         self.frozen_column_table: ColTypeMappingFrozenTableWidget = ...
         self.need_sync_col_type = False
         super().__init__(*args)
+
+        # 安装监听器，监听案件事件，交给滚动控件，为了实现水平滚动
+        self.parent().parent().installEventFilter(self)
+
+    def eventFilter(self, obj, event) -> bool:
+        if type(event) == QKeyEvent and event.key() == Qt.Key_Shift:
+            # 触发表格和表头的shift按键事件
+            ScrollableWidget.keyPressEvent(self, event)
+            ScrollableWidget.keyPressEvent(self.header_widget, event)
+            return True
+        return super().eventFilter(obj, event)
 
     def set_column_count(self):
         # 表格设置为5列
