@@ -10,7 +10,7 @@ from src.view.table.table_header.col_type_mapping_table_header import ColTypeMap
     ColTypeMappingTableHeaderABC, ColTypeMappingFrozenTableHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.table_widget_abc import TableWidgetABC
-from view.custom_widget.scrollable_widget import ScrollableWidget
+from src.view.custom_widget.scrollable_widget import ScrollableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/2/15 18:05'

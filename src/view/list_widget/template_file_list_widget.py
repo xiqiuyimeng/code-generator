@@ -71,3 +71,12 @@ class TemplateFileListWidget(CustomListWidget):
                 template_file.tab_opened = TabOpenedEnum.not_opened.value
             template_files.append(template_file)
         return template_files
+
+    def collect_irrelevant_config_files(self):
+        """收集未关联输出配置的文件"""
+        template_files = list()
+        for idx in range(self.count()):
+            template_file = get_template_file_data(self.item(idx))
+            if not template_file.output_config_id:
+                template_files.append(template_file)
+        return template_files

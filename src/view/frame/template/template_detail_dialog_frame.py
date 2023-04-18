@@ -112,7 +112,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
     def setup_template_config_ui(self):
         # 第一个页面为输出路径配置页
-        self.output_config_widget = TemplateOutputConfigWidget(self.parent_dialog.parent_screen_rect)
+        self.output_config_widget = TemplateOutputConfigWidget(self, self.parent_dialog.parent_screen_rect)
         self.config_tab_widget.addTab(self.output_config_widget, TEMPLATE_OUTPUT_DIR_TAB_TEXT)
         # 第二个页面为模板变量配置页
         self.var_config_widget = TemplateVarConfigWidget(self.parent_dialog.parent_screen_rect)
