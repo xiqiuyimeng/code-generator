@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal
+from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal, QPoint
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu
+from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu, QToolTip
 
 from src.constant.tab_constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
     CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, TABLE_CLOSE_WITH_REFRESHING, \
@@ -42,8 +42,9 @@ class TabBarABC(QTabBar):
             index = self.tabAt(event.pos())
             # 获取当前tab页
             current_tab = self.parent.widget(index)
-            # 设置气泡提示
-            self.setTabToolTip(index, current_tab.toolTip())
+            # 设置气泡提示，向下略微偏移一些，以免鼠标挡住提示文字
+            QToolTip.showText(QPoint(event.globalPos().x() + 5, event.globalPos().y() + 10), current_tab.toolTip())
+            return True
         return super().eventFilter(obj, event)
 
     def right_click_menu(self, pos):

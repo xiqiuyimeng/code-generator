@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidget, QFrame
+from PyQt5.QtCore import Qt, QObject, QEvent, QPoint
+from PyQt5.QtWidgets import QTableWidget, QFrame, QToolTip
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 from src.view.table.table_item.table_item import TableWidgetItem
@@ -17,6 +17,8 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
         self.text_input_delegate: TextInputDelegate = ...
         self.setup_ui()
         self.connect_signal()
+        # 安装监听器
+        self.installEventFilter(self)
 
     def setup_ui(self):
         # 设置无边框
@@ -51,6 +53,16 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
 
     def show_tool_tip(self, model_index):
         self.setToolTip(model_index.data())
+
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+        if obj == self and event.type() == QEvent.ToolTip:
+            # self.indexAt(pos).isValid()，计算规则是默认隐藏了表头，所以需要减去表头高度，才是真实单元格的位置
+            horizontal_header_pos = QPoint(0, self.horizontalHeader().height())
+            if self.indexAt(event.pos() - horizontal_header_pos).isValid():
+                # 设置气泡提示，向下略微偏移一些，以免鼠标挡住提示文字
+                QToolTip.showText(QPoint(event.globalPos().x() + 5, event.globalPos().y() + 10), self.toolTip())
+            return True
+        return super().eventFilter(obj, event)
 
     def connect_other_signal(self): ...
 
