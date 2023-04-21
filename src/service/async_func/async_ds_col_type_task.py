@@ -42,10 +42,8 @@ class SaveDsColTypeWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info('保存数据源列类型成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = '保存数据源列类型列表失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '保存数据源列类型列表失败'
 
 
 class SaveDsColTypeExecutor(LoadingMaskThreadExecutor):
@@ -79,10 +77,8 @@ class ListDsColTypeWorker(ThreadWorkerABC):
             self.success_signal.emit(dict())
         log.info('读取列类型列表成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取列类型列表失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取列类型列表失败'
 
 
 class ListDsColTypeExecutor(LoadingMaskThreadExecutor):

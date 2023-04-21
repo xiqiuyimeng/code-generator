@@ -34,10 +34,8 @@ class ReadTypeMappingWorker(ThreadWorkerABC):
         self.success_signal.emit(type_mapping)
         log.info("读取类型映射详细信息成功")
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取类型映射信息失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取类型映射信息失败'
 
 
 class ReadTypeMappingExecutor(LoadingMaskThreadExecutor):
@@ -73,10 +71,8 @@ class AddTypeMappingWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'保存类型映射 [{self.type_mapping.mapping_name}] 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'保存 [{self.type_mapping.mapping_name}] 类型映射信息失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'保存 [{self.type_mapping.mapping_name}] 类型映射信息失败'
 
 
 class AddTypeMappingExecutor(LoadingMaskThreadExecutor):
@@ -114,10 +110,8 @@ class EditTypeMappingWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'编辑类型映射信息 [{self.type_mapping.mapping_name}] 结束')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'编辑类型映射 [{self.type_mapping.mapping_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'编辑类型映射 [{self.type_mapping.mapping_name}] 失败'
 
 
 class EditTypeMappingExecutor(LoadingMaskThreadExecutor):
@@ -155,10 +149,8 @@ class DelTypeMappingWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'删除类型映射 [{self.type_mapping_names}] 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'删除类型映射 [{self.type_mapping_names}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'删除类型映射 [{self.type_mapping_names}] 失败'
 
 
 class DelTypeMappingExecutor(LoadingMaskThreadExecutor):
@@ -201,10 +193,8 @@ class ListTypeMappingWorker(ThreadWorkerABC):
         self.success_signal.emit(type_mapping_list)
         log.info("读取类型映射列表成功")
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取类型映射列表失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取类型映射列表失败'
 
 
 class ListTypeMappingExecutor(LoadingMaskThreadExecutor):

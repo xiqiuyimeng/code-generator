@@ -40,10 +40,8 @@ class AddConnWorker(ThreadWorkerABC):
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit(opened_conn)
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
 
 
 class AddConnExecutor(LoadingMaskThreadExecutor):
@@ -94,10 +92,8 @@ class DelConnWorker(ThreadWorkerABC):
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_name}]{DEL_CONN_FAIL_PROMPT}'
 
 
 class DelConnExecutor(IconMovieThreadExecutor):
@@ -156,10 +152,8 @@ class EditConnWorker(ThreadWorkerABC):
             opened_conn_tree_item.item_name = self.connection.conn_name
             opened_tree_item_sqlite.update(opened_conn_tree_item)
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
 
 
 class EditConnExecutor(LoadingMaskThreadExecutor):
@@ -226,10 +220,8 @@ class ListConnWorker(ThreadWorkerABC):
             tab.col_list = DsTableColInfoSqlite().select_by_order(col_param)
         self.tab_info_signal.emit(tab_list)
 
-    def do_exception(self, e: Exception):
-        err_msg = LIST_ALL_CONN_FAIL_PROMPT
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return LIST_ALL_CONN_FAIL_PROMPT
 
 
 class ListConnExecutor(LoadingMaskThreadExecutor):
@@ -261,10 +253,8 @@ class QueryConnInfoWorker(ThreadWorkerABC):
         conn_param.id = self.conn_id
         self.success_signal.emit(ConnSqlite().select_one(conn_param))
 
-    def do_exception(self, e: Exception):
-        err_msg = f'查询连接信息失败，连接id：{self.conn_id}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'查询连接信息失败，连接id：{self.conn_id}'
 
 
 class QueryConnInfoExecutor(LoadingMaskThreadExecutor):
@@ -300,9 +290,8 @@ class CloseConnDBWorker(ThreadWorkerABC):
             DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        log.exception(self.err_msg)
-        self.error_signal.emit(f'{self.error_signal}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return self.err_msg
 
 
 class CloseConnExecutor(IconMovieThreadExecutor):

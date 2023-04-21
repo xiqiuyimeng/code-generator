@@ -46,10 +46,8 @@ class ReadTemplateWorker(ThreadWorkerABC):
         self.success_signal.emit(template)
         log.info("读取模板详细信息成功")
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取模板信息失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取模板信息失败'
 
 
 class ReadTemplateExecutor(LoadingMaskThreadExecutor):
@@ -87,10 +85,8 @@ class AddTemplateWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'保存模板 [{self.template.template_name}] 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'保存 [{self.template.template_name}] 模板信息失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'保存 [{self.template.template_name}] 模板信息失败'
 
 
 class AddTemplateExecutor(LoadingMaskThreadExecutor):
@@ -132,10 +128,8 @@ class EditTemplateWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'编辑模板信息 [{self.template.template_name}] 结束')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'编辑模板 [{self.template.template_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'编辑模板 [{self.template.template_name}] 失败'
 
 
 class EditTemplateExecutor(LoadingMaskThreadExecutor):
@@ -175,10 +169,8 @@ class DelTemplateWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'删除模板 [{self.template_names}] 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'删除模板 [{self.template_names}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'删除模板 [{self.template_names}] 失败'
 
 
 class DelTemplateExecutor(LoadingMaskThreadExecutor):
@@ -222,10 +214,8 @@ class ListTemplateWorker(ThreadWorkerABC):
         self.success_signal.emit(template_list)
         log.info("读取模板列表成功")
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取模板列表失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取模板列表失败'
 
 
 class ListTemplateExecutor(LoadingMaskThreadExecutor):
@@ -252,10 +242,8 @@ class ListTemplateConfigWorker(ThreadWorkerABC):
         self.success_signal.emit(*template_config_list)
         log.info(f"读取模板配置列表成功：{self.template_id}")
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取模板配置列表失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取模板配置列表失败'
 
 
 class ListTemplateConfigExecutor(LoadingMaskThreadExecutor):

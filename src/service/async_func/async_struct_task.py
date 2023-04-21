@@ -45,10 +45,8 @@ class AddStructWorker(ThreadWorkerABC):
         log.info(f'[{self.struct_info.struct_name}]保存成功')
         self.success_signal.emit(opened_struct)
 
-    def do_exception(self, e: Exception):
-        err_msg = f'添加{self.struct_info.struct_type}失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'添加{self.struct_info.struct_type}失败'
 
 
 class AddStructExecutor(LoadingMaskThreadExecutor):
@@ -91,10 +89,8 @@ class DelStructWorker(ThreadWorkerABC):
         log.info(f'{self.opened_item.item_name}删除成功')
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.opened_item.item_name}]删除失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.opened_item.item_name}]删除失败'
 
 
 class DelStructExecutor(IconMovieThreadExecutor):
@@ -129,10 +125,8 @@ class EditStructWorker(ThreadWorkerABC):
         OpenedTreeItemSqlite().update(update_param)
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = f'修改{self.struct_info.struct_type}失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'修改{self.struct_info.struct_type}失败'
 
 
 class EditStructExecutor(LoadingMaskThreadExecutor):
@@ -168,10 +162,8 @@ class QueryStructWorker(ThreadWorkerABC):
         else:
             self.success_signal.emit(StructInfo())
 
-    def do_exception(self, e: Exception):
-        err_msg = '查询结构体失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '查询结构体失败'
 
 
 class QueryStructExecutor(LoadingMaskThreadExecutor):
@@ -233,10 +225,8 @@ class ListStructWorker(ThreadWorkerABC):
         # 结束信号
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = '获取所有结构体失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '获取所有结构体失败'
 
 
 class ListStructExecutor(LoadingMaskThreadExecutor):
@@ -274,10 +264,8 @@ class AddFolderWorker(ThreadWorkerABC):
         opened_item.data_type = FolderTypeEnum.folder_type.value
         self.success_signal.emit(opened_item)
 
-    def do_exception(self, e: Exception):
-        error_msg = f'[{self.folder_name}]\n添加文件夹失败'
-        log.exception(error_msg)
-        self.error_signal.emit(f'{error_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.folder_name}]\n添加文件夹失败'
 
 
 class AddFolderExecutor(LoadingMaskThreadExecutor):
@@ -311,10 +299,8 @@ class EditFolderWorker(ThreadWorkerABC):
         OpenedTreeItemSqlite().update(self.folder_item)
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        error_msg = f'[{self.folder_item.item_name}]\n编辑文件夹失败'
-        log.exception(error_msg)
-        self.error_signal.emit(f'{error_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.folder_item.item_name}]\n编辑文件夹失败'
 
 
 class EditFolderExecutor(LoadingMaskThreadExecutor):
@@ -362,10 +348,8 @@ class DelFolderWorker(ThreadWorkerABC):
             DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = f'删除文件夹 [{self.folder_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'删除文件夹 [{self.folder_name}] 失败'
 
 
 class DelFolderExecutor(IconMovieThreadExecutor):
@@ -410,10 +394,8 @@ class ReadFileWorker(ThreadWorkerABC):
             for index, line in enumerate(f):
                 self.success_signal.emit(index, line.rstrip("\n"))
 
-    def do_exception(self, e: Exception):
-        err_msg = f'读取文件失败：[{self.file_url}]'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'读取文件失败：[{self.file_url}]'
 
 
 class ReadFileExecutor(LoadingMaskThreadExecutor):
@@ -445,10 +427,8 @@ class PrettyStructWorker(ThreadWorkerABC):
         result = beautifier_executor.beautify()
         self.success_signal.emit(result)
 
-    def do_exception(self, e: Exception):
-        err_msg = '美化结构体失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '美化结构体失败'
 
 
 class PrettyStructExecutor(LoadingMaskThreadExecutor):
@@ -506,10 +486,8 @@ class OpenStructWorker(ThreadWorkerABC):
         self.modifying_db_task = False
         return table_tab
 
-    def do_exception(self, e: Exception):
-        err_msg = f'打开{self.opened_table_item.item_name}失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'打开{self.opened_table_item.item_name}失败'
 
 
 class OpenStructExecutor(IconMovieThreadExecutor):
@@ -563,10 +541,8 @@ class RefreshStructWorker(ThreadWorkerABC):
         self.table_tab.col_list = column_list
         self.modifying_db_task = False
 
-    def do_exception(self, e: Exception):
-        err_msg = f'刷新 [{self.struct_info.struct_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'刷新 [{self.struct_info.struct_name}] 失败'
 
 
 class RefreshStructExecutor(RefreshMovieThreadExecutor):
@@ -624,10 +600,8 @@ class RefreshFolderWorker(ThreadWorkerABC):
         table_tab.col_list = column_list
         self.modifying_db_task = False
 
-    def do_exception(self, e: Exception):
-        err_msg = f'刷新 [{self.folder_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'刷新 [{self.folder_name}] 失败'
 
 
 class RefreshFolderExecutor(RefreshMovieThreadExecutor):

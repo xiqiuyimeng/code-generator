@@ -5,6 +5,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QMovie, QIcon
 
 from src.exception.exception import ThreadStopException
+from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import set_thread_terminate
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.loading_widget import LoadingMaskWidget, RefreshLoadingMaskWidget
@@ -42,7 +43,12 @@ class ThreadWorkerABC(QThread):
 
     def do_run(self): ...
 
-    def do_exception(self, e: Exception): ...
+    def do_exception(self, e: Exception):
+        err_msg = self.get_err_msg()
+        log.exception(err_msg)
+        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+
+    def get_err_msg(self) -> str: ...
 
     def do_finally(self): ...
 

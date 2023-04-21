@@ -56,10 +56,8 @@ class TestConnWorker(ConnWorkerABC):
         log.info(f'[{self.conn_opened_record.item_name}]{TEST_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}]{TEST_CONN_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}]{TEST_CONN_FAIL_PROMPT}'
 
 
 class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
@@ -114,10 +112,8 @@ class OpenConnWorker(ConnWorkerABC):
                                                              self.conn_opened_record.data_type,
                                                              init_checked=False)
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}]{OPEN_CONN_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}]{OPEN_CONN_FAIL_PROMPT}'
 
 
 class OpenConnExecutor(IconMovieThreadExecutor):
@@ -174,10 +170,8 @@ class RefreshConnWorker(ConnWorkerABC):
         # 库刷新完成，发射信号
         self.db_finished_signal.emit(db_record.item_order)
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}]{REFRESH_CONN_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}]{REFRESH_CONN_FAIL_PROMPT}'
 
 
 class RefreshConnExecutor(RefreshMovieThreadExecutor):
@@ -230,10 +224,8 @@ class OpenDBWorker(ConnWorkerABC):
                                                              DsCategoryEnum.sql_ds_category.value.name,
                                                              self.conn_opened_record.data_type)
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}][{self.db_name}]{OPEN_DB_FAIL_PROMPT}'
 
 
 class OpenDBExecutor(IconMovieThreadExecutor):
@@ -281,10 +273,8 @@ class RefreshDBWorker(ConnWorkerABC):
             executor.check_db(self.db_name)
         self.success_signal.emit()
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}]{REFRESH_DB_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}][{self.db_name}]{REFRESH_DB_FAIL_PROMPT}'
 
 
 class RefreshDBExecutor(RefreshMovieThreadExecutor):
@@ -336,11 +326,9 @@ class OpenTBWorker(ConnWorkerABC):
         table_tab.col_list = columns
         return table_tab
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
-                  f'{OPEN_TB_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
+               f'{OPEN_TB_FAIL_PROMPT}'
 
 
 class OpenTBExecutor(IconMovieThreadExecutor):
@@ -391,11 +379,9 @@ class RefreshTBWorker(ConnWorkerABC):
         else:
             self.success_signal.emit(DsTableTab())
 
-    def do_exception(self, e: Exception):
-        err_msg = f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
-                  f'{REFRESH_TB_FAIL_PROMPT}'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
+               f'{REFRESH_TB_FAIL_PROMPT}'
 
 
 class RefreshTBExecutor(RefreshMovieThreadExecutor):

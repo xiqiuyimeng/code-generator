@@ -24,10 +24,8 @@ class AddTemplateFuncWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'保存模板方法 [{self.template_func.func_name}] 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'保存 [{self.template_func.func_name}] 模板方法信息失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'保存 [{self.template_func.func_name}] 模板方法信息失败'
 
 
 class AddTemplateFuncExecutor(LoadingMaskThreadExecutor):
@@ -62,10 +60,8 @@ class EditTemplateFuncWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'编辑模板方法信息 [{self.template_func.func_name}] 结束')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'编辑模板方法 [{self.template_func.func_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'编辑模板方法 [{self.template_func.func_name}] 失败'
 
 
 class EditTemplateFuncExecutor(LoadingMaskThreadExecutor):
@@ -101,10 +97,8 @@ class DelTemplateFuncWorker(ThreadWorkerABC):
         self.success_signal.emit()
         log.info(f'删除模板方法 [{self.template_func_name}] 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'删除模板方法 [{self.template_func_name}] 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'删除模板方法 [{self.template_func_name}] 失败'
 
 
 class DelTemplateFuncExecutor(LoadingMaskThreadExecutor):
@@ -125,15 +119,13 @@ class DelTemplateFuncExecutor(LoadingMaskThreadExecutor):
 class ClearTemplateFuncWorker(ThreadWorkerABC):
 
     def do_run(self):
-        log.info(f'开始清空模板方法')
+        log.info('开始清空模板方法')
         TemplateFuncSqlite().drop_template_func_table()
         self.success_signal.emit()
-        log.info(f'清空模板方法成功')
+        log.info('清空模板方法成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'清空模板方法失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '清空模板方法失败'
 
 
 class ClearTemplateFuncExecutor(LoadingMaskThreadExecutor):
@@ -156,10 +148,8 @@ class ListTemplateFuncWorker(ThreadWorkerABC):
         self.success_signal.emit(template_list)
         log.info("读取模板方法列表成功")
 
-    def do_exception(self, e: Exception):
-        err_msg = '读取模板方法列表失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return '读取模板方法列表失败'
 
 
 class ListTemplateFuncExecutor(LoadingMaskThreadExecutor):

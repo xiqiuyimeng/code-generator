@@ -65,10 +65,8 @@ class SwitchDsCategoryWorker(InitDsCategoryWorker):
         super().do_run()
         log.info(f'{SWITCH_DS_CATEGORY_TITLE} {self.switch_ds_category} 成功')
 
-    def do_exception(self, e: Exception):
-        err_msg = f'{SWITCH_DS_CATEGORY_TITLE} {self.switch_ds_category} 失败'
-        log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+    def get_err_msg(self) -> str:
+        return f'{SWITCH_DS_CATEGORY_TITLE} {self.switch_ds_category} 失败'
 
 
 class SwitchDsCategoryExecutor(LoadingMaskThreadExecutor):
