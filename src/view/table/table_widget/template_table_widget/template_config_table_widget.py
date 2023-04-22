@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.template_dialog_constant import DEL_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, BATCH_DEL_CONFIG_PROMPT, \
-    TEMPLATE_VAR_CONFIG_HEADER_LABELS, TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS, IRRELEVANT_FILE_TOOL_TIP, \
+    TEMPLATE_VAR_CONFIG_HEADER_LABELS, TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS, UNBIND_FILE_TOOL_TIP, \
     DEL_OUTPUT_CONFIG_PROMPT, BATCH_DEL_OUTPUT_CONFIG_PROMPT
 from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.view.box.message_box import pop_question
@@ -75,7 +75,7 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
             if relevant_file_list:
                 tool_tip = ', \n'.join([tp_file.file_name for tp_file in relevant_file_list])
             else:
-                tool_tip = IRRELEVANT_FILE_TOOL_TIP
+                tool_tip = UNBIND_FILE_TOOL_TIP
             self.setToolTip(tool_tip)
         else:
             super().show_tool_tip(model_index)

@@ -78,7 +78,7 @@ class TemplateFileListWidget(CustomListWidget):
             template_files.append(template_file)
         return template_files
 
-    def collect_irrelevant_config_files(self):
+    def collect_unbind_config_files(self):
         """收集未关联输出配置的文件"""
         template_files = list()
         for idx in range(self.count()):

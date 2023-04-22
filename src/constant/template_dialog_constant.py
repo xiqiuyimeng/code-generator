@@ -114,11 +114,16 @@ OUTPUT_DIR_TXT = '输出路径'
 TEMPLATE_VAR_TXT = '模板变量'
 
 # 输出路径，关联文件，气泡提示
-IRRELEVANT_FILE_TOOL_TIP = '暂未关联模板文件！'
+UNBIND_FILE_TOOL_TIP = '暂未关联模板文件！'
 
 # 没有未关联配置的文件提示
-NO_IRRELEVANT_FILE_PROMPT = '未发现需要生成输出路径配置的模板文件！'
+NO_UNBIND_FILE_PROMPT = '未发现需要生成输出路径配置的模板文件！'
 GENERATE_FILE_CONFIG_TITLE = '生成文件的输出路径配置'
 GENERATE_CONFIG_FAIL_PROMPT = '以下文件未能自动生成输出路径配置，请手动处理！\n\n{}'
 
 MANAGE_FILE_CONFIG_TITLE = '管理文件的输出路径配置'
+
+# 维护配置和文件关系对话框
+MAINTAIN_FILE_CONFIG_TITLE = '维护输出路径配置和文件关系'
+OUTPUT_CONFIG_LIST_HEADER_TEXT = '输出路径配置列表'
+FILE_LIST_HEADER_TEXT = '模板文件列表'

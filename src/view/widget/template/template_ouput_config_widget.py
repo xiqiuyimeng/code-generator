@@ -2,9 +2,10 @@
 from PyQt5.QtWidgets import QPushButton
 
 from src.constant.template_dialog_constant import AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT, MAINTAIN_FILE_CONFIG_BTN_TEXT, \
-    NO_IRRELEVANT_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT
+    NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT
 from src.service.async_func.async_template_task import AutoGenerateOutputConfigExecutor
 from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
+from src.view.dialog.template.template_maintain_file_config_dialog import TemplateMaintainFileConfigDialog
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import \
     TemplateOutputConfigTableWidget
 from src.view.widget.template.template_config_widget import TemplateConfigWidget
@@ -25,7 +26,7 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         # 维护文件和输出路径配置关系按钮
         self.maintain_file_config_btn: QPushButton = ...
         # 维护文件和输出路径的对话框
-        self.maintain_file_config_dialog = ...
+        self.maintain_file_config_dialog: TemplateMaintainFileConfigDialog = ...
         # 自动生成文件对应路径配置执行器
         self.generate_config_executor: AutoGenerateOutputConfigExecutor = ...
         super().__init__(ConfigTypeEnum.output_dir.value, *args)
@@ -51,14 +52,14 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         self.maintain_file_config_btn.clicked.connect(self.maintain_file_config)
 
     def auto_generate_config(self):
-        irrelevant_config_files = self.parent_frame.file_list_widget.collect_irrelevant_config_files()
-        if not irrelevant_config_files:
-            pop_fail(NO_IRRELEVANT_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, self)
+        unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
+        if not unbind_config_files:
+            pop_fail(NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, self)
         else:
             # 生成文件输出配置，并关联文件
             config_names, var_names = self.config_table.get_exists_names_and_var_names()
             self.generate_config_executor = AutoGenerateOutputConfigExecutor(config_names, var_names,
-                                                                             irrelevant_config_files,
+                                                                             unbind_config_files,
                                                                              self, self,
                                                                              GENERATE_FILE_CONFIG_TITLE,
                                                                              self.auto_generate_config_callback)
@@ -73,4 +74,9 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
             pop_fail(GENERATE_CONFIG_FAIL_PROMPT.format('\n'.join(fail_list)), GENERATE_FILE_CONFIG_TITLE, self)
 
     def maintain_file_config(self):
-        ...
+        output_config_list = self.config_table.collect_data()
+        unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
+        self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(self.parent_screen_rect,
+                                                                            output_config_list,
+                                                                            unbind_config_files)
+        self.maintain_file_config_dialog.exec()
