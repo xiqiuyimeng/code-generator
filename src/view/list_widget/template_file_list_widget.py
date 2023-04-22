@@ -39,10 +39,16 @@ class TemplateFileListWidget(CustomListWidget):
         if current_tab_indexes:
             self.parent_dialog.file_tab_widget.removeTab(current_tab_indexes[0])
         super().remove_item_func(item)
+        # 判断是否有绑定输出配置，如果绑定的配置和文件是1:1，询问是否同步删除配置
+        template_file = get_template_file_data(item)
+        if template_file.output_config_id:
+            self.parent_dialog.output_config_widget.config_table.del_bind_file_row(template_file)
 
     def clear_items_func(self):
         super().clear_items_func()
         self.parent_dialog.file_tab_widget.clear()
+        # 处理绑定的配置项
+        self.parent_dialog.output_config_widget.config_table.clear_bind_file_rows()
 
     def search_tab(self, text):
         return tuple(filter(lambda x: self.parent_dialog.file_tab_widget.tabText(x) == text,

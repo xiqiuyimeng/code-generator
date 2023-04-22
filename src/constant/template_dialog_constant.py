@@ -84,6 +84,8 @@ CONFIG_INPUT_WIDGET_TYPE_DICT = {
 DEL_CONFIG_BOX_TITLE = '删除配置项'
 DEL_CONFIG_PROMPT = '配置项：{}\n确认删除配置项吗？'
 BATCH_DEL_CONFIG_PROMPT = '已选择{}个配置项\n确认删除选中的配置项吗？'
+DEL_OUTPUT_CONFIG_PROMPT = '配置项：{}\n关联的模板文件已删除，是否同步删除配置项？'
+BATCH_DEL_OUTPUT_CONFIG_PROMPT = '配置项关联的模板文件已删除\n是否同步删除配置项？'
 
 CONFIG_NAME_TEXT = '配置项名称：'
 VAR_NAME_TEXT = '输出变量名称：'
@@ -117,5 +119,6 @@ IRRELEVANT_FILE_TOOL_TIP = '暂未关联模板文件！'
 # 没有未关联配置的文件提示
 NO_IRRELEVANT_FILE_PROMPT = '未发现需要生成输出路径配置的模板文件！'
 GENERATE_FILE_CONFIG_TITLE = '生成文件的输出路径配置'
+GENERATE_CONFIG_FAIL_PROMPT = '以下文件未能自动生成输出路径配置，请手动处理！\n\n{}'
 
 MANAGE_FILE_CONFIG_TITLE = '管理文件的输出路径配置'

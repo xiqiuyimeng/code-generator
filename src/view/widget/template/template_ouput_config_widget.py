@@ -2,7 +2,8 @@
 from PyQt5.QtWidgets import QPushButton
 
 from src.constant.template_dialog_constant import AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT, MAINTAIN_FILE_CONFIG_BTN_TEXT, \
-    NO_IRRELEVANT_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE
+    NO_IRRELEVANT_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT
+from src.service.async_func.async_template_task import AutoGenerateOutputConfigExecutor
 from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import \
     TemplateOutputConfigTableWidget
@@ -25,6 +26,8 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         self.maintain_file_config_btn: QPushButton = ...
         # 维护文件和输出路径的对话框
         self.maintain_file_config_dialog = ...
+        # 自动生成文件对应路径配置执行器
+        self.generate_config_executor: AutoGenerateOutputConfigExecutor = ...
         super().__init__(ConfigTypeEnum.output_dir.value, *args)
 
     def setup_other_button_ui(self):
@@ -53,8 +56,21 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
             pop_fail(NO_IRRELEVANT_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, self)
         else:
             # 生成文件输出配置，并关联文件
-            [print(f.file_name) for f in irrelevant_config_files]
-            print()
+            config_names, var_names = self.config_table.get_exists_names_and_var_names()
+            self.generate_config_executor = AutoGenerateOutputConfigExecutor(config_names, var_names,
+                                                                             irrelevant_config_files,
+                                                                             self, self,
+                                                                             GENERATE_FILE_CONFIG_TITLE,
+                                                                             self.auto_generate_config_callback)
+            self.generate_config_executor.start()
+
+    def auto_generate_config_callback(self, success_list, fail_list):
+        if success_list:
+            # 成功生成的配置，自动添加到表格中
+            [self.config_table.add_row(config) for config in success_list]
+        if fail_list:
+            # 未成功生成配置的文件，提示
+            pop_fail(GENERATE_CONFIG_FAIL_PROMPT.format('\n'.join(fail_list)), GENERATE_FILE_CONFIG_TITLE, self)
 
     def maintain_file_config(self):
         ...

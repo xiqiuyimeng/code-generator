@@ -3,7 +3,8 @@ from PyQt5.QtCore import pyqtSignal
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.template_dialog_constant import DEL_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, BATCH_DEL_CONFIG_PROMPT, \
-    TEMPLATE_VAR_CONFIG_HEADER_LABELS, TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS, IRRELEVANT_FILE_TOOL_TIP
+    TEMPLATE_VAR_CONFIG_HEADER_LABELS, TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS, IRRELEVANT_FILE_TOOL_TIP, \
+    DEL_OUTPUT_CONFIG_PROMPT, BATCH_DEL_OUTPUT_CONFIG_PROMPT
 from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.view.box.message_box import pop_question
 from src.view.table.table_widget.custom_table_widget import CustomTableWidget
@@ -35,16 +36,14 @@ class TemplateConfigTableWidgetABC(CustomTableWidget):
         return exists_names, exists_var_names
 
     def remove_row(self, row_index, config_name):
-        if not pop_question(DEL_CONFIG_PROMPT.format(config_name), DEL_CONFIG_BOX_TITLE, self):
-            return
-        self.del_row(row_index)
+        if pop_question(DEL_CONFIG_PROMPT.format(config_name), DEL_CONFIG_BOX_TITLE, self):
+            self.del_row(row_index)
 
     def remove_rows(self):
         # 获取选中多少行，进行删除提示
         delete_names = self.get_all_checked_id_names()[1]
-        if not pop_question(BATCH_DEL_CONFIG_PROMPT.format(len(delete_names)), DEL_CONFIG_BOX_TITLE, self):
-            return
-        self.del_rows()
+        if pop_question(BATCH_DEL_CONFIG_PROMPT.format(len(delete_names)), DEL_CONFIG_BOX_TITLE, self):
+            self.del_rows()
 
     def collect_data(self):
         return [self.get_row_data(row) for row in range(self.rowCount())]
@@ -80,6 +79,65 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
             self.setToolTip(tool_tip)
         else:
             super().show_tool_tip(model_index)
+
+    def del_row(self, row):
+        self.unbind_config_file(row)
+        super().del_row(row)
+
+    def del_rows(self):
+        for row_index in reversed(range(self.rowCount())):
+            if self.cellWidget(row_index, 0).check_box.checkState():
+                self.unbind_config_file(row_index)
+        super().del_rows()
+
+    def unbind_config_file(self, row):
+        output_config = self.get_row_data(row)
+        if not output_config.relevant_file_list:
+            return
+        for file in output_config.relevant_file_list:
+            file.output_config_id = None
+
+    def del_bind_file_row(self, template_file):
+        for row_index in range(self.rowCount()):
+            config = self.get_row_data(row_index)
+            if config.relevant_file_list and template_file in config.relevant_file_list:
+                # 如果文件列表只有一个文件，那么询问是否删除配置，否则移除当前文件即可
+                if len(config.relevant_file_list) == 1:
+                    if pop_question(DEL_OUTPUT_CONFIG_PROMPT.format(config.config_name),
+                                    DEL_CONFIG_BOX_TITLE, self):
+                        super().del_row(row_index)
+                        break
+                    else:
+                        config.relevant_file_list = None
+                else:
+                    config.relevant_file_list.remove(template_file)
+                # 更新表格中显示的文件数量
+                self.item(row_index, 5).setText(str(int(self.item(row_index, 5).text()) - 1))
+                break
+
+    def clear_bind_file_rows(self):
+        # 搜集所有绑定了文件的配置
+        bind_file_config_list, row_idxes = list(), list()
+        for row_index in range(self.rowCount()):
+            config = self.get_row_data(row_index)
+            if config.relevant_file_list:
+                bind_file_config_list.append(config)
+                row_idxes.append(row_index)
+        if not bind_file_config_list:
+            return
+        # 如果存在配置绑定了文件，询问是否删除
+        if pop_question(BATCH_DEL_OUTPUT_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, self):
+            for row in reversed(row_idxes):
+                self.removeRow(row)
+            # 行序号重排序
+            self.resort_row()
+            # 删除行后，重新计算表头复选框状态
+            self.header_widget.calculate_header_check_state()
+        else:
+            for config in bind_file_config_list:
+                config.relevant_file_list = None
+                # 更新表中显示的文件数量
+                self.item(row_idxes[bind_file_config_list.index(config)], 5).setText('0')
 
 
 class TemplateVarConfigTableWidget(TemplateConfigTableWidgetABC):

@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.sqlite_abc import transactional
-from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite
+from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, construct_output_config
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
 from src.service.system_storage.template_sqlite import TemplateSqlite, Template
 from src.view.box.message_box import pop_ok
@@ -76,12 +76,12 @@ class AddTemplateWorker(ThreadWorkerABC):
         log.info(f'开始保存模板 [{self.template.template_name}]')
         # 保存模板，首先保存模板信息
         TemplateSqlite().save_template(self.template)
-        # 保存模板文件信息
-        if self.template.template_files:
-            TemplateFileSqlite().batch_add_template_files(self.template.id, self.template.template_files)
         # 保存模板配置信息
         TemplateConfigSqlite().batch_add_config_list(self.template.id, self.template.output_config_list,
                                                      self.template.var_config_list)
+        # 保存模板文件信息
+        if self.template.template_files:
+            TemplateFileSqlite().batch_add_template_files(self.template.id, self.template.template_files)
         self.success_signal.emit()
         log.info(f'保存模板 [{self.template.template_name}] 成功')
 
@@ -120,11 +120,11 @@ class EditTemplateWorker(ThreadWorkerABC):
         log.info(f'开始编辑模板信息 [{self.template.template_name}]')
         # 首先更新模板信息
         TemplateSqlite().update(self.template)
-        # 处理模板文件列表
-        TemplateFileSqlite().batch_edit_template_files(self.template.id, self.template.template_files)
         # 保存模板输入配置信息
         TemplateConfigSqlite().batch_edit_config_list(self.template.id, self.template.output_config_list,
                                                       self.template.var_config_list)
+        # 处理模板文件列表
+        TemplateFileSqlite().batch_edit_template_files(self.template.id, self.template.template_files)
         self.success_signal.emit()
         log.info(f'编辑模板信息 [{self.template.template_name}] 结束')
 
@@ -256,3 +256,48 @@ class ListTemplateConfigExecutor(LoadingMaskThreadExecutor):
         return ListTemplateConfigWorker(self.template_id)
 
 # ----------------------- 获取模板配置列表 end ----------------------- #
+
+
+# ----------------------- 自动生成文件对应的输出配置 start ----------------------- #
+
+class AutoGenerateOutputConfigWorker(ThreadWorkerABC):
+    success_signal = pyqtSignal(list, list)
+
+    def __init__(self, config_name_list, var_name_list, file_list):
+        super().__init__()
+        self.config_name_list = config_name_list
+        self.var_name_list = var_name_list
+        self.file_list = file_list
+
+    def do_run(self):
+        success_list, fail_list = list(), list()
+        # 每个文件生成一个配置
+        for file in self.file_list:
+            output_config = construct_output_config(self.config_name_list,
+                                                    self.var_name_list, file.file_name)
+            if output_config:
+                # 顺利生成，添加到成功列表中，绑定关联文件
+                output_config.relevant_file_list = [file]
+                # 给一个虚id
+                file.output_config_id = -1
+                success_list.append(output_config)
+            else:
+                fail_list.append(file.file_name)
+        self.success_signal.emit(success_list, fail_list)
+
+    def get_err_msg(self) -> str:
+        return '自动生成输出路径配置异常'
+
+
+class AutoGenerateOutputConfigExecutor(LoadingMaskThreadExecutor):
+
+    def __init__(self, config_name_list, var_name_list, file_list, *args):
+        self.config_name_list = config_name_list
+        self.var_name_list = var_name_list
+        self.file_list = file_list
+        super().__init__(*args)
+
+    def get_worker(self) -> ThreadWorkerABC:
+        return AutoGenerateOutputConfigWorker(self.config_name_list, self.var_name_list, self.file_list)
+
+# ----------------------- 自动生成文件对应的输出配置 end ----------------------- #

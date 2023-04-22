@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
+from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional, get_db_conn
 
@@ -99,6 +100,12 @@ class TemplateConfigSqlite(SqliteBasic):
             config.item_order = idx
         if config_list:
             self.batch_insert(config_list)
+        # 处理关联文件的配置id
+        for config in output_config_list:
+            if not config.relevant_file_list:
+                continue
+            for file in config.relevant_file_list:
+                file.output_config_id = config.id
 
     @transactional
     def batch_edit_config_list(self, template_id, output_config_list, var_config_list):
@@ -113,3 +120,24 @@ class TemplateConfigSqlite(SqliteBasic):
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')
 
+
+def get_var_name(var_name_list, order=1):
+    var_name = f'var_{order}'
+    if var_name in var_name_list:
+        return get_var_name(var_name_list, order + 1)
+    return var_name
+
+
+def construct_output_config(config_name_list, var_name_list, file_name):
+    config_name = f'{file_name} 输出路径'
+    if config_name in config_name_list:
+        # 名称重复，不生成
+        return
+    output_config = TemplateConfig()
+    output_config.config_name = config_name
+    output_config.config_type = ConfigTypeEnum.output_dir.value
+    output_config.output_var_name = get_var_name(var_name_list)
+    output_config.config_value_widget = tuple(CONFIG_INPUT_WIDGET_TYPE_DICT)[0]
+    output_config.is_required = RequiredEnum.required.value
+    output_config.config_desc = f'{file_name} 文件将输出到此路径下'
+    return output_config
