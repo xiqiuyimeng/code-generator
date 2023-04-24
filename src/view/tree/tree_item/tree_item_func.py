@@ -129,3 +129,21 @@ def refresh_tree_item_callback(tree_widget, item, item_changed_dict, handle_unch
                                icon, new_item_record, Qt.Unchecked)
     if sort_order:
         item.sortChildren(0, Qt.SortOrder.AscendingOrder)
+
+
+def set_item_output_config(item, output_config):
+    # 放入输出配置
+    item.setData(0, Qt.UserRole, output_config)
+
+
+def get_item_output_config(item):
+    return item.data(0, Qt.UserRole)
+
+
+def set_item_template_file(item, template_file):
+    # 放入模板文件
+    item.setData(0, Qt.UserRole, template_file)
+
+
+def get_item_template_file(item):
+    return item.data(0, Qt.UserRole)

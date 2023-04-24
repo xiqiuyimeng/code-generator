@@ -2,7 +2,8 @@
 from PyQt5.QtWidgets import QPushButton
 
 from src.constant.template_dialog_constant import AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT, MAINTAIN_FILE_CONFIG_BTN_TEXT, \
-    NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT
+    NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, \
+    NO_OUTPUT_CONFIG_PROMPT
 from src.service.async_func.async_template_task import AutoGenerateOutputConfigExecutor
 from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
 from src.view.dialog.template.template_maintain_file_config_dialog import TemplateMaintainFileConfigDialog
@@ -21,6 +22,7 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
     def __init__(self, parent_frame, *args):
         # 父框架
         self.parent_frame = parent_frame
+        self.config_table: TemplateOutputConfigTableWidget = ...
         # 一键生成输出文件对应路径配置按钮
         self.auto_generate_config_btn: QPushButton = ...
         # 维护文件和输出路径配置关系按钮
@@ -74,9 +76,13 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
             pop_fail(GENERATE_CONFIG_FAIL_PROMPT.format('\n'.join(fail_list)), GENERATE_FILE_CONFIG_TITLE, self)
 
     def maintain_file_config(self):
+        if not self.config_table.rowCount():
+            pop_fail(NO_OUTPUT_CONFIG_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, self)
+            return
         output_config_list = self.config_table.collect_data()
         unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
         self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(self.parent_screen_rect,
                                                                             output_config_list,
                                                                             unbind_config_files)
+        self.maintain_file_config_dialog.bind_file_changed.connect(self.config_table.update_bind_file_num_rows)
         self.maintain_file_config_dialog.exec()

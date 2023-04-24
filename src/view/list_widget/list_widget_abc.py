@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtGui import QDropEvent
 
-from src.view.custom_widget.item_view_abc import ItemViewABC
+from src.view.custom_widget.item_view_abc import ItemViewABC, DraggableItemViewABC
 from src.view.searcher.smart_item_view import SmartSearcherListWidget
 
 _author_ = 'luwt'
@@ -16,33 +15,7 @@ class ListWidgetABC(SmartSearcherListWidget, ItemViewABC):
         self.setSpacing(5)
 
 
-class DraggableListWidgetABC(ListWidgetABC):
-    
-    def __init__(self, *args):
-        super().__init__(*args)
-        # 设置接受拖入
-        self.setAcceptDrops(True)
-        # 设置开启拖拽
-        self.setDragEnabled(True)
+class DraggableListWidgetABC(ListWidgetABC, DraggableItemViewABC):
 
-    def dropEvent(self, event: QDropEvent):
-        # 重写，实现拖拽效果
-        # 获取拖入事件的坐标
-        pos = event.pos()
-        # 获取当前坐标下的item
-        current_item = self.itemAt(pos)
-        # 获取该item的index
-        current_index = self.indexFromItem(current_item)
-        # 获取行数
-        current_row = current_index.row()
-
-        # 获取拖入item的父组件
-        source_widget = event.source()
-        # 获取所有拖入item
-        source_items = source_widget.selectedItems()
-        # 当前允许单选就可以了，这样减少其他地方的复杂度
-        for source_item in source_items:
-            # 在列表中移除之前的项
-            self.takeItem(self.indexFromItem(source_item).row())
-            # 插入到当前位置
-            self.insertItem(current_row, source_item)
+    def dropEvent(self, event) -> None:
+        DraggableItemViewABC.dropEvent(self, event)

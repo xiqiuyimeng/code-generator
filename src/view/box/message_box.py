@@ -5,7 +5,7 @@
 
 from PyQt5.QtWidgets import QMessageBox
 
-from src.constant.message_box_constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON, WARNING_OK, WARNING_RESELECT
+from src.constant.message_box_constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON
 
 _author_ = 'luwt'
 _date_ = '2020/6/21 16:08'
@@ -59,20 +59,6 @@ def pop_question(msg, title, window=None):
     msg_box = QMessageBox(QMessageBox.Question, title, msg, parent=window)
     msg_box.addButton(ACCEPT_BUTTON, QMessageBox.AcceptRole)
     msg_box.addButton(REJECT_BUTTON, QMessageBox.RejectRole)
-    reply = msg_box.exec()
-    return True if reply == QMessageBox.AcceptRole else False
-
-
-def pop_warning(msg, title, window=None):
-    """
-    弹出警告信息框
-    :param msg: 弹窗消息
-    :param title: 弹窗标题
-    :param window: 父窗体
-    """
-    msg_box = QMessageBox(QMessageBox.Warning, title, msg, parent=window)
-    msg_box.addButton(WARNING_OK, QMessageBox.AcceptRole)
-    msg_box.addButton(WARNING_RESELECT, QMessageBox.RejectRole)
     reply = msg_box.exec()
     return True if reply == QMessageBox.AcceptRole else False
 

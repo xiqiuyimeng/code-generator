@@ -64,16 +64,16 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
     def get_row_fill_data_tuple(self, template_config) -> tuple:
         return template_config.config_name, template_config.output_var_name, template_config.config_value_widget,\
             COMBO_BOX_YES_TXT if template_config.is_required else COMBO_BOX_NO_TXT, \
-            len(template_config.relevant_file_list) if template_config.relevant_file_list else 0, \
+            len(template_config.bind_file_list) if template_config.bind_file_list else 0, \
             template_config.config_desc
 
     def show_tool_tip(self, model_index):
         # 如果是关联文件列，执行特定的气泡提示
         if model_index.column() == 5:
             # 获取关联文件列表
-            relevant_file_list = self.get_row_data(model_index.row()).relevant_file_list
-            if relevant_file_list:
-                tool_tip = ', \n'.join([tp_file.file_name for tp_file in relevant_file_list])
+            bind_file_list = self.get_row_data(model_index.row()).bind_file_list
+            if bind_file_list:
+                tool_tip = ', \n'.join([tp_file.file_name for tp_file in bind_file_list])
             else:
                 tool_tip = UNBIND_FILE_TOOL_TIP
             self.setToolTip(tool_tip)
@@ -92,27 +92,27 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
 
     def unbind_config_file(self, row):
         output_config = self.get_row_data(row)
-        if not output_config.relevant_file_list:
+        if not output_config.bind_file_list:
             return
-        for file in output_config.relevant_file_list:
+        for file in output_config.bind_file_list:
             file.output_config_id = None
 
     def del_bind_file_row(self, template_file):
         for row_index in range(self.rowCount()):
             config = self.get_row_data(row_index)
-            if config.relevant_file_list and template_file in config.relevant_file_list:
+            if config.bind_file_list and template_file in config.bind_file_list:
                 # 如果文件列表只有一个文件，那么询问是否删除配置，否则移除当前文件即可
-                if len(config.relevant_file_list) == 1:
+                if len(config.bind_file_list) == 1:
                     if pop_question(DEL_OUTPUT_CONFIG_PROMPT.format(config.config_name),
                                     DEL_CONFIG_BOX_TITLE, self):
                         super().del_row(row_index)
                         break
                     else:
-                        config.relevant_file_list = None
+                        config.bind_file_list = None
                 else:
-                    config.relevant_file_list.remove(template_file)
+                    config.bind_file_list.remove(template_file)
                 # 更新表格中显示的文件数量
-                self.item(row_index, 5).setText(str(int(self.item(row_index, 5).text()) - 1))
+                self.update_bind_file_num_row(row_index)
                 break
 
     def clear_bind_file_rows(self):
@@ -120,7 +120,7 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
         bind_file_config_list, row_idxes = list(), list()
         for row_index in range(self.rowCount()):
             config = self.get_row_data(row_index)
-            if config.relevant_file_list:
+            if config.bind_file_list:
                 bind_file_config_list.append(config)
                 row_idxes.append(row_index)
         if not bind_file_config_list:
@@ -135,9 +135,17 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
             self.header_widget.calculate_header_check_state()
         else:
             for config in bind_file_config_list:
-                config.relevant_file_list = None
+                config.bind_file_list = None
                 # 更新表中显示的文件数量
-                self.item(row_idxes[bind_file_config_list.index(config)], 5).setText('0')
+                self.update_bind_file_num_row(row_idxes[bind_file_config_list.index(config)])
+
+    def update_bind_file_num_row(self, row):
+        output_config = self.get_row_data(row)
+        bind_file_num = len(output_config.bind_file_list) if output_config.bind_file_list else 0
+        self.item(row, 5).setText(str(bind_file_num))
+
+    def update_bind_file_num_rows(self):
+        [self.update_bind_file_num_row(row) for row in range(self.rowCount())]
 
 
 class TemplateVarConfigTableWidget(TemplateConfigTableWidgetABC):

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QListWidgetItem, QTreeWidgetItem
 
 from src.constant.template_dialog_constant import OUTPUT_CONFIG_LIST_HEADER_TEXT, FILE_LIST_HEADER_TEXT
 from src.view.frame.dialog_frame_abc import DialogFrameABC
+from src.view.list_widget.list_item_func import set_template_file_data
+from src.view.list_widget.template_maintain_file_config_list_widget import TemplateMaintainFileConfigListWidget
+from src.view.tree.tree_item.tree_item_func import set_item_output_config, set_item_template_file
+from src.view.tree.tree_widget.template_config_tree_widget import TemplateOutputConfigTreeWidget
 
 _author_ = 'luwt'
 _date_ = '2023/4/22 12:39'
@@ -17,10 +21,10 @@ class TemplateMaintainFileConfigFrame(DialogFrameABC):
         self._layout: QHBoxLayout = ...
         self.config_layout: QVBoxLayout = ...
         self.config_header_label: QLabel = ...
-        self.config_tree_widget = ...
+        self.config_tree_widget: TemplateOutputConfigTreeWidget = ...
         self.file_layout: QVBoxLayout = ...
         self.file_header_label: QLabel = ...
-        self.file_list_widget = ...
+        self.file_list_widget: TemplateMaintainFileConfigListWidget = ...
         super().__init__(*args)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
@@ -33,11 +37,44 @@ class TemplateMaintainFileConfigFrame(DialogFrameABC):
         self._layout.addLayout(self.config_layout)
         self.config_header_label = QLabel()
         self.config_layout.addWidget(self.config_header_label)
+        self.config_tree_widget = TemplateOutputConfigTreeWidget(self)
+        self.config_layout.addWidget(self.config_tree_widget)
+        # 填充数据
+        self.fill_config_tree_widget()
+
         # 右侧文件列表
         self.file_layout = QVBoxLayout()
         self._layout.addLayout(self.file_layout)
         self.file_header_label = QLabel()
         self.file_layout.addWidget(self.file_header_label)
+        self.file_list_widget = TemplateMaintainFileConfigListWidget(self)
+        self.file_layout.addWidget(self.file_list_widget)
+        # 填充数据
+        self.fill_file_list_widget()
+
+    def fill_config_tree_widget(self):
+        # 添加配置树列表数据
+        for config in self.output_config_list:
+            config_item = QTreeWidgetItem(self.config_tree_widget)
+            config_item.setText(0, config.config_name)
+            # 保存配置数据
+            set_item_output_config(config_item, config)
+            self.config_tree_widget.addTopLevelItem(config_item)
+            # 处理已绑定的文件列表数据
+            if config.bind_file_list:
+                for bind_file in config.bind_file_list:
+                    bind_file_item = QTreeWidgetItem(config_item)
+                    bind_file_item.setText(0, bind_file.file_name)
+                    # 保存模板文件
+                    set_item_template_file(bind_file_item, bind_file)
+        self.config_tree_widget.expandAll()
+
+    def fill_file_list_widget(self):
+        # 添加列表数据
+        for unbind_file in self.unbind_file_list:
+            file_item = QListWidgetItem(unbind_file.file_name)
+            set_template_file_data(file_item, unbind_file)
+            self.file_list_widget.addItem(file_item)
 
     def setup_other_label_text(self):
         self.config_header_label.setText(OUTPUT_CONFIG_LIST_HEADER_TEXT)

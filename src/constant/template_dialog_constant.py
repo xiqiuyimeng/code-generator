@@ -124,6 +124,9 @@ GENERATE_CONFIG_FAIL_PROMPT = '以下文件未能自动生成输出路径配置�
 MANAGE_FILE_CONFIG_TITLE = '管理文件的输出路径配置'
 
 # 维护配置和文件关系对话框
+MAINTAIN_FILE_CONFIG_BOX_TITLE = '维护输出路径配置和文件关系'
+NO_OUTPUT_CONFIG_PROMPT = '暂无输出配置！\n请添加输出配置后再操作'
+
 MAINTAIN_FILE_CONFIG_TITLE = '维护输出路径配置和文件关系'
 OUTPUT_CONFIG_LIST_HEADER_TEXT = '输出路径配置列表'
 FILE_LIST_HEADER_TEXT = '模板文件列表'

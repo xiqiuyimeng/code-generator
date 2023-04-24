@@ -28,7 +28,7 @@ class ValueRangeListWidget(CustomListWidget, DraggableListWidgetABC):
         self.changed_signal.emit()
 
     def dropEvent(self, event):
-        super().dropEvent(event)
+        DraggableListWidgetABC.dropEvent(self, event)
         self.changed_signal.emit()
 
     def edit_item_func(self, item):

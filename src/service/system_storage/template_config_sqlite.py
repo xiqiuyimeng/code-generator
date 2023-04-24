@@ -56,7 +56,7 @@ class TemplateConfig(BasicSqliteDTO):
     # 控件为下拉框时，下拉列表值，逗号分隔
     range_values: str = field(init=False, default=None)
     # 非数据库字段，统计关联的模板文件列表
-    relevant_file_list: list = field(init=False, default=None)
+    bind_file_list: list = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -102,9 +102,9 @@ class TemplateConfigSqlite(SqliteBasic):
             self.batch_insert(config_list)
         # 处理关联文件的配置id
         for config in output_config_list:
-            if not config.relevant_file_list:
+            if not config.bind_file_list:
                 continue
-            for file in config.relevant_file_list:
+            for file in config.bind_file_list:
                 file.output_config_id = config.id
 
     @transactional

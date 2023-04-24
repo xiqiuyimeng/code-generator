@@ -42,7 +42,7 @@ class ReadTemplateWorker(ThreadWorkerABC):
                     template_file_dict[tp_file.output_config_id] = file_list
                 file_list.append(tp_file)
             for output_config in template.output_config_list:
-                output_config.relevant_file_list = template_file_dict.get(output_config.id)
+                output_config.bind_file_list = template_file_dict.get(output_config.id)
         self.success_signal.emit(template)
         log.info("读取模板详细信息成功")
 
@@ -277,8 +277,8 @@ class AutoGenerateOutputConfigWorker(ThreadWorkerABC):
                                                     self.var_name_list, file.file_name)
             if output_config:
                 # 顺利生成，添加到成功列表中，绑定关联文件
-                output_config.relevant_file_list = [file]
-                # 给一个虚id
+                output_config.bind_file_list = [file]
+                # 给一个虚拟配置id
                 file.output_config_id = -1
                 success_list.append(output_config)
             else:
