@@ -4,10 +4,10 @@ from PyQt5.QtWidgets import QAction, QToolButton
 
 from src.constant.bar_constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
     TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
-    HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, SQL_DS_CATEGORY, \
-    STRUCT_DS_CATEGORY, TYPE_ACTION, TYPE_ACTION_TIP
+    HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, TYPE_ACTION, TYPE_ACTION_TIP
 from src.constant.icon_enum import get_icon
 from src.service.system_storage.conn_type import ConnTypeEnum
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.struct_type import StructTypeEnum
 from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_struct_dialog, refresh, \
     open_type_mapping_dialog, open_template_dialog
@@ -28,9 +28,9 @@ def add_ds_actions(parent_menu, main_window):
     if parent_menu.receivers(parent_menu.triggered):
         parent_menu.triggered.disconnect()
     # 根据当前的数据源类型，决定构建的action类型
-    if main_window.current_ds_category.name == SQL_DS_CATEGORY:
+    if main_window.current_ds_category.name == DsCategoryEnum.sql_ds_category.value.name:
         add_sql_ds_actions(parent_menu, main_window)
-    elif main_window.current_ds_category.name == STRUCT_DS_CATEGORY:
+    elif main_window.current_ds_category.name == DsCategoryEnum.struct_ds_category.value.name:
         add_struct_ds_actions(parent_menu, main_window)
 
 

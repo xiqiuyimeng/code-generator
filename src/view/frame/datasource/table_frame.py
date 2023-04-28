@@ -3,7 +3,7 @@ from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
 
-from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.view.table.table_widget.ds_table_widget.ds_col_table_widget_abc import DsColTableWidgetABC
 from src.view.table.table_widget.ds_table_widget.sql_table_widget import SqlDsColTableWidget
 from src.view.table.table_widget.ds_table_widget.struct_table_widget import StructDsColTableWidget
@@ -14,9 +14,9 @@ _date_ = '2022/9/26 19:28'
 
 def get_table_frame(current_frame_name, *args):
     """根据当前的frame名称获取对应的表结构frame"""
-    if current_frame_name == SQL_DS_CATEGORY:
+    if current_frame_name == DsCategoryEnum.sql_ds_category.value.name:
         return SqlTableFrame(*args)
-    elif current_frame_name == STRUCT_DS_CATEGORY:
+    elif current_frame_name == DsCategoryEnum.struct_ds_category.value.name:
         return StructTableFrame(*args)
 
 

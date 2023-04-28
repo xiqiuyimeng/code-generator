@@ -2,12 +2,12 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
-from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.constant.tree_constant import LOCATION_TXT, CREATE_NEW_FOLDER
-from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget
 from src.view.tree.tree_widget.tree_function import add_folder_func
+from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 18:01'
@@ -15,9 +15,9 @@ _date_ = '2022/9/14 18:01'
 
 def get_tree_frame(current_frame_name, frame_parent, window):
     """根据当前的frame名称获取对应的树结构frame"""
-    if current_frame_name == SQL_DS_CATEGORY:
+    if current_frame_name == DsCategoryEnum.sql_ds_category.value.name:
         return SqlTreeFrame(frame_parent, window)
-    elif current_frame_name == STRUCT_DS_CATEGORY:
+    elif current_frame_name == DsCategoryEnum.struct_ds_category.value.name:
         return StructTreeFrame(frame_parent, window)
 
 
@@ -71,7 +71,7 @@ class SqlTreeFrame(TreeFrameABC):
         window.sql_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
-        return SQL_DS_CATEGORY
+        return DsCategoryEnum.sql_ds_category.value.name
 
     def get_tree_widget(self, window) -> SqlTreeWidget:
         return SqlTreeWidget(self, window)
@@ -95,7 +95,7 @@ class StructTreeFrame(TreeFrameABC):
         window.struct_tree_widget = self.tree_widget
 
     def get_header_text(self) -> str:
-        return STRUCT_DS_CATEGORY
+        return DsCategoryEnum.struct_ds_category.value.name
 
     def get_tree_widget(self, window) -> StructTreeWidget:
         return StructTreeWidget(self, window)

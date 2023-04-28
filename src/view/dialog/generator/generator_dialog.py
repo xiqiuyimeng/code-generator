@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.constant.generator_dialog_constant import SQL_CONFIRM_SELECTED_HEADER_TXT, \
     STRUCT_CONFIRM_SELECTED_HEADER_TXT, SELECT_TYPE_MAPPING_HEADER_TXT, SELECT_TEMPLATE_HEADER_TXT, \
     FILL_TEMPLATE_OUTPUT_CONFIG_HEADER_TXT, FILL_TEMPLATE_VAR_CONFIG_HEADER_TXT
+from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.template_sqlite import Template
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 from src.service.util.tree_node import TreeData
@@ -56,10 +56,10 @@ class GeneratorDialog(CustomDialogABC):
 
     def get_frame(self) -> SelectedDataDialogFrameABC:
         # 根据类型判断，展示为sql还是结构体对话框框架
-        if self.ds_category == SQL_DS_CATEGORY:
+        if self.ds_category == DsCategoryEnum.sql_ds_category.value.name:
             return SqlSelectedDataDialogFrame(self.selected_data, self.dialog_layout,
                                               self, SQL_CONFIRM_SELECTED_HEADER_TXT)
-        elif self.ds_category == STRUCT_DS_CATEGORY:
+        elif self.ds_category == DsCategoryEnum.struct_ds_category.value.name:
             return StructSelectedDataDialogFrame(self.selected_data, self.dialog_layout,
                                                  self, STRUCT_CONFIRM_SELECTED_HEADER_TXT)
 
