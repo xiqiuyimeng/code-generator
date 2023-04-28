@@ -94,14 +94,15 @@ class TreeWidgetABC(DisplayTreeWidget):
         self.item_clicked = False
         self.clicked_item = ...
 
-    def handle_checkbox_changed(self, item: QTreeWidgetItem, clicked=True):
+    def handle_checkbox_changed(self, item: QTreeWidgetItem, clicked=True) -> bool:
         # 事件信号顺序是：mousePressEvent 按鼠标事件触发 -> mouseReleaseEvent 鼠标释放事件触发
         # -> itemChanged信号 -> clicked信号
         # 而在itemChanged信号发出时，会触发树节点的 setData方法，
         # 所以可以根据是否点击和数据变化，判断复选框是否点击
-        self.do_handle_checkbox_changed(item, clicked)
+        checkbox_changed_result = self.do_handle_checkbox_changed(item, clicked)
         check_state = item.checkState(0)
         self.handle_child_item_checked(item, check_state)
+        return checkbox_changed_result
 
     def handle_child_item_checked(self, item, check_state):
         # 之所以不直接使用 item.checkState(0)，而使用参数传递的形式，
@@ -120,10 +121,11 @@ class TreeWidgetABC(DisplayTreeWidget):
                 if child_item.data(0, Qt.CheckStateRole) is None \
                         or child_item.checkState(0) == check_state:
                     continue
-                opened_list.append(get_item_opened_record(child_item))
                 child_item.setCheckState(0, check_state)
                 get_item_opened_record(child_item).checked = check_state
-                self.handle_checkbox_changed(child_item, clicked=False)
+                # 如果子元素
+                if not self.handle_checkbox_changed(child_item, clicked=False):
+                    opened_list.append(get_item_opened_record(child_item))
             if opened_list:
                 recursive_get_add_del_data(item, add_del_data)
                 add_del_data[opened_list[0].level] = opened_list
@@ -209,8 +211,8 @@ class TreeWidgetABC(DisplayTreeWidget):
     def do_right_menu_func(self, item, func_name):
         self.get_item_node(item).handle_menu_func(func_name)
 
-    def do_handle_checkbox_changed(self, item, clicked):
-        self.get_item_node(item).change_check_box(item.checkState(0), clicked)
+    def do_handle_checkbox_changed(self, item, clicked) -> bool:
+        return self.get_item_node(item).change_check_box(item.checkState(0), clicked)
 
     def refresh(self, item):
         self.get_item_node(item).refresh()

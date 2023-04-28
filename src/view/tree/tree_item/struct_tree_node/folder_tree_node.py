@@ -112,6 +112,8 @@ class FolderTreeNode(StructTreeNodeABC):
     def handle_child_item_checked(self, check_state):
         self.tree_widget.item_changed_executor.item_checked(self.item)
         self.item.setCheckState(0, check_state)
+        self.tree_widget.item_changed_executor.item_checked(self.item)
+        self.link_parent_node()
         self.tree_widget.handle_child_item_checked(self.item, check_state)
 
     def set_check_state(self):

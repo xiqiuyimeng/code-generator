@@ -26,7 +26,8 @@ class SqlDsColTableWidget(DsColTableWidgetABC):
                 checked_list.append(col)
                 self.cellWidget(row, 0).check_box.setCheckState(Qt.Checked)
         # 将选中项保存到选中树结构中
-        self.add_checked_data(checked_list)
+        if checked_list:
+            self.add_checked_data(checked_list)
 
     def add_checked_data(self, cols):
         add_data = get_add_del_data(self.tree_item)

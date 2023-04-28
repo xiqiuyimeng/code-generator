@@ -66,7 +66,7 @@ class TableTreeNode(SqlTreeNodeABC):
         if clicked:
             self.save_check_state()
         # 联动表格内的复选框
-        link_table_checkbox(self.item, check_state)
+        return link_table_checkbox(self.item, check_state)
 
     def save_check_state(self):
         # 保存选中数据
