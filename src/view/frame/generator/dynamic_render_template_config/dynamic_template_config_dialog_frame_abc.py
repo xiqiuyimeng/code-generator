@@ -17,8 +17,7 @@ _date_ = '2023/4/6 9:09'
 class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
     """动态模板配置对话框框架，根据模板配置动态生成页面"""
 
-    def __init__(self, *args, template_config_list=None, template=None, get_template_func=None,
-                 preview_mode=False, quit_button_row_index=3):
+    def __init__(self, *args, template_config_list=None, template=None, get_template_func=None, preview_mode=False):
         # 如果是预览模式，直接传递配置项列表
         self.template_config_list = template_config_list
         # 当前模板，记录当前使用的模板，方便对比，判断是否需要重新渲染页面
@@ -41,7 +40,7 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         self.canvas_content_frame: QFrame = ...
         self.canvas_content_frame_layout: QFormLayout = ...
         self.list_template_config_executor: ListTemplateConfigExecutor = ...
-        super().__init__(*args, quit_button_row_index)
+        super().__init__(*args)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
@@ -121,13 +120,16 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         self.no_data_label.setText(NO_TEMPLATE_CONFIG_ITEMS_TEXT)
         self.no_data_layout.addWidget(self.no_data_label)
 
-    def setup_other_button(self):
+    def get_blank_left_buttons(self) -> tuple:
         if self.preview_mode:
-            return
-        super().setup_other_button()
-        self.do_set_other_button()
+            return tuple()
+        other_button = self.do_set_other_button()
+        if other_button:
+            return *super().get_blank_left_buttons(), *other_button
+        else:
+            return super().get_blank_left_buttons()
 
-    def do_set_other_button(self): ...
+    def do_set_other_button(self) -> tuple: ...
 
     def setup_other_label_text(self):
         if self.preview_mode:

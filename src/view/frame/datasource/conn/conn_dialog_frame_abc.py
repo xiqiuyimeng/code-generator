@@ -37,7 +37,7 @@ class ConnDialogFrameABC(DsDialogFrameABC):
         self.edit_conn_executor: EditConnExecutor = ...
 
         super().__init__(parent_dialog, dialog_title.format(self.conn_type.display_name),
-                         conn_name_list, conn_id)
+                         conn_name_list, conn_id, placeholder_blank_width=1)
 
     def get_conn_type(self) -> ConnType:
         ...
@@ -47,10 +47,9 @@ class ConnDialogFrameABC(DsDialogFrameABC):
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
-    def setup_other_button(self):
-        # 按钮部分
+    def get_blank_left_buttons(self) -> tuple:
         self.test_conn_button = QPushButton(self)
-        self.button_layout.addWidget(self.test_conn_button, 0, 0, 1, 1)
+        return self.test_conn_button,
 
     def setup_other_label_text(self):
         self.name_label.setText(CONN_NAME_TEXT)

@@ -23,7 +23,7 @@ class TypeMappingDialogFrame(TableDialogFrame):
         self.open_ds_col_type_button: QPushButton = ...
         # 列类型列表对话框
         self.ds_col_type_list_dialog: DsColTypeDialog = ...
-        super().__init__(parent_dialog, dialog_title, quit_button_row_index=4)
+        super().__init__(parent_dialog, dialog_title)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 

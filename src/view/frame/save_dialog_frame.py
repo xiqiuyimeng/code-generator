@@ -31,11 +31,9 @@ class SaveDialogFrame(DialogFrameABC):
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
-    def setup_button_ui(self):
-        super().setup_button_ui()
+    def get_blank_right_buttons(self) -> tuple:
         self.save_button = QPushButton(self)
-        # 保存按钮放在退出按钮的前一个位置
-        self.button_layout.addWidget(self.save_button, 0, self.quit_button_row_index - 1, 1, 1)
+        return self.save_button,
 
     def setup_label_text(self):
         self.save_button.setText(OK_BTN_TEXT)

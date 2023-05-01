@@ -22,7 +22,7 @@ class TemplateFuncDialogFrame(DialogFrameABC):
         self.create_new_func_btn: QPushButton = ...
         self.func_detail_dialog: TemplateFuncDetailDialog = ...
         self.list_func_executor: ListTemplateFuncExecutor = ...
-        super().__init__(parent_dialog, title)
+        super().__init__(parent_dialog, title, placeholder_blank_width=1)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
@@ -31,9 +31,9 @@ class TemplateFuncDialogFrame(DialogFrameABC):
         self.list_widget = TemplateFuncListWidget(self.open_create_func_dialog, self)
         self.frame_layout.addWidget(self.list_widget)
 
-    def setup_other_button(self):
+    def get_blank_left_buttons(self) -> tuple:
         self.create_new_func_btn = QPushButton()
-        self.button_layout.addWidget(self.create_new_func_btn, 0, 0, 1, 1)
+        return self.create_new_func_btn,
 
     def setup_other_label_text(self):
         self.create_new_func_btn.setText(CREATE_NEW_FUNC_BTN_TEXT)

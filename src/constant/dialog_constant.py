@@ -5,6 +5,7 @@ _date_ = '2023/2/24 12:32'
 
 OK_BTN_TEXT = "保存"
 QUIT_BTN_TEXT = "退出"
+HELP_BTN_TEXT = '帮助'
 
 # 检查系统库中连接名字存在提示语
 NAME_EXISTS = '当前名称不可用，{}已存在！'

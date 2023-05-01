@@ -50,7 +50,7 @@ class StructDialogFrameABC(DsDialogFrameABC):
         # 如果是编辑，需要读取数据库中存储的实际的结构体信息，用来回显
 
         super().__init__(parent_dialog, dialog_title.format(self.struct_type.display_name),
-                         struct_name_list, opened_struct_id)
+                         struct_name_list, opened_struct_id, placeholder_blank_width=1)
 
         # 调整布局比例
         self.frame_layout.setStretch(0, 2)
@@ -86,10 +86,10 @@ class StructDialogFrameABC(DsDialogFrameABC):
 
     def get_syntax_highlighter(self) -> SyntaxHighLighterABC: ...
 
-    def setup_other_button(self):
+    def get_blank_left_buttons(self) -> tuple:
         # 按钮部分
         self.pretty_button = QPushButton(self)
-        self.button_layout.addWidget(self.pretty_button, 0, 0, 1, 1)
+        return self.pretty_button,
 
     def setup_other_label_text(self):
         self.name_label.setText(STRUCT_NAME_TEXT.format(self.struct_type.display_name))

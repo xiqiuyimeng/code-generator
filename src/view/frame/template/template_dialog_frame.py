@@ -22,7 +22,7 @@ class TemplateDialogFrame(TableDialogFrame):
         self.open_template_func_dialog_btn: QPushButton = ...
         # 常用方法对话框
         self.template_func_dialog: TemplateFuncDialog = ...
-        super().__init__(parent_dialog, dialog_title, quit_button_row_index=4)
+        super().__init__(parent_dialog, dialog_title)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 

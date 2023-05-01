@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton, QFrame, QVBoxLayout
+from PyQt5.QtWidgets import QPushButton, QFrame, QVBoxLayout, QGridLayout
 
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.box.message_box import pop_question
@@ -15,14 +15,17 @@ class TableDialogFrame(DialogFrameABC):
     """通用表格对话框框架，包含一个主体展示表格及相关操作按钮"""
 
     def __init__(self, *args, **kwargs):
+        # 表格主体框架
         self.table_frame: QFrame = ...
         self.table_frame_layout: QVBoxLayout = ...
-        # 主体表格
-        self.table_widget: CustomTableWidget = ...
+        # 操作表格按钮布局
+        self.operation_table_btn_layout: QGridLayout = ...
         # 添加新行按钮
         self.add_row_button: QPushButton = ...
         # 删除行按钮
         self.del_row_button: QPushButton = ...
+        # 主体表格
+        self.table_widget: CustomTableWidget = ...
         # 读取表格数据列表执行器
         self.list_table_data_executor: LoadingMaskThreadExecutor = ...
         # 删除行数据执行器
@@ -41,31 +44,26 @@ class TableDialogFrame(DialogFrameABC):
         self.table_frame_layout = QVBoxLayout(self.table_frame)
         # 将表格布局边距清空
         self.table_frame_layout.setContentsMargins(0, 0, 0, 0)
+        # 操作按钮组
+        self.operation_table_btn_layout = QGridLayout(self.table_frame)
+        self.setup_operation_button()
+        self.table_frame_layout.addLayout(self.operation_table_btn_layout)
+        # 创建表格
         self.make_table_widget()
         self.table_frame_layout.addWidget(self.table_widget)
         self.frame_layout.addWidget(self.table_frame)
 
-    def make_table_widget(self): ...
-
-    def setup_other_button(self):
-        # 第一个按钮位置，如果没有返回按钮，那么就将添加按钮移动到第一个按钮的位置
-        first_button = self.setup_first_button()
-        if first_button:
-            self.button_layout.addWidget(first_button, 0, 0, 1, 1)
-
-            self.add_row_button = QPushButton(self)
-            self.button_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
-
-            self.button_layout.addWidget(self.placeholder_blank, 0, 2, 1, 1)
-        else:
-            self.add_row_button = QPushButton(self)
-            self.button_layout.addWidget(self.add_row_button, 0, 0, 1, 1)
-
-            self.button_layout.addWidget(self.placeholder_blank, 0, 2, 1, 2)
+    def setup_operation_button(self):
+        first_operation_button = self.setup_first_button()
+        self.operation_table_btn_layout.addWidget(first_operation_button, 0, 0, 1, 1)
+        self.add_row_button = QPushButton(self)
+        self.operation_table_btn_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
         self.del_row_button = QPushButton(self)
-        self.button_layout.addWidget(self.del_row_button, 0, 3, 1, 1)
+        self.operation_table_btn_layout.addWidget(self.del_row_button, 0, 2, 1, 1)
 
     def setup_first_button(self) -> QPushButton: ...
+
+    def make_table_widget(self): ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 

@@ -16,16 +16,16 @@ class DynamicVarConfigDialogFrame(DynamicTemplateConfigDialogFrameABC):
     def __init__(self, *args, **kwargs):
         self.preview_generate_button: QPushButton = ...
         self.preview_generate_frame: ChainDialogFrameABC = ...
-        super().__init__(*args, **kwargs , quit_button_row_index=4)
+        super().__init__(*args, **kwargs)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def do_get_config_list(self) -> list:
         return self.template.var_config_list
 
-    def do_set_other_button(self):
+    def do_set_other_button(self) -> tuple:
         self.preview_generate_button = QPushButton()
-        self.button_layout.addWidget(self.preview_generate_button, 0, 2, 1, 1)
+        return self.preview_generate_button,
 
     def do_set_other_label_text(self):
         self.previous_frame_button.setText(BACK_TO_FILL_OUTPUT_CONFIG_TXT)

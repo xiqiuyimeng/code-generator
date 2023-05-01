@@ -13,7 +13,8 @@ class SimpleNameCheckDialogFrame(NameCheckDialogFrame):
     edit_signal = pyqtSignal(str)
 
     def __init__(self, parent_dialog, dialog_title, name_list, current_name=None):
-        super().__init__(parent_dialog, dialog_title, name_list, current_name, read_storage=False)
+        super().__init__(parent_dialog, dialog_title, name_list, current_name,
+                         read_storage=False, need_help_button=False)
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
 

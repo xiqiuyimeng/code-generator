@@ -32,7 +32,7 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         # 添加编辑数据源列类型项对话框
         self.save_ds_col_type_dialog: SimpleNameCheckDialog = ...
         # 为了美观，将表格布局扩大，容纳5个元素，中间为空白占位label
-        super().__init__(parent_dialog, dialog_title, quit_button_row_index=4)
+        super().__init__(parent_dialog, dialog_title)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
@@ -52,9 +52,9 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         self.stacked_widget = QStackedWidget(self)
         self._layout.addWidget(self.stacked_widget)
 
-    def setup_other_button(self):
+    def get_blank_left_buttons(self) -> tuple:
         self.add_ds_col_type_button = QPushButton(self)
-        self.button_layout.addWidget(self.add_ds_col_type_button, 0, 0, 1, 1)
+        return self.add_ds_col_type_button,
 
     def setup_other_label_text(self):
         self.add_ds_col_type_button.setText(ADD_DS_COL_TYPE_BUTTON_TEXT)

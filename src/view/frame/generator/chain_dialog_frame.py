@@ -19,16 +19,15 @@ class ChainDialogFrameABC(DialogFrameABC):
         self.next_frame: DialogFrameABC = ...
         self.previous_frame_button: QPushButton = ...
         self.next_frame_button: QPushButton = ...
-        super().__init__(*args)
+        super().__init__(*args, need_help_button=False)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
-    def setup_other_button(self):
+    def get_blank_left_buttons(self) -> tuple:
         # 按钮部分
         self.previous_frame_button = QPushButton(self)
-        self.button_layout.addWidget(self.previous_frame_button, 0, 0, 1, 1)
         self.next_frame_button = QPushButton(self)
-        self.button_layout.addWidget(self.next_frame_button, 0, 1, 1, 1)
+        return self.previous_frame_button, self.next_frame_button
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 

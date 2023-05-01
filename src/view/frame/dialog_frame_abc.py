@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QGridLayout, QPushButton
 
-from src.constant.dialog_constant import QUIT_BTN_TEXT
+from src.constant.dialog_constant import QUIT_BTN_TEXT, HELP_BTN_TEXT
 
 _author_ = 'luwt'
 _date_ = '2023/4/3 8:52'
@@ -10,18 +10,21 @@ _date_ = '2023/4/3 8:52'
 class DialogFrameABC(QFrame):
     """对话框框架抽象类"""
 
-    def __init__(self, parent_dialog, dialog_title, quit_button_row_index=3):
+    def __init__(self, parent_dialog, dialog_title, placeholder_blank_width=2, need_help_button=True):
         super().__init__(parent_dialog)
         self.parent_dialog = parent_dialog
         # 标题label
         self.dialog_title = dialog_title
-        # 退出按钮行位置，退出按钮在栅格布局最后的位置，默认为3，即表格布局的一行可以容纳四个控件
-        self.quit_button_row_index = quit_button_row_index
+        # 空白占位label占栅格布局宽度，用来调节按钮布局美观
+        self.placeholder_blank_width = placeholder_blank_width
+        # 是否需要帮助按钮
+        self.need_help_button = need_help_button
         # 框架布局，分三部分，第一部分：标题部分，第二部分：主体内容，第三部分：按钮部分
         self.frame_layout: QVBoxLayout = ...
         self.title: QLabel = ...
         self.button_layout: QGridLayout = ...
         self.placeholder_blank: QLabel = ...
+        self.help_button: QPushButton = ...
         self.dialog_quit_button: QPushButton = ...
 
         # 构建界面
@@ -60,16 +63,39 @@ class DialogFrameABC(QFrame):
         self.button_layout = QGridLayout()
         self.frame_layout.addLayout(self.button_layout)
 
-        self.button_layout.addWidget(self.placeholder_blank, 0, 0, 1, self.quit_button_row_index)
+        if self.need_help_button:
+            self.help_button = QPushButton()
+            self.button_layout.addWidget(self.help_button, 0, 0, 1, 1)
+
+        # 空白占位左侧的按钮组
+        left_buttons = self.get_blank_left_buttons()
+        if left_buttons:
+            [self.button_layout.addWidget(left_button, 0, idx, 1, 1)
+             for idx, left_button in enumerate(left_buttons, start=self.button_layout.count())]
+
+        self.button_layout.addWidget(self.placeholder_blank,
+                                     0, self.button_layout.count(), 1, self.placeholder_blank_width)
+
+        # 空白占位右侧的按钮组
+        right_buttons = self.get_blank_right_buttons()
+        if right_buttons:
+            [self.button_layout.addWidget(right_button, 0, idx, 1, 1)
+             for idx, right_button in enumerate(right_buttons, start=self.get_blank_right_start_col_idx())]
+
         self.dialog_quit_button = QPushButton(self)
-        self.button_layout.addWidget(self.dialog_quit_button, 0, self.quit_button_row_index, 1, 1)
+        self.button_layout.addWidget(self.dialog_quit_button, 0, self.get_blank_right_start_col_idx(), 1, 1)
 
-        self.setup_other_button()
+    def get_blank_left_buttons(self) -> tuple: ...
 
-    def setup_other_button(self): ...
+    def get_blank_right_buttons(self) -> tuple: ...
+
+    def get_blank_right_start_col_idx(self) -> int:
+        return self.button_layout.count() + self.placeholder_blank_width - 1
 
     def setup_label_text(self):
         self.title.setText(self.dialog_title)
+        if self.need_help_button:
+            self.help_button.setText(HELP_BTN_TEXT)
         self.dialog_quit_button.setText(QUIT_BTN_TEXT)
         self.setup_other_label_text()
 
@@ -80,8 +106,11 @@ class DialogFrameABC(QFrame):
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def connect_signal(self):
+        self.help_button.clicked.connect(self.open_help_dialog)
         self.dialog_quit_button.clicked.connect(self.parent_dialog.close)
         self.connect_other_signal()
+
+    def open_help_dialog(self): ...
 
     def connect_other_signal(self): ...
 

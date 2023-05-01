@@ -14,7 +14,7 @@ _date_ = '2023/4/3 12:43'
 class NameCheckDialogFrame(SaveDialogFrame):
     """具有名称检查功能的对话框框架，内置一个名称输入表单"""
 
-    def __init__(self, parent_dialog, dialog_title, name_list, dialog_data=None, read_storage=True):
+    def __init__(self, parent_dialog, dialog_title, name_list, dialog_data=None, read_storage=True, **kwargs):
         # 框架布局，分四部分，第一部分：标题部分，第二部分：名称表单，第三部分：其他内容，第四部分：按钮部分
         # 存储当前名称不允许重复的列表
         self.name_list = name_list
@@ -34,7 +34,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.name_checker: QLabel = ...
         self.name_check_action: QAction = ...
 
-        super().__init__(parent_dialog, dialog_title)
+        super().__init__(parent_dialog, dialog_title, **kwargs)
 
     def get_new_dialog_data(self) -> BasicSqliteDTO:
         ...
