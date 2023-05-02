@@ -2,7 +2,8 @@
 from PyQt5.QtWidgets import QPushButton
 
 from src.constant.template_dialog_constant import FUNC_DIALOG_BTN_TEXT, ADD_TEMPLATE_BTN_TEXT, \
-    DEL_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE, BATCH_TEMPLATE_PROMPT, TEMPLATE_LIST_BOX_TITLE
+    DEL_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE, BATCH_TEMPLATE_PROMPT, TEMPLATE_LIST_BOX_TITLE, \
+    IMPORT_TEMPLATE_BTN_TEXT, EXPORT_TEMPLATE_BTN_TEXT
 from src.service.async_func.async_template_task import DelTemplateExecutor, BatchDelTemplateExecutor, \
     ListTemplateExecutor
 from src.view.dialog.template.template_detail_dialog import TemplateDetailDialog
@@ -37,6 +38,8 @@ class TemplateDialogFrame(TableDialogFrame):
         self.open_template_func_dialog_btn.setText(FUNC_DIALOG_BTN_TEXT)
         self.add_row_button.setText(ADD_TEMPLATE_BTN_TEXT)
         self.del_row_button.setText(DEL_TEMPLATE_BTN_TEXT)
+        self.import_button.setText(IMPORT_TEMPLATE_BTN_TEXT)
+        self.export_button.setText(EXPORT_TEMPLATE_BTN_TEXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QPushButton
 
 from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_BUTTON_TEXT, \
     ADD_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE, \
-    BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE
+    BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE, IMPORT_TYPE_MAPPING_BTN_TEXT, EXPORT_TYPE_MAPPING_BTN_TEXT
 from src.service.async_func.async_type_mapping_task import DelTypeMappingExecutor, BatchDelTypeMappingExecutor, \
     ListTypeMappingExecutor
 from src.view.dialog.type_mapping.ds_col_type_dialog import DsColTypeDialog
@@ -38,6 +38,8 @@ class TypeMappingDialogFrame(TableDialogFrame):
         self.open_ds_col_type_button.setText(DS_COL_TYPE_BUTTON_TEXT)
         self.add_row_button.setText(ADD_TYPE_MAPPING_BUTTON_TEXT)
         self.del_row_button.setText(DEL_TYPE_MAPPING_BUTTON_TEXT)
+        self.import_button.setText(IMPORT_TYPE_MAPPING_BTN_TEXT)
+        self.export_button.setText(EXPORT_TYPE_MAPPING_BTN_TEXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 

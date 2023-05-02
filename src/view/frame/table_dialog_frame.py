@@ -24,6 +24,10 @@ class TableDialogFrame(DialogFrameABC):
         self.add_row_button: QPushButton = ...
         # 删除行按钮
         self.del_row_button: QPushButton = ...
+        # 导入按钮
+        self.import_button: QPushButton = ...
+        # 导出按钮
+        self.export_button: QPushButton = ...
         # 主体表格
         self.table_widget: CustomTableWidget = ...
         # 读取表格数据列表执行器
@@ -60,8 +64,15 @@ class TableDialogFrame(DialogFrameABC):
         self.operation_table_btn_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
         self.del_row_button = QPushButton(self)
         self.operation_table_btn_layout.addWidget(self.del_row_button, 0, 2, 1, 1)
+        self.setup_import_export_button()
 
     def setup_first_button(self) -> QPushButton: ...
+
+    def setup_import_export_button(self):
+        self.import_button = QPushButton(self)
+        self.operation_table_btn_layout.addWidget(self.import_button, 0, 3, 1, 1)
+        self.export_button = QPushButton(self)
+        self.operation_table_btn_layout.addWidget(self.export_button, 0, 4, 1, 1)
 
     def make_table_widget(self): ...
 
@@ -77,7 +88,7 @@ class TableDialogFrame(DialogFrameABC):
         # 连接表格中行删除信号
         self.table_widget.row_del_signal.connect(self.del_row)
         # 连接表头复选框状态变化信号
-        self.table_widget.header_widget.header_check_changed.connect(self.set_del_btn_available)
+        self.table_widget.header_widget.header_check_changed.connect(self.set_del_export_btn_available)
         # 删除行按钮点击信号
         self.del_row_button.clicked.connect(self.del_rows)
         # 子类的其他信号
@@ -108,12 +119,14 @@ class TableDialogFrame(DialogFrameABC):
 
     def get_del_executor(self, row_id, item_name, row_index, del_title) -> LoadingMaskThreadExecutor: ...
 
-    def set_del_btn_available(self, checked):
-        # 如果表格存在行，删除按钮状态根据传入状态变化，否则应该置为不可用
+    def set_del_export_btn_available(self, checked):
+        # 如果表格存在行，删除按钮和导出按钮状态根据传入状态变化，否则应该置为不可用
         if self.table_widget.rowCount():
             self.del_row_button.setDisabled(not checked)
+            self.export_button.setDisabled(not checked)
         else:
             self.del_row_button.setDisabled(True)
+            self.export_button.setDisabled(True)
 
     def del_rows(self):
         # 收集所有选中项数据，进行删除
@@ -141,7 +154,7 @@ class TableDialogFrame(DialogFrameABC):
     def get_list_table_data_executor(self) -> LoadingMaskThreadExecutor: ...
 
     def init_del_button_status(self):
-        # 设置删除按钮状态，初始不可用
-        self.set_del_btn_available(False)
+        # 设置删除按钮和导出按钮状态，初始不可用
+        self.set_del_export_btn_available(False)
 
     # ------------------------------ 后置处理 end ------------------------------ #

@@ -25,6 +25,8 @@ DEL_TYPE_MAPPING_BUTTON_TEXT = '删除类型映射'
 DEL_TYPE_MAPPING_BOX_TITLE = '删除类型映射'
 DEL_TYPE_MAPPING_PROMPT = '类型映射：{}\n确认删除类型映射吗？'
 BATCH_DEL_TYPE_MAPPING_PROMPT = '已选择{}个类型映射\n确认删除选中的类型映射吗？'
+IMPORT_TYPE_MAPPING_BTN_TEXT = '导入类型映射'
+EXPORT_TYPE_MAPPING_BTN_TEXT = '导出类型映射'
 
 # 类型映射详情页
 TYPE_MAPPING_TITLE = '类型映射信息'
