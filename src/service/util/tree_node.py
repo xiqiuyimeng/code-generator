@@ -38,22 +38,6 @@ class TreeData:
     def root_children(self):
         return self._root_node.children
 
-    def iterator(self):
-        current_node = self._root_node
-        generator = self._iterate_node(current_node)
-        while True:
-            try:
-                yield generator.__next__()
-            except StopIteration:
-                break
-
-    def _iterate_node(self, node):
-        if node.children:
-            for value in node.children.values():
-                current_node = value
-                yield current_node
-                yield from self._iterate_node(current_node)
-
     def _get_child_node(self, parent_node: TreeDataNode, node_data):
         if parent_node.children:
             return parent_node.children.get(self._get_node_id(node_data))
