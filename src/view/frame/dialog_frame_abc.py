@@ -106,7 +106,8 @@ class DialogFrameABC(QFrame):
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def connect_signal(self):
-        self.help_button.clicked.connect(self.open_help_dialog)
+        if self.need_help_button:
+            self.help_button.clicked.connect(self.open_help_dialog)
         self.dialog_quit_button.clicked.connect(self.parent_dialog.close)
         self.connect_other_signal()
 
