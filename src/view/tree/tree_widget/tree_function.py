@@ -42,22 +42,16 @@ def make_sql_tree_item(tree_widget, parent, name, icon, opened_item_record=None,
     return item
 
 
-def make_display_tree_item(parent, name, icon, opened_item_record=None, checkbox=None):
+def make_display_tree_item(parent, name, icon):
     """
     构造sql树的子项
     :param parent: 要构造子项的父节点元素
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
-    :param opened_item_record: 打开记录表中的记录
-    :param checkbox: 构造的子节点的复选框
     """
     item = QTreeWidgetItem(parent)
     item.setIcon(0, icon)
     item.setText(0, name)
-    if opened_item_record:
-        set_item_opened_record(item, opened_item_record)
-    if checkbox is not None:
-        item.setCheckState(0, checkbox)
     return item
 
 
