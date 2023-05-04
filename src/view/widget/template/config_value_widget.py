@@ -147,6 +147,9 @@ class FileDialogConfigValueWidget(FileDialogConfigValueWidgetABC):
     def set_dir(self, exists_dir):
         self.dir_label.setText(exists_dir)
 
+    def collect_data(self):
+        return self.dir_label.text()
+
 
 class LineEditFileDialogConfigValueWidget(LineEditConfigValueWidget, FileDialogConfigValueWidgetABC):
     """文本输入框 + 文件夹对话框 控件"""
