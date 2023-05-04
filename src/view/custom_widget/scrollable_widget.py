@@ -7,7 +7,7 @@ import re
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QAbstractScrollArea, QPlainTextEdit, QAbstractItemView, QScrollArea, QFrame
+from PyQt5.QtWidgets import QAbstractScrollArea, QPlainTextEdit, QAbstractItemView, QScrollArea, QFrame, QTextBrowser
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:18'
@@ -125,3 +125,7 @@ class ScrollableTextEdit(QPlainTextEdit, ScrollableWidget):
                 self.zoomOut()
         else:
             ScrollableWidget.wheelEvent(self, e)
+
+
+class ScrollableTextBrowser(QTextBrowser, ScrollableWidget):
+    pass
