@@ -328,6 +328,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     def save_func(self):
         # 原数据存在，说明是编辑
         if self.dialog_data:
+            # 将关联的文件指向到新的对象上
+            self.new_dialog_data.bind_file_list = self.dialog_data.bind_file_list
             self.edit_signal.emit(self.new_dialog_data)
         else:
             self.save_signal.emit(self.new_dialog_data)
