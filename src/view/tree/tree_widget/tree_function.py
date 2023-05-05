@@ -205,12 +205,12 @@ def get_struct_parent_item(tree_widget, parent_item):
         if cur_item is None:
             return tree_widget, tree_widget.top_item
         # 如果当前节点不是文件夹类型，那么应该向上找一层
-        if get_item_opened_record(cur_item).data_type != FolderTypeEnum.folder_type.value:
+        if get_item_opened_record(cur_item).data_type is not FolderTypeEnum.folder_type.value:
             return do_get_struct_parent_item(tree_widget, cur_item)
         else:
             return cur_item, get_item_opened_record(cur_item)
     # 如果当前节点不为空，且不是文件夹类型，那么应该向上找一层
-    elif get_item_opened_record(parent_item).data_type != FolderTypeEnum.folder_type.value:
+    elif get_item_opened_record(parent_item).data_type is not FolderTypeEnum.folder_type.value:
         return do_get_struct_parent_item(tree_widget, parent_item)
 
 

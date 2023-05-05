@@ -73,12 +73,26 @@ class ScrollArea(QScrollArea, ScrollableWidget):
         self.setWidget(canvas_widget)
 
 
-class ScrollableTextEdit(QPlainTextEdit, ScrollableWidget):
-    blank_pattern = r'\s+'
+class ScrollableZoomWidget(ScrollableWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setLineWrapMode(self.NoWrap)
+
+    def wheelEvent(self, e: QtGui.QWheelEvent):
+        """实现ctrl + 滚轮缩放功能"""
+        if e.modifiers() == Qt.ControlModifier:
+            if e.angleDelta().y() > 0:
+                # 放大
+                self.zoomIn()
+            else:
+                self.zoomOut()
+        else:
+            ScrollableWidget.wheelEvent(self, e)
+
+
+class ScrollableTextEdit(QPlainTextEdit, ScrollableZoomWidget):
+    blank_pattern = r'\s+'
 
     def keyPressEvent(self, e):
         # 按下tab键，设置四个空格位
@@ -113,19 +127,8 @@ class ScrollableTextEdit(QPlainTextEdit, ScrollableWidget):
             return
         super().keyPressEvent(e)
         # 因为拦截了按键事件，所以需要再手动调用滚动部件的按键事件，实现shift 滚轮水平滚动
-        ScrollableWidget.keyPressEvent(self, e)
-
-    def wheelEvent(self, e: QtGui.QWheelEvent):
-        """实现ctrl + 滚轮缩放功能"""
-        if e.modifiers() == Qt.ControlModifier:
-            if e.angleDelta().y() > 0:
-                # 放大
-                self.zoomIn()
-            else:
-                self.zoomOut()
-        else:
-            ScrollableWidget.wheelEvent(self, e)
+        ScrollableZoomWidget.keyPressEvent(self, e)
 
 
-class ScrollableTextBrowser(QTextBrowser, ScrollableWidget):
+class ScrollableTextBrowser(QTextBrowser, ScrollableZoomWidget):
     pass
