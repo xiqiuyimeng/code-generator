@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
 
 from src.constant.template_dialog_constant import TEMPLATE_CONFIG_LIST_BOX_TITLE, NO_TEMPLATE_CONFIG_ITEMS_TEXT, \
-    NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE
+    NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE, NO_TEMPLATE_PROMPT, NO_TEMPLATE_TITLE
 from src.service.async_func.async_template_task import ListTemplateConfigExecutor
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.scrollable_widget import ScrollArea
@@ -123,13 +123,7 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
     def get_blank_left_buttons(self) -> tuple:
         if self.preview_mode:
             return tuple()
-        other_button = self.do_set_other_button()
-        if other_button:
-            return *super().get_blank_left_buttons(), *other_button
-        else:
-            return super().get_blank_left_buttons()
-
-    def do_set_other_button(self) -> tuple: ...
+        return super().get_blank_left_buttons()
 
     def setup_other_label_text(self):
         if self.preview_mode:
@@ -146,9 +140,6 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         if self.preview_mode:
             return
         super().connect_other_signal()
-        self.do_connect_other_signal()
-
-    def do_connect_other_signal(self): ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
@@ -162,19 +153,27 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
 
     def switch_frame(self, frame):
         # 只要不是回退，都需要收集数据
-        if frame is not self.previous_frame and self.config_widget_list is not Ellipsis:
-            self.config_data_dict = dict([(config.config.output_var_name, config.collect_data())
-                                          for config in self.config_widget_list])
-            # 找出必填的变量名称
-            required_var_names = set(map(lambda x: x.output_var_name,
-                                         filter(lambda x: x.is_required, self.get_config_list())))
-            if required_var_names:
-                # 如果还有未填完的值，提示
-                filled_var_names = set(map(lambda x: x[0], filter(lambda x: x[1], self.config_data_dict.items())))
-                if required_var_names != filled_var_names:
-                    pop_fail(NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE, self)
-                    return
+        if frame is not self.previous_frame:
+            if self.config_widget_list is not Ellipsis:
+                self.config_data_dict = dict([(config.config.id, config.collect_data())
+                                              for config in self.config_widget_list])
+                # 找出必填的变量配置id
+                required_var_ids = set(map(lambda x: x.id, filter(lambda x: x.is_required, self.get_config_list())))
+                if required_var_ids:
+                    # 如果还有未填完的值，提示
+                    filled_var_ids = set(map(lambda x: x[0], filter(lambda x: x[1], self.config_data_dict.items())))
+                    if not required_var_ids.issubset(filled_var_ids):
+                        pop_fail(NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE, self)
+                        return
+            # 更新父对话框数据
+            self.update_parent_dialog_config_dict()
+        # 如果是回退，清空数据
+        elif frame is self.previous_frame:
+            self.config_widget_list = ...
+            self.config_data_dict = ...
         super().switch_frame(frame)
+
+    def update_parent_dialog_config_dict(self): ...
 
     def show(self):
         super().show()
@@ -182,6 +181,9 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         if not self.preview_mode and self.get_template_func:
             template = self.get_template_func()
             if template is Ellipsis:
+                pop_fail(NO_TEMPLATE_PROMPT, NO_TEMPLATE_TITLE, self)
+                # 如果没有模板，没必要继续了
+                self.parent_dialog.close()
                 return
             if not self.template:
                 # 如果当前模板不存在，记录当前模板，动态渲染页面

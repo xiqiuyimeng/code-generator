@@ -48,3 +48,7 @@ class TemplateFuncSqlite(SqliteBasic):
         log.info(f'清空表 {self.table_name}')
         get_db_conn().query(sql_dict.get('drop'))
 
+    def get_all_func(self):
+        param = TemplateFunc()
+        return self.select_by_order(param)
+

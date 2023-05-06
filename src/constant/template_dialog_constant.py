@@ -132,3 +132,6 @@ NO_OUTPUT_CONFIG_PROMPT = '暂无输出配置！\n请添加输出配置后再操
 MAINTAIN_FILE_CONFIG_TITLE = '维护输出路径配置和文件关系'
 OUTPUT_CONFIG_LIST_HEADER_TEXT = '输出路径配置列表'
 FILE_LIST_HEADER_TEXT = '模板文件列表'
+
+NO_TEMPLATE_PROMPT = '暂无模板，请先维护模板再进行生成'
+NO_TEMPLATE_TITLE = '获取模板'

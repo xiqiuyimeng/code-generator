@@ -37,9 +37,7 @@ class ConnWorkerABC(ThreadWorkerABC):
         db_executor_class = self.conn_opened_record.data_type.db_executor
         # 获取连接对象，如果没有传进来，从数据库获取
         if not self.connection:
-            conn_param = SqlConnection()
-            conn_param.id = self.conn_opened_record.parent_id
-            self.connection = ConnSqlite().select_one(conn_param)
+            self.connection = ConnSqlite().get_conn_by_id(self.conn_opened_record.parent_id)
         executor: SqlDBExecutor = globals()[db_executor_class](self.connection)
         # 实际的功能实现
         self.do_executor_func(executor)

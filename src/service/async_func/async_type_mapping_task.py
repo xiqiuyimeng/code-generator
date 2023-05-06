@@ -24,9 +24,7 @@ class ReadTypeMappingWorker(ThreadWorkerABC):
     def do_run(self):
         log.info("开始读取类型映射详细信息")
         # 查询类型映射信息
-        param = TypeMapping()
-        param.id = self.type_mapping_id
-        type_mapping = TypeMappingSqlite().select_one(param)
+        type_mapping = TypeMappingSqlite().get_type_mapping_by_id(self.type_mapping_id)
         if not type_mapping:
             raise Exception('未查询到类型映射信息')
         # 查询列类型映射组信息

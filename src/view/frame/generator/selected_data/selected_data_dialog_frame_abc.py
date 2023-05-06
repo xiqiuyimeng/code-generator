@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from src.constant.generator_dialog_constant import RESELECT_TXT, CHOOSE_TYPE_MAPPING_TXT
+from src.constant.generator_dialog_constant import RESELECT_BTN_TXT, CHOOSE_TYPE_MAPPING_BTN_TXT
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC
 from src.view.tree.tree_widget.tree_widget_abc import DisplayTreeWidget
 
@@ -27,7 +27,7 @@ class SelectedDataDialogFrameABC(ChainDialogFrameABC):
     def setup_tree_ui(self): ...
 
     def setup_other_label_text(self):
-        self.previous_frame_button.setText(RESELECT_TXT)
-        self.next_frame_button.setText(CHOOSE_TYPE_MAPPING_TXT)
+        self.previous_frame_button.setText(RESELECT_BTN_TXT)
+        self.next_frame_button.setText(CHOOSE_TYPE_MAPPING_BTN_TXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #

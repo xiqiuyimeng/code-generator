@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.generator_dialog_constant import BACK_TO_SELECT_TYPE_MAPPING_TXT, FILL_TEMPLATE_OUTPUT_CONFIG_TXT
+from src.constant.generator_dialog_constant import BACK_TO_SELECT_TYPE_MAPPING_BTN_TXT, FILL_TEMPLATE_OUTPUT_CONFIG_BTN_TXT
 from src.constant.template_dialog_constant import TEMPLATE_LIST_BOX_TITLE
 from src.service.async_func.async_template_task import ListTemplateExecutor
 from src.view.frame.generator.select_list.select_dialog_frame_abc import SelectDialogFrame
@@ -14,8 +14,8 @@ class SelectTemplateDialogFrame(SelectDialogFrame):
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def setup_other_label_text(self):
-        self.previous_frame_button.setText(BACK_TO_SELECT_TYPE_MAPPING_TXT)
-        self.next_frame_button.setText(FILL_TEMPLATE_OUTPUT_CONFIG_TXT)
+        self.previous_frame_button.setText(BACK_TO_SELECT_TYPE_MAPPING_BTN_TXT)
+        self.next_frame_button.setText(FILL_TEMPLATE_OUTPUT_CONFIG_BTN_TXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 

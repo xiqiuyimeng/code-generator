@@ -49,3 +49,8 @@ class TypeMappingSqlite(SqliteBasic):
     def save_type_mapping(self, type_mapping):
         type_mapping.item_order = self.get_max_order()
         self.insert(type_mapping)
+
+    def get_type_mapping_by_id(self, type_mapping_id):
+        param = TypeMapping()
+        param.id = type_mapping_id
+        return self.select_one(param)

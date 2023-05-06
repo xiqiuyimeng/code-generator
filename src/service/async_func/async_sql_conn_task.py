@@ -249,9 +249,7 @@ class QueryConnInfoWorker(ThreadWorkerABC):
         self.conn_id = conn_id
 
     def do_run(self):
-        conn_param = SqlConnection()
-        conn_param.id = self.conn_id
-        self.success_signal.emit(ConnSqlite().select_one(conn_param))
+        self.success_signal.emit(ConnSqlite().get_conn_by_id(self.conn_id))
 
     def get_err_msg(self) -> str:
         return f'查询连接信息失败，连接id：{self.conn_id}'

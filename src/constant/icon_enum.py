@@ -9,6 +9,7 @@ from src.constant.dialog_constant import NAME_AVAILABLE, NAME_EXISTS
 from src.constant.ds_type_constant import SQLITE_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, SQLITE_COL, MYSQL_DISPLAY_NAME, \
     MYSQL_DB, MYSQL_TB, MYSQL_COL, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL, FOLDER_TYPE, \
     JSON_DISPLAY_NAME, STRUCT_COL_ICON
+from src.constant.generator_dialog_constant import PREVIEW_TREE_FOLDER_ICON, PREVIEW_TREE_FILE_ICON
 from src.constant.list_constant import EDIT_LIST_ITEM_ICON, DEL_LIST_ITEM_ICON, DEL_ALL_LIST_ITEMS_ICON
 from src.constant.table_constant import ROW_OPERATION_ICON, ROW_CAT_EDIT_ICON, \
     ROW_DEL_ICON, EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
@@ -133,6 +134,10 @@ class IconEnum(Enum):
     row_operation_icon = ROW_OPERATION_ICON, ':/icon/right.png'
     row_cat_edit_icon = ROW_CAT_EDIT_ICON, ':/icon/exec.png'
     row_del_icon = ROW_DEL_ICON, ':/icon/remove.png'
+
+    # 预览生成页，树结构 icon
+    preview_tree_folder_icon = PREVIEW_TREE_FOLDER_ICON, ':/icon/exec.png'
+    preview_tree_file_icon = PREVIEW_TREE_FILE_ICON, ':/icon/table_icon.png'
 
 
 def get_icon_path(name):

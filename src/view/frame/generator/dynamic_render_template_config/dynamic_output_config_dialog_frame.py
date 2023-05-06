@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.generator_dialog_constant import BACK_TO_SELECT_TEMPLATE_TXT, FILL_TEMPLATE_VAR_CONFIG_TXT
+from src.constant.generator_dialog_constant import BACK_TO_SELECT_TEMPLATE_BTN_TXT, FILL_TEMPLATE_VAR_CONFIG_BTN_TXT
 from src.view.frame.generator.dynamic_render_template_config.dynamic_template_config_dialog_frame_abc import \
     DynamicTemplateConfigDialogFrameABC
 
@@ -16,7 +16,10 @@ class DynamicOutputConfigDialogFrame(DynamicTemplateConfigDialogFrameABC):
         return self.template.output_config_list
 
     def do_set_other_label_text(self):
-        self.previous_frame_button.setText(BACK_TO_SELECT_TEMPLATE_TXT)
-        self.next_frame_button.setText(FILL_TEMPLATE_VAR_CONFIG_TXT)
+        self.previous_frame_button.setText(BACK_TO_SELECT_TEMPLATE_BTN_TXT)
+        self.next_frame_button.setText(FILL_TEMPLATE_VAR_CONFIG_BTN_TXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    def update_parent_dialog_config_dict(self):
+        self.parent_dialog.output_config_input_dict = self.config_data_dict
