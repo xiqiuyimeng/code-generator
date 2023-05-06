@@ -127,7 +127,8 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
 
     def open_dir_dialog(self):
         exists_dir = QFileDialog.getExistingDirectory(self, SELECT_DIRECTORY_TITLE, "/", QFileDialog.ShowDirsOnly)
-        self.set_dir(exists_dir)
+        if exists_dir:
+            self.set_dir(exists_dir)
 
     def set_dir(self, exists_dir): ...
 
