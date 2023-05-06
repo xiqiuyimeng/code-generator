@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QTabWidget
+from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QFormLayout, QLabel, QLineEdit
 
+from src.constant.template_dialog_constant import FILE_NAME_TEMPLATE_LABEL_TEXT
+from src.view.custom_widget.text_editor import TextEditor
 from src.view.list_widget.list_item_func import get_template_file_data
 from src.view.tab.tab_bar.tab_bar_abc import TabBarABC
 
@@ -25,3 +27,27 @@ class TemplateFileTabWidget(QTabWidget):
         # 将tab页内保存的文本数据刷入对象中
         template_file_data.file_content = self.widget(index).toPlainText()
         super().removeTab(index)
+
+    def add_file_tab(self, template_file):
+        tab_widget = QWidget()
+        self.addTab(tab_widget, template_file.file_name)
+        self.setCurrentIndex(self.count() - 1)
+
+        tab_layout = QVBoxLayout(tab_widget)
+        file_name_layout = QFormLayout()
+        tab_layout.addLayout(file_name_layout)
+        file_name_label = QLabel()
+        file_name_edit = QLineEdit()
+        file_name_layout.addRow(file_name_label, file_name_edit)
+
+        content_editor = TextEditor()
+        tab_layout.addWidget(content_editor)
+
+        file_name_label.setText(FILE_NAME_TEMPLATE_LABEL_TEXT)
+
+        # 填充数据
+        file_name_edit.setText(template_file.file_name_template)
+        content_editor.setPlainText(template_file.file_content)
+
+        setattr(tab_widget, 'file_name_edit', file_name_edit)
+        setattr(tab_widget, 'content_editor', content_editor)

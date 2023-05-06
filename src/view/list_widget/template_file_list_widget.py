@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import QListWidgetItem
 
 from src.constant.list_constant import TEMPLATE_TYPE_NAME, EDIT_FILE_BOX_TITLE
 from src.service.system_storage.template_file_sqlite import CurrentEnum, TabOpenedEnum
 from src.view.list_widget.custom_list_widget import CustomListWidget
-from src.view.list_widget.list_item_func import get_template_file_data
+from src.view.list_widget.list_item_func import get_template_file_data, set_template_file_data
 
 _author_ = 'luwt'
 _date_ = '2023/3/12 9:55'
@@ -28,7 +29,7 @@ class TemplateFileListWidget(CustomListWidget):
             index = current_tab_indexes[0]
             self.parent_dialog.file_tab_widget.setCurrentIndex(index)
         else:
-            self.parent_dialog.add_file_tab(get_template_file_data(self.currentItem()))
+            self.parent_dialog.file_tab_widget.add_file_tab(get_template_file_data(self.currentItem()))
 
     def edit_item_func(self, item):
         self.edit_file_name_func(EDIT_FILE_BOX_TITLE, item.text())
@@ -54,6 +55,22 @@ class TemplateFileListWidget(CustomListWidget):
         return tuple(filter(lambda x: self.parent_dialog.file_tab_widget.tabText(x) == text,
                             range(self.parent_dialog.file_tab_widget.count())))
 
+    def add_list_file_item(self, template_file):
+        # 添加模板文件
+        file_item = QListWidgetItem(template_file.file_name)
+        self.addItem(file_item)
+        # 保存引用
+        set_template_file_data(file_item, template_file)
+        # 设置当前项
+        self.setCurrentItem(file_item)
+
+    def locate_file(self):
+        file_tab_widget = self.parent_dialog.file_tab_widget
+        current_tab_text = file_tab_widget.tabText(file_tab_widget.currentIndex())
+        if current_tab_text:
+            current_index = tuple(filter(lambda x: self.item(x).text() == current_tab_text, range(self.count())))[0]
+            self.setCurrentRow(current_index)
+
     def collect_template_files(self):
         file_tab_widget = self.parent_dialog.file_tab_widget
         # 将tab按名称，tab widget 放入字典，方便下面查询是否打开了tab
@@ -68,7 +85,8 @@ class TemplateFileListWidget(CustomListWidget):
                 if self.currentRow() == list_idx else CurrentEnum.not_current.value
             tab_widget = name_tab_dict.get(list_item.text())
             if tab_widget:
-                template_file.file_content = tab_widget.toPlainText()
+                template_file.file_content = tab_widget.content_editor.toPlainText()
+                template_file.file_name_template = tab_widget.file_name_edit.text()
                 template_file.tab_opened = TabOpenedEnum.opened.value
                 template_file.is_current_tab = CurrentEnum.current.value \
                     if file_tab_widget.currentWidget() is tab_widget else CurrentEnum.not_current.value

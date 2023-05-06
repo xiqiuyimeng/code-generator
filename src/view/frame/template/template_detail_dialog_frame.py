@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter, QFrame, QPushButton, \
-    QListWidgetItem, QTabWidget
+    QTabWidget
 
 from src.constant.template_dialog_constant import TEMPLATE_INFO_TEXT, TEMPLATE_CONFIG_TEXT, TEMPLATE_FILE_TEXT, \
     TEMPLATE_NAME, TEMPLATE_DESC, ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
     EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
     TEMPLATE_VAR_CONFIG_TAB_TEXT, CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, \
-    CHECK_TP_FILE_CONFIG_TITLE, CHECK_TP_FILE_CONFIG_PROMPT
+    CHECK_TP_FILE_CONFIG_TITLE, CHECK_TP_FILE_CONFIG_PROMPT, CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE
 from src.service.async_func.async_template_task import AddTemplateExecutor, EditTemplateExecutor, ReadTemplateExecutor
 from src.service.system_storage.template_file_sqlite import TemplateFile
 from src.service.system_storage.template_sqlite import Template
@@ -15,7 +15,7 @@ from src.view.box.message_box import pop_question
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
 from src.view.frame.stacked_dialog_frame import StackedDialogFrame
-from src.view.list_widget.list_item_func import get_template_file_data, set_template_file_data
+from src.view.list_widget.list_item_func import get_template_file_data
 from src.view.list_widget.template_file_list_widget import TemplateFileListWidget
 from src.view.tab.tab_widget.template_file_tab_widget import TemplateFileTabWidget
 from src.view.widget.template.template_ouput_config_widget import TemplateOutputConfigWidget
@@ -178,7 +178,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
     def connect_child_signal(self):
         self.create_new_file_button.clicked.connect(lambda: self.open_create_file_dialog(CREATE_FILE_TITLE))
-        self.locate_file_button.clicked.connect(self.locate_file)
+        self.locate_file_button.clicked.connect(self.file_list_widget.locate_file)
 
     def open_create_file_dialog(self, dialog_title, current_file_name=None):
         self.file_name_check_dialog = SimpleNameCheckDialog(self.parent_dialog.parent_screen_rect, dialog_title,
@@ -207,32 +207,9 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         template_file = TemplateFile()
         template_file.file_name = file_name
         # 添加列表项
-        self.add_list_file_item(template_file)
+        self.file_list_widget.add_list_file_item(template_file)
         # 添加tab
-        self.add_file_tab(template_file)
-
-    def add_list_file_item(self, template_file):
-        # 添加模板文件
-        file_item = QListWidgetItem(template_file.file_name)
-        self.file_list_widget.addItem(file_item)
-        # 保存引用
-        set_template_file_data(file_item, template_file)
-        # 设置当前项
-        self.file_list_widget.setCurrentItem(file_item)
-
-    def add_file_tab(self, template_file):
-        content_editor = TextEditor(self.file_tab_widget)
-        self.file_tab_widget.addTab(content_editor, template_file.file_name)
-        # 填充数据
-        content_editor.setPlainText(template_file.file_content)
-        self.file_tab_widget.setCurrentIndex(self.file_tab_widget.count() - 1)
-
-    def locate_file(self):
-        current_tab_text = self.file_tab_widget.tabText(self.file_tab_widget.currentIndex())
-        if current_tab_text:
-            current_index = tuple(filter(lambda x: self.file_list_widget.item(x).text() == current_tab_text,
-                                         range(self.file_list_widget.count())))[0]
-            self.file_list_widget.setCurrentRow(current_index)
+        self.file_tab_widget.add_file_tab(template_file)
 
     def save_func(self):
         # 手动收集数据
@@ -253,12 +230,15 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
                 self.add_template_executor.start()
 
     def check_template_completable(self):
-        # 校验模板文件是否存在，模板文件是否关联了输出路径配置，如果没有，提示
+        # 校验模板文件是否存在，模板文件是否关联了输出路径配置，模板文件名称模板是否存在，如果没有，提示
         template_completable = True
         if not self.new_dialog_data.template_files:
             template_completable = pop_question(CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, self)
-        elif tuple(filter(lambda x: x.output_config_id is None, self.new_dialog_data.template_files)):
-            template_completable = pop_question(CHECK_TP_FILE_CONFIG_PROMPT, CHECK_TP_FILE_CONFIG_TITLE, self)
+        else:
+            if tuple(filter(lambda x: x.output_config_id is None, self.new_dialog_data.template_files)):
+                template_completable = pop_question(CHECK_TP_FILE_CONFIG_PROMPT, CHECK_TP_FILE_CONFIG_TITLE, self)
+            elif tuple(filter(lambda x: not x.file_name_template, self.new_dialog_data.template_files)):
+                template_completable = pop_question(CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE, self)
         return template_completable
 
     def add_post_process(self):
@@ -283,11 +263,11 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     def setup_echo_other_data(self):
         self.template_desc_text_edit.setPlainText(self.dialog_data.template_desc)
         # 回显文件列表
-        [self.add_list_file_item(template_file) for template_file in self.dialog_data.template_files]
+        [self.file_list_widget.add_list_file_item(template_file) for template_file in self.dialog_data.template_files]
         # 回显模板文件列表数据，按照tab顺序
         reopen_tab_files = sorted(filter(lambda x: x.tab_opened, self.dialog_data.template_files),
                                   key=lambda x: x.tab_item_order)
-        [self.add_file_tab(template_file) for template_file in reopen_tab_files]
+        [self.file_tab_widget.add_file_tab(template_file) for template_file in reopen_tab_files]
         # 找出当前列表项
         current_files = tuple(filter(lambda x: x.is_current, self.dialog_data.template_files))
         if current_files:

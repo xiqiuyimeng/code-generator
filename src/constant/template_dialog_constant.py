@@ -136,7 +136,11 @@ FILE_LIST_HEADER_TEXT = '模板文件列表'
 NO_TEMPLATE_PROMPT = '暂无模板，请先维护模板再进行生成'
 NO_TEMPLATE_TITLE = '获取模板'
 
+FILE_NAME_TEMPLATE_LABEL_TEXT = '文件名模板：'
+
 CHECK_TEMPLATE_FILE_TITLE = '检查模板文件'
 CHECK_TEMPLATE_FILE_PROMPT = '您还未添加模板文件，当前模板将无法在生成代码时使用，确认保存吗？'
 CHECK_TP_FILE_CONFIG_TITLE = '检查模板文件关联输出路径配置'
 CHECK_TP_FILE_CONFIG_PROMPT = '当前模板存在模板文件还未绑定输出路径配置，当前模板将无法在生成代码时使用，确认保存吗？'
+CHECK_FILE_NAME_TP_TITLE = '检查模板文件名称模板'
+CHECK_FILE_NAME_TP_PROMPT = '当前模板存在模板文件还未设置文件名称模板，在生成代码时，无法根据数据表名生成文件名，确认保存吗？'

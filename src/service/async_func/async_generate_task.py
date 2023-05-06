@@ -96,8 +96,9 @@ class GenerateWorker(ThreadWorkerABC):
                 self.generate_progress_signal.emit(current_file_index * 100 // total_file_count)
                 continue
 
-            # 动态生成文件名的模板
-            file_name_template = Template(template_file.file_name)
+            # 动态生成文件名的模板，如果不存在文件名称模板，那么取文件名，这样会导致重复
+            file_name_template = Template(template_file.file_name_template
+                                          if template_file.file_name_template else template_file.file_name)
             # 生成文件内容的模板
             template = Template(template_file.file_content)
 
