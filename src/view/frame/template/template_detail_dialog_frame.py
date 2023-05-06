@@ -6,10 +6,12 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter
 from src.constant.template_dialog_constant import TEMPLATE_INFO_TEXT, TEMPLATE_CONFIG_TEXT, TEMPLATE_FILE_TEXT, \
     TEMPLATE_NAME, TEMPLATE_DESC, ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
     EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
-    TEMPLATE_VAR_CONFIG_TAB_TEXT
+    TEMPLATE_VAR_CONFIG_TAB_TEXT, CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, \
+    CHECK_TP_FILE_CONFIG_TITLE, CHECK_TP_FILE_CONFIG_PROMPT
 from src.service.async_func.async_template_task import AddTemplateExecutor, EditTemplateExecutor, ReadTemplateExecutor
 from src.service.system_storage.template_file_sqlite import TemplateFile
 from src.service.system_storage.template_sqlite import Template
+from src.view.box.message_box import pop_question
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
 from src.view.frame.stacked_dialog_frame import StackedDialogFrame
@@ -235,18 +237,29 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     def save_func(self):
         # 手动收集数据
         self.collect_input()
-        # 如果存在原数据，说明是编辑
-        if self.dialog_data:
-            self.new_dialog_data.id = self.dialog_data.id
-            self.edit_template_executor = EditTemplateExecutor(self.new_dialog_data, self.parent_dialog,
-                                                               self.parent_dialog, EDIT_TEMPLATE_BOX_TITLE,
-                                                               self.edit_post_process)
-            self.edit_template_executor.start()
-        else:
-            self.add_template_executor = AddTemplateExecutor(self.new_dialog_data, self.parent_dialog,
-                                                             self.parent_dialog, ADD_TEMPLATE_BOX_TITLE,
-                                                             self.add_post_process)
-            self.add_template_executor.start()
+        # 校验模板数据是否完整，主要是文件与输出路径配置关系，是否可以正常生成
+        if self.check_template_completable():
+            # 如果存在原数据，说明是编辑
+            if self.dialog_data:
+                self.new_dialog_data.id = self.dialog_data.id
+                self.edit_template_executor = EditTemplateExecutor(self.new_dialog_data, self.parent_dialog,
+                                                                   self.parent_dialog, EDIT_TEMPLATE_BOX_TITLE,
+                                                                   self.edit_post_process)
+                self.edit_template_executor.start()
+            else:
+                self.add_template_executor = AddTemplateExecutor(self.new_dialog_data, self.parent_dialog,
+                                                                 self.parent_dialog, ADD_TEMPLATE_BOX_TITLE,
+                                                                 self.add_post_process)
+                self.add_template_executor.start()
+
+    def check_template_completable(self):
+        # 校验模板文件是否存在，模板文件是否关联了输出路径配置，如果没有，提示
+        template_completable = True
+        if not self.new_dialog_data.template_files:
+            template_completable = pop_question(CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, self)
+        elif tuple(filter(lambda x: x.output_config_id is None, self.new_dialog_data.template_files)):
+            template_completable = pop_question(CHECK_TP_FILE_CONFIG_PROMPT, CHECK_TP_FILE_CONFIG_TITLE, self)
+        return template_completable
 
     def add_post_process(self):
         self.save_signal.emit(self.new_dialog_data)

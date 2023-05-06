@@ -68,7 +68,7 @@ class TemplateDialogFrame(TableDialogFrame):
         return BATCH_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
 
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTemplateExecutor:
-        return BatchDelTemplateExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialogelf,
+        return BatchDelTemplateExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
                                         del_title, self.table_widget.del_rows)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
