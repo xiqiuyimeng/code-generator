@@ -10,6 +10,7 @@ from src.service.system_storage.col_type_mapping_sqlite import ColTypeMappingSql
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
 from src.service.system_storage.template_func_sqlite import TemplateFuncSqlite
 from src.service.util.generate_util import convert_complete_table_cols
+from src.service.util.path_util import check_path_legal
 
 _author_ = 'luwt'
 _date_ = '2023/4/26 11:16'
@@ -88,19 +89,25 @@ class GenerateWorker(ThreadWorkerABC):
         for template_file in template_files:
             # 获取当前模板文件，用户输入的输出路径
             file_path = self.output_config_input_dict.get(template_file.output_config_id)
-            # 如果没有获取到用户输入路径，跳过
-            if not file_path or not os.path.isdir(file_path):
+            # 如果没有获取到用户输入路径或路径不合法，跳过
+            if not file_path or not check_path_legal(file_path):
                 current_file_index += len(table_col_dict)
-                self.generate_log_signal.emit(f'模板文件：{template_file.file_name}，未获取到合法的输出路径，跳过！')
+                self.generate_log_signal.emit(f'模板文件：{template_file.file_name}，'
+                                              f'当前输出路径为：{file_path}，输出路径不合法，跳过！')
                 # 计算当前进度
                 self.generate_progress_signal.emit(current_file_index * 100 // total_file_count)
                 continue
 
+            # 如果是保存到文件，提前创建目录
+            if self.save_file and not os.path.exists(file_path):
+                os.makedirs(file_path)
+
             # 动态生成文件名的模板，如果不存在文件名称模板，那么取文件名，这样会导致重复
             file_name_template = Template(template_file.file_name_template
-                                          if template_file.file_name_template else template_file.file_name)
+                                          if template_file.file_name_template else template_file.file_name,
+                                          trim_blocks=True, lstrip_blocks=True)
             # 生成文件内容的模板
-            template = Template(template_file.file_content)
+            template = Template(template_file.file_content, trim_blocks=True, lstrip_blocks=True)
 
             for table_name, col_list in table_col_dict.items():
                 # 生成文件名只需要表名和方法
@@ -216,6 +223,8 @@ class SaveFileWorker(ThreadWorkerABC):
         for idx, file_item in enumerate(self.file_dict.items(), start=1):
             file_name, file_value = file_item
             file_path, file_content = file_value
+            if not os.path.exists(file_path):
+                os.makedirs(file_path)
             with open(os.path.join(file_path, file_name), 'w', encoding='utf-8')as f:
                 f.write(file_content)
             self.save_progress_signal.emit(idx * 100 // file_count)
