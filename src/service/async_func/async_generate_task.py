@@ -40,26 +40,39 @@ class GenerateWorker(ThreadWorkerABC):
 
     def do_run(self):
         generate_type = '生成到文件' if self.save_file else '预览生成'
-        log.info(f'{generate_type} 开始')
+        start_log = f'{generate_type} 开始!'
+        log.info(start_log)
+        self.generate_log_signal.emit(start_log)
+
+        self.generate_log_signal.emit('---------- 开始生成准备工作 ----------')
         # 1. 首先判断，如果是生成到文件，是否存在模板输出配置，不存在则提示退出
-        if self.save_file and not self.template.output_config_list:
-            raise Exception('未检测到模板文件输出配置，无法生成到文件，退出！')
+        if self.save_file:
+            self.generate_log_signal.emit('检查模板输出配置是否存在 =====')
+            if not self.template.output_config_list:
+                raise Exception('未检测到模板文件输出配置，无法生成到文件，退出！')
         # 2. 获取模板文件
+        self.generate_log_signal.emit('开始准备模板文件数据 >>>>>')
         template_files = TemplateFileSqlite().get_by_template_id(self.template.id)
         # 检测模板文件是否存在，如果不存在，则提示退出
         if not template_files:
             raise Exception('未能获取到模板文件，无法生成代码，退出！')
         self.prepare_progress_signal.emit(20)
+        self.generate_log_signal.emit('准备模板文件数据完毕 =====')
 
         # 3. 获取类型映射列数据
+        self.generate_log_signal.emit('开始准备类型映射数据 >>>>>')
         type_mapping_dict = self.get_type_mapping_dict()
         self.prepare_progress_signal.emit(40)
+        self.generate_log_signal.emit('准备类型映射数据完毕 =====')
 
         # 4. 检查完善选中数据，如果选中数据没有列数据，需要补充列数据
+        self.generate_log_signal.emit('开始准备数据表列数据 >>>>>')
         table_col_dict = convert_complete_table_cols(self.selected_data, type_mapping_dict)
         self.prepare_progress_signal.emit(60)
+        self.generate_log_signal.emit('准备数据表列数据完毕 =====')
 
         # 5. 获取模板方法
+        self.generate_log_signal.emit('开始准备模板方法 >>>>>')
         template_func_list = TemplateFuncSqlite().get_all_func()
         template_func_dict = dict()
         for template_func in template_func_list:
@@ -74,15 +87,20 @@ class GenerateWorker(ThreadWorkerABC):
                 self.generate_log_signal.emit(load_func_err_msg)
                 log.exception(load_func_err_msg, e)
         self.prepare_progress_signal.emit(80)
+        self.generate_log_signal.emit('准备模板方法完毕 =====')
 
         # 6. 收集变量配置，k：输出变量名称，v：用户输入值
+        self.generate_log_signal.emit('开始准备模板变量 >>>>>')
         output_config_dict = dict(map(lambda x: (x.output_var_name, self.output_config_input_dict.get(x.id)),
                                       self.template.output_config_list))
         var_config_dict = dict(map(lambda x: (x.output_var_name, self.var_config_input_dict.get(x.id)),
                                    self.template.var_config_list))
         self.prepare_progress_signal.emit(100)
+        self.generate_log_signal.emit('准备模板变量完毕 =====')
+        self.generate_log_signal.emit('---------- 生成准备工作完毕 ----------\n')
 
         # 7. 准备字段开始生成
+        self.generate_log_signal.emit('********** 开始生成 **********')
         # 需要生成的总文件数为 表数 × 模板文件数
         total_file_count = len(table_col_dict) * len(template_files)
         current_file_index = 0
@@ -133,8 +151,11 @@ class GenerateWorker(ThreadWorkerABC):
                 else:
                     # 解析路径结构
                     self.generate_file_signal.emit(file_name, generated_content, file_path)
+        self.generate_log_signal.emit('********** 生成完毕 **********')
         self.success_signal.emit()
-        log.info(f'{generate_type} 结束')
+        end_log = f'{generate_type} 结束!'
+        log.info(end_log)
+        self.generate_log_signal.emit(end_log)
 
     def get_type_mapping_dict(self):
         col_type_mapping_list = ColTypeMappingSqlite().get_by_parent_id(self.type_mapping_id)
