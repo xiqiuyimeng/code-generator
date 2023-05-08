@@ -4,20 +4,23 @@ from PyQt5.QtGui import QKeyEvent
 
 from src.constant.table_constant import DEL_MAPPING_GROUP_BOX_TITLE, DEL_MAPPING_GROUP_PROMPT, \
     DEL_COL_TYPE_MAPPING_PROMPT, DEL_COL_TYPE_MAPPING_TITLE
+from src.constant.type_mapping_dialog_constant import DUPLICATE_MAPPING_COL_NAME_PROMPT, \
+    DUPLICATE_MAPPING_COL_NAME_TITLE, CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT, GROUP_MAPPING_COL_NAME_DIFFERENT, \
+    GROUP_MAPPING_COL_NAME_DUPLICATE
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMapping
-from src.view.box.message_box import pop_question
+from src.view.box.message_box import pop_question, pop_fail
+from src.view.custom_widget.scrollable_widget import ScrollableWidget
 from src.view.table.table_header.col_type_mapping_table_header import ColTypeMappingTableHeader, \
     ColTypeMappingTableHeaderABC, ColTypeMappingFrozenTableHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
 from src.view.table.table_widget.table_widget_abc import TableWidgetABC
-from src.view.custom_widget.scrollable_widget import ScrollableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/2/15 18:05'
 
 
 class ColTypeMappingTableWidgetABC(TableWidgetABC):
-    
+
     def __init__(self, *args):
         # 表头控件
         self.header_widget: ColTypeMappingTableHeaderABC = ...
@@ -47,9 +50,11 @@ class ColTypeMappingTableWidgetABC(TableWidgetABC):
             cell_widget = self.cellWidget(row, 0)
             cell_widget.check_label.setText(str(row + 1))
 
-    def set_column_count(self): ...
+    def set_column_count(self):
+        ...
 
-    def setup_header(self): ...
+    def setup_header(self):
+        ...
 
 
 class ColTypeMappingFrozenTableWidget(ColTypeMappingTableWidgetABC):
@@ -159,15 +164,33 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def connect_other_signal(self):
         # 转发信号
         self.header_widget.header_check_changed.connect(self.header_check_changed.emit)
-        # 连接单元格变化信号
-        self.cellChanged.connect(self._cell_change_slot)
+        # 连接当前单元格变化信号
+        self.currentItemChanged.connect(self._current_item_change)
 
-    def _cell_change_slot(self, row, col):
-        # 当映射列名称 列中的单元格数据变化，且当前单元格被选中时，可以判定单元格刚编辑完成，
-        # 此时应该整列所有的单元格，保持数据一致，因为对于映射列名称来说，每一行都应该是一致的
-        if (col - 2) % 3 == 0 and self.item(row, col).isSelected():
-            mapping_col_name = self.item(row, col).text()
-            [self.item(row_idx, col).setText(mapping_col_name) for row_idx in range(self.rowCount())]
+    def _current_item_change(self, current, previous):
+        # 如果当前单元格变化，且是从映射列名称单元格变化到其他单元格，那么校验映射列名称是否存在重复的情况，
+        # 如果名称重复，提示错误，并重新定位到之前的单元格，进入编辑状态
+        # 如果名称不重复，映射列名称所在列所有单元格都需要同步数据，因为对于映射列名称来说，每一列都应该是一致的
+        if previous and previous is not current and (previous.column() - 2) % 3 == 0:
+            mapping_col_name = previous.text()
+            if not mapping_col_name:
+                return
+            # 收集当前行其他组映射列名称
+            exists_mapping_col_names = [self.item(previous.row(), col_idx).text()
+                                        for col_idx in range(self.columnCount())
+                                        if col_idx != previous.column() and (col_idx - 2) % 3 == 0
+                                        and self.item(previous.row(), col_idx).text()]
+            # 如果重复，提示错误，重新定位之前的单元格，进入编辑状态
+            if mapping_col_name in exists_mapping_col_names:
+                pop_fail(DUPLICATE_MAPPING_COL_NAME_PROMPT.format(mapping_col_name),
+                         DUPLICATE_MAPPING_COL_NAME_TITLE, self.parent())
+                self.editItem(previous)
+                self.setCurrentItem(previous)
+            else:
+                self._sync_mapping_col_name(previous.column(), mapping_col_name)
+
+    def _sync_mapping_col_name(self, col, mapping_col_name):
+        [self.item(row_idx, col).setText(mapping_col_name) for row_idx in range(self.rowCount())]
 
     def add_type_mapping(self):
         # 增加一个新的类型映射行
@@ -330,8 +353,11 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         col_type_mapping.group_num = group_num
         return col_type_mapping
 
-    def check_fragmentary_data(self):
-        """检查表格中，所有映射列名称和映射类型是否已经填写完成，如果没有，应该返回提示"""
+    def check_data_valid(self):
+        """检查表格中，所有映射列名称和映射类型是否已经填写完成；检查映射列名称同组内是否相同；检查映射列名称是否都是唯一的"""
+        if not self.rowCount():
+            return
+        # 1. 检查表格中，所有映射列名称和映射类型是否已经填写完成
         fragmentary_data_prompt_list = list()
         # 首先检查第二列，数据源列类型
         for row_idx in range(self.rowCount()):
@@ -350,7 +376,26 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
                 if not self.item(row_idx, col_idx).text():
                     fragmentary_data_prompt_list.append(f'[{group_title}]-[{col_title}]')
                     break
-        return fragmentary_data_prompt_list
+        if fragmentary_data_prompt_list:
+            return CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT.format("\n".join(fragmentary_data_prompt_list))
+        # 2. 检查映射列名称同组内是否相同，检查映射列名称是否都是唯一的
+        start_col_idx, different_mapping_col_name_groups, duplicate_mapping_col_name_groups = 2, list(), list()
+        unique_mapping_col_names = set()
+        while start_col_idx < self.columnCount():
+            group_title = self.header_widget.get_mapping_group_title(start_col_idx)
+            if len(set(map(lambda x: self.item(x, start_col_idx).text(), range(self.rowCount())))) > 1:
+                different_mapping_col_name_groups.append(f'[{group_title}]')
+            else:
+                mapping_col_name = self.item(0, start_col_idx).text()
+                if mapping_col_name in unique_mapping_col_names:
+                    duplicate_mapping_col_name_groups.append(f'[{group_title}]')
+                else:
+                    unique_mapping_col_names.add(mapping_col_name)
+            start_col_idx += 3
+        if different_mapping_col_name_groups:
+            return GROUP_MAPPING_COL_NAME_DIFFERENT.format("\n".join(different_mapping_col_name_groups))
+        if duplicate_mapping_col_name_groups:
+            return GROUP_MAPPING_COL_NAME_DUPLICATE.format("\n".join(duplicate_mapping_col_name_groups))
 
     def fill_table(self, type_mapping):
         max_group_num = type_mapping.max_col_type_group_num

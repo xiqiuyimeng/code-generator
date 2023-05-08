@@ -6,8 +6,8 @@ from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_INFO_TEXT, TY
     TYPE_MAPPING_NAME, DS_TYPE_TEXT, TYPE_MAPPING_COMMENT_TEXT, SYNC_DS_COL_TYPE_BTN_TEXT, \
     ADD_COL_TYPE_MAPPING_BTN_TEXT, DEL_COL_TYPE_MAPPING_BTN_TEXT, ADD_MAPPING_GROUP_BTN_TEXT, \
     DEL_MAPPING_GROUP_BTN_TEXT, NO_COL_TYPES_PROMPT, GET_COL_TYPES_TITLE, NO_DS_TYPE_PROMPT, GET_DS_TYPE_TITLE, \
-    CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT, CHECK_COL_TYPE_MAPPING_FRAGMENTARY_TITLE, \
-    EDIT_TYPE_MAPPING_BOX_TITLE, ADD_TYPE_MAPPING_BOX_TITLE, DS_COL_TYPE_LIST_BOX_TITLE, READ_TYPE_MAPPING_BOX_TITLE
+    CHECK_COL_TYPE_MAPPING_DATA_TITLE, EDIT_TYPE_MAPPING_BOX_TITLE, ADD_TYPE_MAPPING_BOX_TITLE, \
+    DS_COL_TYPE_LIST_BOX_TITLE, READ_TYPE_MAPPING_BOX_TITLE
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor
 from src.service.async_func.async_type_mapping_task import AddTypeMappingExecutor, EditTypeMappingExecutor, \
     ReadTypeMappingExecutor
@@ -229,10 +229,9 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
 
     def save_func(self):
         # 检查表格中数据是否可以提交
-        fragmentary_data_prompt_list = self.col_type_table_widget.check_fragmentary_data()
-        if fragmentary_data_prompt_list:
-            pop_fail(CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT.format("\n".join(fragmentary_data_prompt_list)),
-                     CHECK_COL_TYPE_MAPPING_FRAGMENTARY_TITLE, self)
+        check_data_invalid_result = self.col_type_table_widget.check_data_valid()
+        if check_data_invalid_result:
+            pop_fail(check_data_invalid_result, CHECK_COL_TYPE_MAPPING_DATA_TITLE, self)
             return
         # 手动收集数据
         self.collect_input()

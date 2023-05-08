@@ -62,5 +62,12 @@ NO_COL_TYPES_PROMPT = f'根据数据源类型 [{0}]，获取列类型为空！\n
                       f'[{ADD_COL_TYPE_MAPPING_BTN_TEXT}] 手动添加列类型数据'
 
 # 检查列类型映射表中未完成数据的提示
-CHECK_COL_TYPE_MAPPING_FRAGMENTARY_TITLE = '列类型映射表数据检查'
+CHECK_COL_TYPE_MAPPING_DATA_TITLE = '列类型映射表数据检查'
 CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT = '输入不完整，以下列中存在空值，请完成输入！\n\n{}'
+# 映射列名称同组不相同
+GROUP_MAPPING_COL_NAME_DIFFERENT = '以下映射组的映射列名称，同组内未保持相同，请修改！\n\n{}'
+GROUP_MAPPING_COL_NAME_DUPLICATE = '以下映射组的映射列名称，在其他映射组中已存在，请修改！\n\n{}'
+
+# 当映射列名称重复时提示
+DUPLICATE_MAPPING_COL_NAME_PROMPT = '映射列名称 [{}] 在其他映射组中已存在，请重新填写'
+DUPLICATE_MAPPING_COL_NAME_TITLE = '映射列名称唯一检查'
