@@ -21,28 +21,14 @@ class ScrollableWidget(QAbstractScrollArea):
             # 按像素滚动
             self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
             self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        # 是否按下shift键
-        self.press_shift = False
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
-        if self.press_shift:
+        if event.modifiers() == Qt.ShiftModifier:
             # 如果是按下 shift 键进行鼠标滚轮滚动，执行水平滚动
             scroll_value = 10 if event.angleDelta().y() < 0 else -10
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() + scroll_value)
         else:
             super().wheelEvent(event)
-
-    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
-        if event.key() == Qt.Key_Shift:
-            self.press_shift = True
-        else:
-            super().keyPressEvent(event)
-
-    def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
-        if event.key() == Qt.Key_Shift:
-            self.press_shift = False
-        else:
-            super().keyReleaseEvent(event)
 
     def enterEvent(self, event):
         """设置滚动条在进入控件区域的时候显示"""
@@ -117,7 +103,7 @@ class ScrollableTextEdit(QPlainTextEdit, ScrollableZoomWidget):
                         # 删除4个空白
                         [tc.deletePreviousChar() for i in range(4)]
                         return
-        elif self.press_shift and e.key() == Qt.Key_Return:
+        elif e.modifiers() == Qt.ShiftModifier and e.key() == Qt.Key_Return:
             # 将光标移动到末位
             tc.movePosition(QTextCursor.EndOfBlock)
             # 新起一行

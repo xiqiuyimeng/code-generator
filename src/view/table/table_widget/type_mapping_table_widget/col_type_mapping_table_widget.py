@@ -120,7 +120,9 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             self.header_widget.viewport().stackUnder(self.frozen_column_table)
             self.frozen_column_table.show()
 
+            # 主表和冻结表，滚动条保持同步
             self.verticalScrollBar().valueChanged.connect(self.frozen_column_table.verticalScrollBar().setValue)
+            self.frozen_column_table.verticalScrollBar().valueChanged.connect(self.verticalScrollBar().setValue)
             # 连接冻结表头的信号
             self.frozen_column_table.header_widget.header_clicked.connect(self.link_header_check_state)
             # 转发信号

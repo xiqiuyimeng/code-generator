@@ -31,12 +31,6 @@ class DisplayTreeWidget(SmartSearcherTreeWidget, ItemViewABC):
         super().__init__(parent)
         self.headerItem().setHidden(True)
 
-    def keyPressEvent(self, event) -> None:
-        # 先调用智能搜索的按键检测方法
-        super().keyPressEvent(event)
-        # 再调用统一元素视图中的方法
-        ItemViewABC.keyPressEvent(self, event)
-
     def paintEvent(self, e) -> None:
         self.resize_header_width()
         super().paintEvent(e)

@@ -20,11 +20,6 @@ class ItemViewABC(QAbstractItemView, ScrollableWidget):
 
         self.connect_signal()
 
-    def keyPressEvent(self, e) -> None:
-        # 传递调用
-        super().keyPressEvent(e)
-        ScrollableWidget.keyPressEvent(self, e)
-
     def connect_signal(self):
         # 右击事件
         self.setContextMenuPolicy(Qt.CustomContextMenu)
