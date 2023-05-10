@@ -29,6 +29,9 @@ ROW_CAT_EDIT_ICON = '表格行操作icon：查看编辑'
 ROW_DEL_TEXT = '删除'
 ROW_DEL_ICON = '表格行操作icon：删除'
 
+ROW_EXPORT_TEXT = '导出'
+ROW_EXPORT_ICON = '表格行操作icon：导出'
+
 # 数据源列类型映射表格表头
 DS_COL_TYPE_TABLE_HEADER = ['数据源列类型', '映射列名称', '映射类型', '引包声明']
 

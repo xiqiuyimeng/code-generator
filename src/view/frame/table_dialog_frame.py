@@ -4,8 +4,10 @@ from PyQt5.QtWidgets import QPushButton, QFrame, QVBoxLayout, QGridLayout
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.box.message_box import pop_question
 from src.view.dialog.custom_dialog_abc import StackedDialogABC
+from src.view.dialog.export_dialog import ExportDialog
+from src.view.dialog.import_dialog import ImportDialog
 from src.view.frame.dialog_frame_abc import DialogFrameABC
-from src.view.table.table_widget.custom_table_widget import CustomTableWidget
+from src.view.table.table_widget.custom_export_table_widget import CustomExportTableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/3/8 13:27'
@@ -29,7 +31,7 @@ class TableDialogFrame(DialogFrameABC):
         # 导出按钮
         self.export_button: QPushButton = ...
         # 主体表格
-        self.table_widget: CustomTableWidget = ...
+        self.table_widget: CustomExportTableWidget = ...
         # 读取表格数据列表执行器
         self.list_table_data_executor: LoadingMaskThreadExecutor = ...
         # 删除行数据执行器
@@ -38,6 +40,10 @@ class TableDialogFrame(DialogFrameABC):
         self.batch_del_row_data_executor: LoadingMaskThreadExecutor = ...
         # 行具体信息对话框
         self.row_data_dialog: StackedDialogABC = ...
+        # 导入数据对话框
+        self.import_data_dialog: ImportDialog = ...
+        # 导出数据对话框
+        self.export_data_dialog: ExportDialog = ...
         super().__init__(*args, **kwargs)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
@@ -87,10 +93,16 @@ class TableDialogFrame(DialogFrameABC):
         self.table_widget.row_edit_signal.connect(self.open_row_data_dialog)
         # 连接表格中行删除信号
         self.table_widget.row_del_signal.connect(self.del_row)
+        # 连接表格中行导出信号
+        self.table_widget.row_export_signal.connect(self.export_row_data)
         # 连接表头复选框状态变化信号
         self.table_widget.header_widget.header_check_changed.connect(self.set_del_export_btn_available)
         # 删除行按钮点击信号
         self.del_row_button.clicked.connect(self.del_rows)
+        # 导入按钮
+        self.import_button.clicked.connect(self.import_data)
+        # 导出按钮
+        self.export_button.clicked.connect(self.export_data)
         # 子类的其他信号
         self.connect_special_signal()
 
@@ -119,6 +131,9 @@ class TableDialogFrame(DialogFrameABC):
 
     def get_del_executor(self, row_id, item_name, row_index, del_title) -> LoadingMaskThreadExecutor: ...
 
+    def export_row_data(self, row_id):
+        self.do_export_data((row_id, ))
+
     def set_del_export_btn_available(self, checked):
         # 如果表格存在行，删除按钮和导出按钮状态根据传入状态变化，否则应该置为不可用
         if self.table_widget.rowCount():
@@ -140,6 +155,33 @@ class TableDialogFrame(DialogFrameABC):
     def get_batch_del_prompt_title(self) -> tuple: ...
 
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> LoadingMaskThreadExecutor: ...
+
+    def import_data(self):
+        # 打开导入对话框
+        self.import_data_dialog = ImportDialog(self.get_import_data_executor,
+                                               self.get_import_data_dialog_title(),
+                                               self.parent_dialog.parent_screen_rect)
+        self.import_data_dialog.exec()
+
+    def get_import_data_executor(self, file_path, masked_widget, window) -> LoadingMaskThreadExecutor: ...
+
+    def get_import_data_dialog_title(self) -> str: ...
+
+    def export_data(self):
+        # 收集所有选中项id
+        checked_ids = self.table_widget.get_all_checked_id_names()[0]
+        self.do_export_data(checked_ids)
+
+    def do_export_data(self, row_ids):
+        # 打开导出对话框
+        self.export_data_dialog = ExportDialog(row_ids, self.get_export_data_executor,
+                                               self.get_export_data_dialog_title(),
+                                               self.parent_dialog.parent_screen_rect)
+        self.export_data_dialog.exec()
+
+    def get_export_data_executor(self, row_ids, file_path, masked_widget, window) -> LoadingMaskThreadExecutor: ...
+
+    def get_export_data_dialog_title(self) -> str: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

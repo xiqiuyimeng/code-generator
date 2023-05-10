@@ -11,13 +11,21 @@ _date_ = '2023/1/13 12:33'
 
 # ---------------------------------------- 解析json结构体 start ---------------------------------------- #
 
+
+def load_json_str(raw_str):
+    try:
+        load_json = json.loads(raw_str)
+    except:
+        raise Exception('使用json解析失败')
+    if not isinstance(load_json, dict):
+        raise Exception('无法解析为json结构')
+    return load_json
+
+
 class JsonParser(StructParser):
 
     def load_content(self) -> dict:
-        struct_content_dict = json.loads(self.struct_content)
-        if not isinstance(struct_content_dict, dict):
-            raise Exception('无法解析结构体，因为它不是json格式')
-        return struct_content_dict
+        return load_json_str(self.struct_content)
 
     def do_parse_content(self, load_content_dict) -> list:
         return self.parse_json(load_content_dict)
@@ -73,6 +81,6 @@ class JsonParser(StructParser):
 class JsonBeautifier(StructBeautifier):
 
     def do_beautify(self):
-        return json.dumps(json.loads(self.struct_content), ensure_ascii=False, indent=4)
+        return json.dumps(load_json_str(self.struct_content), ensure_ascii=False, indent=4)
 
 # ---------------------------------------- 美化json结构体 end ---------------------------------------- #

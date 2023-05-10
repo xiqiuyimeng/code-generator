@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from src.constant.table_constant import TYPE_MAPPING_TABLE_HEADER_LABELS
-from src.view.table.table_widget.custom_table_widget import CustomTableWidget
+from src.view.table.table_widget.custom_export_table_widget import CustomExportTableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/2/13 11:09'
 
 
-class TypeMappingTableWidget(CustomTableWidget):
+class TypeMappingTableWidget(CustomExportTableWidget):
 
     def __init__(self, *args):
         super().__init__(TYPE_MAPPING_TABLE_HEADER_LABELS, *args)
