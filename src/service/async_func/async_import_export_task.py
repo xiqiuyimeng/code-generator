@@ -6,6 +6,7 @@ from src.constant.export_import_constant import TYPE_KEY, DATA_KEY
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.util.path_util import check_path_legal
 from src.service.util.struct_util.json_util import load_json_str
+from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
 _date_ = '2023/5/10 14:23'
@@ -35,6 +36,7 @@ class ImportDataWorker(ThreadWorkerABC):
         import_data_list = load_json.get(DATA_KEY)
         # 开始导入
         self.import_data(import_data_list)
+        self.success_signal.emit()
 
     def import_data(self, data_list): ...
 
@@ -45,6 +47,9 @@ class ImportDataExecutor(LoadingMaskThreadExecutor):
         # 要导入的文件路径，目前只允许导入一个文件
         self.file_path = file_path
         super().__init__(*args)
+
+    def success_post_process(self):
+        pop_ok(f'{self.error_box_title}成功', self.error_box_title, self.window)
 
 
 # ----------------------- 导入数据 end ----------------------- #
@@ -77,6 +82,7 @@ class ExportDataWorker(ThreadWorkerABC):
         }
         with open(self.file_path, 'w', encoding='utf-8')as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
+        self.success_signal.emit()
 
     def export_data(self) -> list[dict]: ...
 
@@ -87,5 +93,8 @@ class ExportDataExecutor(LoadingMaskThreadExecutor):
         self.row_ids = row_ids
         self.file_path = file_path
         super().__init__(*args)
+
+    def success_post_process(self):
+        pop_ok(f'{self.error_box_title}成功', self.error_box_title, self.window)
 
 # ----------------------- 导出数据 end ----------------------- #

@@ -62,7 +62,7 @@ class ImportExportDialogFrameABC(DialogFrameABC):
 
     def file_path_change(self, file_path):
         # 操作按钮是否禁用应该根据是否存在文件路径决定
-        self.start_process_button.setDisabled(bool(file_path))
+        self.start_process_button.setDisabled(not bool(file_path))
 
     def choose_file(self):
         file_url = QFileDialog.getOpenFileName(self, CHOOSE_FILE_TEXT, '/')
