@@ -275,6 +275,9 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         if not pop_question(DEL_MAPPING_GROUP_PROMPT.format(group_title),
                             DEL_MAPPING_GROUP_BOX_TITLE, self):
             return
+        # 先断开信号，因为删除组有可能会触发到单元格变化信号，进而触发映射列名称校验，
+        # 如果删除的组包含错误的映射列名称，那么这个校验是不必要的
+        self.currentItemChanged.disconnect()
         # 移除最后一个映射组
         column_count = self.columnCount()
         self.removeColumn(column_count - 1)
@@ -283,6 +286,9 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
         # 移除表头映射组
         self.header_widget.del_type_mapping_group()
+
+        # 重新连接信号
+        self.currentItemChanged.connect(self._current_item_change)
 
     def _sync_frozen_col_data(self):
         # 当前行数
