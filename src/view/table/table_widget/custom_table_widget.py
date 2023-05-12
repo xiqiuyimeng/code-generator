@@ -104,6 +104,9 @@ class CustomTableWidget(TableWidgetABC):
         # 获取当前表格的最大行，添加新行
         self._do_add_row(row_data, self.rowCount())
 
+    def add_rows(self, row_data_list):
+        [self.add_row(row_data) for row_data in row_data_list]
+
     def del_row(self, row):
         self.removeRow(row)
         # 移除行后，需要重新构建序号

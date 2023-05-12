@@ -14,6 +14,9 @@ class ListWidgetABC(SmartSearcherListWidget, ItemViewABC):
         # 设置列表项间距
         self.setSpacing(5)
 
+    def fill_list_widget(self, *args):
+        self.addItems(*args)
+
 
 class DraggableListWidgetABC(ListWidgetABC, DraggableItemViewABC):
 

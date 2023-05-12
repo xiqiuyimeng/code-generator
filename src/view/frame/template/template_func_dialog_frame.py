@@ -71,14 +71,8 @@ class TemplateFuncDialogFrame(DialogFrameABC):
 
     def post_process(self):
         self.list_func_executor = ListTemplateFuncExecutor(self.parent_dialog, self.parent_dialog,
-                                                           TEMPLATE_FUNC_LIST_TITLE, self.fill_list_widget)
+                                                           TEMPLATE_FUNC_LIST_TITLE,
+                                                           self.list_widget.fill_list_widget)
         self.list_func_executor.start()
-
-    def fill_list_widget(self, func_list):
-        # 填充列表
-        for func in func_list:
-            func_item = QListWidgetItem(func.func_name)
-            self.list_widget.addItem(func_item)
-            set_template_func_data(func_item, func)
 
     # ------------------------------ 后置处理 end ------------------------------ #

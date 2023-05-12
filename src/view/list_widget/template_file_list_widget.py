@@ -22,6 +22,9 @@ class TemplateFileListWidget(CustomListWidget):
         # 双击
         self.doubleClicked.connect(self.open_tab)
 
+    def fill_list_widget(self, template_files):
+        [self.add_list_file_item(template_file) for template_file in template_files]
+
     def open_tab(self, idx):
         current_text = self.itemFromIndex(idx).text()
         current_tab_indexes = self.search_tab(current_text)

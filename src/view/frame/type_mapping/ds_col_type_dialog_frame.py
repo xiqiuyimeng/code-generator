@@ -122,7 +122,7 @@ class DsColTypeDialogFrame(SaveDialogFrame):
     def fill_col_types(self):
         for col_types in self.ds_col_type_dict.values():
             col_type_list_widget = ColTypeListWidget(col_types, self.open_save_col_type_dialog, self)
-            [col_type_list_widget.addItem(col_type) for col_type in col_types]
+            col_type_list_widget.fill_list_widget(col_types)
             self.stacked_widget.addWidget(col_type_list_widget)
 
     # ------------------------------ 后置处理 end ------------------------------ #

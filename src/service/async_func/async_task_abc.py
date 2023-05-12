@@ -128,11 +128,11 @@ class ThreadExecutorABC(QObject):
 class LoadingMaskThreadExecutor(ThreadExecutorABC):
     """使用遮罩层作为任务开始时前置动作的调度器"""
 
-    def __init__(self, masked_widget, *args):
+    def __init__(self, masked_widget, *args, **kwargs):
         self.loading_movie = QMovie(":/gif/loading.gif")
         self.masked_widget = masked_widget
         self.loading_mask = LoadingMaskWidget(self.masked_widget, self.loading_movie)
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     def pre_process(self):
         self.loading_mask.start()
@@ -147,11 +147,11 @@ class LoadingMaskThreadExecutor(ThreadExecutorABC):
 class IconMovieThreadExecutor(ThreadExecutorABC):
     """使用图标动画作为任务开始时前置动作的调度器"""
 
-    def __init__(self, item, *args):
+    def __init__(self, item, *args, **kwargs):
         self.item = item
         self.icon_movie = QMovie(":/gif/loading_simple.gif")
         self.icon = self.item.icon(0)
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     def pre_process(self):
         self.icon_movie.start()
@@ -167,7 +167,7 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
     """支持使用多个动画，用于多组树节点icon movie + 对应tab的 masked widget，根据给定的item，对所有子节点处理"""
 
-    def __init__(self, item, window, *args):
+    def __init__(self, item, window, *args, **kwargs):
         self.item = item
         self.tab_widget = ...
         self.loading_gif = ":/gif/loading.gif"
@@ -175,7 +175,7 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
         # 首先获取 item 下所有的子节点，key -> item id, value -> item item_icon tab_dict
         self.item_dict = dict()
         self.get_item_dict(item, window)
-        super().__init__(window, *args)
+        super().__init__(window, *args, **kwargs)
 
     def get_item_dict(self, item, window):
         # 设置 item 标志
@@ -268,9 +268,9 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
 
 class RefreshMovieThreadExecutor(IconMovieLoadingMaskThreadExecutor):
 
-    def __init__(self, tree_widget, *args):
+    def __init__(self, tree_widget, *args, **kwargs):
         self.tree_widget = tree_widget
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     def item_pre_process(self, item):
         node = self.tree_widget.get_item_node(item)

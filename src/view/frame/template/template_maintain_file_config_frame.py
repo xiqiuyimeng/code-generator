@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QListWidgetItem, QTreeWidgetItem
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QTreeWidgetItem
 
 from src.constant.template_dialog_constant import OUTPUT_CONFIG_LIST_HEADER_TEXT, FILE_LIST_HEADER_TEXT
 from src.view.frame.dialog_frame_abc import DialogFrameABC
-from src.view.list_widget.list_item_func import set_template_file_data
 from src.view.list_widget.template_maintain_file_config_list_widget import TemplateMaintainFileConfigListWidget
 from src.view.tree.tree_item.tree_item_func import set_item_output_config, set_item_template_file
 from src.view.tree.tree_widget.template_config_tree_widget import TemplateOutputConfigTreeWidget
@@ -50,7 +49,7 @@ class TemplateMaintainFileConfigFrame(DialogFrameABC):
         self.file_list_widget = TemplateMaintainFileConfigListWidget(self)
         self.file_layout.addWidget(self.file_list_widget)
         # 填充数据
-        self.fill_file_list_widget()
+        self.file_list_widget.fill_list_widget(self.unbind_file_list)
 
     def fill_config_tree_widget(self):
         # 添加配置树列表数据
@@ -68,13 +67,6 @@ class TemplateMaintainFileConfigFrame(DialogFrameABC):
                     # 保存模板文件
                     set_item_template_file(bind_file_item, bind_file)
         self.config_tree_widget.expandAll()
-
-    def fill_file_list_widget(self):
-        # 添加列表数据
-        for unbind_file in self.unbind_file_list:
-            file_item = QListWidgetItem(unbind_file.file_name)
-            set_template_file_data(file_item, unbind_file)
-            self.file_list_widget.addItem(file_item)
 
     def setup_other_label_text(self):
         self.config_header_label.setText(OUTPUT_CONFIG_LIST_HEADER_TEXT)

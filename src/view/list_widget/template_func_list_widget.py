@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import QListWidgetItem
+
 from src.constant.list_constant import TEMPLATE_FUNC_NAME, EDIT_TEMPLATE_FUNC_BOX_TITLE
 from src.constant.template_dialog_constant import DEL_TEMPLATE_FUNC_BOX_TITLE, CLEAR_TEMPLATE_FUNC_BOX_TITLE
 from src.service.async_func.async_template_func_task import DelTemplateFuncExecutor, ClearTemplateFuncExecutor
 from src.view.list_widget.custom_list_widget import CustomListWidget
-from src.view.list_widget.list_item_func import get_template_func_data
+from src.view.list_widget.list_item_func import get_template_func_data, set_template_func_data
 
 _author_ = 'luwt'
 _date_ = '2023/3/27 17:44'
@@ -16,6 +18,12 @@ class TemplateFuncListWidget(CustomListWidget):
         self.del_template_func_executor: DelTemplateFuncExecutor = ...
         self.clear_template_func_executor: ClearTemplateFuncExecutor = ...
         super().__init__(TEMPLATE_FUNC_NAME, *args)
+
+    def fill_list_widget(self, func_list):
+        for func in func_list:
+            func_item = QListWidgetItem(func.func_name)
+            self.addItem(func_item)
+            set_template_func_data(func_item, func)
 
     def edit_item_func(self, item):
         template_func = get_template_func_data(item)

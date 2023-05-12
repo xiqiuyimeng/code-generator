@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt5.QtWidgets import QTreeWidgetItem, QListWidgetItem
 
 from src.view.list_widget.list_item_func import set_template_file_data
 from src.view.list_widget.list_widget_abc import DraggableListWidgetABC
@@ -13,6 +13,12 @@ _date_ = '2023/4/23 16:42'
 class TemplateMaintainFileConfigListWidget(DraggableListWidgetABC):
     # 绑定文件数变化信号
     bind_file_changed = pyqtSignal()
+
+    def fill_list_widget(self, unbind_file_list):
+        for unbind_file in unbind_file_list:
+            file_item = QListWidgetItem(unbind_file.file_name)
+            set_template_file_data(file_item, unbind_file)
+            self.addItem(file_item)
 
     def deal_source_list_item_data(self, source_item):
         # 从列表拖拽项到列表中，不需要做任何处理

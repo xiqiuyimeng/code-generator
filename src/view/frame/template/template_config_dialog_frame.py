@@ -378,7 +378,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         elif current_widget_idx == 3:
             # 回显数据
             range_values = self.dialog_data.range_values.split(',')
-            self.value_range_list_widget.addItems(range_values)
+            self.value_range_list_widget.fill_list_widget(range_values)
             self.default_value_combo_box.setCurrentText(self.dialog_data.default_value)
 
     # ------------------------------ 后置处理 end ------------------------------ #

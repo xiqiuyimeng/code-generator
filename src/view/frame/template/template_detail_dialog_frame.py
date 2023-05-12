@@ -263,7 +263,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     def setup_echo_other_data(self):
         self.template_desc_text_edit.setPlainText(self.dialog_data.template_desc)
         # 回显文件列表
-        [self.file_list_widget.add_list_file_item(template_file) for template_file in self.dialog_data.template_files]
+        self.file_list_widget.fill_list_widget(self.dialog_data.template_files)
         # 回显模板文件列表数据，按照tab顺序
         reopen_tab_files = sorted(filter(lambda x: x.tab_opened, self.dialog_data.template_files),
                                   key=lambda x: x.tab_item_order)
