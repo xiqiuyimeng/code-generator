@@ -30,6 +30,7 @@ sql_dict = {
     update_time datetime
     );''',
     'delete_by_template_ids': f'delete from {table_name} where template_id in ',
+    'export_by_template_ids': f'select * from {table_name} where template_id in ',
 }
 
 
@@ -61,6 +62,42 @@ class TemplateConfig(BasicSqliteDTO):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+
+@dataclass
+class ImportExportTemplateConfig:
+    # 配置项名称
+    config_name: str = field(init=False, default=None)
+    # 配置项类型
+    config_type: int = field(init=False, default=None)
+    # 输出的变量名
+    output_var_name: str = field(init=False, default=None)
+    # 配置输入项使用的控件，控件名称
+    config_value_widget: str = field(init=False, default=None)
+    # 是否必填
+    is_required: int = field(init=False, default=None)
+    # 配置项说明
+    config_desc: str = field(init=False, default=None)
+    # 占位文本
+    placeholder_text: str = field(init=False, default=None)
+    # 默认值
+    default_value: str = field(init=False, default=None)
+    # 控件为下拉框时，下拉列表值，逗号分隔
+    range_values: str = field(init=False, default=None)
+    # 非数据库字段，统计关联的模板文件列表
+    bind_file_list: list = field(init=False, default=None)
+
+    def convert_import(self, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(self, k):
+                setattr(self, k, v)
+        return self
+
+    def convert_export(self, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(self, k) or k == 'template_id' or k == 'id':
+                setattr(self, k, v)
+        return self
 
 
 class ConfigTypeEnum(Enum):
@@ -119,6 +156,13 @@ class TemplateConfigSqlite(SqliteBasic):
         sql = f"{sql_dict.get('delete_by_template_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')
+
+    def export_config_by_template_ids(self, template_ids):
+        id_str = ','.join([str(template_id) for template_id in template_ids])
+        sql = f'{sql_dict.get("export_by_template_ids")} ({id_str})'
+        rows = get_db_conn().query(sql)
+        log.info(f'{self.table_name} 根据模板id导出')
+        return [ImportExportTemplateConfig().convert_export(**row) for row in rows.as_dict()]
 
 
 def get_var_name(var_name_list, order=1):

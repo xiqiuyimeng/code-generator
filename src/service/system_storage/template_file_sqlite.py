@@ -28,6 +28,7 @@ sql_dict = {
     update_time datetime
     );''',
     'delete_by_template_ids': f'delete from {table_name} where template_id in ',
+    'export_by_template_ids': f'select * from {table_name} where template_id in ',
 }
 
 
@@ -55,6 +56,36 @@ class TemplateFile(BasicSqliteDTO):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+
+@dataclass
+class ImportExportTemplateFile:
+    # 模板文件名称
+    file_name: str = field(default=None)
+    # 模板文件名称的模板，用来存放生成模板文件的模板语法
+    file_name_template: str = field(default=None)
+    # 模板文件内容
+    file_content: str = field(default=None)
+    # 是否是当前项
+    is_current: int = field(default=None)
+    # 是否打开了tab页
+    tab_opened: int = field(default=None)
+    # 是否是当前tab
+    is_current_tab: int = field(default=None)
+    # tab页顺序
+    tab_item_order: int = field(default=None)
+
+    def convert_import(self, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(self, k):
+                setattr(self, k, v)
+        return self
+
+    def convert_export(self, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(self, k) or k == 'template_id' or k == 'output_config_id':
+                setattr(self, k, v)
+        return self
 
 
 class CurrentEnum(Enum):
@@ -96,3 +127,10 @@ class TemplateFileSqlite(SqliteBasic):
         sql = f"{sql_dict.get('delete_by_template_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')
+
+    def export_files_by_parent_id(self, template_ids):
+        id_str = ','.join([str(template_id) for template_id in template_ids])
+        sql = f'{sql_dict.get("export_by_template_ids")} ({id_str})'
+        rows = get_db_conn().query(sql)
+        log.info(f'{self.table_name} 根据模板id导出')
+        return [ImportExportTemplateFile().convert_export(**row) for row in rows.as_dict()]

@@ -366,9 +366,8 @@ class ExportTypeMappingWorker(ExportDataWorker):
         type_mapping_list = TypeMappingSqlite().export_type_mapping_by_ids(self.row_ids)
         if not type_mapping_list:
             raise Exception('未获取到类型映射信息')
-        type_mapping_ids = [type_mapping.id for type_mapping in type_mapping_list]
         # 根据类型映射id查询类型映射组信息
-        col_type_mapping_list = ColTypeMappingSqlite().export_by_parent_ids(type_mapping_ids)
+        col_type_mapping_list = ColTypeMappingSqlite().export_by_parent_ids(self.row_ids)
         # 对映射组信息分组
         if col_type_mapping_list:
             col_type_mapping_dict = dict()

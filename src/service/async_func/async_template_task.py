@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+import dataclasses
+
 from PyQt5.QtCore import pyqtSignal
 
+from src.constant.export_import_constant import TEMPLATE_DATA_KEY
 from src.logger.log import logger as log
+from src.service.async_func.async_import_export_task import ExportDataWorker, ExportDataExecutor
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.sqlite_abc import transactional
-from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, construct_output_config
+from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, construct_output_config, \
+    ConfigTypeEnum
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
 from src.service.system_storage.template_sqlite import TemplateSqlite, Template
 from src.view.box.message_box import pop_ok
@@ -301,3 +306,74 @@ class AutoGenerateOutputConfigExecutor(LoadingMaskThreadExecutor):
         return AutoGenerateOutputConfigWorker(self.config_name_list, self.var_name_list, self.file_list)
 
 # ----------------------- 自动生成文件对应的输出配置 end ----------------------- #
+
+
+# ----------------------- 导出类型映射 start ----------------------- #
+
+class ExportTemplateWorker(ExportDataWorker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.data_key = TEMPLATE_DATA_KEY
+
+    def export_data(self) -> list[dict]:
+        # 1. 查询模板信息
+        template_list = TemplateSqlite().export_template_by_ids(self.row_ids)
+        if not template_list:
+            raise Exception('未获取到模板信息')
+        # 2. 查询模板文件
+        template_file_list = TemplateFileSqlite().export_files_by_parent_id(self.row_ids)
+
+        def group_template_file(get_group_key):
+            template_file_dict = dict()
+            for template_file in template_file_list:
+                file_list = template_file_dict.get(get_group_key(template_file))
+                if file_list is None:
+                    file_list = list()
+                    template_file_dict[get_group_key(template_file)] = file_list
+                file_list.append(template_file)
+            return template_file_dict
+
+        # 3. 文件按模板id分组
+        template_id_file_dict = group_template_file(lambda x: x.template_id)
+
+        # 4. 文件按output_config_id分组
+        template_output_file_dict = group_template_file(lambda x: x.output_config_id)
+
+        # 5. 查询模板配置
+        template_config_list = TemplateConfigSqlite().export_config_by_template_ids(self.row_ids)
+        # 6. 配置分类，并将文件关联到对应的输出配置上
+        template_id_output_config_dict, template_id_var_config_dict = dict(), dict()
+        for config in template_config_list:
+            if config.config_type == ConfigTypeEnum.output_dir.value:
+                output_config_list = template_id_output_config_dict.get(config.template_id)
+                if output_config_list is None:
+                    output_config_list = list()
+                    template_id_output_config_dict[config.template_id] = output_config_list
+                output_config_list.append(config)
+                # 关联文件
+                config.bind_file_list = template_output_file_dict.get(config.id)
+            elif config.config_type == ConfigTypeEnum.template_var.value:
+                var_config_list = template_id_var_config_dict.get(config.template_id)
+                if var_config_list is None:
+                    var_config_list = list()
+                    template_id_var_config_dict[config.template_id] = var_config_list
+                var_config_list.append(config)
+        # 将模板配置、模板文件都关联到模板上
+        for template in template_list:
+            template.template_files = template_id_file_dict.get(template.id)
+            template.output_config_list = template_id_output_config_dict.get(template.id)
+            template.var_config_list = template_id_var_config_dict.get(template.id)
+        return [dataclasses.asdict(x) for x in template_list]
+
+    def get_err_msg(self) -> str:
+        return '导出模板失败'
+
+
+class ExportTemplateExecutor(ExportDataExecutor):
+
+    def get_worker(self) -> ExportTemplateWorker:
+        return ExportTemplateWorker(self.row_ids, self.file_path)
+
+# ----------------------- 导出类型映射 end ----------------------- #
+

@@ -21,7 +21,7 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'export': f'select * from {table_name} where id in ',
+    'export': f'select id, mapping_name, ds_type, comment, max_col_type_group_num from {table_name} where id in ',
     'all_mapping_names': f'select mapping_name from {table_name}',
     'get_id_by_names': f'select id from {table_name} where mapping_name in '
 }
