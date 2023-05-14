@@ -4,6 +4,7 @@ from PyQt5.QtGui import QDragEnterEvent, QDropEvent
 from src.constant.export_import_constant import IMPORT_FILE_PROMPT, IMPORT_FILE_LABEL_TEXT, \
     START_IMPORT_BTN_TEXT
 from src.service.async_func.async_import_export_task import ImportDataExecutor
+from src.view.dialog.import_error_data_process_dialog import ImportErrorDataProcessDialog
 from src.view.frame.import_export_dialog_frame_abc import ImportExportDialogFrameABC
 
 _author_ = 'luwt'
@@ -12,7 +13,10 @@ _date_ = '2023/5/9 17:47'
 
 class ImportDialogFrame(ImportExportDialogFrameABC):
     
-    def __init__(self, *args):
+    def __init__(self, *args, import_success_callback=None, get_row_data_dialog=None):
+        self.import_success_callback = import_success_callback
+        self.get_row_data_dialog = get_row_data_dialog
+        self.import_error_data_process_dialog: ImportErrorDataProcessDialog = ...
         super().__init__(*args)
         # 接收拖拽事件
         self.setAcceptDrops(True)
@@ -29,7 +33,19 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def get_process_data_executor(self) -> ImportDataExecutor:
-        return self.get_executor_func(self.file_path_linedit.text(), self, self)
+        return self.get_process_import_data_executor(self.file_path_linedit.text(),
+                                                     self, self, self.dialog_title,
+                                                     success_callback=self.import_success_callback,
+                                                     process_error_data_func=self.process_import_error_data)
+
+    def get_process_import_data_executor(self, *args, **kwargs) -> ImportDataExecutor: ...
+
+    def process_import_error_data(self, *args):
+        # 处理异常数据，打开异常数据处理对话框
+        self.import_error_data_process_dialog = self.get_process_error_data_dialog(*args)
+        self.import_error_data_process_dialog.exec()
+
+    def get_process_error_data_dialog(self, *args) -> ImportErrorDataProcessDialog: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

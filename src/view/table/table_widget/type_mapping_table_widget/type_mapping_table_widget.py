@@ -19,3 +19,9 @@ class TypeMappingTableWidget(CustomExportTableWidget):
         if fill_create_time:
             self.setItem(row_index, 4, self.make_item(type_mapping.create_time))
         self.setItem(row_index, 5, self.make_item(type_mapping.update_time))
+
+    def del_duplicate_rows(self, duplicate_data_list):
+        # 根据名称删除
+        duplicate_names = [data.mapping_name for data in duplicate_data_list]
+        [self.del_row(row) for row in reversed(range(self.rowCount()))
+         if self.item(row, 1).text() in duplicate_names]

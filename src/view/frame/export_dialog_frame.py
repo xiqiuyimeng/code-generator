@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QLabel
 
 from src.constant.export_import_constant import EXPORT_SELECTED_DATA_LABEL_TEXT, EXPORT_OUTPUT_PATH_LABEL_TEXT, \
     START_EXPORT_BTN_TEXT, EXPORT_SELECTED_DATA_DESC_TEXT
-from src.service.async_func.async_import_export_task import ExportDataExecutor
 from src.view.frame.import_export_dialog_frame_abc import ImportExportDialogFrameABC
 
 _author_ = 'luwt'
@@ -33,10 +32,3 @@ class ExportDialogFrame(ImportExportDialogFrameABC):
         self.start_process_button.setText(START_EXPORT_BTN_TEXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
-
-    # ------------------------------ 信号槽处理 start ------------------------------ #
-
-    def get_process_data_executor(self) -> ExportDataExecutor:
-        return self.get_executor_func(self.row_ids, self.file_path_linedit.text(), self, self)
-
-    # ------------------------------ 信号槽处理 end ------------------------------ #

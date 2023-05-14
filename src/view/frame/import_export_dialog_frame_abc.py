@@ -12,9 +12,7 @@ _date_ = '2023/5/10 11:28'
 
 class ImportExportDialogFrameABC(DialogFrameABC):
 
-    def __init__(self, get_executor_func, *args):
-        # 获取执行器的方法
-        self.get_executor_func = get_executor_func
+    def __init__(self, *args):
         self.blank_label: QLabel = ...
         self.form_layout: QFormLayout = ...
         self.file_path_label: QLabel = ...

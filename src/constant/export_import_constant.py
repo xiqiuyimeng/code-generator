@@ -24,6 +24,9 @@ DATA_KEY = 'data_list'
 IMPORT_TYPE_MAPPING_TITLE = '导入类型映射'
 EXPORT_TYPE_MAPPING_TITLE = '导出类型映射'
 TYPE_MAPPING_DATA_KEY = 'type_mapping'
+PROCESS_DUPLICATE_TYPE_MAPPING_TITLE = '处理重复的类型映射数据'
+PROCESS_ILLEGAL_TYPE_MAPPING_TITLE = '处理异常的类型映射数据'
+OVERRIDE_TYPE_MAPPING_TITLE = '覆盖类型映射数据'
 
 # 模板
 IMPORT_TEMPLATE_TITLE = '导入模板'
@@ -34,3 +37,16 @@ TEMPLATE_DATA_KEY = 'template'
 IMPORT_TEMPLATE_FUNC_TITLE = '导入模板方法'
 EXPORT_TEMPLATE_FUNC_TITLE = '导出模板方法'
 TEMPLATE_FUNC_DATA_KEY = 'template_function'
+
+# 处理导入数据异常对话框
+SELECT_ALL_BTN_TEXT = '全选'
+UNSELECT_ALL_BTN_TEXT = '取消选择'
+SKIP_DUPLICATE_BTN_TEXT = '跳过选中的重复数据'
+PROCESS_DUPLICATE_BTN_TEXT = '覆盖数据库数据'
+
+SKIP_ILLEGAL_BTN_TEXT = '跳过选中的异常数据'
+PROCESS_ILLEGAL_BTN_TEXT = '手动处理数据'
+
+MULTI_ILLEGAL_SELECTED_TITLE = '手动处理异常数据'
+MULTI_ILLEGAL_SELECTED_PROMPT = '系统目前只支持一次处理一条异常数据，您选中的多条数据中，此次处理仅处理第一条，' \
+                                '若需要处理其他数据，请在当前处理完成后，继续处理'

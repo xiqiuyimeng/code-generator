@@ -110,15 +110,24 @@ class TableDialogFrame(DialogFrameABC):
 
     def open_row_data_dialog(self, row_id=None, row_index=None):
         """打开添加或编辑行数据对话框"""
-        self.row_data_dialog = self.get_row_data_dialog(row_id)
-        if row_id:
-            self.row_data_dialog.edit_signal.connect(lambda row_data: self.table_widget.edit_row(row_index,
-                                                                                                 row_data))
-        else:
-            self.row_data_dialog.save_signal.connect(self.table_widget.add_row)
+        self.row_data_dialog = self.get_row_data_dialog(row_id=row_id, row_index=row_index)
         self.row_data_dialog.exec()
 
-    def get_row_data_dialog(self, row_id) -> StackedDialogABC: ...
+    def get_row_data_dialog(self, row_id=None, row_index=None, row_data=None) -> StackedDialogABC:
+        row_data_dialog: StackedDialogABC = self.do_get_row_data_dialog(row_id)
+        if row_id:
+            row_data_dialog.edit_signal.connect(lambda data: self.table_widget.edit_row(row_index, data))
+        else:
+            # 如果 row_data 存在，那应该是用于导入时，处理异常数据，所以需要手动回显数据
+            if row_data:
+                row_data_dialog.frame.dialog_data = row_data
+                row_data_dialog.frame.import_error_data = True
+                row_data_dialog.frame.setup_echo_data()
+            else:
+                row_data_dialog.save_signal.connect(self.table_widget.add_row)
+        return row_data_dialog
+
+    def do_get_row_data_dialog(self, row_id) -> StackedDialogABC: ...
 
     def del_row(self, row_id, row_index, item_name):
         del_prompt, del_title = self.get_del_prompt_title()
@@ -158,14 +167,15 @@ class TableDialogFrame(DialogFrameABC):
 
     def import_data(self):
         # 打开导入对话框
-        self.import_data_dialog = ImportDialog(self.get_import_data_executor,
-                                               self.get_import_data_dialog_title(),
-                                               self.parent_dialog.parent_screen_rect)
+        self.import_data_dialog = self.get_import_dialog(self.import_success_callback, self.get_row_data_dialog)
         self.import_data_dialog.exec()
 
-    def get_import_data_executor(self, file_path, masked_widget, window) -> LoadingMaskThreadExecutor: ...
+    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog: ...
 
-    def get_import_data_dialog_title(self) -> str: ...
+    def import_success_callback(self, add_data_list, del_data_list=None):
+        if del_data_list:
+            self.table_widget.del_duplicate_rows(del_data_list)
+        self.table_widget.add_rows(add_data_list)
 
     def export_data(self):
         # 收集所有选中项id
@@ -174,14 +184,10 @@ class TableDialogFrame(DialogFrameABC):
 
     def do_export_data(self, row_ids):
         # 打开导出对话框
-        self.export_data_dialog = ExportDialog(row_ids, self.get_export_data_executor,
-                                               self.get_export_data_dialog_title(),
-                                               self.parent_dialog.parent_screen_rect)
+        self.export_data_dialog = self.get_export_dialog(row_ids)
         self.export_data_dialog.exec()
 
-    def get_export_data_executor(self, row_ids, file_path, masked_widget, window) -> LoadingMaskThreadExecutor: ...
-
-    def get_export_data_dialog_title(self) -> str: ...
+    def get_export_dialog(self, row_ids) -> ExportDialog: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

@@ -26,7 +26,6 @@ class CustomTableWidget(TableWidgetABC):
         # 表头控件
         self.header_widget: CheckBoxHeader = ...
         super().__init__(*args)
-        self.cols = list()
 
     def setup_other_ui(self):
         # 设置表格列数，由于第一列顺序列已经在表头中确定，所以传进来的表头文本实际是内容表头，
@@ -51,7 +50,6 @@ class CustomTableWidget(TableWidgetABC):
         super().resizeEvent(e)
 
     def fill_table(self, cols):
-        self.cols = cols
         for i, col in enumerate(cols):
             self._do_add_row(col, i)
 
@@ -65,6 +63,7 @@ class CustomTableWidget(TableWidgetABC):
         # 最后一列添加操作按钮
         row_id = row_data.id if row_data.id else -1
         self.setCellWidget(row_index, self.columnCount() - 1, self.make_operation_buttons(order_item, row_id))
+        self.header_widget.calculate_header_check_state()
 
     def do_fill_row(self, row_index, row_data, fill_create_time=True): ...
 
@@ -144,3 +143,5 @@ class CustomTableWidget(TableWidgetABC):
         self.resort_row()
         # 删除行后，重新计算表头复选框状态
         self.header_widget.calculate_header_check_state()
+
+    def del_duplicate_rows(self, duplicate_data_list): ...

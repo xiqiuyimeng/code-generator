@@ -21,3 +21,12 @@ def set_template_func_data(item, template_func):
 
 def get_template_func_data(item):
     return item.data(Qt.UserRole)
+
+
+# 取出放置导入异常数据的对象
+def set_import_error_data(item, import_error_data):
+    item.setData(Qt.UserRole, import_error_data)
+
+
+def get_import_error_data(item):
+    return item.data(Qt.UserRole)

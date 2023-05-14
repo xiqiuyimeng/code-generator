@@ -192,7 +192,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def _sync_mapping_col_name(self, col, mapping_col_name):
         [self.item(row_idx, col).setText(mapping_col_name) for row_idx in range(self.rowCount())]
 
-    def add_type_mapping(self):
+    def add_type_mapping(self, import_error_data=False):
         # 增加一个新的类型映射行
         row = self.rowCount()
         if self.frozen_column_table is not Ellipsis:
@@ -211,7 +211,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         # 重新计算表头复选框状态
         self.calculate_header_checked()
         # 同步上一行所有映射列名称数据
-        self._sync_last_mapping_col_text(row)
+        if not import_error_data:
+            self._sync_last_mapping_col_text(row)
 
     def check_box_clicked_slot(self, check_state, row_num):
         # 如果冻结表格存在，那么当前点击的复选框，应当是冻结表，所以需要同步复选框状态到底表
@@ -403,7 +404,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         if duplicate_mapping_col_name_groups:
             return GROUP_MAPPING_COL_NAME_DUPLICATE.format("\n".join(duplicate_mapping_col_name_groups))
 
-    def fill_table(self, type_mapping):
+    def fill_table(self, type_mapping, import_error_data=False):
         max_group_num = type_mapping.max_col_type_group_num
         # 首先渲染表结构，如果最大组号大于0，那么需要新增类型映射组
         if max_group_num:
@@ -430,7 +431,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             # 后续按组来赋值，只需要给底表赋值即可
             start_col = col_type_mapping.group_num * 3 + 2
             # 如果是第一行需要赋值映射列名称，其他行在添加行时，会自动复制上一行的数据
-            if current_row == 0:
+            # 在展示导入的错误数据时，需要按数据导入，不使用动态添加
+            if (current_row == 0 and not import_error_data) or import_error_data:
                 self.item(current_row, start_col).setText(col_type_mapping.mapping_col_name)
             self.item(current_row, start_col + 1).setText(col_type_mapping.mapping_type)
             self.item(current_row, start_col + 2).setText(col_type_mapping.import_desc)

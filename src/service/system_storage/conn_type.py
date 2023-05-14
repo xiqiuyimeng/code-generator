@@ -40,6 +40,12 @@ def get_conn_dialog(display_name):
     return get_conn_type(display_name).type_dialog
 
 
+def check_conn_type(display_name):
+    for conn_type in ConnTypeEnum:
+        if conn_type.value.display_name == display_name:
+            return True
+
+
 @dataclass
 class ConnType:
     type: int = field(init=False)

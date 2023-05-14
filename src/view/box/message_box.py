@@ -11,13 +11,14 @@ _author_ = 'luwt'
 _date_ = '2020/6/21 16:08'
 
 
-def pop_msg(title, msg):
+def pop_msg(title, msg, window=None):
     """
     弹出普通信息框
     :param title: 弹窗标题
     :param msg: 弹窗消息
+    :param window: 父窗体
     """
-    msg_box = QMessageBox(QMessageBox.Information, title, msg)
+    msg_box = QMessageBox(QMessageBox.Information, title, msg, parent=window)
     msg_box.addButton(OK_BUTTON, QMessageBox.AcceptRole)
     msg_box.exec()
 

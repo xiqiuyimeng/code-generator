@@ -26,6 +26,12 @@ def get_struct_dialog(display_name):
     return get_struct_type(display_name).type_dialog
 
 
+def check_struct_type(display_name):
+    for struct_type in StructTypeEnum:
+        if struct_type.value.display_name == display_name:
+            return True
+
+
 @dataclass
 class StructType:
     type: str = field(init=False)

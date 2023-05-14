@@ -14,6 +14,7 @@ class TypeMappingDetailDialog(StackedDialogABC):
     """类型映射详情对话框"""
     save_signal = pyqtSignal(TypeMapping)
     edit_signal = pyqtSignal(TypeMapping)
+    override_signal = pyqtSignal(list, list)
     
     def __init__(self, screen_rect, type_mapping_names, type_mapping_id=None):
         self.type_mapping_names = type_mapping_names
@@ -26,3 +27,7 @@ class TypeMappingDetailDialog(StackedDialogABC):
 
     def get_frame(self) -> TypeMappingDetailDialogFrame:
         return TypeMappingDetailDialogFrame(self, self.dialog_title, self.type_mapping_names, self.type_mapping_id)
+
+    def connect_signal(self):
+        super().connect_signal()
+        self.frame.override_signal.connect(self.override_signal.emit)

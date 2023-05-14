@@ -2,6 +2,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QLabel, QGridLayout, QPushButton, QFrame
 
+from src.constant.export_import_constant import OVERRIDE_TYPE_MAPPING_TITLE
 from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_INFO_TEXT, TYPE_MAPPING_COL_TABLE_TEXT, \
     TYPE_MAPPING_NAME, DS_TYPE_TEXT, TYPE_MAPPING_COMMENT_TEXT, SYNC_DS_COL_TYPE_BTN_TEXT, \
     ADD_COL_TYPE_MAPPING_BTN_TEXT, DEL_COL_TYPE_MAPPING_BTN_TEXT, ADD_MAPPING_GROUP_BTN_TEXT, \
@@ -10,7 +11,7 @@ from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_INFO_TEXT, TY
     DS_COL_TYPE_LIST_BOX_TITLE, READ_TYPE_MAPPING_BOX_TITLE
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor
 from src.service.async_func.async_type_mapping_task import AddTypeMappingExecutor, EditTypeMappingExecutor, \
-    ReadTypeMappingExecutor
+    ReadTypeMappingExecutor, OverrideTypeMappingExecutor
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.ds_type_combo_box import DsTypeComboBox
@@ -27,10 +28,13 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
     """类型映射详情对话框框架"""
     save_signal = pyqtSignal(TypeMapping)
     edit_signal = pyqtSignal(TypeMapping)
+    override_signal = pyqtSignal(list, list)
 
     def __init__(self, parent_dialog, dialog_title, type_mapping_names, type_mapping_id=None):
         self.dialog_data: TypeMapping = ...
         self.new_dialog_data: TypeMapping = ...
+        # 标记当前是否是用来展示导入错误数据详情页
+        self.import_error_data = False
 
         # 第一个窗口，类型映射信息窗口
         self.mapping_info_widget: QWidget = ...
@@ -76,6 +80,8 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.add_type_mapping_executor: AddTypeMappingExecutor = ...
         # 编辑类型映射执行器
         self.edit_type_mapping_executor: EditTypeMappingExecutor = ...
+        # 覆盖导入类型映射执行器
+        self.override_data_executor: OverrideTypeMappingExecutor = ...
         super().__init__(parent_dialog, dialog_title, type_mapping_names, type_mapping_id)
 
     def get_new_dialog_data(self) -> TypeMapping:
@@ -192,7 +198,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 按钮点击信号
         self.sync_ds_col_type_button.clicked.connect(self.sync_ds_col_types)
         # 添加类型映射
-        self.add_mapping_button.clicked.connect(self.col_type_table_widget.add_type_mapping)
+        self.add_mapping_button.clicked.connect(lambda: self.col_type_table_widget.add_type_mapping())
         # 删除类型映射
         self.del_mapping_button.clicked.connect(self.col_type_table_widget.del_type_mapping)
         # 添加映射组
@@ -236,20 +242,33 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 手动收集数据
         self.collect_input()
         # 如果存在原数据，说明是编辑
-        if self.dialog_data:
+        if self.dialog_data and not self.import_error_data:
             self.new_dialog_data.id = self.dialog_data.id
             self.edit_type_mapping_executor = EditTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
-                                                                      self.parent_dialog, EDIT_TYPE_MAPPING_BOX_TITLE,
+                                                                      self.parent_dialog,
+                                                                      EDIT_TYPE_MAPPING_BOX_TITLE,
                                                                       self.edit_post_process)
             self.edit_type_mapping_executor.start()
         else:
-            self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
-                                                                    self.parent_dialog, ADD_TYPE_MAPPING_BOX_TITLE,
-                                                                    self.add_post_process)
-            self.add_type_mapping_executor.start()
+            # 如果名称存在，那么是覆盖模式
+            if self.new_dialog_data.mapping_name in self.name_list:
+                self.override_data_executor = OverrideTypeMappingExecutor([self.new_dialog_data, ], self, self,
+                                                                          OVERRIDE_TYPE_MAPPING_TITLE,
+                                                                          success_callback=self.override_post_process)
+                self.override_data_executor.start()
+            else:
+                self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
+                                                                        self.parent_dialog,
+                                                                        ADD_TYPE_MAPPING_BOX_TITLE,
+                                                                        self.add_post_process)
+                self.add_type_mapping_executor.start()
 
     def add_post_process(self):
         self.save_signal.emit(self.new_dialog_data)
+        self.parent_dialog.close()
+
+    def override_post_process(self, add_data_list, del_data_list):
+        self.override_signal.emit(add_data_list, del_data_list)
         self.parent_dialog.close()
 
     def edit_post_process(self):
@@ -293,6 +312,6 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.ds_type_combo_box.echo_ds_type(self.dialog_data.ds_type)
         self.type_mapping_comment_text_edit.setPlainText(self.dialog_data.comment)
         # 回显表格数据
-        self.col_type_table_widget.fill_table(self.dialog_data)
+        self.col_type_table_widget.fill_table(self.dialog_data, self.import_error_data)
 
     # ------------------------------ 后置处理 end ------------------------------ #

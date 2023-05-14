@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton
 
+from src.constant.export_import_constant import IMPORT_TYPE_MAPPING_TITLE, EXPORT_TYPE_MAPPING_TITLE
 from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_BUTTON_TEXT, \
     ADD_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE, \
     BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE, IMPORT_TYPE_MAPPING_BTN_TEXT, EXPORT_TYPE_MAPPING_BTN_TEXT
 from src.service.async_func.async_type_mapping_task import DelTypeMappingExecutor, BatchDelTypeMappingExecutor, \
     ListTypeMappingExecutor
 from src.view.dialog.type_mapping.ds_col_type_dialog import DsColTypeDialog
+from src.view.dialog.type_mapping.export_type_mapping_dialog import ExportTypeMappingDialog
+from src.view.dialog.type_mapping.import_type_mapping_dialog import ImportTypeMappingDialog
 from src.view.dialog.type_mapping.type_mapping_detail_dialog import TypeMappingDetailDialog
 from src.view.frame.table_dialog_frame import TableDialogFrame
 from src.view.table.table_widget.type_mapping_table_widget.type_mapping_table_widget import TypeMappingTableWidget
@@ -53,8 +56,9 @@ class TypeMappingDialogFrame(TableDialogFrame):
         self.ds_col_type_list_dialog = DsColTypeDialog(self.parent_dialog.parent_screen_rect)
         self.ds_col_type_list_dialog.exec()
 
-    def get_row_data_dialog(self, row_id) -> TypeMappingDetailDialog:
-        type_mapping_names = list(map(lambda x: x.mapping_name, self.table_widget.cols))
+    def do_get_row_data_dialog(self, row_id) -> TypeMappingDetailDialog:
+        type_mapping_names = [self.table_widget.item(row, 1).text()
+                              for row in range(self.table_widget.rowCount())]
         return TypeMappingDetailDialog(self.parent_dialog.parent_screen_rect, type_mapping_names, row_id)
 
     def get_del_prompt_title(self):
@@ -70,6 +74,14 @@ class TypeMappingDialogFrame(TableDialogFrame):
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTypeMappingExecutor:
         return BatchDelTypeMappingExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
                                            del_title, self.table_widget.del_rows)
+
+    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportTypeMappingDialog:
+        return ImportTypeMappingDialog(IMPORT_TYPE_MAPPING_TITLE, self.parent_dialog.parent_screen_rect,
+                                       import_success_callback=import_success_callback,
+                                       get_row_data_dialog=get_row_data_dialog)
+
+    def get_export_dialog(self, row_ids) -> ExportTypeMappingDialog:
+        return ExportTypeMappingDialog(row_ids, EXPORT_TYPE_MAPPING_TITLE, self.parent_dialog.parent_screen_rect)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

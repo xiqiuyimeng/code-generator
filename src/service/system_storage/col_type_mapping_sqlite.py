@@ -22,7 +22,8 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_by_parent_ids': f'delete from {table_name} where parent_id in '
+    'delete_by_parent_ids': f'delete from {table_name} where parent_id in ',
+    'export': f'select * from {table_name} where parent_id in ',
 }
 
 
@@ -46,6 +47,32 @@ class ColTypeMapping(BasicSqliteDTO):
             setattr(self, k, v)
 
 
+@dataclass
+class ImportExportColTypeMapping:
+    # 数据源列类型
+    ds_col_type: str = field(default=None)
+    # 映射列名称，在模板中使用
+    mapping_col_name: str = field(default=None)
+    # 映射类型
+    mapping_type: str = field(default=None)
+    # 引包声明
+    import_desc: str = field(default=None)
+    # 类型映射组，当一个列映射多组类型时，需要派生出多个组
+    group_num: int = field(default=None)
+
+    def convert_import(self, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(self, k):
+                setattr(self, k, v)
+        return self
+
+    def convert_export(self, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(self, k) or k == 'parent_id':
+                setattr(self, k, v)
+        return self
+
+
 class ColTypeMappingSqlite(SqliteBasic):
 
     def __init__(self):
@@ -56,10 +83,11 @@ class ColTypeMappingSqlite(SqliteBasic):
         param.parent_id = parent_id
         return self.select_by_order(param)
 
-    def save_col_type_mappings(self, col_type_mappings):
+    def batch_save(self, col_type_mappings, parent_id):
         # 批量保存
         for order, col_type_mapping in enumerate(col_type_mappings, start=1):
             col_type_mapping.item_order = order
+            col_type_mapping.parent_id = parent_id
         self.batch_insert(col_type_mappings)
 
     @transactional
@@ -78,3 +106,10 @@ class ColTypeMappingSqlite(SqliteBasic):
         sql = f"{sql_dict.get('delete_by_parent_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据parent_id: {parent_ids} 删除')
+
+    def export_by_parent_ids(self, parent_ids):
+        ids_str = ','.join(map(lambda x: str(x), parent_ids))
+        sql = f"{sql_dict.get('export')} ({ids_str})"
+        rows = get_db_conn().query(sql)
+        log.info(f'{self.table_name} 根据 parent_id: {parent_ids} 导出')
+        return [ImportExportColTypeMapping().convert_export(**row) for row in rows.as_dict()]

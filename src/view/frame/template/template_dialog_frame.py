@@ -53,8 +53,8 @@ class TemplateDialogFrame(TableDialogFrame):
         self.template_func_dialog = TemplateFuncDialog(self.parent_dialog.parent_screen_rect)
         self.template_func_dialog.exec()
 
-    def get_row_data_dialog(self, row_id) -> TemplateDetailDialog:
-        template_names = list(map(lambda x: x.template_name, self.table_widget.cols))
+    def do_get_row_data_dialog(self, row_id) -> TemplateDetailDialog:
+        template_names = [self.table_widget.item(row, 1).text() for row in range(self.table_widget.rowCount())]
         return TemplateDetailDialog(self.parent_dialog.parent_screen_rect, template_names, row_id)
 
     def get_del_prompt_title(self):
