@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import dataclasses
 import json
 import os
 
@@ -80,26 +81,26 @@ class ImportDataWorker(ThreadWorkerABC):
         for data_row in import_data_list:
             # 校验数据重复
             duplicate_flag = self.check_data_exists(self.get_unique_key(data_row))
-            # 校验数据是否正确合法
-            if self.check_data_legal(data_row):
-                # 如果数据正确合法，且不重复，放入正确的数据列表
-                if not duplicate_flag:
-                    legal_rows.append(data_row)
-                else:
-                    # 数据正确，但重复，放入重复数据列表
-                    duplicate_rows.append(data_row)
-            else:
+            # 校验数据是否正确合法，校验的同时，也应当将一些页面无法体现错误的数据进行修复，例如类型映射中的组号
+            if self.check_repair_illegal_data(data_row):
                 # 数据不合法，且重复，放入重复不合法数据列表
                 if duplicate_flag:
                     duplicate_illegal_rows.append(data_row)
                 # 数据不合法，且不重复，放入不合法数据列表
                 else:
                     illegal_rows.append(data_row)
+            else:
+                # 如果数据正确合法，且不重复，放入正确的数据列表
+                if not duplicate_flag:
+                    legal_rows.append(data_row)
+                else:
+                    # 数据正确，但重复，放入重复数据列表
+                    duplicate_rows.append(data_row)
         return duplicate_rows, illegal_rows, duplicate_illegal_rows, legal_rows
 
     def check_data_exists(self, unique_key) -> bool: ...
 
-    def check_data_legal(self, data_row) -> bool: ...
+    def check_repair_illegal_data(self, data_row) -> int: ...
 
     def import_data(self, data_list): ...
 
@@ -189,6 +190,7 @@ class ExportDataWorker(ThreadWorkerABC):
             raise Exception(f'当前路径不合法：{self.file_path}')
         # 根据传入的行id列表，进行导出
         export_data_list = self.export_data()
+        data_dict_list = [dataclasses.asdict(data) for data in export_data_list]
         # 导出完毕，检查路径是否存在，不存在则创建
         file_dir = os.path.split(self.file_path)[0]
         if not os.path.exists(file_dir):
@@ -196,13 +198,13 @@ class ExportDataWorker(ThreadWorkerABC):
         # 写入数据，类型、数据
         result_json = {
             TYPE_KEY: self.data_key,
-            DATA_KEY: export_data_list
+            DATA_KEY: data_dict_list
         }
         with open(self.file_path, 'w', encoding='utf-8') as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
         self.success_signal.emit()
 
-    def export_data(self) -> list[dict]: ...
+    def export_data(self) -> list[dataclasses.dataclass]: ...
 
 
 class ExportDataExecutor(LoadingMaskThreadExecutor):

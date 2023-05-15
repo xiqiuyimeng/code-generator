@@ -14,6 +14,8 @@ from src.service.system_storage.conn_type import check_conn_type
 from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.struct_type import check_struct_type
 from src.service.system_storage.type_mapping_sqlite import TypeMappingSqlite, TypeMapping, ImportExportTypeMapping
+from src.service.util.import_export_util import convert_import_to_model_list, convert_import_to_model, group_model_list, \
+    add_group_list, check_repair_type_mapping_group_num
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -221,16 +223,11 @@ class ImportTypeMappingWorker(ImportDataWorker):
         self.exists_type_mapping_names = ...
 
     def convert_to_model(self, import_data):
-        # 之所以要经历两次转化，是为了规范数据
-        import_type_mapping = ImportExportTypeMapping().convert_import(**import_data)
-        # 第二次转为可插入数据库的实体
-        type_mapping = TypeMapping(**dataclasses.asdict(import_type_mapping))
-        if import_type_mapping.type_mapping_cols:
-            import_cols = [ImportExportColTypeMapping().convert_import(**col)
-                           for col in import_type_mapping.type_mapping_cols]
-            import_type_mapping.type_mapping_cols = import_cols
-            type_mapping.type_mapping_cols = [ColTypeMapping(**col)
-                                              for col in type_mapping.type_mapping_cols]
+        type_mapping = convert_import_to_model(ImportExportTypeMapping, TypeMapping, import_data)
+        if type_mapping.type_mapping_cols:
+            type_mapping.type_mapping_cols = convert_import_to_model_list(ImportExportColTypeMapping,
+                                                                          ColTypeMapping,
+                                                                          type_mapping.type_mapping_cols)
         return type_mapping
 
     def get_unique_key(self, row: TypeMapping) -> str:
@@ -244,12 +241,18 @@ class ImportTypeMappingWorker(ImportDataWorker):
     def check_data_exists(self, unique_key) -> bool:
         return unique_key in self.exists_type_mapping_names
 
-    def check_data_legal(self, data_row: TypeMapping) -> bool:
+    def check_repair_illegal_data(self, data_row: TypeMapping) -> int:
+        illegal_data_count = 0
         # 前面已经检查过了映射名称，现在检查数据源类型是否合法
         data_row_legal = data_row.ds_type and (check_conn_type(data_row.ds_type)
                                                or check_struct_type(data_row.ds_type))
         if not data_row_legal:
-            return data_row_legal
+            illegal_data_count += 1
+        # 检查最大组号，是否为数字类型，如果是其他类型，自动修正
+        need_correct_max_group_num = False
+        if data_row.max_col_type_group_num and not isinstance(data_row.max_col_type_group_num, int):
+            data_row.max_col_type_group_num = 0
+            need_correct_max_group_num = True
         # 检查映射列类型
         if data_row.type_mapping_cols:
             # 映射组
@@ -257,49 +260,47 @@ class ImportTypeMappingWorker(ImportDataWorker):
             for col in data_row.type_mapping_cols:
                 # 1. 数据源列类型不能为空
                 if not col.ds_col_type:
-                    return False
-                # 2. 组号必须存在，且为大于0的整数
+                    illegal_data_count += 1
+                # 2. 组号必须存在，且为大于0的整数，如果数据有问题，自动修复下，重置为0
                 if col.group_num is None or not isinstance(col.group_num, int) or col.group_num < 0:
-                    return False
+                    col.group_num = 0
                 # 3. 映射类型必须存在
                 if not col.mapping_type:
-                    return False
+                    illegal_data_count += 1
                 # 4. 映射列名称不能为空
                 if not col.mapping_col_name:
-                    return False
+                    illegal_data_count += 1
                 # 放入组内
-                mapping_col_list = mapping_col_group_dict.get(col.group_num)
-                if not mapping_col_list:
-                    mapping_col_list = list()
-                    mapping_col_group_dict[col.group_num] = mapping_col_list
-                mapping_col_list.append(col)
+                add_group_list(mapping_col_group_dict, lambda x: x.group_num, col)
 
-            # 5. 组号必须为连续的整数
-            for group_num in range(len(mapping_col_group_dict)):
-                if group_num not in mapping_col_group_dict:
-                    return False
+            # 5. 组号必须为连续的整数，如果组号不连续，进行修复
+            check_repair_type_mapping_group_num(mapping_col_group_dict)
+
+            # 类型映射中存的最大组号，和实际的最大组保持一致
+            if need_correct_max_group_num and mapping_col_group_dict:
+                data_row.max_col_type_group_num = len(mapping_col_group_dict) - 1
             # 6. 映射列名称，同组内相同，不同组保持唯一性；数据源列类型不同组必须相同
             group_mapping_col_name_set, ds_col_type_set = set(), set()
             for group_num, mapping_col_list in mapping_col_group_dict.items():
                 if len(set([mapping_col.mapping_col_name for mapping_col in mapping_col_list])) != 1:
-                    return False
+                    illegal_data_count += 1
                 # 判断映射列名称是否重复
                 current_group_mapping_col_name = mapping_col_list[0].mapping_col_name
                 if current_group_mapping_col_name in group_mapping_col_name_set:
-                    return False
+                    illegal_data_count += 1
                 group_mapping_col_name_set.add(current_group_mapping_col_name)
 
                 # 7. 数据源列类型同组内保持唯一性，不同组必须相同
                 current_ds_col_type_set = set([mapping_col.ds_col_type for mapping_col in mapping_col_list])
                 # 同组保持不同
                 if len(current_ds_col_type_set) != len(mapping_col_list):
-                    return False
+                    illegal_data_count += 1
                 if not ds_col_type_set:
                     ds_col_type_set = current_ds_col_type_set
                 # 不同组需要保持相同
                 if current_ds_col_type_set != ds_col_type_set:
-                    return False
-        return True
+                    illegal_data_count += 1
+        return illegal_data_count
 
     @transactional
     def import_data(self, data_list):
@@ -308,7 +309,8 @@ class ImportTypeMappingWorker(ImportDataWorker):
         # 保存列类型映射组信息
         for type_mapping in data_list:
             if type_mapping.type_mapping_cols:
-                self.col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols, type_mapping.id)
+                self.col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols,
+                                                        type_mapping.id)
 
     def get_err_msg(self) -> str:
         return '导入类型映射失败'
@@ -342,7 +344,8 @@ class OverrideTypeMappingWorker(OverrideDataWorker):
         # 保存列类型映射组信息
         for type_mapping in self.data_list:
             if type_mapping.type_mapping_cols:
-                self.col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols, type_mapping.id)
+                self.col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols,
+                                                        type_mapping.id)
 
 
 class OverrideTypeMappingExecutor(OverrideDataExecutor):
@@ -361,7 +364,7 @@ class ExportTypeMappingWorker(ExportDataWorker):
         super().__init__(*args)
         self.data_key = TYPE_MAPPING_DATA_KEY
 
-    def export_data(self) -> list[dict]:
+    def export_data(self) -> list[dataclasses.dataclass]:
         # 查询类型映射信息
         type_mapping_list = TypeMappingSqlite().export_type_mapping_by_ids(self.row_ids)
         if not type_mapping_list:
@@ -370,18 +373,11 @@ class ExportTypeMappingWorker(ExportDataWorker):
         col_type_mapping_list = ColTypeMappingSqlite().export_by_parent_ids(self.row_ids)
         # 对映射组信息分组
         if col_type_mapping_list:
-            col_type_mapping_dict = dict()
-            for col_type_mapping in col_type_mapping_list:
-                col_type_mappings = col_type_mapping_dict.get(col_type_mapping.parent_id)
-                # 如果之前没存储过，那么创建list
-                if col_type_mappings is None:
-                    col_type_mappings = list()
-                    col_type_mapping_dict[col_type_mapping.parent_id] = col_type_mappings
-                col_type_mappings.append(col_type_mapping)
+            col_type_mapping_dict = group_model_list(col_type_mapping_list, lambda x: x.parent_id)
             # 类型映射匹配映射组信息
             for type_mapping in type_mapping_list:
                 type_mapping.type_mapping_cols = col_type_mapping_dict.get(type_mapping.id)
-        return [dataclasses.asdict(x) for x in type_mapping_list]
+        return type_mapping_list
 
     def get_err_msg(self) -> str:
         return '导出类型映射失败'

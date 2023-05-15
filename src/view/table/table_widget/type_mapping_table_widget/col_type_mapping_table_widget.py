@@ -420,8 +420,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
                 current_ds_col_type = col_type_mapping.ds_col_type
                 self.add_type_mapping()
                 current_row += 1
-            # 设置列类型
-            if col_type_mapping.group_num == 0:
+                # 设置列类型
                 if self.frozen_column_table is not Ellipsis:
                     # 不需要向底表同步
                     self.need_sync_col_type = False

@@ -26,6 +26,7 @@ class TemplateFileTabWidget(QTabWidget):
         template_file_data = get_template_file_data(list_item)
         # 将tab页内保存的文本数据刷入对象中
         template_file_data.file_content = self.widget(index).content_editor.toPlainText()
+        template_file_data.file_name_template = self.widget(index).file_name_edit.text()
         super().removeTab(index)
 
     def add_file_tab(self, template_file):
