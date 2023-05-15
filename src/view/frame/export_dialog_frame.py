@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtCore import QDir
+from PyQt5.QtWidgets import QLabel, QFileDialog
 
 from src.constant.export_import_constant import EXPORT_SELECTED_DATA_LABEL_TEXT, EXPORT_OUTPUT_PATH_LABEL_TEXT, \
-    START_EXPORT_BTN_TEXT, EXPORT_SELECTED_DATA_DESC_TEXT
+    START_EXPORT_BTN_TEXT, EXPORT_SELECTED_DATA_DESC_TEXT, CHOOSE_EXPORT_DIR_TEXT
 from src.view.frame.import_export_dialog_frame_abc import ImportExportDialogFrameABC
 
 _author_ = 'luwt'
@@ -32,3 +33,21 @@ class ExportDialogFrame(ImportExportDialogFrameABC):
         self.start_process_button.setText(START_EXPORT_BTN_TEXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
+
+    # ------------------------------ 信号槽处理 start ------------------------------ #
+    def choose_file(self):
+        dir_url = QFileDialog.getSaveFileName(self, CHOOSE_EXPORT_DIR_TEXT, self.file_path_linedit.text())
+        if dir_url[0]:
+            self.file_path_linedit.setText(dir_url[0])
+
+    def get_export_file_name(self) -> str: ...
+
+    # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        # 给一个默认导出文件地址，当前路径 /export/ 导出文件名
+        self.file_path_linedit.setText(f'{QDir().absolutePath()}/export/{self.get_export_file_name()}')
+
+    # ------------------------------ 后置处理 end ------------------------------ #

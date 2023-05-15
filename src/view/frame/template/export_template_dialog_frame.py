@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE
+from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE, EXPORT_TEMPLATE_FILE_NAME
 from src.service.async_func.async_template_task import ExportTemplateExecutor
 from src.view.frame.export_dialog_frame import ExportDialogFrame
 
@@ -10,6 +10,9 @@ _date_ = '2023/5/14 18:29'
 class ExportTemplateDialogFrame(ExportDialogFrame):
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_export_file_name(self) -> str:
+        return EXPORT_TEMPLATE_FILE_NAME
 
     def get_process_data_executor(self) -> ExportTemplateExecutor:
         return ExportTemplateExecutor(self.row_ids, self.file_path_linedit.text(),

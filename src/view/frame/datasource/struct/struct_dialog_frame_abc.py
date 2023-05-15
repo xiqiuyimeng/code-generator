@@ -132,7 +132,7 @@ class StructDialogFrameABC(DsDialogFrameABC):
         self.pretty_button.clicked.connect(self.pretty_func)
 
     def choose_file(self):
-        file_url = QFileDialog.getOpenFileName(self, CHOOSE_STRUCT_FILE_TEXT, '/')
+        file_url = QFileDialog.getOpenFileName(self, CHOOSE_STRUCT_FILE_TEXT, '')
         if file_url[0]:
             self.struct_file_url_linedit.setText(file_url[0])
             # 异步读取文件内容，回显到内容区域

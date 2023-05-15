@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QPushButton
 
-from src.constant.export_import_constant import IMPORT_EXPORT_SELECT_FILE_ICON, CHOOSE_FILE_TEXT
+from src.constant.export_import_constant import IMPORT_EXPORT_SELECT_FILE_ICON
 from src.constant.icon_enum import get_icon
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.frame.dialog_frame_abc import DialogFrameABC
@@ -62,10 +62,7 @@ class ImportExportDialogFrameABC(DialogFrameABC):
         # 操作按钮是否禁用应该根据是否存在文件路径决定
         self.start_process_button.setDisabled(not bool(file_path))
 
-    def choose_file(self):
-        file_url = QFileDialog.getOpenFileName(self, CHOOSE_FILE_TEXT, '/')
-        if file_url[0]:
-            self.file_path_linedit.setText(file_url[0])
+    def choose_file(self): ...
 
     def process_data(self):
         self.process_data_executor = self.get_process_data_executor()
@@ -74,11 +71,3 @@ class ImportExportDialogFrameABC(DialogFrameABC):
     def get_process_data_executor(self) -> LoadingMaskThreadExecutor: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
-
-    # ------------------------------ 后置处理 start ------------------------------ #
-
-    def post_process(self):
-        # 操作按钮开始应该是禁用的
-        self.start_process_button.setDisabled(True)
-
-    # ------------------------------ 后置处理 end ------------------------------ #

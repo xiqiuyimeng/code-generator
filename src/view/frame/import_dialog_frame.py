@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtGui import QDragEnterEvent, QDropEvent
+from PyQt5.QtWidgets import QFileDialog
 
 from src.constant.export_import_constant import IMPORT_FILE_PROMPT, IMPORT_FILE_LABEL_TEXT, \
-    START_IMPORT_BTN_TEXT
+    START_IMPORT_BTN_TEXT, CHOOSE_IMPORT_FILE_TEXT
 from src.service.async_func.async_import_export_task import ImportDataExecutor
 from src.view.dialog.import_error_data_process_dialog import ImportErrorDataProcessDialog
 from src.view.frame.import_export_dialog_frame_abc import ImportExportDialogFrameABC
@@ -32,6 +33,11 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
+    def choose_file(self):
+        file_url = QFileDialog.getOpenFileName(self, CHOOSE_IMPORT_FILE_TEXT, '')
+        if file_url[0]:
+            self.file_path_linedit.setText(file_url[0])
+
     def get_process_data_executor(self) -> ImportDataExecutor:
         return self.get_process_import_data_executor(self.file_path_linedit.text(),
                                                      self, self, self.dialog_title,
@@ -48,6 +54,14 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
     def get_process_error_data_dialog(self, *args) -> ImportErrorDataProcessDialog: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        # 操作按钮开始应该是禁用的
+        self.start_process_button.setDisabled(True)
+
+    # ------------------------------ 后置处理 end ------------------------------ #
 
     def dragEnterEvent(self, event: QDragEnterEvent):
         # 有拖拽文件时，设置接受，本地文件是以url类型描述的，

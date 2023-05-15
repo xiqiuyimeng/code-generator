@@ -33,7 +33,7 @@ class CustomDialogABC(DraggableDialog):
         # 计算窗口大小
         self.resize_dialog()
         # 不透明度
-        self.setWindowOpacity(0.95)
+        self.setWindowOpacity(0.97)
         # 隐藏窗口边框
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置窗口背景透明
