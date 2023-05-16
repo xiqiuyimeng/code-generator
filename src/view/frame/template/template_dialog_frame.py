@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton
 
-from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE, EXPORT_TEMPLATE_FILE_NAME
+from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE, EXPORT_TEMPLATE_FILE_NAME, \
+    PROCESS_DUPLICATE_TEMPLATE_TITLE, OVERRIDE_TEMPLATE_TITLE, PROCESS_ILLEGAL_TEMPLATE_TITLE, IMPORT_TEMPLATE_TITLE
 from src.constant.template_dialog_constant import FUNC_DIALOG_BTN_TEXT, ADD_TEMPLATE_BTN_TEXT, \
-    DEL_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE, BATCH_TEMPLATE_PROMPT, TEMPLATE_LIST_BOX_TITLE, \
-    IMPORT_TEMPLATE_BTN_TEXT, EXPORT_TEMPLATE_BTN_TEXT
+    DEL_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE, BATCH_TEMPLATE_PROMPT, \
+    TEMPLATE_LIST_BOX_TITLE, IMPORT_TEMPLATE_BTN_TEXT, EXPORT_TEMPLATE_BTN_TEXT
 from src.service.async_func.async_template_task import DelTemplateExecutor, BatchDelTemplateExecutor, \
-    ListTemplateExecutor, ExportTemplateExecutor
+    ListTemplateExecutor, ExportTemplateExecutor, ImportTemplateExecutor, OverrideTemplateExecutor
 from src.view.dialog.export_dialog import ExportDialog
+from src.view.dialog.import_dialog import ImportDialog
 from src.view.dialog.template.template_detail_dialog import TemplateDetailDialog
 from src.view.dialog.template.template_func_dialog import TemplateFuncDialog
 from src.view.frame.table_dialog_frame import TableDialogFrame
@@ -72,6 +74,13 @@ class TemplateDialogFrame(TableDialogFrame):
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTemplateExecutor:
         return BatchDelTemplateExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
                                         del_title, self.table_widget.del_rows)
+
+    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog:
+        return ImportDialog(ImportTemplateExecutor, PROCESS_DUPLICATE_TEMPLATE_TITLE,
+                            OverrideTemplateExecutor, OVERRIDE_TEMPLATE_TITLE,
+                            PROCESS_ILLEGAL_TEMPLATE_TITLE, import_success_callback,
+                            get_row_data_dialog, IMPORT_TEMPLATE_TITLE,
+                            self.parent_dialog.parent_screen_rect)
 
     def get_export_dialog(self, row_ids) -> ExportDialog:
         return ExportDialog(row_ids, EXPORT_TEMPLATE_FILE_NAME, ExportTemplateExecutor,

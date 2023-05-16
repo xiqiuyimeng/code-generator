@@ -12,7 +12,7 @@ from src.constant.template_dialog_constant import CONFIG_NAME_TEXT, VAR_NAME_TEX
 from src.service.system_storage.template_config_sqlite import TemplateConfig, RequiredEnum
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
-from src.view.frame.frame_func import set_name_input_style, reset_name_input_style
+from src.view.frame.frame_func import check_name_available
 from src.view.frame.name_check_dialog_frame import NameCheckDialogFrame
 from src.view.list_widget.range_value_list_widget import ValueRangeListWidget
 
@@ -235,20 +235,9 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.placeholder_input.textEdited.connect(self.check_input)
 
     def check_var_name_available(self, var_name):
-        if self.var_name_check_action is Ellipsis:
-            self.var_name_check_action = QAction(self)
-        if var_name:
-            self.var_name_available = self.do_check_var_name_available(var_name)
-            set_name_input_style(self.var_name_available, var_name, self.old_var_name, 'var_name_input',
-                                 self.var_name_input, self.var_name_check_action, self.var_name_checker)
-        else:
-            reset_name_input_style(self.var_name_input, self.var_name_checker, self.var_name_check_action)
-
-    def do_check_var_name_available(self, var_name):
-        if self.old_var_name:
-            return (self.old_var_name != var_name and var_name not in self.var_names) or self.old_var_name == var_name
-        else:
-            return var_name not in self.var_names
+        self.var_name_available = check_name_available(var_name, self.old_var_name, self.var_names,
+                                                       self.var_name_check_action, self.var_name_input,
+                                                       self.var_name_checker, 'var_name_input')
 
     def button_available(self) -> bool:
         return self.name_input.displayText() and self.name_available \

@@ -5,13 +5,16 @@ from PyQt5.QtCore import pyqtSignal
 
 from src.constant.export_import_constant import TEMPLATE_DATA_KEY
 from src.logger.log import logger as log
-from src.service.async_func.async_import_export_task import ExportDataWorker, ExportDataExecutor
+from src.service.async_func.async_import_export_task import ExportDataWorker, ExportDataExecutor, ImportDataWorker, \
+    ImportDataExecutor, OverrideDataWorker, OverrideDataExecutor
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, construct_output_config, \
-    ConfigTypeEnum
-from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
-from src.service.system_storage.template_sqlite import TemplateSqlite, Template
+    ConfigTypeEnum, ImportExportTemplateConfig, TemplateConfig
+from src.service.system_storage.template_file_sqlite import TemplateFileSqlite, ImportExportTemplateFile, TemplateFile
+from src.service.system_storage.template_sqlite import TemplateSqlite, Template, ImportExportTemplate
+from src.service.util.import_export_util import convert_import_to_model, convert_import_to_model_list, \
+    group_model_list, add_group_list, check_duplicate_template_file_name, check_template_config
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -40,12 +43,7 @@ class ReadTemplateWorker(ThreadWorkerABC):
         template.output_config_list, template.var_config_list = template_config_list
         # 将模板文件按关联的输出路径配置id分组
         if template.template_files and template.output_config_list:
-            template_file_dict = dict()
-            for tp_file in template.template_files:
-                file_list = template_file_dict.get(tp_file.output_config_id, list())
-                if not file_list:
-                    template_file_dict[tp_file.output_config_id] = file_list
-                file_list.append(tp_file)
+            template_file_dict = group_model_list(template.template_files, lambda x: x.output_config_id)
             for output_config in template.output_config_list:
                 output_config.bind_file_list = template_file_dict.get(output_config.id)
         self.success_signal.emit(template)
@@ -308,6 +306,145 @@ class AutoGenerateOutputConfigExecutor(LoadingMaskThreadExecutor):
 # ----------------------- 自动生成文件对应的输出配置 end ----------------------- #
 
 
+# ----------------------- 导入模板 start ----------------------- #
+
+
+def batch_save_template(template_sqlite: TemplateSqlite, template_config_sqlite: TemplateConfigSqlite,
+                        template_file_sqlite: TemplateFileSqlite, data_list):
+    # 批量保存模板
+    template_sqlite.batch_save_templates(data_list)
+    for template in data_list:
+        template_config_sqlite.batch_add_config_list(template.id, template.output_config_list,
+                                                     template.var_config_list)
+        if template.template_files:
+            template_file_sqlite.batch_add_template_files(template.id,
+                                                          template.template_files)
+
+
+class ImportTemplateWorker(ImportDataWorker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.data_key = TEMPLATE_DATA_KEY
+        self.template_sqlite = TemplateSqlite()
+        self.template_file_sqlite = TemplateFileSqlite()
+        self.template_config_sqlite = TemplateConfigSqlite()
+        self.exists_template_names = ...
+
+    def convert_to_model(self, import_data):
+        template = convert_import_to_model(ImportExportTemplate, Template, import_data)
+        # 处理文件
+        template_file_dict = dict()
+        if template.template_files:
+            template.template_files = convert_import_to_model_list(ImportExportTemplateFile,
+                                                                   TemplateFile, template.template_files)
+            # 这里需要使用最终被赋值到模板中的模板文件对象，否则会和实际的模板文件对象不同，导致最终的保存失败
+            template_file_dict = dict([(file.file_name, file) for file in template.template_files])
+        # 处理输出路径配置
+        if template.output_config_list:
+            template.output_config_list = convert_import_to_model_list(ImportExportTemplateConfig,
+                                                                       TemplateConfig, template.output_config_list)
+            # 处理关联的文件
+            for output_config in template.output_config_list:
+                bind_file_list = list()
+                for bind_file in output_config.bind_file_list:
+                    template_file = template_file_dict.get(bind_file.get('file_name'))
+                    if template_file:
+                        bind_file_list.append(template_file)
+                        # 给绑定的文件分配一个虚id
+                        template_file.output_config_id = -1
+                if bind_file_list:
+                    output_config.bind_file_list = bind_file_list
+                else:
+                    # 如果绑定文件数据不存在，或错误，直接清空
+                    output_config.bind_file_list = None
+        # 处理变量配置
+        if template.var_config_list:
+            template.var_config_list = convert_import_to_model_list(ImportExportTemplateConfig,
+                                                                    TemplateConfig, template.var_config_list)
+        return template
+
+    def get_unique_key(self, row: Template) -> str:
+        # 获取唯一键，标识数据唯一性
+        return row.template_name
+
+    def pre_process_before_check_data(self):
+        # 查出所有的模板名称
+        self.exists_template_names = self.template_sqlite.get_all_names()
+
+    def check_data_exists(self, unique_key) -> bool:
+        return unique_key in self.exists_template_names
+
+    def check_repair_illegal_data(self, data_row: Template) -> int:
+        illegal_data_count = 0
+        # 检查模板文件名称是否重复，如果文件名为空，自动修复，添加默认值
+        if data_row.template_files:
+            illegal_data_count += check_duplicate_template_file_name(data_row.template_files)
+
+        # 检查输出路径配置
+        if data_row.output_config_list:
+            error_name_count, error_var_name_count = check_template_config(data_row.output_config_list,
+                                                                           ConfigTypeEnum.output_dir.value)
+            illegal_data_count += error_name_count + error_var_name_count
+        else:
+            data_row.output_config_list = list()
+        # 检查变量配置
+        if data_row.var_config_list:
+            error_name_count, error_var_name_count = check_template_config(data_row.var_config_list,
+                                                                           ConfigTypeEnum.template_var.value)
+            illegal_data_count += error_name_count + error_var_name_count
+        else:
+            data_row.var_config_list = list()
+        return illegal_data_count
+
+    @transactional
+    def import_data(self, data_list):
+        # 批量保存模板
+        batch_save_template(self.template_sqlite, self.template_config_sqlite,
+                            self.template_file_sqlite, data_list)
+
+    def get_err_msg(self) -> str:
+        return '导入模板失败'
+
+
+class ImportTemplateExecutor(ImportDataExecutor):
+
+    def get_worker(self) -> ImportTemplateWorker:
+        return ImportTemplateWorker(self.file_path)
+
+# ----------------------- 导入模板 end ----------------------- #
+
+
+# ----------------------- 覆盖数据 start ----------------------- #
+
+class OverrideTemplateWorker(OverrideDataWorker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.template_sqlite = TemplateSqlite()
+        self.template_file_sqlite = TemplateFileSqlite()
+        self.template_config_sqlite = TemplateConfigSqlite()
+
+    def batch_delete_origin_data(self):
+        id_list = self.template_sqlite.get_id_by_names(self.data_list)
+        self.template_sqlite.batch_delete(id_list)
+        self.template_file_sqlite.batch_del_template_files(id_list)
+        self.template_config_sqlite.batch_del_config_list(id_list)
+
+    def batch_insert_data_list(self):
+        # 批量保存模板
+        batch_save_template(self.template_sqlite, self.template_config_sqlite,
+                            self.template_file_sqlite, self.data_list)
+
+
+class OverrideTemplateExecutor(OverrideDataExecutor):
+
+    def get_worker(self) -> OverrideTemplateWorker:
+        return OverrideTemplateWorker(self.data_list)
+
+# ----------------------- 覆盖数据 end ----------------------- #
+
+
 # ----------------------- 导出类型映射 start ----------------------- #
 
 class ExportTemplateWorker(ExportDataWorker):
@@ -316,7 +453,7 @@ class ExportTemplateWorker(ExportDataWorker):
         super().__init__(*args)
         self.data_key = TEMPLATE_DATA_KEY
 
-    def export_data(self) -> list[dict]:
+    def export_data(self) -> list[dataclasses.dataclass]:
         # 1. 查询模板信息
         template_list = TemplateSqlite().export_template_by_ids(self.row_ids)
         if not template_list:
@@ -324,47 +461,31 @@ class ExportTemplateWorker(ExportDataWorker):
         # 2. 查询模板文件
         template_file_list = TemplateFileSqlite().export_files_by_parent_id(self.row_ids)
 
-        def group_template_file(get_group_key):
-            template_file_dict = dict()
-            for template_file in template_file_list:
-                file_list = template_file_dict.get(get_group_key(template_file))
-                if file_list is None:
-                    file_list = list()
-                    template_file_dict[get_group_key(template_file)] = file_list
-                file_list.append(template_file)
-            return template_file_dict
-
         # 3. 文件按模板id分组
-        template_id_file_dict = group_template_file(lambda x: x.template_id)
+        template_id_file_dict = group_model_list(template_file_list, lambda x: x.template_id)
 
         # 4. 文件按output_config_id分组
-        template_output_file_dict = group_template_file(lambda x: x.output_config_id)
+        template_output_file_dict = group_model_list(template_file_list, lambda x: x.output_config_id)
 
         # 5. 查询模板配置
         template_config_list = TemplateConfigSqlite().export_config_by_template_ids(self.row_ids)
+
         # 6. 配置分类，并将文件关联到对应的输出配置上
         template_id_output_config_dict, template_id_var_config_dict = dict(), dict()
         for config in template_config_list:
             if config.config_type == ConfigTypeEnum.output_dir.value:
-                output_config_list = template_id_output_config_dict.get(config.template_id)
-                if output_config_list is None:
-                    output_config_list = list()
-                    template_id_output_config_dict[config.template_id] = output_config_list
-                output_config_list.append(config)
+                add_group_list(template_id_output_config_dict, lambda x: x.template_id, config)
                 # 关联文件
                 config.bind_file_list = template_output_file_dict.get(config.id)
             elif config.config_type == ConfigTypeEnum.template_var.value:
-                var_config_list = template_id_var_config_dict.get(config.template_id)
-                if var_config_list is None:
-                    var_config_list = list()
-                    template_id_var_config_dict[config.template_id] = var_config_list
-                var_config_list.append(config)
+                add_group_list(template_id_var_config_dict, lambda x: x.template_id, config)
+
         # 将模板配置、模板文件都关联到模板上
         for template in template_list:
             template.template_files = template_id_file_dict.get(template.id)
             template.output_config_list = template_id_output_config_dict.get(template.id)
             template.var_config_list = template_id_var_config_dict.get(template.id)
-        return [dataclasses.asdict(x) for x in template_list]
+        return template_list
 
     def get_err_msg(self) -> str:
         return '导出模板失败'

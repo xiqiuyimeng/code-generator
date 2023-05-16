@@ -213,6 +213,17 @@ class ListTypeMappingExecutor(LoadingMaskThreadExecutor):
 
 # ----------------------- 导入类型映射 start ----------------------- #
 
+
+def batch_save_type_mapping(type_mapping_sqlite: TypeMappingSqlite,
+                            col_type_mapping_sqlite: ColTypeMappingSqlite, data_list):
+    # 批量保存类型映射
+    type_mapping_sqlite.batch_save_type_mappings(data_list)
+    # 保存列类型映射组信息
+    for type_mapping in data_list:
+        if type_mapping.type_mapping_cols:
+            col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols, type_mapping.id)
+
+
 class ImportTypeMappingWorker(ImportDataWorker):
 
     def __init__(self, *args):
@@ -305,12 +316,7 @@ class ImportTypeMappingWorker(ImportDataWorker):
     @transactional
     def import_data(self, data_list):
         # 批量保存类型映射
-        self.type_mapping_sqlite.batch_save_type_mappings(data_list)
-        # 保存列类型映射组信息
-        for type_mapping in data_list:
-            if type_mapping.type_mapping_cols:
-                self.col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols,
-                                                        type_mapping.id)
+        batch_save_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite, data_list)
 
     def get_err_msg(self) -> str:
         return '导入类型映射失败'
@@ -340,12 +346,7 @@ class OverrideTypeMappingWorker(OverrideDataWorker):
 
     def batch_insert_data_list(self):
         # 批量保存类型映射
-        self.type_mapping_sqlite.batch_save_type_mappings(self.data_list)
-        # 保存列类型映射组信息
-        for type_mapping in self.data_list:
-            if type_mapping.type_mapping_cols:
-                self.col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols,
-                                                        type_mapping.id)
+        batch_save_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite, self.data_list)
 
 
 class OverrideTypeMappingExecutor(OverrideDataExecutor):

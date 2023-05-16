@@ -3,15 +3,22 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter, QFrame, QPushButton, \
     QTabWidget
 
+from src.constant.export_import_constant import OVERRIDE_TEMPLATE_TITLE
 from src.constant.template_dialog_constant import TEMPLATE_INFO_TEXT, TEMPLATE_CONFIG_TEXT, TEMPLATE_FILE_TEXT, \
     TEMPLATE_NAME, TEMPLATE_DESC, ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
     EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
     TEMPLATE_VAR_CONFIG_TAB_TEXT, CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, \
-    CHECK_TP_FILE_CONFIG_TITLE, CHECK_TP_FILE_CONFIG_PROMPT, CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE
-from src.service.async_func.async_template_task import AddTemplateExecutor, EditTemplateExecutor, ReadTemplateExecutor
+    CHECK_TP_FILE_CONFIG_TITLE, CHECK_TP_FILE_CONFIG_PROMPT, CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE, \
+    CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, \
+    CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE, CHECK_VAR_CONFIG_NAME_PROMPT, CHECK_VAR_CONFIG_NAME_TITLE, \
+    CHECK_VAR_CONFIG_VAR_NAME_PROMPT, CHECK_VAR_CONFIG_VAR_NAME_TITLE
+from src.service.async_func.async_template_task import AddTemplateExecutor, EditTemplateExecutor, \
+    ReadTemplateExecutor, OverrideTemplateExecutor
+from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
 from src.service.system_storage.template_file_sqlite import TemplateFile
 from src.service.system_storage.template_sqlite import Template
-from src.view.box.message_box import pop_question
+from src.service.util.import_export_util import check_template_config
+from src.view.box.message_box import pop_question, pop_fail
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
 from src.view.frame.stacked_dialog_frame import StackedDialogFrame
@@ -29,10 +36,13 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     """模板详情对话框框架"""
     save_signal = pyqtSignal(Template)
     edit_signal = pyqtSignal(Template)
+    override_signal = pyqtSignal(list, list)
 
     def __init__(self, parent_dialog, dialog_title, template_names, template_id=None):
         self.dialog_data: Template = ...
         self.new_dialog_data: Template = ...
+        # 标记当前是否是用来展示导入错误数据详情页
+        self.import_error_data = False
 
         # 第一个窗口，模板基本信息窗口
         self.template_info_widget: QWidget = ...
@@ -68,6 +78,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.add_template_executor: AddTemplateExecutor = ...
         # 编辑模板执行器
         self.edit_template_executor: EditTemplateExecutor = ...
+        # 覆盖导入模板执行器
+        self.override_data_executor: OverrideTemplateExecutor = ...
         super().__init__(parent_dialog, dialog_title, template_names, template_id)
 
     def get_new_dialog_data(self) -> Template:
@@ -214,22 +226,48 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     def save_func(self):
         # 手动收集数据
         self.collect_input()
-        # 校验模板数据是否完整，主要是文件与输出路径配置关系，是否可以正常生成
+        # 校验模板数据是否完整
         if self.check_template_completable():
             # 如果存在原数据，说明是编辑
-            if self.dialog_data:
+            if self.dialog_data and not self.import_error_data:
                 self.new_dialog_data.id = self.dialog_data.id
                 self.edit_template_executor = EditTemplateExecutor(self.new_dialog_data, self.parent_dialog,
                                                                    self.parent_dialog, EDIT_TEMPLATE_BOX_TITLE,
                                                                    self.edit_post_process)
                 self.edit_template_executor.start()
             else:
-                self.add_template_executor = AddTemplateExecutor(self.new_dialog_data, self.parent_dialog,
-                                                                 self.parent_dialog, ADD_TEMPLATE_BOX_TITLE,
-                                                                 self.add_post_process)
-                self.add_template_executor.start()
+                # 如果名称存在，那么是覆盖模式
+                if self.new_dialog_data.template_name in self.name_list:
+                    self.override_data_executor = OverrideTemplateExecutor([self.new_dialog_data, ], self,
+                                                                           OVERRIDE_TEMPLATE_TITLE,
+                                                                           success_callback=self.override_post_process)
+                    self.override_data_executor.start()
+                else:
+                    self.add_template_executor = AddTemplateExecutor(self.new_dialog_data, self.parent_dialog,
+                                                                     self.parent_dialog, ADD_TEMPLATE_BOX_TITLE,
+                                                                     self.add_post_process)
+                    self.add_template_executor.start()
 
     def check_template_completable(self):
+        # 检查配置数据是否正确，主要是针对于回显过来的数据，例如导入的数据，进行校验
+        if self.new_dialog_data.output_config_list:
+            error_name_count, error_var_name_count = check_template_config(self.new_dialog_data.output_config_list,
+                                                                           ConfigTypeEnum.output_dir.value)
+            if error_name_count:
+                pop_fail(CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, self)
+                return
+            if error_var_name_count:
+                pop_fail(CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE, self)
+                return
+        if self.new_dialog_data.var_config_list:
+            error_name_count, error_var_name_count = check_template_config(self.new_dialog_data.var_config_list,
+                                                                           ConfigTypeEnum.template_var.value)
+            if error_name_count:
+                pop_fail(CHECK_VAR_CONFIG_NAME_PROMPT, CHECK_VAR_CONFIG_NAME_TITLE, self)
+                return
+            if error_var_name_count:
+                pop_fail(CHECK_VAR_CONFIG_VAR_NAME_PROMPT, CHECK_VAR_CONFIG_VAR_NAME_TITLE, self)
+                return
         # 校验模板文件是否存在，模板文件是否关联了输出路径配置，模板文件名称模板是否存在，如果没有，提示
         template_completable = True
         if not self.new_dialog_data.template_files:
@@ -243,6 +281,10 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
     def add_post_process(self):
         self.save_signal.emit(self.new_dialog_data)
+        self.parent_dialog.close()
+
+    def override_post_process(self, add_data_list, del_data_list):
+        self.override_signal.emit(add_data_list, del_data_list)
         self.parent_dialog.close()
 
     def edit_post_process(self):
@@ -279,5 +321,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         # 回显模板配置数据
         self.output_config_widget.config_table.fill_table(self.dialog_data.output_config_list)
         self.var_config_widget.config_table.fill_table(self.dialog_data.var_config_list)
+        # 如果是回显导入的错误数据，那么将保存按钮打开
+        if self.import_error_data:
+            self.save_button.setDisabled(False)
 
     # ------------------------------ 后置处理 end ------------------------------ #

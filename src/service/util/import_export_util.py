@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import dataclasses
 
+from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT, DEFAULT_INPUT_WIDGET_TYPE
+from src.service.system_storage.template_config_sqlite import RequiredEnum, check_required_value_legal
+
 _author_ = 'luwt'
 _date_ = '2023/5/15 14:11'
 
@@ -45,3 +48,59 @@ def check_repair_type_mapping_group_num(mapping_col_group_dict):
                 mapping_col_group_dict[group_idx].extend(error_group_list)
             # 删除原有组
             del mapping_col_group_dict[group_num]
+
+
+def create_default_file_name(template_file_name_set, default_file_name, start_idx):
+    current_file_name = default_file_name.format(start_idx)
+    if current_file_name in template_file_name_set:
+        return create_default_file_name(template_file_name_set, default_file_name, start_idx + 1)
+    return current_file_name
+
+
+def check_duplicate_template_file_name(template_files):
+    duplicate_file_name_count = 0
+    template_file_name_set, empty_name_file_list = set(), list()
+    for file in template_files:
+        if not file.file_name:
+            empty_name_file_list.append(file)
+        elif file.file_name in template_file_name_set:
+            duplicate_file_name_count += 1
+        else:
+            template_file_name_set.add(file.file_name)
+    # 如果文件名称存在空的情况，给予一个默认值
+    if empty_name_file_list:
+        default_file_name, start_idx = '模板文件-系统创建-{}', 1
+        for empty_name_file in empty_name_file_list:
+            empty_name_file.file_name = create_default_file_name(template_file_name_set,
+                                                                 default_file_name, start_idx)
+    return duplicate_file_name_count
+
+
+def repair_template_config(config, config_type):
+    # 配置类型修正
+    config.config_type = config_type
+    # 变量控件类型校验，如果类型不对，那么重置为一个默认类型
+    if config.config_value_widget not in CONFIG_INPUT_WIDGET_TYPE_DICT:
+        config.config_value_widget = DEFAULT_INPUT_WIDGET_TYPE
+    # 是否必填，如果当前值不合法，重置为必填
+    if not check_required_value_legal(config.is_required):
+        config.is_required = RequiredEnum.required.value
+
+
+def check_template_config(config_list, config_type):
+    error_name_count, error_var_name_count = 0, 0
+    config_name_list, var_name_list = list(), list()
+    for config in config_list:
+        # 配置名称不可重复
+        if config.config_name in config_name_list:
+            error_name_count += 1
+        else:
+            config_name_list.append(config.config_name)
+        # 输出变量名称不可重复
+        if config.output_var_name in var_name_list:
+            error_var_name_count += 1
+        else:
+            var_name_list.append(config.output_var_name)
+        # 修正配置数据
+        repair_template_config(config, config_type)
+    return error_name_count, error_var_name_count

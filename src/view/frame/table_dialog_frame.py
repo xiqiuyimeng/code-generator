@@ -119,6 +119,7 @@ class TableDialogFrame(DialogFrameABC):
             row_data_dialog.edit_signal.connect(lambda data: self.table_widget.edit_row(row_index, data))
         else:
             # 如果 row_data 存在，那应该是用于导入时，处理异常数据，所以需要手动回显数据
+            # 子类框架需要设置 import_error_data 标记，并将其用于判断是否是异常数据回显
             if row_data:
                 row_data_dialog.frame.dialog_data = row_data
                 row_data_dialog.frame.import_error_data = True

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QAction
 from src.constant.dialog_constant import NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO
-from src.view.frame.frame_func import set_name_input_style, reset_name_input_style
+from src.view.frame.frame_func import check_name_available
 from src.view.frame.save_dialog_frame import SaveDialogFrame
 
 _author_ = 'luwt'
@@ -72,20 +72,8 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.connect_child_signal()
 
     def check_name_available(self, name):
-        if self.name_check_action is Ellipsis:
-            self.name_check_action = QAction()
-        if name:
-            self.name_available = self.check_available(name)
-            set_name_input_style(self.name_available, name, self.old_name, 'name_input',
-                                 self.name_input, self.name_check_action, self.name_checker)
-        else:
-            reset_name_input_style(self.name_input, self.name_checker, self.name_check_action)
-
-    def check_available(self, name):
-        if self.old_name:
-            return (self.old_name != name and name not in self.name_list) or self.old_name == name
-        else:
-            return name not in self.name_list
+        self.name_available = check_name_available(name, self.old_name, self.name_list, self.name_check_action,
+                                                   self.name_input, self.name_checker, 'name_input')
 
     def check_input(self):
         # 收集用户输入数据

@@ -80,6 +80,8 @@ class TemplateFileListWidget(CustomListWidget):
         name_tab_dict = dict(map(lambda x: (file_tab_widget.tabText(x), file_tab_widget.widget(x)),
                                  range(file_tab_widget.count())))
         # 遍历列表项，收集数据，如果打开了tab页，文件内容使用tab页中的数据
+        if not self.count():
+            return
         template_files = list()
         for list_idx in range(self.count()):
             list_item = self.item(list_idx)

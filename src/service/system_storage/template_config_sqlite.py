@@ -112,6 +112,12 @@ class RequiredEnum(Enum):
     required = 1
 
 
+def check_required_value_legal(value):
+    if value == RequiredEnum.not_required.value or value == RequiredEnum.required.value:
+        return True
+    return False
+
+
 class TemplateConfigSqlite(SqliteBasic):
 
     def __init__(self):

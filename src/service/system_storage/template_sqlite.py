@@ -19,7 +19,9 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'export': f'select id, template_name, template_desc from {table_name} where id in '
+    'export': f'select id, template_name, template_desc from {table_name} where id in ',
+    'select_all_names': f'select template_name from {table_name}',
+    'get_id_by_names': f'select id from {table_name} where template_name in ',
 }
 
 
@@ -39,6 +41,9 @@ class Template(BasicSqliteDTO):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+    def get_name(self):
+        return self.template_name
 
 
 @dataclass
@@ -82,3 +87,22 @@ class TemplateSqlite(SqliteBasic):
         rows = get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据id导出模板信息')
         return [ImportExportTemplate().convert_export(**row) for row in rows.as_dict()]
+
+    def get_all_names(self):
+        sql = sql_dict.get('select_all_names')
+        rows = get_db_conn().query(sql)
+        log.info(f'{self.table_name} 获取所有模板名称')
+        return [row.get('template_name') for row in rows.as_dict()]
+
+    def get_id_by_names(self, template_list):
+        name_str = ','.join([f'"{template.template_name}"' for template in template_list])
+        sql = f"{sql_dict.get('get_id_by_names')} ({name_str})"
+        rows = get_db_conn().query(sql)
+        log.info(f'{self.table_name} 根据名称查询id')
+        return [row.get('id') for row in rows.as_dict()]
+
+    def batch_save_templates(self, template_list):
+        max_order = self.get_max_order()
+        for order, template in enumerate(template_list, start=max_order):
+            template.item_order = order
+        self.batch_insert(template_list)

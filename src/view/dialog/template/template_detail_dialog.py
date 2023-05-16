@@ -14,6 +14,7 @@ class TemplateDetailDialog(StackedDialogABC):
     """模板详情对话框"""
     save_signal = pyqtSignal(Template)
     edit_signal = pyqtSignal(Template)
+    override_signal = pyqtSignal(list, list)
     
     def __init__(self, screen_rect, template_names, template_id=None):
         self.template_names = template_names
@@ -28,3 +29,7 @@ class TemplateDetailDialog(StackedDialogABC):
 
     def get_frame(self) -> TemplateDetailDialogFrame:
         return TemplateDetailDialogFrame(self, self.dialog_title, self.template_names, self.template_id)
+
+    def connect_signal(self):
+        super().connect_signal()
+        self.frame.override_signal.connect(self.override_signal.emit)

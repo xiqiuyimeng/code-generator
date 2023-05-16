@@ -15,7 +15,7 @@ sql_dict = {
     'create': f'''create table if not exists {table_name}
     (id integer primary key autoincrement,
     file_name char(50) not null,
-    file_name_template text not null,
+    file_name_template text null,
     file_content text,
     is_current integer not null,
     tab_opened integer not null,

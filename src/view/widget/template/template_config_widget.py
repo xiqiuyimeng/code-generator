@@ -69,8 +69,8 @@ class TemplateConfigWidget(QWidget):
         # 连接表格中行编辑信号
         self.config_table.row_edit_signal.connect(self.open_config_row_dialog)
         # 配置表格中行删除信号
-        self.config_table.row_del_signal.connect(
-            lambda row_id, row_index, config_name: self.config_table.remove_row(row_index, config_name))
+        self.config_table.row_del_signal.connect(lambda row_id, row_index, config_name:
+                                                 self.config_table.remove_row(row_index, config_name))
         # 输出配置表头复选框状态变化信号
         self.config_table.header_widget.header_check_changed.connect(self.set_remove_btn_available)
         self.preview_config_btn.clicked.connect(self.preview_template_config)

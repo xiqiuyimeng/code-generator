@@ -83,6 +83,7 @@ CONFIG_INPUT_WIDGET_TYPE_DICT = {
     '下拉框列表': 'ComboBoxConfigValueWidget',
     '文件夹对话框': 'FileDialogConfigValueWidget',
 }
+DEFAULT_INPUT_WIDGET_TYPE = tuple(CONFIG_INPUT_WIDGET_TYPE_DICT)[0]
 DEL_CONFIG_BOX_TITLE = '删除配置项'
 DEL_CONFIG_PROMPT = '配置项：{}\n确认删除配置项吗？'
 BATCH_DEL_CONFIG_PROMPT = '已选择{}个配置项\n确认删除选中的配置项吗？'
@@ -144,3 +145,12 @@ CHECK_TP_FILE_CONFIG_TITLE = '检查模板文件关联输出路径配置'
 CHECK_TP_FILE_CONFIG_PROMPT = '当前模板存在模板文件还未绑定输出路径配置，当前模板将无法在生成代码时使用，确认保存吗？'
 CHECK_FILE_NAME_TP_TITLE = '检查模板文件名称模板'
 CHECK_FILE_NAME_TP_PROMPT = '当前模板存在模板文件还未设置文件名称模板，在生成代码时，无法根据数据表名生成文件名，确认保存吗？'
+
+CHECK_OUTPUT_CONFIG_NAME_TITLE = '检查模板输出配置名称'
+CHECK_OUTPUT_CONFIG_NAME_PROMPT = '模板输出配置，配置项名称存在空值或重复项，请打开输出配置详情页，进行数据修正'
+CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE = '检查模板输出配置变量名称'
+CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT = '模板输出配置，输出变量名称存在空值或重复项，请打开输出配置详情页，进行数据修正'
+CHECK_VAR_CONFIG_NAME_TITLE = '检查模板变量配置名称'
+CHECK_VAR_CONFIG_NAME_PROMPT = '模板变量配置，配置项名称存在空值或重复项，请打开变量配置详情页，进行数据修正'
+CHECK_VAR_CONFIG_VAR_NAME_TITLE = '检查模板变量配置变量名称'
+CHECK_VAR_CONFIG_VAR_NAME_PROMPT = '模板变量配置，输出变量名称存在空值或重复项，请打开变量配置详情页，进行数据修正'
