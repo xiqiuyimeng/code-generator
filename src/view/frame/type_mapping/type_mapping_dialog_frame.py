@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton
 
-from src.constant.export_import_constant import IMPORT_TYPE_MAPPING_TITLE, EXPORT_TYPE_MAPPING_TITLE
+from src.constant.export_import_constant import IMPORT_TYPE_MAPPING_TITLE, EXPORT_TYPE_MAPPING_TITLE, \
+    EXPORT_TYPE_MAPPING_FILE_NAME, PROCESS_DUPLICATE_TYPE_MAPPING_TITLE, OVERRIDE_TYPE_MAPPING_TITLE, \
+    PROCESS_ILLEGAL_TYPE_MAPPING_TITLE
 from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_BUTTON_TEXT, \
     ADD_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE, \
     BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE, IMPORT_TYPE_MAPPING_BTN_TEXT, EXPORT_TYPE_MAPPING_BTN_TEXT
 from src.service.async_func.async_type_mapping_task import DelTypeMappingExecutor, BatchDelTypeMappingExecutor, \
-    ListTypeMappingExecutor
+    ListTypeMappingExecutor, ExportTypeMappingExecutor, ImportTypeMappingExecutor, OverrideTypeMappingExecutor
+from src.view.dialog.export_dialog import ExportDialog
+from src.view.dialog.import_dialog import ImportDialog
 from src.view.dialog.type_mapping.ds_col_type_dialog import DsColTypeDialog
-from src.view.dialog.type_mapping.export_type_mapping_dialog import ExportTypeMappingDialog
-from src.view.dialog.type_mapping.import_type_mapping_dialog import ImportTypeMappingDialog
 from src.view.dialog.type_mapping.type_mapping_detail_dialog import TypeMappingDetailDialog
 from src.view.frame.table_dialog_frame import TableDialogFrame
 from src.view.table.table_widget.type_mapping_table_widget.type_mapping_table_widget import TypeMappingTableWidget
@@ -75,13 +77,16 @@ class TypeMappingDialogFrame(TableDialogFrame):
         return BatchDelTypeMappingExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
                                            del_title, self.table_widget.del_rows)
 
-    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportTypeMappingDialog:
-        return ImportTypeMappingDialog(IMPORT_TYPE_MAPPING_TITLE, self.parent_dialog.parent_screen_rect,
-                                       import_success_callback=import_success_callback,
-                                       get_row_data_dialog=get_row_data_dialog)
+    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog:
+        return ImportDialog(ImportTypeMappingExecutor, PROCESS_DUPLICATE_TYPE_MAPPING_TITLE,
+                            OverrideTypeMappingExecutor, OVERRIDE_TYPE_MAPPING_TITLE,
+                            PROCESS_ILLEGAL_TYPE_MAPPING_TITLE, import_success_callback,
+                            get_row_data_dialog, IMPORT_TYPE_MAPPING_TITLE,
+                            self.parent_dialog.parent_screen_rect)
 
-    def get_export_dialog(self, row_ids) -> ExportTypeMappingDialog:
-        return ExportTypeMappingDialog(row_ids, EXPORT_TYPE_MAPPING_TITLE, self.parent_dialog.parent_screen_rect)
+    def get_export_dialog(self, row_ids) -> ExportDialog:
+        return ExportDialog(row_ids, EXPORT_TYPE_MAPPING_FILE_NAME, ExportTypeMappingExecutor,
+                            EXPORT_TYPE_MAPPING_TITLE, self.parent_dialog.parent_screen_rect)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

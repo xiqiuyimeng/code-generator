@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os.path
 
 _author_ = 'luwt'
 _date_ = '2023/5/10 9:04'

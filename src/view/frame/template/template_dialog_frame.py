@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton
 
-from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE
+from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE, EXPORT_TEMPLATE_FILE_NAME
 from src.constant.template_dialog_constant import FUNC_DIALOG_BTN_TEXT, ADD_TEMPLATE_BTN_TEXT, \
     DEL_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE, BATCH_TEMPLATE_PROMPT, TEMPLATE_LIST_BOX_TITLE, \
     IMPORT_TEMPLATE_BTN_TEXT, EXPORT_TEMPLATE_BTN_TEXT
 from src.service.async_func.async_template_task import DelTemplateExecutor, BatchDelTemplateExecutor, \
-    ListTemplateExecutor
-from src.view.dialog.template.export_template_dialog import ExportTemplateDialog
+    ListTemplateExecutor, ExportTemplateExecutor
+from src.view.dialog.export_dialog import ExportDialog
 from src.view.dialog.template.template_detail_dialog import TemplateDetailDialog
 from src.view.dialog.template.template_func_dialog import TemplateFuncDialog
 from src.view.frame.table_dialog_frame import TableDialogFrame
@@ -73,8 +73,9 @@ class TemplateDialogFrame(TableDialogFrame):
         return BatchDelTemplateExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
                                         del_title, self.table_widget.del_rows)
 
-    def get_export_dialog(self, row_ids) -> ExportTemplateDialog:
-        return ExportTemplateDialog(row_ids, EXPORT_TEMPLATE_TITLE, self.parent_dialog.parent_screen_rect)
+    def get_export_dialog(self, row_ids) -> ExportDialog:
+        return ExportDialog(row_ids, EXPORT_TEMPLATE_FILE_NAME, ExportTemplateExecutor,
+                            EXPORT_TEMPLATE_TITLE, self.parent_dialog.parent_screen_rect)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

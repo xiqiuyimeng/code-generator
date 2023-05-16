@@ -13,10 +13,13 @@ _date_ = '2023/5/12 17:26'
 class ImportDuplicateDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC):
     illegal_rows_signal = pyqtSignal(list)
 
-    def __init__(self, duplicate_rows, duplicate_illegal_rows, *args):
+    def __init__(self, duplicate_rows, duplicate_illegal_rows,
+                 override_executor_class, override_title, *args):
         # 这个集合内的数据，不可以直接覆盖，需要转到不合法数据页处理
         self.duplicate_illegal_rows = duplicate_illegal_rows
-        self.override_data_executor: OverrideDataExecutor = ...
+        self.override_executor_class = override_executor_class
+        self.override_title = override_title
+        self.override_executor: OverrideDataExecutor = ...
         self.illegal_rows = list()
         super().__init__(duplicate_rows, *args)
 
@@ -46,15 +49,14 @@ class ImportDuplicateDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC
                 duplicate_legal_rows.append(data)
         # 开线程处理
         if duplicate_legal_rows:
-            self.override_data_executor = self.get_override_data_executor(duplicate_legal_rows,
-                                                                          self.override_data_success_callback)
-            self.override_data_executor.start()
+            self.override_executor = self.override_executor_class(duplicate_legal_rows, self, self,
+                                                                  self.override_title,
+                                                                  success_callback=self.override_success_callback)
+            self.override_executor.start()
         else:
             self.allow_close()
 
-    def get_override_data_executor(self, row_list, success_callback) -> OverrideDataExecutor: ...
-
-    def override_data_success_callback(self, add_data_list, del_data_list):
+    def override_success_callback(self, add_data_list, del_data_list):
         self.list_widget.remove_selected_items()
         self.import_success_callback(add_data_list, del_data_list)
         self.allow_close()

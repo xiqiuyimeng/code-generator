@@ -13,8 +13,15 @@ _date_ = '2023/5/9 17:47'
 
 
 class ImportDialogFrame(ImportExportDialogFrameABC):
-    
-    def __init__(self, *args, import_success_callback=None, get_row_data_dialog=None):
+
+    def __init__(self, import_executor_class, duplicate_dialog_title, override_executor_class,
+                 override_dialog_title, illegal_dialog_title, import_success_callback,
+                 get_row_data_dialog, *args):
+        self.import_executor_class = import_executor_class
+        self.duplicate_dialog_title = duplicate_dialog_title
+        self.override_executor_class = override_executor_class
+        self.override_dialog_title = override_dialog_title
+        self.illegal_dialog_title = illegal_dialog_title
         self.import_success_callback = import_success_callback
         self.get_row_data_dialog = get_row_data_dialog
         self.import_error_data_process_dialog: ImportErrorDataProcessDialog = ...
@@ -39,19 +46,22 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
             self.file_path_linedit.setText(file_url[0])
 
     def get_process_data_executor(self) -> ImportDataExecutor:
-        return self.get_process_import_data_executor(self.file_path_linedit.text(),
-                                                     self, self, self.dialog_title,
-                                                     success_callback=self.import_success_callback,
-                                                     process_error_data_func=self.process_import_error_data)
-
-    def get_process_import_data_executor(self, *args, **kwargs) -> ImportDataExecutor: ...
+        return self.import_executor_class(self.file_path_linedit.text(),
+                                          self, self, self.dialog_title,
+                                          success_callback=self.import_success_callback,
+                                          process_error_data_func=self.process_import_error_data)
 
     def process_import_error_data(self, *args):
         # 处理异常数据，打开异常数据处理对话框
-        self.import_error_data_process_dialog = self.get_process_error_data_dialog(*args)
+        self.import_error_data_process_dialog = ImportErrorDataProcessDialog(*args, self.duplicate_dialog_title,
+                                                                             self.override_executor_class,
+                                                                             self.override_dialog_title,
+                                                                             self.import_success_callback,
+                                                                             self.get_row_data_dialog,
+                                                                             self.illegal_dialog_title,
+                                                                             self.dialog_title,
+                                                                             self.parent_dialog.parent_screen_rect)
         self.import_error_data_process_dialog.exec()
-
-    def get_process_error_data_dialog(self, *args) -> ImportErrorDataProcessDialog: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

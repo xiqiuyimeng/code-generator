@@ -169,7 +169,7 @@ class OverrideDataExecutor(LoadingMaskThreadExecutor):
 
     def success_post_process(self, *args):
         self.success_callback(self.data_list, self.data_list)
-        pop_ok('覆盖数据成功', self.error_box_title, self.window)
+        pop_ok(f'覆盖 {len(self.data_list)} 条数据成功', self.error_box_title, self.window)
 
 # ----------------------- 覆盖数据 end ----------------------- #
 

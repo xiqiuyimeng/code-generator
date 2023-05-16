@@ -12,10 +12,10 @@ _date_ = '2023/5/12 17:35'
 
 class ImportIllegalDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC):
 
-    def __init__(self, error_data_rows, import_success_callback, get_row_data_dialog, *args):
+    def __init__(self, get_row_data_dialog, *args):
         self.get_row_data_dialog = get_row_data_dialog
         self.process_illegal_data_dialog = ...
-        super().__init__(error_data_rows, import_success_callback, *args)
+        super().__init__(*args)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
@@ -43,13 +43,11 @@ class ImportIllegalDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC):
         self.open_row_detail_dialog(first_row_data)
 
     def open_row_detail_dialog(self, row_data):
-        self.process_illegal_data_dialog = self.get_row_detail_dialog(row_data)
+        self.process_illegal_data_dialog = self.get_row_data_dialog(row_data=row_data)
         self.process_illegal_data_dialog.override_signal.connect(self.override_callback)
         self.process_illegal_data_dialog.save_signal.connect(self.save_callback)
         self.process_illegal_data_dialog.exec()
         self.allow_close()
-
-    def get_row_detail_dialog(self, row_data): ...
 
     def override_callback(self, add_data_list, del_data_list):
         # 应该只有一个值，取第一个
