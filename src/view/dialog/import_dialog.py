@@ -7,6 +7,7 @@ _date_ = '2023/5/9 17:45'
 
 
 class ImportDialog(CustomDialogABC):
+    """导入对话框"""
 
     def __init__(self, import_executor_class, duplicate_dialog_title, override_executor_class,
                  override_dialog_title, illegal_dialog_title, import_success_callback,

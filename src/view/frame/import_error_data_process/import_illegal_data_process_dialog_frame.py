@@ -11,6 +11,7 @@ _date_ = '2023/5/12 17:35'
 
 
 class ImportIllegalDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC):
+    """处理导入数据不合法的对话框框架"""
 
     def __init__(self, get_row_data_dialog, *args):
         self.get_row_data_dialog = get_row_data_dialog

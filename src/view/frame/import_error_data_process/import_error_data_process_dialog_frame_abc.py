@@ -10,6 +10,7 @@ _date_ = '2023/5/12 11:35'
 
 
 class ImportErrorDataProcessDialogFrameABC(DialogFrameABC):
+    """处理导入数据错误的对话框框架抽象类"""
 
     def __init__(self, error_data_rows, import_success_callback, *args):
         self.error_data_rows = error_data_rows

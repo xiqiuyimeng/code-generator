@@ -11,6 +11,7 @@ _date_ = '2023/5/12 17:26'
 
 
 class ImportDuplicateDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC):
+    """处理导入数据重复的对话框框架"""
     illegal_rows_signal = pyqtSignal(list)
 
     def __init__(self, duplicate_rows, duplicate_illegal_rows,

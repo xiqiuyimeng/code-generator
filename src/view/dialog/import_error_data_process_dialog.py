@@ -12,6 +12,7 @@ _date_ = '2023/5/12 11:10'
 
 
 class ImportErrorDataProcessDialog(CustomDialogABC):
+    """处理导入数据错误的对话框"""
 
     def __init__(self, duplicate_rows, illegal_rows, duplicate_illegal_rows,
                  duplicate_dialog_title, override_executor_class, override_dialog_title,

@@ -7,6 +7,7 @@ _date_ = '2023/5/9 17:45'
 
 
 class ExportDialog(CustomDialogABC):
+    """导出对话框"""
 
     def __init__(self, row_ids, default_export_file_name, export_executor_class, *args):
         # 选中需要导出的数据id

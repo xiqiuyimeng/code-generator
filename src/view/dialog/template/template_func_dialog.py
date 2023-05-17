@@ -16,7 +16,6 @@ class TemplateFuncDialog(CustomDialogABC):
         self.frame: TemplateFuncDialogFrame = ...
         super().__init__(TEMPLATE_FUNC_TITLE, screen_rect)
 
-    # ------------------------------ 创建ui界面 start ------------------------------ #
     def resize_dialog(self):
         self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.7)
 

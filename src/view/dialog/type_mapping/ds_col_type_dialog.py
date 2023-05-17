@@ -15,8 +15,6 @@ class DsColTypeDialog(CustomDialogABC):
         self.frame: DsColTypeDialogFrame = ...
         super().__init__(DS_COL_TYPE_LIST_TITLE, screen_rect)
 
-    # ------------------------------ 创建ui界面 start ------------------------------ #
-
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
         self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)

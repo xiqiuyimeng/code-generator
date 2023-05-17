@@ -11,6 +11,7 @@ _date_ = '2023/5/10 11:28'
 
 
 class ImportExportDialogFrameABC(DialogFrameABC):
+    """导入导出对话框框架抽象类"""
 
     def __init__(self, *args):
         self.blank_label: QLabel = ...
