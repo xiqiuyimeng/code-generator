@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_TITLE
+from src.constant.type_mapping_dialog_constant import EDIT_TYPE_MAPPING_TITLE, CREATE_TYPE_MAPPING_TITLE
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 from src.view.dialog.custom_dialog_abc import StackedDialogABC
 from src.view.frame.type_mapping.type_mapping_detail_dialog_frame import TypeMappingDetailDialogFrame
@@ -20,7 +20,7 @@ class TypeMappingDetailDialog(StackedDialogABC):
         self.type_mapping_names = type_mapping_names
         self.type_mapping_id = type_mapping_id
         self.frame: TypeMappingDetailDialogFrame = ...
-        super().__init__(TYPE_MAPPING_TITLE, screen_rect)
+        super().__init__(EDIT_TYPE_MAPPING_TITLE if type_mapping_id else CREATE_TYPE_MAPPING_TITLE, screen_rect)
 
     def resize_dialog(self):
         self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)

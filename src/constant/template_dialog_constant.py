@@ -27,6 +27,9 @@ EDIT_FUNC_BOX_TITLE = '编辑方法'
 # 删除方法对话框标题
 DEL_TEMPLATE_FUNC_BOX_TITLE = '删除模板方法'
 CLEAR_TEMPLATE_FUNC_BOX_TITLE = '清空模板方法'
+# 导入导出模板方法按钮
+IMPORT_TEMPLATE_FUNC_BTN_TEXT = '导入模板方法'
+EXPORT_TEMPLATE_FUNC_BTN_TEXT = '导出模板方法'
 
 
 # 删除模板消息对话框标题
@@ -35,7 +38,8 @@ DEL_TEMPLATE_PROMPT = '模板：{}\n确认删除模板吗？'
 BATCH_TEMPLATE_PROMPT = '已选择{}个模板\n确认删除选中的模板吗？'
 
 # 模板详细信息
-TEMPLATE_TITLE = '模板详细信息'
+CREATE_TEMPLATE_TITLE = '添加模板'
+EDIT_TEMPLATE_TITLE = '编辑模板'
 READ_TEMPLATE_BOX_TITLE = '读取模板详细信息'
 ADD_TEMPLATE_BOX_TITLE = '添加模板'
 EDIT_TEMPLATE_BOX_TITLE = '编辑模板'
@@ -72,8 +76,10 @@ TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS = ['配置项名称', '输出变量名', '�
 TEMPLATE_CONFIG_LIST_BOX_TITLE = '模板配置列表'
 
 # 模板配置详情页
-TEMPLATE_OUTPUT_DIR_TITLE_TEXT = '模板输出路径配置详情'
-TEMPLATE_VAR_CONFIG_TITLE_TEXT = '模板变量配置详情'
+CREATE_OUTPUT_CONFIG_TITLE = '添加模板输出路径配置'
+EDIT_OUTPUT_CONFIG_TITLE = '编辑模板输出路径配置'
+CREATE_VAR_CONFIG_TITLE = '添加模板变量配置'
+EDIT_VAR_CONFIG_TITLE = '编辑模板变量配置'
 
 # 控件类型
 CONFIG_INPUT_WIDGET_TYPE_DICT = {

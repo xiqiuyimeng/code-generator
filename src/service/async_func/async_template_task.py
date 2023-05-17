@@ -329,7 +329,6 @@ class ImportTemplateWorker(ImportDataWorker):
         self.template_sqlite = TemplateSqlite()
         self.template_file_sqlite = TemplateFileSqlite()
         self.template_config_sqlite = TemplateConfigSqlite()
-        self.exists_template_names = ...
 
     def convert_to_model(self, import_data):
         template = convert_import_to_model(ImportExportTemplate, Template, import_data)
@@ -364,16 +363,9 @@ class ImportTemplateWorker(ImportDataWorker):
                                                                     TemplateConfig, template.var_config_list)
         return template
 
-    def get_unique_key(self, row: Template) -> str:
-        # 获取唯一键，标识数据唯一性
-        return row.template_name
-
     def pre_process_before_check_data(self):
         # 查出所有的模板名称
-        self.exists_template_names = self.template_sqlite.get_all_names()
-
-    def check_data_exists(self, unique_key) -> bool:
-        return unique_key in self.exists_template_names
+        self.exists_names = self.template_sqlite.get_all_names()
 
     def check_repair_illegal_data(self, data_row: Template) -> int:
         illegal_data_count = 0
@@ -435,6 +427,9 @@ class OverrideTemplateWorker(OverrideDataWorker):
         # 批量保存模板
         batch_save_template(self.template_sqlite, self.template_config_sqlite,
                             self.template_file_sqlite, self.data_list)
+
+    def get_err_msg(self) -> str:
+        return '覆盖模板数据失败'
 
 
 class OverrideTemplateExecutor(OverrideDataExecutor):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal
 
-from src.constant.template_dialog_constant import TEMPLATE_TITLE
+from src.constant.template_dialog_constant import CREATE_TEMPLATE_TITLE, EDIT_TEMPLATE_TITLE
 from src.service.system_storage.template_sqlite import Template
 from src.view.dialog.custom_dialog_abc import StackedDialogABC
 from src.view.frame.template.template_detail_dialog_frame import TemplateDetailDialogFrame
@@ -20,7 +20,7 @@ class TemplateDetailDialog(StackedDialogABC):
         self.template_names = template_names
         self.template_id = template_id
         self.frame: TemplateDetailDialogFrame = ...
-        super().__init__(TEMPLATE_TITLE, screen_rect)
+        super().__init__(EDIT_TEMPLATE_TITLE if template_id else CREATE_TEMPLATE_TITLE, screen_rect)
 
     def resize_dialog(self):
         self.resize(self.parent_screen_rect.width(), self.parent_screen_rect.height())

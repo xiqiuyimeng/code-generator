@@ -25,6 +25,7 @@ class ImportDataWorker(ThreadWorkerABC):
         super().__init__()
         self.file_path = file_path
         self.data_key: str = ...
+        self.exists_names = ...
 
     def do_run(self):
         if not os.path.exists(self.file_path):
@@ -44,10 +45,12 @@ class ImportDataWorker(ThreadWorkerABC):
             raise Exception('未检测到导入数据')
 
         # 转为实体
-        import_data_model_list = self.convert_to_model_list(import_data_list)
+        import_data_model_list: list = self.convert_to_model_list(import_data_list)
 
         # 数据去重，如果导入的数据内存在重复的，首先去重，再进行下面的处理
-        unique_model_list = self.drop_duplicate_row(import_data_model_list)
+        unique_model_list = list(dict([(row.get_name(), row)
+                                       for row in import_data_model_list
+                                       if row.get_name()]).values())
 
         # 前置处理，因为下面的校验会涉及数据库操作，允许子类预先将所有需要数据准备好
         self.pre_process_before_check_data()
@@ -67,20 +70,13 @@ class ImportDataWorker(ThreadWorkerABC):
 
     def convert_to_model(self, import_data): ...
 
-    def drop_duplicate_row(self, import_data_list):
-        # 数据内部不允许重复，需要子类提供校验数据是否重复的方法
-        return list(dict([(self.get_unique_key(row), row) for row in import_data_list
-                          if self.get_unique_key(row)]).values())
-
-    def get_unique_key(self, row) -> str: ...
-
     def pre_process_before_check_data(self): ...
 
     def collect_check_data(self, import_data_list):
         duplicate_rows, illegal_rows, duplicate_illegal_rows, legal_rows = list(), list(), list(), list()
         for data_row in import_data_list:
             # 校验数据重复
-            duplicate_flag = self.check_data_exists(self.get_unique_key(data_row))
+            duplicate_flag = data_row.get_name() in self.exists_names
             # 校验数据是否正确合法，校验的同时，也应当将一些页面无法体现错误的数据进行修复，例如类型映射中的组号
             if self.check_repair_illegal_data(data_row):
                 # 数据不合法，且重复，放入重复不合法数据列表
@@ -97,8 +93,6 @@ class ImportDataWorker(ThreadWorkerABC):
                     # 数据正确，但重复，放入重复数据列表
                     duplicate_rows.append(data_row)
         return duplicate_rows, illegal_rows, duplicate_illegal_rows, legal_rows
-
-    def check_data_exists(self, unique_key) -> bool: ...
 
     def check_repair_illegal_data(self, data_row) -> int: ...
 

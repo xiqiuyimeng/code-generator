@@ -23,6 +23,7 @@ class CustomListWidget(ListWidgetABC):
         menu.addAction(QAction(get_icon(EDIT_LIST_ITEM_ICON),
                                EDIT_ITEM_ACTION.format(self.item_type_name, item.text()),
                                menu))
+        menu.addSeparator()
         # 删除
         menu.addAction(QAction(get_icon(DEL_LIST_ITEM_ICON),
                                DEL_ITEM_ACTION.format(self.item_type_name, item.text()),
@@ -55,4 +56,4 @@ class CustomListWidget(ListWidgetABC):
         self.clear()
 
     def collect_item_text_list(self):
-        return list(map(lambda x: self.item(x).text(), range(self.count())))
+        return [self.item(row).text() for row in range(self.count())]

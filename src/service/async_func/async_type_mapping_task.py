@@ -231,7 +231,6 @@ class ImportTypeMappingWorker(ImportDataWorker):
         self.data_key = TYPE_MAPPING_DATA_KEY
         self.type_mapping_sqlite = TypeMappingSqlite()
         self.col_type_mapping_sqlite = ColTypeMappingSqlite()
-        self.exists_type_mapping_names = ...
 
     def convert_to_model(self, import_data):
         type_mapping = convert_import_to_model(ImportExportTypeMapping, TypeMapping, import_data)
@@ -241,16 +240,9 @@ class ImportTypeMappingWorker(ImportDataWorker):
                                                                           type_mapping.type_mapping_cols)
         return type_mapping
 
-    def get_unique_key(self, row: TypeMapping) -> str:
-        # 获取唯一键，标识数据唯一性
-        return row.mapping_name
-
     def pre_process_before_check_data(self):
         # 查出所有的类型映射名称
-        self.exists_type_mapping_names = self.type_mapping_sqlite.get_all_mapping_names()
-
-    def check_data_exists(self, unique_key) -> bool:
-        return unique_key in self.exists_type_mapping_names
+        self.exists_names = self.type_mapping_sqlite.get_all_mapping_names()
 
     def check_repair_illegal_data(self, data_row: TypeMapping) -> int:
         illegal_data_count = 0
@@ -347,6 +339,9 @@ class OverrideTypeMappingWorker(OverrideDataWorker):
     def batch_insert_data_list(self):
         # 批量保存类型映射
         batch_save_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite, self.data_list)
+
+    def get_err_msg(self) -> str:
+        return '覆盖类型映射数据失败'
 
 
 class OverrideTypeMappingExecutor(OverrideDataExecutor):

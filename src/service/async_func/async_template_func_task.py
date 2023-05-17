@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+import dataclasses
+
 from PyQt5.QtCore import pyqtSignal
 
+from src.constant.export_import_constant import TEMPLATE_FUNC_DATA_KEY
 from src.logger.log import logger as log
+from src.service.async_func.async_import_export_task import ImportDataWorker, ImportDataExecutor, OverrideDataWorker, \
+    OverrideDataExecutor, ExportDataWorker, ExportDataExecutor
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from src.service.system_storage.template_func_sqlite import TemplateFunc, TemplateFuncSqlite
+from src.service.system_storage.sqlite_abc import transactional
+from src.service.system_storage.template_func_sqlite import TemplateFunc, TemplateFuncSqlite, ImportExportTemplateFunc
+from src.service.util.import_export_util import convert_import_to_model
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -159,3 +166,86 @@ class ListTemplateFuncExecutor(LoadingMaskThreadExecutor):
 
 # ----------------------- 获取模板方法列表 end ----------------------- #
 
+
+# ----------------------- 导入模板方法 start ----------------------- #
+
+class ImportTemplateFuncWorker(ImportDataWorker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.data_key = TEMPLATE_FUNC_DATA_KEY
+        self.template_func_sqlite = TemplateFuncSqlite()
+
+    def convert_to_model(self, import_data):
+        return convert_import_to_model(ImportExportTemplateFunc, TemplateFunc, import_data)
+
+    def pre_process_before_check_data(self):
+        # 查出所有模板方法名称
+        self.exists_names = self.template_func_sqlite.get_all_names()
+
+    def check_repair_illegal_data(self, data_row) -> int:
+        return 0
+
+    @transactional
+    def import_data(self, data_list):
+        self.template_func_sqlite.batch_save_template_funcs(data_list)
+
+    def get_err_msg(self) -> str:
+        return '导入模板方法失败'
+
+
+class ImportTemplateFuncExecutor(ImportDataExecutor):
+
+    def get_worker(self) -> ImportTemplateFuncWorker:
+        return ImportTemplateFuncWorker(self.file_path)
+
+# ----------------------- 导入模板方法 end ----------------------- #
+
+
+# ----------------------- 覆盖数据 start ----------------------- #
+
+class OverrideTemplateFuncWorker(OverrideDataWorker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.template_func_sqlite = TemplateFuncSqlite()
+
+    def batch_delete_origin_data(self):
+        self.template_func_sqlite.batch_delete_by_names(self.data_list)
+
+    def batch_insert_data_list(self):
+        self.template_func_sqlite.batch_save_template_funcs(self.data_list)
+
+    def get_err_msg(self) -> str:
+        return '覆盖模板方法失败'
+
+
+class OverrideTemplateFuncExecutor(OverrideDataExecutor):
+
+    def get_worker(self) -> OverrideTemplateFuncWorker:
+        return OverrideTemplateFuncWorker(self.data_list)
+
+# ----------------------- 覆盖数据 end ----------------------- #
+
+
+# ----------------------- 导出模板方法 start ----------------------- #
+
+class ExportTemplateFuncWorker(ExportDataWorker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.data_key = TEMPLATE_FUNC_DATA_KEY
+
+    def export_data(self) -> list[dataclasses.dataclass]:
+        return TemplateFuncSqlite().export_template_func_by_ids(self.row_ids)
+
+    def get_err_msg(self) -> str:
+        return '导出模板方法失败'
+
+
+class ExportTemplateFuncExecutor(ExportDataExecutor):
+
+    def get_worker(self) -> ExportTemplateFuncWorker:
+        return ExportTemplateFuncWorker(self.row_ids, self.file_path)
+
+# ----------------------- 导出模板方法 end ----------------------- #

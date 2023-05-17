@@ -21,7 +21,7 @@ class TemplateFuncDetailDialog(CustomSaveDialogABC):
         super().__init__(title, screen_rect)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() * 0.5, self.parent_screen_rect.height() * 0.6)
+        self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.7)
 
     def get_frame(self) -> TemplateFuncDetailDialogFrame:
         return TemplateFuncDetailDialogFrame(self, self.dialog_title, self.func_names, self.template_func)

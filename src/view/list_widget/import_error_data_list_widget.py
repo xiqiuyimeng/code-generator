@@ -33,7 +33,6 @@ class ImportErrorDataListWidget(ListWidgetABC):
 
     def remove_item_by_name(self, data):
         for row in range(self.count()):
-            print(row)
             if self.item(row).text() == data.get_name():
                 self.takeItem(row)
                 break

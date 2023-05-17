@@ -15,6 +15,8 @@ DEL_ALL_ITEMS_ACTION = '删除所有{}'
 DEL_ALL_ITEMS_BOX_TITLE = '删除所有{}'
 DEL_ALL_LIST_ITEMS_ICON = '删除所有列表元素'
 DEL_ALL_ITEMS_PROMPT = '是否要删除当前列表中所有的{}？'
+EXPORT_ITEM_ACTION = '导出{} [{}]'
+EXPORT_ITEM_ICON = '导出列表元素'
 # ---------- 右键操作列表元素 end ---------- #
 
 COL_TYPE_NAME = '列类型'
