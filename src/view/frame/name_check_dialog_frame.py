@@ -14,10 +14,11 @@ _date_ = '2023/4/3 12:43'
 class NameCheckDialogFrame(SaveDialogFrame):
     """具有名称检查功能的对话框框架，内置一个名称输入表单"""
 
-    def __init__(self, parent_dialog, dialog_title, name_list, dialog_data=None, read_storage=True, **kwargs):
+    def __init__(self, parent_dialog, dialog_title, exits_name_tuple,
+                 dialog_data=None, read_storage=True, **kwargs):
         # 框架布局，分四部分，第一部分：标题部分，第二部分：名称表单，第三部分：其他内容，第四部分：按钮部分
-        # 存储当前名称不允许重复的列表
-        self.name_list = name_list
+        # 存储当前已经存在的名称元祖
+        self.exits_name_tuple = exits_name_tuple
         # 原数据对象，编辑时，回显数据使用
         self.dialog_data = dialog_data
         # 是否读取存储的数据，如果开启，将从数据库异步读取数据，否则将使用 dialog_data 回显数据
@@ -72,8 +73,9 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.connect_child_signal()
 
     def check_name_available(self, name):
-        self.name_available = check_name_available(name, self.old_name, self.name_list, self.name_check_action,
-                                                   self.name_input, self.name_checker, 'name_input')
+        self.name_available = check_name_available(name, self.old_name, self.exits_name_tuple,
+                                                   self.name_check_action, self.name_input,
+                                                   self.name_checker, 'name_input')
 
     def check_input(self):
         # 收集用户输入数据

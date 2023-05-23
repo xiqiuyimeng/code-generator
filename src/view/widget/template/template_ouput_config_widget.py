@@ -19,7 +19,7 @@ _date_ = '2023/4/12 14:39'
 class TemplateOutputConfigWidget(TemplateConfigWidget):
     """模板输出路径配置表格页面控件"""
 
-    def __init__(self, parent_frame, *args):
+    def __init__(self, parent_frame):
         # 父框架
         self.parent_frame = parent_frame
         self.config_table: TemplateOutputConfigTableWidget = ...
@@ -31,7 +31,7 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         self.maintain_file_config_dialog: TemplateMaintainFileConfigDialog = ...
         # 自动生成文件对应路径配置执行器
         self.generate_config_executor: AutoGenerateOutputConfigExecutor = ...
-        super().__init__(ConfigTypeEnum.output_dir.value, *args)
+        super().__init__(ConfigTypeEnum.output_dir.value)
 
     def setup_other_button_ui(self):
         # 插入到预览配置页之前
@@ -79,10 +79,9 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         if not self.config_table.rowCount():
             pop_fail(NO_OUTPUT_CONFIG_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, self)
             return
-        output_config_list = self.config_table.collect_data()
+        output_config_tuple = self.config_table.collect_data()
         unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
-        self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(self.parent_screen_rect,
-                                                                            output_config_list,
+        self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(output_config_tuple,
                                                                             unbind_config_files)
         self.maintain_file_config_dialog.bind_file_changed.connect(self.config_table.update_bind_file_num_rows)
         self.maintain_file_config_dialog.exec()

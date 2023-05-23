@@ -57,7 +57,7 @@ class GeneratorDialog(CustomDialogABC):
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
-        self.setFixedSize(self.parent_screen_rect.width() * 0.8, self.parent_screen_rect.height() * 0.8)
+        self.setFixedSize(self.window_geometry.width() * 0.8, self.window_geometry.height() * 0.8)
 
     def get_frame(self) -> SelectedDataDialogFrameABC:
         # 根据类型判断，展示为sql还是结构体对话框框架

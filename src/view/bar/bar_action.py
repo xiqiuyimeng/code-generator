@@ -36,8 +36,7 @@ def add_ds_actions(parent_menu, main_window):
 
 def add_sql_ds_actions(parent_menu, main_window):
     # 连接菜单点击信号槽
-    parent_menu.triggered.connect(lambda action: open_conn_dialog(action, main_window.sql_tree_widget,
-                                                                  main_window.geometry()))
+    parent_menu.triggered.connect(lambda action: open_conn_dialog(action))
     for conn_type in ConnTypeEnum:
         conn_type_name = conn_type.value.display_name
         add_action = QAction(get_icon(conn_type_name), conn_type_name, main_window)
@@ -45,9 +44,7 @@ def add_sql_ds_actions(parent_menu, main_window):
 
 
 def add_struct_ds_actions(parent_menu, main_window, parent_opened_item=None, parent_item=None):
-    parent_menu.triggered.connect(lambda action: open_struct_dialog(action, main_window.struct_tree_widget,
-                                                                    main_window.geometry(), parent_opened_item,
-                                                                    parent_item))
+    parent_menu.triggered.connect(lambda action: open_struct_dialog(action, parent_opened_item, parent_item))
     for struct_type in StructTypeEnum:
         struct_type_name = struct_type.value.display_name
         add_action = QAction(get_icon(struct_type_name), struct_type_name, main_window)
@@ -74,14 +71,14 @@ def add_refresh_action(main_window):
 def add_type_mapping_action(main_window):
     type_mapping_action = QAction(get_icon(TYPE_ACTION), TYPE_ACTION, main_window)
     type_mapping_action.setStatusTip(TYPE_ACTION_TIP)
-    type_mapping_action.triggered.connect(lambda: open_type_mapping_dialog(main_window))
+    type_mapping_action.triggered.connect(lambda: open_type_mapping_dialog())
     return type_mapping_action
 
 
 def add_template_action(main_window):
     template_action = QAction(get_icon(TEMPLATE_ACTION), TEMPLATE_ACTION, main_window)
     template_action.setStatusTip(TEMPLATE_ACTION_TIP)
-    template_action.triggered.connect(lambda: open_template_dialog(main_window))
+    template_action.triggered.connect(lambda: open_template_dialog())
     return template_action
 
 

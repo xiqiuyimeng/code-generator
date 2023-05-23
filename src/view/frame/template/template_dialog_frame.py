@@ -54,12 +54,13 @@ class TemplateDialogFrame(TableDialogFrame):
 
     def open_template_func_dialog(self):
         """打开模板常用方法对话框"""
-        self.template_func_dialog = TemplateFuncDialog(self.parent_dialog.parent_screen_rect)
+        self.template_func_dialog = TemplateFuncDialog()
         self.template_func_dialog.exec()
 
     def do_get_row_data_dialog(self, row_id) -> TemplateDetailDialog:
-        template_names = [self.table_widget.item(row, 1).text() for row in range(self.table_widget.rowCount())]
-        return TemplateDetailDialog(self.parent_dialog.parent_screen_rect, template_names, row_id)
+        exists_template_name_tuple = tuple(self.table_widget.item(row, 1).text()
+                                           for row in range(self.table_widget.rowCount()))
+        return TemplateDetailDialog(exists_template_name_tuple, row_id)
 
     def get_del_prompt_title(self):
         return DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
@@ -79,12 +80,10 @@ class TemplateDialogFrame(TableDialogFrame):
         return ImportDialog(ImportTemplateExecutor, PROCESS_DUPLICATE_TEMPLATE_TITLE,
                             OverrideTemplateExecutor, OVERRIDE_TEMPLATE_TITLE,
                             PROCESS_ILLEGAL_TEMPLATE_TITLE, import_success_callback,
-                            get_row_data_dialog, IMPORT_TEMPLATE_TITLE,
-                            self.parent_dialog.parent_screen_rect)
+                            get_row_data_dialog, IMPORT_TEMPLATE_TITLE)
 
     def get_export_dialog(self, row_ids) -> ExportDialog:
-        return ExportDialog(row_ids, EXPORT_TEMPLATE_FILE_NAME, ExportTemplateExecutor,
-                            EXPORT_TEMPLATE_TITLE, self.parent_dialog.parent_screen_rect)
+        return ExportDialog(row_ids, EXPORT_TEMPLATE_FILE_NAME, ExportTemplateExecutor, EXPORT_TEMPLATE_TITLE)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

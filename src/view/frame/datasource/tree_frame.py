@@ -8,23 +8,24 @@ from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget
 from src.view.tree.tree_widget.tree_function import add_folder_func
 from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
+from src.view.window.main_window_func import set_sql_tree_widget, set_struct_tree_widget
 
 _author_ = 'luwt'
 _date_ = '2022/9/14 18:01'
 
 
-def get_tree_frame(current_frame_name, frame_parent, window):
+def get_tree_frame(current_frame_name, frame_parent):
     """根据当前的frame名称获取对应的树结构frame"""
     if current_frame_name == DsCategoryEnum.sql_ds_category.value.name:
-        return SqlTreeFrame(frame_parent, window)
+        return SqlTreeFrame(frame_parent)
     elif current_frame_name == DsCategoryEnum.struct_ds_category.value.name:
-        return StructTreeFrame(frame_parent, window)
+        return StructTreeFrame(frame_parent)
 
 
 class TreeFrameABC(QFrame):
     """树结构frame抽象类"""
 
-    def __init__(self, parent, window):
+    def __init__(self, parent):
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
         self.setFrameShadow(QFrame.Raised)
@@ -47,7 +48,7 @@ class TreeFrameABC(QFrame):
         self.header_layout.setStretch(0, 1)
         self.header_layout.addWidget(self.tree_locate_button)
 
-        self.tree_widget = self.get_tree_widget(window)
+        self.tree_widget = self.get_tree_widget()
         self.tree_widget.setObjectName('tree_widget')
         self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.tree_widget)
@@ -59,43 +60,41 @@ class TreeFrameABC(QFrame):
 
     def get_header_text(self) -> str: ...
 
-    def get_tree_widget(self, window) -> TreeWidgetABC: ...
+    def get_tree_widget(self) -> TreeWidgetABC: ...
 
 
 class SqlTreeFrame(TreeFrameABC):
     """sql数据源列表frame"""
 
-    def __init__(self, parent, window):
-        super().__init__(parent, window)
-        # 为了方便访问，树部件引用也挂到window上
-        window.sql_tree_widget = self.tree_widget
+    def __init__(self, parent):
+        super().__init__(parent)
+        # 保存引用
+        set_sql_tree_widget(self.tree_widget)
 
     def get_header_text(self) -> str:
         return DsCategoryEnum.sql_ds_category.value.name
 
-    def get_tree_widget(self, window) -> SqlTreeWidget:
-        return SqlTreeWidget(self, window)
+    def get_tree_widget(self) -> SqlTreeWidget:
+        return SqlTreeWidget(self)
 
 
 class StructTreeFrame(TreeFrameABC):
     """结构体数据源列表frame"""
 
-    def __init__(self, parent, window):
+    def __init__(self, parent):
         self.tree_widget: StructTreeWidget = ...
-        super().__init__(parent, window)
+        super().__init__(parent)
 
         # 增加新建文件夹按钮
         self.create_folder_button = QPushButton(self)
         self.create_folder_button.setText(CREATE_NEW_FOLDER)
         self.header_layout.insertWidget(1, self.create_folder_button)
-        self.create_folder_button.clicked.connect(
-            lambda: add_folder_func(window.geometry(), self.tree_widget))
-
-        # 为了方便访问，树部件引用也挂到window上
-        window.struct_tree_widget = self.tree_widget
+        self.create_folder_button.clicked.connect(lambda: add_folder_func(self.tree_widget))
+        # 保存引用
+        set_struct_tree_widget(self.tree_widget)
 
     def get_header_text(self) -> str:
         return DsCategoryEnum.struct_ds_category.value.name
 
-    def get_tree_widget(self, window) -> StructTreeWidget:
-        return StructTreeWidget(self, window)
+    def get_tree_widget(self) -> StructTreeWidget:
+        return StructTreeWidget(self)

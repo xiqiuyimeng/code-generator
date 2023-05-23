@@ -16,9 +16,9 @@ class TemplateConfigDialog(CustomSaveDialogABC):
     save_signal = pyqtSignal(TemplateConfig)
     edit_signal = pyqtSignal(TemplateConfig)
 
-    def __init__(self, screen_rect, name_list, var_names, config_type, template_config=None):
-        self.name_list = name_list
-        self.var_names = var_names
+    def __init__(self, exits_name_tuple, exits_var_name_tuple, config_type, template_config=None):
+        self.exits_name_tuple = exits_name_tuple
+        self.exits_var_name_tuple = exits_var_name_tuple
         self.config_type = config_type
         self.template_config = template_config
         self.frame: TemplateConfigDialogFrame = ...
@@ -26,11 +26,12 @@ class TemplateConfigDialog(CustomSaveDialogABC):
             dialog_title = EDIT_VAR_CONFIG_TITLE if self.template_config else CREATE_VAR_CONFIG_TITLE
         else:
             dialog_title = EDIT_OUTPUT_CONFIG_TITLE if self.template_config else CREATE_OUTPUT_CONFIG_TITLE
-        super().__init__(dialog_title, screen_rect)
+        super().__init__(dialog_title)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() * 0.5, self.parent_screen_rect.height() * 0.5)
+        self.resize(self.window_geometry.width() * 0.5, self.window_geometry.height() * 0.5)
 
     def get_frame(self) -> TemplateConfigDialogFrame:
-        return TemplateConfigDialogFrame(self, self.dialog_title, self.name_list,
-                                         self.var_names, self.config_type, self.template_config)
+        return TemplateConfigDialogFrame(self, self.dialog_title, self.exits_name_tuple,
+                                         self.exits_var_name_tuple, self.config_type,
+                                         self.template_config)

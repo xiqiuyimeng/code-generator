@@ -73,9 +73,8 @@ class TemplateFuncDialogFrame(DialogFrameABC):
         self.export_template_func_btn.clicked.connect(lambda: self.export_template_func())
 
     def open_create_func_dialog(self, dialog_title, template_func=None):
-        self.func_detail_dialog = TemplateFuncDetailDialog(self.parent_dialog.parent_screen_rect, dialog_title,
-                                                           self.list_widget.collect_item_text_list(),
-                                                           template_func)
+        self.func_detail_dialog = TemplateFuncDetailDialog(self.list_widget.collect_item_text(),
+                                                           dialog_title, template_func)
         if template_func:
             self.func_detail_dialog.edit_signal.connect(self.edit_template_func)
         else:
@@ -96,8 +95,7 @@ class TemplateFuncDialogFrame(DialogFrameABC):
         # 因为目前模板方法没有导入数据异常情况，所以异常处理不存在，所以不需要异常处理对话框
         self.import_data_dialog = ImportDialog(ImportTemplateFuncExecutor, PROCESS_DUPLICATE_TEMPLATE_FUNC_TITLE,
                                                OverrideTemplateFuncExecutor, OVERRIDE_TEMPLATE_FUNC_TITLE,
-                                               None, self.import_success_callback, None, IMPORT_TEMPLATE_FUNC_TITLE,
-                                               self.parent_dialog.parent_screen_rect)
+                                               None, self.import_success_callback, None, IMPORT_TEMPLATE_FUNC_TITLE)
         self.import_data_dialog.exec()
 
     def import_success_callback(self, add_data_list, del_data_list=None):
@@ -112,8 +110,8 @@ class TemplateFuncDialogFrame(DialogFrameABC):
         else:
             # 获取所有方法id
             row_ids = self.list_widget.collect_func_ids()
-        self.export_data_dialog = ExportDialog(row_ids, EXPORT_TEMPLATE_FUNC_FILE_NAME, ExportTemplateFuncExecutor,
-                                               EXPORT_TEMPLATE_FUNC_TITLE, self.parent_dialog.parent_screen_rect)
+        self.export_data_dialog = ExportDialog(row_ids, EXPORT_TEMPLATE_FUNC_FILE_NAME,
+                                               ExportTemplateFuncExecutor, EXPORT_TEMPLATE_FUNC_TITLE)
         self.export_data_dialog.exec()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #

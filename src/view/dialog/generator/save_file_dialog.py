@@ -9,13 +9,13 @@ _date_ = '2023/5/6 14:22'
 
 class SaveFileDialog(CustomDialogABC):
 
-    def __init__(self, save_file_dict, screen_rect):
+    def __init__(self, save_file_dict):
         self.save_file_dict = save_file_dict
         self.frame: SaveFileDialogFrame = ...
-        super().__init__(SAVE_PREVIEW_FILE_TITLE, screen_rect)
+        super().__init__(SAVE_PREVIEW_FILE_TITLE)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() >> 1, self.parent_screen_rect.height() >> 2)
+        self.resize(self.window_geometry.width() >> 1, self.window_geometry.height() >> 2)
 
     def get_frame(self) -> SaveFileDialogFrame:
         return SaveFileDialogFrame(self.save_file_dict, self, self.dialog_title)

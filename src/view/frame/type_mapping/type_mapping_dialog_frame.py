@@ -55,12 +55,13 @@ class TypeMappingDialogFrame(TableDialogFrame):
 
     def open_ds_col_type_list_dialog(self):
         """打开数据源列类型对话框"""
-        self.ds_col_type_list_dialog = DsColTypeDialog(self.parent_dialog.parent_screen_rect)
+        self.ds_col_type_list_dialog = DsColTypeDialog()
         self.ds_col_type_list_dialog.exec()
 
     def do_get_row_data_dialog(self, row_id) -> TypeMappingDetailDialog:
-        type_mapping_names = [self.table_widget.item(row, 1).text() for row in range(self.table_widget.rowCount())]
-        return TypeMappingDetailDialog(self.parent_dialog.parent_screen_rect, type_mapping_names, row_id)
+        type_mapping_name_tuple = tuple(self.table_widget.item(row, 1).text()
+                                        for row in range(self.table_widget.rowCount()))
+        return TypeMappingDetailDialog(type_mapping_name_tuple, row_id)
 
     def get_del_prompt_title(self):
         return DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE
@@ -80,12 +81,11 @@ class TypeMappingDialogFrame(TableDialogFrame):
         return ImportDialog(ImportTypeMappingExecutor, PROCESS_DUPLICATE_TYPE_MAPPING_TITLE,
                             OverrideTypeMappingExecutor, OVERRIDE_TYPE_MAPPING_TITLE,
                             PROCESS_ILLEGAL_TYPE_MAPPING_TITLE, import_success_callback,
-                            get_row_data_dialog, IMPORT_TYPE_MAPPING_TITLE,
-                            self.parent_dialog.parent_screen_rect)
+                            get_row_data_dialog, IMPORT_TYPE_MAPPING_TITLE)
 
     def get_export_dialog(self, row_ids) -> ExportDialog:
-        return ExportDialog(row_ids, EXPORT_TYPE_MAPPING_FILE_NAME, ExportTypeMappingExecutor,
-                            EXPORT_TYPE_MAPPING_TITLE, self.parent_dialog.parent_screen_rect)
+        return ExportDialog(row_ids, EXPORT_TYPE_MAPPING_FILE_NAME,
+                            ExportTypeMappingExecutor, EXPORT_TYPE_MAPPING_TITLE)
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 

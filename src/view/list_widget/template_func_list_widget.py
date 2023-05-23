@@ -67,9 +67,9 @@ class TemplateFuncListWidget(CustomListWidget):
         self.clear_template_func_executor.start()
 
     def collect_func_ids(self):
-        return [get_template_func_data(self.item(row)).id for row in range(self.count())]
+        return tuple(get_template_func_data(self.item(row)).id for row in range(self.count()))
 
     def del_duplicate_rows(self, duplicate_data_list):
         # 根据名称删除
-        duplicate_names = [data.func_name for data in duplicate_data_list]
+        duplicate_names = tuple(data.func_name for data in duplicate_data_list)
         [self.takeItem(row) for row in reversed(range(self.count())) if self.item(row).text() in duplicate_names]

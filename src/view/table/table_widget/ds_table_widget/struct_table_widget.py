@@ -114,7 +114,7 @@ class StructDsColTableWidget(DsColTableWidgetABC):
         child_layout = QHBoxLayout()
         child_widget.setLayout(child_layout)
         # 创建子表格
-        child_table = StructDsColTableWidget(self.main_window, self.tree_widget, child_widget,
+        child_table = StructDsColTableWidget(self.tree_widget, child_widget,
                                              col_data.children, parent_table=self)
         child_widget.child_table = child_table
         child_layout.addWidget(child_table)

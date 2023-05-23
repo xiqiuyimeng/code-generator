@@ -13,10 +13,9 @@ _date_ = '2022/10/9 17:37'
 
 class TabWidget(QTabWidget):
 
-    def __init__(self, parent, main_window):
+    def __init__(self, parent):
         super().__init__(parent=parent)
-        self.main_window = main_window
-        self.tab_bar = self.get_tab_bar(main_window)
+        self.tab_bar = self.get_tab_bar()
         self.setTabBar(self.tab_bar)
 
         self.async_save_executor = AsyncSaveTabObjExecutor()
@@ -27,7 +26,7 @@ class TabWidget(QTabWidget):
     def get_current_widget(self):
         return self.currentWidget()
 
-    def get_tab_bar(self, window) -> DsTabBar: ...
+    def get_tab_bar(self) -> DsTabBar: ...
 
     def connect_signal(self):
         # 删除tab页信号
@@ -38,12 +37,12 @@ class TabWidget(QTabWidget):
 
 class SqlTabWidget(TabWidget):
 
-    def get_tab_bar(self, window) -> DsTabBar:
-        return SqlTabBar(self, window)
+    def get_tab_bar(self) -> DsTabBar:
+        return SqlTabBar(self)
 
 
 class StructTabWidget(TabWidget):
 
-    def get_tab_bar(self, window) -> DsTabBar:
-        return StructTabBar(self, window)
+    def get_tab_bar(self) -> DsTabBar:
+        return StructTabBar(self)
 

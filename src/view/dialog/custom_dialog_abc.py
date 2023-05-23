@@ -7,6 +7,7 @@ from src.view.custom_widget.draggable_widget import DraggableDialog
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 from src.view.frame.save_dialog_frame import SaveDialogFrame
 from src.view.frame.stacked_dialog_frame import StackedDialogFrame
+from src.view.window.main_window_func import get_window_geometry
 
 _author_ = 'luwt'
 _date_ = '2023/4/3 15:30'
@@ -15,10 +16,10 @@ _date_ = '2023/4/3 15:30'
 class CustomDialogABC(DraggableDialog):
     """通用对话框抽象类"""
 
-    def __init__(self, dialog_title, screen_rect):
+    def __init__(self, dialog_title):
         super().__init__()
         self.dialog_title = dialog_title
-        self.parent_screen_rect = screen_rect
+        self.window_geometry = get_window_geometry()
         # 当前对话框主布局
         self.dialog_layout: QVBoxLayout = ...
         # 对话框frame

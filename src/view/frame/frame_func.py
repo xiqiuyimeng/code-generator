@@ -40,22 +40,22 @@ def reset_name_input_style(name_input: QLineEdit, name_checker: QLabel, check_ac
     name_input.removeAction(check_action)
 
 
-def check_available(name, old_name, name_list):
+def check_available(name, old_name, exits_name_tuple):
     if old_name:
         # 假如原有的名称已经重复，那么再输入一遍原有名称，应该提示不可用
-        if name_list.count(old_name) > 1 and name == old_name:
+        if exits_name_tuple.count(old_name) > 1 and name == old_name:
             return False
-        return (old_name != name and name not in name_list) or old_name == name
+        return (old_name != name and name not in exits_name_tuple) or old_name == name
     else:
-        return name not in name_list
+        return name not in exits_name_tuple
 
 
-def check_name_available(name, old_name, name_list, name_check_action, name_input,
+def check_name_available(name, old_name, exits_name_tuple, name_check_action, name_input,
                          name_checker, name_input_qss_id):
     if name_check_action is Ellipsis:
         name_check_action = QAction()
     if name:
-        name_available = check_available(name, old_name, name_list)
+        name_available = check_available(name, old_name, exits_name_tuple)
         set_name_input_style(name_available, name, old_name, name_input_qss_id,
                              name_input, name_check_action, name_checker)
         return name_available
@@ -66,8 +66,8 @@ def check_name_available(name, old_name, name_list, name_check_action, name_inpu
 
 # ---------------------------------------- 表格代理对话框检测文本重复 ---------------------------------------- #
 
-def check_text_available(text: str, unique_text_tuple: tuple, duplicate_checker: QLabel, duplicate_prompt: str):
-    text_available = text not in unique_text_tuple
+def check_text_available(text: str, exists_data_tuple, duplicate_checker: QLabel, duplicate_prompt: str):
+    text_available = text not in exists_data_tuple
     if text_available:
         duplicate_checker.setStyleSheet(read_qss())
         duplicate_checker.setText('')

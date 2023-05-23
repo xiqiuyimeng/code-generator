@@ -13,6 +13,7 @@ from src.logger.log import logger as log
 from src.service.read_qrc.read_config import read_qss
 from src.service.util.init_util import init_data
 from src.view.window.main_window import MainWindow
+from src.view.window.main_window_func import set_window
 
 # 引入静态资源
 from static import image_rc
@@ -74,15 +75,17 @@ if __name__ == "__main__":
     desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())
     screen_rect = desktop.screenGeometry()
-    ui = MainWindow(screen_rect)
+    main_window = MainWindow(screen_rect)
+    # 保存引用
+    set_window(main_window)
     # 声明AppUserModelID，否则windows认为这是python子程序，无法使用自定义任务栏图标
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("generator")
-    ui.show()
+    main_window.show()
     if pyi_splash_spec is not None and pyi_splash.is_alive():
         if platform.system() == 'Windows':
-            move_above_splash(ui.winId())
+            move_above_splash(main_window.winId())
         pyi_splash.close()
-    splash.finish(ui)
+    splash.finish(main_window)
     app.exec_()
     log.info("**********生成器退出**********\n")
     sys.exit()

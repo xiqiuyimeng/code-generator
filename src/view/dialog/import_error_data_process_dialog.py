@@ -30,7 +30,7 @@ class ImportErrorDataProcessDialog(CustomDialogABC):
         super().__init__(*args)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.7)
+        self.resize(self.window_geometry.width() * 0.6, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> ImportErrorDataProcessDialogFrameABC:
         # 判断重复数据是否存在，如果重复数据存在，则加载处理重复数据页面

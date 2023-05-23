@@ -10,28 +10,22 @@ _author_ = 'luwt'
 _date_ = '2022/5/29 16:51'
 
 
-def open_conn_dialog(sql_type_action, tree_widget, screen_rect):
+def open_conn_dialog(sql_type_action):
     """
     打开添加连接子窗口
     :param sql_type_action: 用来标识sql数据源类型
-    :param tree_widget: 树对象
-    :param screen_rect: 父窗口大小
     """
-    add_conn_func(sql_type_action.text(), tree_widget, screen_rect)
+    add_conn_func(sql_type_action.text())
 
 
-def open_struct_dialog(struct_type_action, tree_widget, screen_rect,
-                       parent_opened_item, parent_item):
+def open_struct_dialog(struct_type_action, parent_opened_item, parent_item):
     """
     打开添加结构体子窗口
     :param struct_type_action: 用来标识结构体数据源类型
-    :param tree_widget: 树对象
-    :param screen_rect: 父窗口大小
     :param parent_opened_item
     :param parent_item
     """
-    add_struct_func(struct_type_action.text(), tree_widget, screen_rect,
-                    parent_opened_item, parent_item)
+    add_struct_func(struct_type_action.text(), parent_opened_item, parent_item)
 
 
 def refresh(main_window):
@@ -41,14 +35,14 @@ def refresh(main_window):
         main_window.central_widget.tree_frame.tree_widget.refresh(item)
 
 
-def open_type_mapping_dialog(main_window):
+def open_type_mapping_dialog():
     """打开类型映射对话框"""
-    TypeMappingDialog(main_window.geometry()).exec()
+    TypeMappingDialog().exec()
 
 
-def open_template_dialog(main_window):
+def open_template_dialog():
     """打开模板对话框"""
-    TemplateDialog(main_window.geometry()).exec()
+    TemplateDialog().exec()
 
 
 def generate(main_window):
@@ -59,7 +53,7 @@ def generate(main_window):
         pop_ok(NO_SELECTED_DATA, GENERATE_ACTION, main_window)
     else:
         confirm_selected_dialog = GeneratorDialog(main_window.current_ds_category.name,
-                                                  selected_data, None, main_window.geometry())
+                                                  selected_data, None)
         confirm_selected_dialog.exec()
 
 

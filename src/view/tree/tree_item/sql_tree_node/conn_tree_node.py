@@ -206,8 +206,7 @@ class ConnTreeNode(SqlTreeNodeABC):
 
     def edit_conn(self):
         opened_record = get_item_opened_record(self.item)
-        edit_conn_func(opened_record.data_type.display_name, self.tree_widget,
-                       self.window.geometry(), opened_record.parent_id)
+        edit_conn_func(opened_record.data_type.display_name, self.tree_widget, opened_record.parent_id)
 
     def del_conn(self):
         # 在删除连接之后的连接项，应该对其进行重新排序

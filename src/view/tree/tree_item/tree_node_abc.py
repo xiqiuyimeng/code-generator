@@ -7,6 +7,7 @@ from src.constant.tree_constant import CLOSE_REFRESHING_NODE_PROMPT, CLOSE_REFRE
 from src.view.tab.tab_ui import TabTableUI
 from src.view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, \
     get_add_del_data
+from src.view.window.main_window_func import get_window
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:36'
@@ -14,16 +15,16 @@ _date_ = '2022/12/2 11:36'
 
 class TreeNodeABC:
 
-    def __new__(cls, item: QTreeWidgetItem, tree_widget, window):
+    def __new__(cls, item: QTreeWidgetItem, tree_widget):
         if not hasattr(item, 'tree_node'):
             item.tree_node = object.__new__(cls)
         return item.tree_node
 
-    def __init__(self, item: QTreeWidgetItem, tree_widget, window):
+    def __init__(self, item: QTreeWidgetItem, tree_widget):
         self.item = item
         self.item_name = self.item.text(0)
         self.tree_widget = tree_widget
-        self.window = window
+        self.window = get_window()
         self.is_opening = False
         # 记录当前节点下一层，正在打开的节点数量
         self.opening_child_count = 0

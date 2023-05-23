@@ -20,6 +20,6 @@ class TemplateTableWidget(CustomExportTableWidget):
 
     def del_duplicate_rows(self, duplicate_data_list):
         # 根据名称删除
-        duplicate_names = [data.template_name for data in duplicate_data_list]
+        duplicate_names = tuple(data.template_name for data in duplicate_data_list)
         [self.del_row(row) for row in reversed(range(self.rowCount()))
          if self.item(row, 1).text() in duplicate_names]

@@ -25,8 +25,9 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     save_signal = pyqtSignal(TemplateConfig)
     edit_signal = pyqtSignal(TemplateConfig)
 
-    def __init__(self, parent_dialog, dialog_title, name_list, var_names, config_type, template_config=None):
-        self.var_names = var_names
+    def __init__(self, parent_dialog, dialog_title, exits_name_tuple, exits_var_name_tuple,
+                 config_type, template_config=None):
+        self.exits_var_name_tuple = exits_var_name_tuple
         self.config_type = config_type
         self.old_var_name: str = ...
         self.var_name_available: bool = ...
@@ -73,7 +74,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         # 取值范围下拉框，添加值按钮
         self.add_value_button: QPushButton = ...
         self.save_range_value_dialog: SimpleNameCheckDialog = ...
-        super().__init__(parent_dialog, dialog_title, name_list, template_config, read_storage=False)
+        super().__init__(parent_dialog, dialog_title, exits_name_tuple, template_config, read_storage=False)
 
     def get_new_dialog_data(self) -> TemplateConfig:
         return TemplateConfig()
@@ -235,7 +236,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.placeholder_input.textEdited.connect(self.check_input)
 
     def check_var_name_available(self, var_name):
-        self.var_name_available = check_name_available(var_name, self.old_var_name, self.var_names,
+        self.var_name_available = check_name_available(var_name, self.old_var_name, self.exits_var_name_tuple,
                                                        self.var_name_check_action, self.var_name_input,
                                                        self.var_name_checker, 'var_name_input')
 
@@ -253,10 +254,10 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.check_input()
 
     def value_range_changed(self):
-        # 重新刷新默认值下拉框值列表
-        item_text_list = self.value_range_list_widget.collect_item_text_list()
+        # 重新刷新默认值下拉框值元祖
+        item_text_tuple = self.value_range_list_widget.collect_item_text()
         self.default_value_combo_box.clear()
-        self.default_value_combo_box.addItems(item_text_list)
+        self.default_value_combo_box.addItems(item_text_tuple)
         self.check_input()
 
     def add_range_value(self):
@@ -264,9 +265,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.open_save_range_value_dialog(ADD_RANGE_VALUE_BOX_TITLE)
 
     def open_save_range_value_dialog(self, dialog_title, range_value=None):
-        self.save_range_value_dialog = SimpleNameCheckDialog(self.parent_dialog.parent_screen_rect, dialog_title,
-                                                             self.value_range_list_widget.collect_item_text_list(),
-                                                             range_value)
+        self.save_range_value_dialog = SimpleNameCheckDialog(self.value_range_list_widget.collect_item_text(),
+                                                             dialog_title, range_value)
         if range_value:
             self.save_range_value_dialog.edit_signal.connect(self.edit_combox_range_value)
         else:
@@ -306,7 +306,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
             self.new_dialog_data.placeholder_text = ''
             # 收集数据
             self.new_dialog_data.default_value = self.default_value_combo_box.currentText()
-            range_values = self.value_range_list_widget.collect_item_text_list()
+            range_values = self.value_range_list_widget.collect_item_text()
             self.new_dialog_data.range_values = ",".join(range_values)
         elif current_widget_idx == 4:
             # 清除占位文本、默认值、下拉值列表

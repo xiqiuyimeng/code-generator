@@ -23,9 +23,8 @@ def get_table_frame(current_frame_name, *args):
 class TableFrameABC(QFrame):
     """表结构frame抽象类"""
 
-    def __init__(self, main_window, parent, column_list, tree_item, tree_widget):
+    def __init__(self, parent, column_list, tree_item, tree_widget):
         super().__init__(parent)
-        self.main_window = main_window
         self.column_list = column_list
         self.tree_item = tree_item
         self.tree_widget = tree_widget
@@ -75,7 +74,7 @@ class SqlTableFrame(TableFrameABC):
                f'当前数据表：{self.tree_item.text(0)}'
 
     def get_table_widget(self) -> DsColTableWidgetABC:
-        return SqlDsColTableWidget(self.main_window, self.tree_widget, self, self.column_list)
+        return SqlDsColTableWidget(self.tree_widget, self, self.column_list)
 
 
 class StructTableFrame(TableFrameABC):
@@ -85,7 +84,7 @@ class StructTableFrame(TableFrameABC):
         return f'当前结构体：{self.tree_item.text(0)}'
 
     def get_table_widget(self) -> DsColTableWidgetABC:
-        return StructDsColTableWidget(self.main_window, self.tree_widget, self, self.column_list)
+        return StructDsColTableWidget(self.tree_widget, self, self.column_list)
 
 
 

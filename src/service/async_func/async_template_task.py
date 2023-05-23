@@ -346,12 +346,13 @@ class ImportTemplateWorker(ImportDataWorker):
             # 处理关联的文件
             for output_config in template.output_config_list:
                 bind_file_list = list()
-                for bind_file in output_config.bind_file_list:
-                    template_file = template_file_dict.get(bind_file.get('file_name'))
-                    if template_file:
-                        bind_file_list.append(template_file)
-                        # 给绑定的文件分配一个虚id
-                        template_file.output_config_id = -1
+                if output_config.bind_file_list:
+                    for bind_file in output_config.bind_file_list:
+                        template_file = template_file_dict.get(bind_file.get('file_name'))
+                        if template_file:
+                            bind_file_list.append(template_file)
+                            # 给绑定的文件分配一个虚id
+                            template_file.output_config_id = -1
                 if bind_file_list:
                     output_config.bind_file_list = bind_file_list
                 else:

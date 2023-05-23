@@ -60,8 +60,7 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
                                                                              self.import_success_callback,
                                                                              self.get_row_data_dialog,
                                                                              self.illegal_dialog_title,
-                                                                             self.dialog_title,
-                                                                             self.parent_dialog.parent_screen_rect)
+                                                                             self.dialog_title)
         self.import_error_data_process_dialog.exec()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #

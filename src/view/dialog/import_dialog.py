@@ -22,7 +22,7 @@ class ImportDialog(CustomDialogABC):
         super().__init__(*args)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() * 0.5, self.parent_screen_rect.height() * 0.4)
+        self.resize(self.window_geometry.width() * 0.5, self.window_geometry.height() * 0.4)
 
     def get_frame(self) -> ImportDialogFrame:
         return ImportDialogFrame(self.import_executor_class, self.duplicate_dialog_title,

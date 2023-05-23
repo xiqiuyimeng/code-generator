@@ -15,7 +15,7 @@ class FolderDialogFrame(NameCheckDialogFrame):
     save_signal = pyqtSignal(OpenedTreeItem)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, parent_dialog, dialog_title, folder_name_list,
+    def __init__(self, parent_dialog, dialog_title, exists_folder_name_tuple,
                  opened_folder_item, parent_folder_item):
         self.parent_folder_item: OpenedTreeItem = parent_folder_item
 
@@ -23,7 +23,8 @@ class FolderDialogFrame(NameCheckDialogFrame):
         self.edit_folder_executor: EditFolderExecutor = ...
 
         # 框架布局，分四部分，第一部分：标题部分，第二部分：文件夹名称表单，第三部分：按钮部分
-        super().__init__(parent_dialog, dialog_title, folder_name_list, opened_folder_item, read_storage=False)
+        super().__init__(parent_dialog, dialog_title, exists_folder_name_tuple,
+                         opened_folder_item, read_storage=False)
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
 

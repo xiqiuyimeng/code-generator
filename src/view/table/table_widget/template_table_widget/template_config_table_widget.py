@@ -46,7 +46,7 @@ class TemplateConfigTableWidgetABC(CustomTableWidget):
             self.del_rows()
 
     def collect_data(self):
-        return [self.get_row_data(row) for row in range(self.rowCount())]
+        return tuple(self.get_row_data(row) for row in range(self.rowCount()))
 
     def get_row_data(self, row):
         # 收集数据

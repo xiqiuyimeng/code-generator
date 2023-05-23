@@ -15,16 +15,16 @@ _date_ = '2023/4/6 10:40'
 class TemplateConfigPreviewDialog(CustomDialogABC):
     """模板列表表格对话框"""
 
-    def __init__(self, screen_rect, config_type, template_config_list):
+    def __init__(self, config_type, template_config_list):
         self.template_config_list = template_config_list
         self.frame: DynamicTemplateConfigDialogFrameABC = ...
         self.config_type = config_type
         dialog_title = PREVIEW_VAR_CONFIG_TITLE if config_type else PREVIEW_OUTPUT_CONFIG_TITLE
-        super().__init__(dialog_title, screen_rect)
+        super().__init__(dialog_title)
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
-        self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
+        self.resize(self.window_geometry.width() * 0.7, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> DynamicTemplateConfigDialogFrameABC:
         if self.config_type:

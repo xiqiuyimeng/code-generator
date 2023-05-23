@@ -23,7 +23,7 @@ class ConnDialogFrameABC(DsDialogFrameABC):
     # 修改后的连接名称
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, parent_dialog, dialog_title, conn_name_list, conn_id):
+    def __init__(self, parent_dialog, dialog_title, exists_conn_name_tuple, conn_id):
         self.dialog_data: SqlConnection = ...
         self.new_dialog_data: SqlConnection = ...
         self.conn_type: ConnType = self.get_conn_type()
@@ -37,7 +37,7 @@ class ConnDialogFrameABC(DsDialogFrameABC):
         self.edit_conn_executor: EditConnExecutor = ...
 
         super().__init__(parent_dialog, dialog_title.format(self.conn_type.display_name),
-                         conn_name_list, conn_id, placeholder_blank_width=1)
+                         exists_conn_name_tuple, conn_id, placeholder_blank_width=1)
 
     def get_conn_type(self) -> ConnType:
         ...

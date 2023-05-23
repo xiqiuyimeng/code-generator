@@ -26,12 +26,11 @@ class ComboboxDelegate(QItemDelegate):
 
 class TextInputDelegate(QItemDelegate):
 
-    def __init__(self, parent_screen_rect, duplicate_prompt=None, get_unique_text_tuple_func=None):
-        self.parent_screen_rect = parent_screen_rect
+    def __init__(self, duplicate_prompt=None, get_exists_data_tuple_func=None):
         # 数据重复提示语
         self.duplicate_prompt = duplicate_prompt
         # 获取不重复数据元祖的方法
-        self.get_unique_text_tuple_func = get_unique_text_tuple_func
+        self.get_exists_data_tuple_func = get_exists_data_tuple_func
         self.input_dialog: TableItemInputDelegateDialog = ...
         # 新数据
         self.new_data = ...
@@ -39,8 +38,9 @@ class TextInputDelegate(QItemDelegate):
 
     def createEditor(self, parent: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex) -> QWidget:
         """创建编辑器，只有在编辑时才会触发，编辑器控件选择combox"""
-        self.input_dialog = TableItemInputDelegateDialog(index.row(), index.column(), self.parent_screen_rect,
-                                                         bool(self.get_unique_text_tuple_func), self.duplicate_prompt)
+        self.input_dialog = TableItemInputDelegateDialog(index.row(), index.column(),
+                                                         bool(self.get_exists_data_tuple_func),
+                                                         self.duplicate_prompt)
         self.input_dialog.setModal(True)
         self.input_dialog.save_signal.connect(self.update_new_data)
         return self.input_dialog
@@ -50,8 +50,8 @@ class TextInputDelegate(QItemDelegate):
 
     def setEditorData(self, editor: QWidget, index: QModelIndex) -> None:
         """将模型中的数据，赋值到对话框中"""
-        if self.get_unique_text_tuple_func:
-            self.input_dialog.frame.set_unique_data_tuple(self.get_unique_text_tuple_func(index))
+        if self.get_exists_data_tuple_func:
+            self.input_dialog.frame.set_exists_data_tuple(self.get_exists_data_tuple_func(index))
         self.input_dialog.frame.echo_dialog_data(index.model().data(index))
 
     def setModelData(self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex) -> None:

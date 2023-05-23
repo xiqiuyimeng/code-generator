@@ -77,7 +77,7 @@ class FolderTreeNode(StructTreeNodeABC):
     def handle_menu_func(self, func):
         # 新建文件夹
         if func == CREATE_NEW_FOLDER_ACTION:
-            add_folder_func(self.window.geometry(), self.tree_widget)
+            add_folder_func(self.tree_widget)
         # 全选
         elif func == SELECT_ALL_ACTION:
             self.handle_child_item_checked(Qt.Checked)
@@ -90,7 +90,7 @@ class FolderTreeNode(StructTreeNodeABC):
             parent_opened_item = self.tree_widget.top_item \
                 if parent_item is None else get_item_opened_record(parent_item)
             # 打开重命名文件夹对话框
-            edit_folder_func(self.window.geometry(), self.tree_widget, parent_opened_item,
+            edit_folder_func(self.tree_widget, parent_opened_item,
                              get_item_opened_record(self.item), parent_item)
         # 删除
         elif func == DEL_FOLDER_ACTION.format(self.item_name):

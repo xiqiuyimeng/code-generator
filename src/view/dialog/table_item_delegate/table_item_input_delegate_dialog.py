@@ -14,15 +14,15 @@ class TableItemInputDelegateDialog(CustomSaveDialogABC):
     """表格单元格输入框代理对话框"""
     save_signal = pyqtSignal(str)
 
-    def __init__(self, row, col, parent_screen_rect, check_text_duplicate=True, duplicate_prompt=None):
+    def __init__(self, row, col, check_text_duplicate=True, duplicate_prompt=None):
         self.check_text_duplicate = check_text_duplicate
         # 数据重复提示语
         self.duplicate_prompt = duplicate_prompt
         self.frame: TableItemInputDelegateDialogFrame = ...
-        super().__init__(TABLE_ITEM_INPUT_DELEGATE_TITLE.format(row, col), parent_screen_rect)
+        super().__init__(TABLE_ITEM_INPUT_DELEGATE_TITLE.format(row, col))
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() >> 1, self.parent_screen_rect.height() >> 1)
+        self.resize(self.window_geometry.width() >> 1, self.window_geometry.height() >> 1)
 
     def get_frame(self) -> TableItemInputDelegateDialogFrame:
         return TableItemInputDelegateDialogFrame(self, self.dialog_title,

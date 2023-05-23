@@ -20,8 +20,7 @@ _date_ = '2023/2/15 18:05'
 
 class ColTypeMappingTableWidgetABC(TableWidgetABC):
 
-    def __init__(self, parent, parent_screen_rect):
-        self.parent_screen_rect = parent_screen_rect
+    def __init__(self, parent):
         # 表头控件
         self.header_widget: ColTypeMappingTableHeaderABC = ...
         # 代理编辑器有三种：
@@ -46,12 +45,12 @@ class ColTypeMappingTableWidgetABC(TableWidgetABC):
 
     def set_text_input_delegate(self):
         # 第一列输入编辑器代理代理，同列数据不能相同
-        self.ds_col_type_input_delegate = TextInputDelegate(self.parent_screen_rect,
-                                                            DUPLICATE_DS_COL_TYPE_PROMPT,
-                                                            self.get_unique_ds_col_type_tuple)
+        self.ds_col_type_input_delegate = TextInputDelegate(DUPLICATE_DS_COL_TYPE_PROMPT,
+                                                            self.get_exists_ds_col_types)
         self.setItemDelegateForColumn(1, self.ds_col_type_input_delegate)
 
-    def get_unique_ds_col_type_tuple(self, index):
+    def get_exists_ds_col_types(self, index):
+        # 这里返回生成器即可
         return tuple(self.item(row, 1).text() for row in range(self.rowCount()) if row != index.row())
 
     def remove_row(self):
@@ -118,18 +117,18 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def set_text_input_delegate(self):
         super().set_text_input_delegate()
         # 映射列名称不同组不能重复，即同行不重复
-        self.mapping_col_name_input_delegate = TextInputDelegate(self.parent_screen_rect,
-                                                                 DUPLICATE_MAPPING_COL_NAME_PROMPT,
-                                                                 self.get_unique_mapping_col_name_tuple)
+        self.mapping_col_name_input_delegate = TextInputDelegate(DUPLICATE_MAPPING_COL_NAME_PROMPT,
+                                                                 self.get_exists_mapping_col_names)
         [self.setItemDelegateForColumn(col, self.mapping_col_name_input_delegate)
          for col in range(2, self.columnCount()) if (col - 2) % 3 == 0]
 
         # 其他列，输入编辑器代理
-        self.text_input_delegate = TextInputDelegate(self.parent_screen_rect)
+        self.text_input_delegate = TextInputDelegate()
         [self.setItemDelegateForColumn(col, self.text_input_delegate)
          for col in range(2, self.columnCount()) if (col - 2) % 3 > 0]
 
-    def get_unique_mapping_col_name_tuple(self, index):
+    def get_exists_mapping_col_names(self, index):
+        # 返回生成器即可
         return tuple(self.item(index.row(), col).text() for col in range(1, self.columnCount())
                      if col != index.column() and (col - 2) % 3 == 0)
 
@@ -142,7 +141,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             # 开启同步列类型数据
             self.need_sync_col_type = True
             # 冻结表
-            self.frozen_column_table = ColTypeMappingFrozenTableWidget(self.parent(), self.parent_screen_rect)
+            self.frozen_column_table = ColTypeMappingFrozenTableWidget(self.parent())
             # 设置冻结列表格的位置
             self.update_frozen_table_geometry()
             # 当前表视图层次关系为：底表 --> 底表表头 --> 冻结列表格 --> 冻结列表头

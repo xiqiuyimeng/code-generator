@@ -152,7 +152,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
         if not self.preview_data_dict:
             pop_fail(NO_FILE_TO_PREVIEW_PROMPT, PREVIEW_GENERATE_TITLE, self)
             return
-        self.preview_file_dialog = PreviewFileDialog(self.preview_data_dict, self.parent_dialog.parent_screen_rect)
+        self.preview_file_dialog = PreviewFileDialog(self.preview_data_dict)
         self.preview_file_dialog.exec()
 
     def collect_preview_data(self, file_name, file_content, file_path_tuple):

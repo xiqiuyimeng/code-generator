@@ -13,11 +13,10 @@ _date_ = '2023/3/21 17:06'
 class TemplateConfigWidget(QWidget):
     """模板配置页，嵌入在堆栈式窗口中"""
 
-    def __init__(self, config_type, parent_screen_rect):
+    def __init__(self, config_type):
         super().__init__()
         # 配置类型
         self.config_type = config_type
-        self.parent_screen_rect = parent_screen_rect
         self.config_layout: QVBoxLayout = ...
         self.config_btn_layout: QGridLayout = ...
         self.add_config_btn: QPushButton = ...
@@ -81,8 +80,7 @@ class TemplateConfigWidget(QWidget):
     def open_config_row_dialog(self, config_data=None, row_index=None):
         # 获取配置项名称列表、配置变量名称列表，这两项都不可以重复
         config_names, config_var_names = self.config_table.get_exists_names_and_var_names()
-        self.config_row_dialog = TemplateConfigDialog(self.parent_screen_rect, config_names,
-                                                      config_var_names, self.config_type, config_data)
+        self.config_row_dialog = TemplateConfigDialog(config_names, config_var_names, self.config_type, config_data)
         if config_data:
             self.config_row_dialog.edit_signal.connect(lambda template_config:
                                                        self.config_table.edit_row(row_index, template_config))
@@ -101,8 +99,7 @@ class TemplateConfigWidget(QWidget):
         # 收集数据
         self.collect_template_config()
         # 预览配置页
-        self.preview_config_dialog = TemplateConfigPreviewDialog(self.parent_screen_rect, self.config_type,
-                                                                 self.config_table.collect_data())
+        self.preview_config_dialog = TemplateConfigPreviewDialog(self.config_type, self.config_table.collect_data())
         self.preview_config_dialog.exec()
 
     def collect_template_config(self): ...

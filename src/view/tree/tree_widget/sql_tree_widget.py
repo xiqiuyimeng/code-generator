@@ -11,6 +11,7 @@ from src.view.tree.tree_item.context import get_sql_tree_node
 from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
 from src.view.tree.tree_widget.tree_function import make_conn_tree_items
+from src.view.window.main_window_func import get_window, get_sql_tab_widget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 17:21'
@@ -19,9 +20,8 @@ _date_ = '2022/5/7 17:21'
 class SqlTreeWidget(TreeWidgetABC):
     """sql数据源树部件"""
 
-    def __init__(self, parent, window):
-        super().__init__(parent, window)
-        self.main_window = window
+    def __init__(self, parent):
+        super().__init__(parent)
         self.list_conn_executor = ...
         # 保存 sql tree 选中数据
         self.tree_data = TreeData()
@@ -31,13 +31,13 @@ class SqlTreeWidget(TreeWidgetABC):
         if self.list_conn_executor is Ellipsis:
             self.reopening_flag = True
             # 初始化数据
-            self.list_conn_executor = ListConnExecutor(self.reopen_items, self.reopen_tab, self.main_window,
-                                                       self.main_window, LIST_ALL_CONN_BOX_TITLE,
-                                                       self.reopen_end, self.reopen_end)
+            window = get_window()
+            self.list_conn_executor = ListConnExecutor(self.reopen_items, self.reopen_tab, window, window,
+                                                       LIST_ALL_CONN_BOX_TITLE, self.reopen_end, self.reopen_end)
             self.list_conn_executor.start()
 
     def get_current_tab_widget(self) -> TabWidget:
-        return self.main_window.sql_tab_widget
+        return get_sql_tab_widget()
 
     def reopen_items(self, opened_items):
         """
@@ -53,4 +53,4 @@ class SqlTreeWidget(TreeWidgetABC):
             self.reopen_tree_item(opened_items)
 
     def get_item_node(self, item) -> SqlTreeNodeABC:
-        return get_sql_tree_node(item, self, self.main_window)
+        return get_sql_tree_node(item, self)

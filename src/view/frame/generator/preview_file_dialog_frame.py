@@ -140,13 +140,13 @@ class PreviewFileDialogFrame(DialogFrameABC):
         if not current_item or current_item.childCount():
             pop_fail(NO_SELECTED_FILE_ITEM_PROMPT, PREVIEW_RENAME_FILE_NAME_TITLE, self)
         else:
-            # 收集不可重复的名称列表
-            exists_file_names = [current_item.parent().child(child_idx).text(0)
-                                 for child_idx in range(current_item.parent().childCount())]
+            # 收集不可重复的名称元祖
+            exists_file_name_tuple = tuple(current_item.parent().child(child_idx).text(0)
+                                           for child_idx in range(current_item.parent().childCount()))
             # 打开修改文件名对话框
-            self.rename_file_name_dialog = SimpleNameCheckDialog(self.parent_dialog.parent_screen_rect,
+            self.rename_file_name_dialog = SimpleNameCheckDialog(exists_file_name_tuple,
                                                                  PREVIEW_RENAME_FILE_NAME_TITLE,
-                                                                 exists_file_names, current_item.text(0))
+                                                                 current_item.text(0))
             self.rename_file_name_dialog.edit_signal.connect(lambda new_file_name:
                                                              self.modify_file_name(current_item, new_file_name))
             self.rename_file_name_dialog.exec()
@@ -169,7 +169,7 @@ class PreviewFileDialogFrame(DialogFrameABC):
             # 收集输出路径和当前的文件内容
             save_file_dict[file_name] = file_path, file_tab_widget.content_editor.toPlainText()
         # 打开保存进度对话框
-        self.save_file_dialog = SaveFileDialog(save_file_dict, self.parent_dialog.parent_screen_rect)
+        self.save_file_dialog = SaveFileDialog(save_file_dict)
         self.save_file_dialog.exec()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #

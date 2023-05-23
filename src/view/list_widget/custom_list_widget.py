@@ -55,5 +55,5 @@ class CustomListWidget(ListWidgetABC):
     def clear_items_func(self):
         self.clear()
 
-    def collect_item_text_list(self):
-        return [self.item(row).text() for row in range(self.count())]
+    def collect_item_text(self):
+        return tuple(self.item(row).text() for row in range(self.count()))

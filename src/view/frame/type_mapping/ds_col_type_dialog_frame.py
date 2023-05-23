@@ -70,8 +70,8 @@ class DsColTypeDialogFrame(SaveDialogFrame):
     def open_save_col_type_dialog(self, dialog_title, col_type=None):
         current_ds_type = self.ds_type_list_widget.currentItem().text()
         # 打开添加数据源列类型对话框
-        self.save_ds_col_type_dialog = SimpleNameCheckDialog(self.parent_dialog.parent_screen_rect, dialog_title,
-                                                             self.ds_col_type_dict.get(current_ds_type), col_type)
+        self.save_ds_col_type_dialog = SimpleNameCheckDialog(self.ds_col_type_dict.get(current_ds_type),
+                                                             dialog_title, col_type)
         if col_type:
             self.save_ds_col_type_dialog.edit_signal.connect(self.edit_ds_col_type)
         else:

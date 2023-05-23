@@ -8,6 +8,7 @@ from src.view.tree.tree_item.context import get_struct_tree_node
 from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
 from src.view.tree.tree_widget.tree_widget_abc import TreeWidgetABC
 from src.view.tree.tree_widget.tree_function import add_struct_tree_item
+from src.view.window.main_window_func import get_window, get_struct_tab_widget
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:10'
@@ -16,8 +17,8 @@ _date_ = '2022/9/15 17:10'
 class StructTreeWidget(TreeWidgetABC):
     """结构体数据源树结构"""
 
-    def __init__(self, parent, window):
-        super().__init__(parent, window)
+    def __init__(self, parent):
+        super().__init__(parent)
         self.list_struct_executor = ...
         # 保存 struct tree 选中数据
         self.tree_data = TreeData()
@@ -29,9 +30,9 @@ class StructTreeWidget(TreeWidgetABC):
         # 如果还没初始化过，再执行初始化
         if self.list_struct_executor is Ellipsis:
             # 初始化数据
-            self.list_struct_executor = ListStructExecutor(self.reopen_items, self.reopen_tab, self.main_window,
-                                                           self.main_window, LIST_ALL_STRUCT_BOX_TITLE,
-                                                           self.reopen_end, self.reopen_end)
+            window = get_window()
+            self.list_struct_executor = ListStructExecutor(self.reopen_items, self.reopen_tab, window, window,
+                                                           LIST_ALL_STRUCT_BOX_TITLE, self.reopen_end, self.reopen_end)
             self.reopening_flag = True
             self.list_struct_executor.start()
 
@@ -50,10 +51,10 @@ class StructTreeWidget(TreeWidgetABC):
             self.reopen_tree_item(opened_items)
 
     def get_current_tab_widget(self) -> TabWidget:
-        return self.main_window.struct_tab_widget
+        return get_struct_tab_widget()
 
     def link_parent_node(self, item, parent_item=None):
         self.get_item_node(item).link_parent_node(parent_item)
 
     def get_item_node(self, item) -> StructTreeNodeABC:
-        return get_struct_tree_node(item, self, self.main_window)
+        return get_struct_tree_node(item, self)

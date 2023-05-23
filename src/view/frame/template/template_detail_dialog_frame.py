@@ -38,7 +38,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     edit_signal = pyqtSignal(Template)
     override_signal = pyqtSignal(list, list)
 
-    def __init__(self, parent_dialog, dialog_title, template_names, template_id=None):
+    def __init__(self, parent_dialog, dialog_title, exists_template_name_tuple, template_id=None):
         self.dialog_data: Template = ...
         self.new_dialog_data: Template = ...
         # 标记当前是否是用来展示导入错误数据详情页
@@ -80,7 +80,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.edit_template_executor: EditTemplateExecutor = ...
         # 覆盖导入模板执行器
         self.override_data_executor: OverrideTemplateExecutor = ...
-        super().__init__(parent_dialog, dialog_title, template_names, template_id)
+        super().__init__(parent_dialog, dialog_title, exists_template_name_tuple, template_id)
 
     def get_new_dialog_data(self) -> Template:
         return Template()
@@ -126,10 +126,10 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
     def setup_template_config_ui(self):
         # 第一个页面为输出路径配置页
-        self.output_config_widget = TemplateOutputConfigWidget(self, self.parent_dialog.parent_screen_rect)
+        self.output_config_widget = TemplateOutputConfigWidget(self)
         self.config_tab_widget.addTab(self.output_config_widget, TEMPLATE_OUTPUT_DIR_TAB_TEXT)
         # 第二个页面为模板变量配置页
-        self.var_config_widget = TemplateVarConfigWidget(self.parent_dialog.parent_screen_rect)
+        self.var_config_widget = TemplateVarConfigWidget()
         self.config_tab_widget.addTab(self.var_config_widget, TEMPLATE_VAR_CONFIG_TAB_TEXT)
 
     def setup_template_file_ui(self):
@@ -193,9 +193,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.locate_file_button.clicked.connect(self.file_list_widget.locate_file)
 
     def open_create_file_dialog(self, dialog_title, current_file_name=None):
-        self.file_name_check_dialog = SimpleNameCheckDialog(self.parent_dialog.parent_screen_rect, dialog_title,
-                                                            self.file_list_widget.collect_item_text_list(),
-                                                            current_file_name)
+        self.file_name_check_dialog = SimpleNameCheckDialog(self.file_list_widget.collect_item_text(),
+                                                            dialog_title, current_file_name)
         if current_file_name:
             self.file_name_check_dialog.edit_signal.connect(self.edit_file_name)
         else:
@@ -237,8 +236,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
                 self.edit_template_executor.start()
             else:
                 # 如果名称存在，那么是覆盖模式
-                if self.new_dialog_data.template_name in self.name_list:
-                    self.override_data_executor = OverrideTemplateExecutor([self.new_dialog_data, ], self,
+                if self.new_dialog_data.template_name in self.exits_name_tuple:
+                    self.override_data_executor = OverrideTemplateExecutor([self.new_dialog_data, ], self, self,
                                                                            OVERRIDE_TEMPLATE_TITLE,
                                                                            success_callback=self.override_post_process)
                     self.override_data_executor.start()

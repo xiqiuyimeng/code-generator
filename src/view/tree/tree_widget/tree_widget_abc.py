@@ -44,9 +44,8 @@ class TreeWidgetABC(DisplayTreeWidget):
     # 定义信号，发送点击复选框的树节点
     item_checkbox_clicked = pyqtSignal(QTreeWidgetItem)
 
-    def __init__(self, parent, window):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.main_window = window
         # item 是否正在被鼠标左键点击
         self.item_clicked = False
         self.clicked_item = ...

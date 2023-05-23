@@ -16,19 +16,18 @@ class FolderDialog(CustomSaveDialogABC):
     save_signal = pyqtSignal(OpenedTreeItem)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, dialog_title, screen_rect, folder_name_list,
-                 opened_folder_item, parent_folder_item):
-        self.folder_name_list = folder_name_list
+    def __init__(self, dialog_title, exists_folder_name_tuple, opened_folder_item, parent_folder_item):
+        self.exists_folder_name_tuple = exists_folder_name_tuple
         self.opened_folder_item = opened_folder_item
         self.parent_folder_item = parent_folder_item
         self.frame: FolderDialogFrame = ...
-        super().__init__(dialog_title, screen_rect)
+        super().__init__(dialog_title)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() * 0.3, self.parent_screen_rect.height() * 0.3)
+        self.resize(self.window_geometry.width() * 0.3, self.window_geometry.height() * 0.3)
 
     def get_frame(self) -> FolderDialogFrame:
-        return FolderDialogFrame(self, self.dialog_title, self.folder_name_list,
+        return FolderDialogFrame(self, self.dialog_title, self.exists_folder_name_tuple,
                                  self.opened_folder_item, self.parent_folder_item)
 
 
@@ -37,23 +36,23 @@ class StructDialogABC(CustomSaveDialogABC):
     save_signal = pyqtSignal(OpenedTreeItem)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, dialog_title, screen_rect, struct_name_list, opened_struct_id,
+    def __init__(self, dialog_title, exists_struct_name_tuple, opened_struct_id,
                  tree_widget, parent_folder_item):
-        self.struct_name_list = struct_name_list
+        self.exists_struct_name_tuple = exists_struct_name_tuple
         self.opened_struct_id = opened_struct_id
         self.tree_widget = tree_widget
         self.parent_folder_item = parent_folder_item
         self.frame: StructDialogFrameABC = ...
-        super().__init__(dialog_title, screen_rect)
+        super().__init__(dialog_title)
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
-        self.resize(self.parent_screen_rect.width() * 0.6, self.parent_screen_rect.height() * 0.8)
+        self.resize(self.window_geometry.width() * 0.6, self.window_geometry.height() * 0.8)
 
 
 class JsonStructDialog(StructDialogABC):
     """json结构体对话框"""
 
     def get_frame(self) -> JsonStructDialogFrame:
-        return JsonStructDialogFrame(self, self.dialog_title, self.struct_name_list,
+        return JsonStructDialogFrame(self, self.dialog_title, self.exists_struct_name_tuple,
                                      self.opened_struct_id, self.tree_widget, self.parent_folder_item)

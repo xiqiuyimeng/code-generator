@@ -11,13 +11,13 @@ _date_ = '2023/4/3 18:42'
 class TypeMappingDialog(CustomDialogABC):
     """类型映射表格对话框"""
 
-    def __init__(self, screen_rect):
+    def __init__(self):
         self.frame: TypeMappingDialogFrame = ...
-        super().__init__(TYPE_MAPPING_LIST_TITLE, screen_rect)
+        super().__init__(TYPE_MAPPING_LIST_TITLE)
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
-        self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
+        self.resize(self.window_geometry.width() * 0.7, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> TypeMappingDialogFrame:
         return TypeMappingDialogFrame(self, self.dialog_title)

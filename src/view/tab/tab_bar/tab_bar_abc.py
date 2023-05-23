@@ -10,6 +10,7 @@ from src.constant.tree_constant import CLOSE_TABLE_BOX_TITLE
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab
 from src.view.box.message_box import pop_fail
 from src.view.tree.tree_item.tree_item_func import set_item_opened_tab
+from src.view.window.main_window_func import get_window
 
 _author_ = 'luwt'
 _date_ = '2022/10/9 17:39'
@@ -119,8 +120,7 @@ class TabBarABC(QTabBar):
 class DsTabBar(TabBarABC):
     remove_tab_signal = pyqtSignal(DsTableTab)
 
-    def __init__(self, parent: QTabWidget, main_window):
-        self.main_window = main_window
+    def __init__(self, parent: QTabWidget):
         self.is_moving = False
         self.current_changed = False
         super().__init__(parent=parent)
@@ -154,7 +154,7 @@ class DsTabBar(TabBarABC):
             if partially_checked_tables:
                 prompt_list.append(TABLE_CLOSE_WITH_PARTIALLY_CHECKED.format('\n'.join(partially_checked_tables)))
             # 弹窗提示
-            pop_fail('\n\n'.join(prompt_list), CLOSE_TABLE_BOX_TITLE, self.main_window)
+            pop_fail('\n\n'.join(prompt_list), CLOSE_TABLE_BOX_TITLE, get_window())
         return not (partially_checked_tables or refreshing_tables)
 
     def partially_checked_table_prompt(self, tab_widget) -> str: ...

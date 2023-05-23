@@ -20,7 +20,7 @@ class ExportDialog(CustomDialogABC):
         super().__init__(*args)
 
     def resize_dialog(self):
-        self.resize(self.parent_screen_rect.width() * 0.5, self.parent_screen_rect.height() * 0.4)
+        self.resize(self.window_geometry.width() * 0.5, self.window_geometry.height() * 0.4)
 
     def get_frame(self) -> ExportDialogFrame:
         return ExportDialogFrame(self.row_ids, self.default_export_file_name,

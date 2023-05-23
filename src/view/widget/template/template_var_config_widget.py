@@ -10,8 +10,8 @@ _date_ = '2023/4/12 14:38'
 class TemplateVarConfigWidget(TemplateConfigWidget):
     """模板变量配置表格页面控件"""
 
-    def __init__(self, *args):
-        super().__init__(ConfigTypeEnum.template_var.value, *args)
+    def __init__(self):
+        super().__init__(ConfigTypeEnum.template_var.value)
 
     def get_table_widget(self) -> TemplateVarConfigTableWidget:
         return TemplateVarConfigTableWidget(self)

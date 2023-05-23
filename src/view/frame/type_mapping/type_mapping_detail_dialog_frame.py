@@ -30,7 +30,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
     edit_signal = pyqtSignal(TypeMapping)
     override_signal = pyqtSignal(list, list)
 
-    def __init__(self, parent_dialog, dialog_title, type_mapping_names, type_mapping_id=None):
+    def __init__(self, parent_dialog, dialog_title, type_mapping_name_tuple, type_mapping_id=None):
         self.dialog_data: TypeMapping = ...
         self.new_dialog_data: TypeMapping = ...
         # 标记当前是否是用来展示导入错误数据详情页
@@ -82,7 +82,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.edit_type_mapping_executor: EditTypeMappingExecutor = ...
         # 覆盖导入类型映射执行器
         self.override_data_executor: OverrideTypeMappingExecutor = ...
-        super().__init__(parent_dialog, dialog_title, type_mapping_names, type_mapping_id)
+        super().__init__(parent_dialog, dialog_title, type_mapping_name_tuple, type_mapping_id)
 
     def get_new_dialog_data(self) -> TypeMapping:
         return TypeMapping()
@@ -159,7 +159,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.table_frame_layout = QVBoxLayout(self.table_frame)
         # 将表格布局边距清空
         self.table_frame_layout.setContentsMargins(0, 0, 0, 0)
-        self.col_type_table_widget = ColTypeMappingTableWidget(self.table_frame, self.parent_dialog.parent_screen_rect)
+        self.col_type_table_widget = ColTypeMappingTableWidget(self.table_frame)
         self.table_frame_layout.addWidget(self.col_type_table_widget)
         self.col_type_layout.addWidget(self.table_frame)
 
@@ -193,7 +193,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 连接表格信号，动态渲染删除类型映射按钮状态
         self.col_type_table_widget.header_check_changed.connect(self.set_del_mapping_button_available)
         # 连接表头信号，动态渲染删除类型映射组按钮状态
-        self.col_type_table_widget.header_widget.group_num_changed.connect(self.set_del_mapping_group_button_available)
+        self.col_type_table_widget.header_widget.group_num_changed.connect(self.set_del_mapping_group_btn_available)
 
         # 按钮点击信号
         self.sync_ds_col_type_button.clicked.connect(self.sync_ds_col_types)
@@ -213,7 +213,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         else:
             self.del_mapping_button.setDisabled(True)
 
-    def set_del_mapping_group_button_available(self, max_group_num):
+    def set_del_mapping_group_btn_available(self, max_group_num):
         # 删除类型映射组按钮，根据是否存在额外组来决定
         if max_group_num > 0:
             self.del_mapping_group_button.setDisabled(False)
@@ -251,7 +251,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
             self.edit_type_mapping_executor.start()
         else:
             # 如果名称存在，那么是覆盖模式
-            if self.new_dialog_data.mapping_name in self.name_list:
+            if self.new_dialog_data.mapping_name in self.exits_name_tuple:
                 self.override_data_executor = OverrideTypeMappingExecutor([self.new_dialog_data, ], self, self,
                                                                           OVERRIDE_TYPE_MAPPING_TITLE,
                                                                           success_callback=self.override_post_process)
@@ -303,7 +303,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 删除类型映射按钮，初始应该是不可用状态
         self.set_del_mapping_button_available(False)
         # 删除类型映射组按钮状态
-        self.set_del_mapping_group_button_available(self.col_type_table_widget.header_widget.max_group_num)
+        self.set_del_mapping_group_btn_available(self.col_type_table_widget.header_widget.max_group_num)
 
     def get_old_name(self) -> str:
         return self.dialog_data.mapping_name

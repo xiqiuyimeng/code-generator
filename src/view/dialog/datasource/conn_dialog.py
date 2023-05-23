@@ -18,15 +18,15 @@ class ConnDialogABC(CustomSaveDialogABC):
     # 修改后的连接名称
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, dialog_title, screen_rect, conn_name_list, conn_id):
+    def __init__(self, dialog_title, conn_name_list, conn_id):
         self.conn_name_list = conn_name_list
         self.conn_id = conn_id
         self.frame: ConnDialogFrameABC = ...
-        super().__init__(dialog_title, screen_rect)
+        super().__init__(dialog_title)
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
-        self.resize(self.parent_screen_rect.width() * 0.4, self.parent_screen_rect.height() * 0.5)
+        self.resize(self.window_geometry.width() * 0.4, self.window_geometry.height() * 0.5)
 
 
 class MysqlConnDialog(ConnDialogABC):

@@ -11,13 +11,13 @@ _date_ = '2023/2/13 10:03'
 class DsColTypeDialog(CustomDialogABC):
     """数据源列类型对话框，用以维护所有的数据类型和列类型"""
 
-    def __init__(self, screen_rect):
+    def __init__(self):
         self.frame: DsColTypeDialogFrame = ...
-        super().__init__(DS_COL_TYPE_LIST_TITLE, screen_rect)
+        super().__init__(DS_COL_TYPE_LIST_TITLE)
 
     def resize_dialog(self):
         # 当前窗口大小根据主窗口大小计算
-        self.resize(self.parent_screen_rect.width() * 0.7, self.parent_screen_rect.height() * 0.7)
+        self.resize(self.window_geometry.width() * 0.7, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> DsColTypeDialogFrame:
         return DsColTypeDialogFrame(self, self.dialog_title)

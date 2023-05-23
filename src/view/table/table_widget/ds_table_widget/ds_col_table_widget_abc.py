@@ -17,8 +17,7 @@ _date_ = '2022/12/6 15:50'
 
 class DsColTableWidgetABC(TableWidgetABC):
 
-    def __init__(self, main_window, tree_widget, parent, cols):
-        self.main_window = main_window
+    def __init__(self, tree_widget, parent, cols):
         self.tree_widget = tree_widget
         self.cols = cols
         # 获取tab widget中的队列线程执行器
@@ -60,7 +59,7 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.combox_delegate = ComboboxDelegate()
         self.setItemDelegateForColumn(4, self.combox_delegate)
         # 第2,3,4,6列设置编辑代理项
-        self.text_input_delegate = TextInputDelegate(self.main_window.geometry())
+        self.text_input_delegate = TextInputDelegate()
         [self.setItemDelegateForColumn(col, self.text_input_delegate) for col in (1, 2, 3, 5)]
 
     def get_header(self, header_labels) -> CheckBoxHeader: ...
