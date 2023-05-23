@@ -16,3 +16,6 @@ NAME_MAX_LENGTH_PLACEHOLDER_TEXT = '名称最多可输入50字符'
 
 QUIT_PROMPT = '确认退出当前窗口吗？'
 QUIT_BOX_TITLE = '退出'
+
+# 单元格输入代理对话框
+TABLE_ITEM_INPUT_DELEGATE_TITLE = '编辑单元格 行：{}, 列：{}'

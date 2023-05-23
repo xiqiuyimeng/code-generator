@@ -62,3 +62,17 @@ def check_name_available(name, old_name, name_list, name_check_action, name_inpu
     else:
         reset_name_input_style(name_input, name_checker, name_check_action)
         return False
+
+
+# ---------------------------------------- 表格代理对话框检测文本重复 ---------------------------------------- #
+
+def check_text_available(text: str, unique_text_tuple: tuple, duplicate_checker: QLabel, duplicate_prompt: str):
+    text_available = text not in unique_text_tuple
+    if text_available:
+        duplicate_checker.setStyleSheet(read_qss())
+        duplicate_checker.setText('')
+    else:
+        style = "color:red"
+        duplicate_checker.setText(duplicate_prompt)
+        duplicate_checker.setStyleSheet(style)
+    return text_available

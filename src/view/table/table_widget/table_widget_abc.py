@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QTableWidget, QFrame, QToolTip
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 from src.view.table.table_item.table_item import TableWidgetItem
-from src.view.table.table_item.table_item_delegate import TextInputDelegate
 
 _author_ = 'luwt'
 _date_ = '2023/2/13 11:38'
@@ -14,7 +13,6 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.text_input_delegate: TextInputDelegate = ...
         self.setup_ui()
         self.connect_signal()
         # 安装监听器
@@ -70,11 +68,6 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
         item = TableWidgetItem(self)
         item.setText(str(text) if text is not None else '')
         return item
-
-    def set_text_input_delegate(self, columns):
-        # 设置编辑器代理
-        self.text_input_delegate = TextInputDelegate()
-        [self.setItemDelegateForColumn(col, self.text_input_delegate) for col in columns]
 
     def insert_row(self, row_index):
         self.insertRow(row_index)

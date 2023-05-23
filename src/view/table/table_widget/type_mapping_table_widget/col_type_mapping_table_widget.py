@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
 
 from src.constant.table_constant import DEL_MAPPING_GROUP_BOX_TITLE, DEL_MAPPING_GROUP_PROMPT, \
     DEL_COL_TYPE_MAPPING_PROMPT, DEL_COL_TYPE_MAPPING_TITLE
 from src.constant.type_mapping_dialog_constant import DUPLICATE_MAPPING_COL_NAME_PROMPT, \
-    DUPLICATE_MAPPING_COL_NAME_TITLE, CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT, GROUP_MAPPING_COL_NAME_DIFFERENT, \
-    GROUP_MAPPING_COL_NAME_DUPLICATE
+    CHECK_COL_TYPE_MAPPING_FRAGMENTARY_PROMPT, GROUP_MAPPING_COL_NAME_DIFFERENT, \
+    GROUP_MAPPING_COL_NAME_DUPLICATE, DUPLICATE_DS_COL_TYPE_PROMPT
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMapping
-from src.view.box.message_box import pop_question, pop_fail
-from src.view.custom_widget.scrollable_widget import ScrollableWidget
+from src.view.box.message_box import pop_question
 from src.view.table.table_header.col_type_mapping_table_header import ColTypeMappingTableHeader, \
     ColTypeMappingTableHeaderABC, ColTypeMappingFrozenTableHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
+from src.view.table.table_item.table_item_delegate import TextInputDelegate
 from src.view.table.table_widget.table_widget_abc import TableWidgetABC
 
 _author_ = 'luwt'
@@ -21,21 +20,39 @@ _date_ = '2023/2/15 18:05'
 
 class ColTypeMappingTableWidgetABC(TableWidgetABC):
 
-    def __init__(self, *args):
+    def __init__(self, parent, parent_screen_rect):
+        self.parent_screen_rect = parent_screen_rect
         # 表头控件
         self.header_widget: ColTypeMappingTableHeaderABC = ...
-        super().__init__(*args)
+        # 代理编辑器有三种：
+        # 1. 数据源列类型输入编辑器，校验同列数据不能相同
+        self.ds_col_type_input_delegate: TextInputDelegate = ...
+        # 2. 映射列名称输入编辑器，校验同行数据不能相同
+        self.mapping_col_name_input_delegate: TextInputDelegate = ...
+        # 3. 普通输入编辑器
+        self.text_input_delegate: TextInputDelegate = ...
+        super().__init__(parent)
 
     def setup_other_ui(self):
         self.set_column_count()
-        # 第一列之后的所有列，设置表格编辑器代理
-        self.set_text_input_delegate(range(2, self.columnCount()))
+        # 设置代理编辑器
+        self.set_text_input_delegate()
         self.setup_header()
         # 表头高度写死，表头有两行，所以高度定位表头行高度2倍
         self.horizontalHeader().setFixedHeight(self.header_widget.rowHeight(0) << 1)
         # 设置窗口层次，表头始终在表格上方，始终保持视图关系为表头在表格上方
         self.viewport().stackUnder(self.header_widget)
         self.header_widget.show()
+
+    def set_text_input_delegate(self):
+        # 第一列输入编辑器代理代理，同列数据不能相同
+        self.ds_col_type_input_delegate = TextInputDelegate(self.parent_screen_rect,
+                                                            DUPLICATE_DS_COL_TYPE_PROMPT,
+                                                            self.get_unique_ds_col_type_tuple)
+        self.setItemDelegateForColumn(1, self.ds_col_type_input_delegate)
+
+    def get_unique_ds_col_type_tuple(self, index):
+        return tuple(self.item(row, 1).text() for row in range(self.rowCount()) if row != index.row())
 
     def remove_row(self):
         rm_index_list = list()
@@ -94,20 +111,27 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         self.need_sync_col_type = False
         super().__init__(*args)
 
-        # 安装监听器，监听案件事件，交给滚动控件，为了实现水平滚动
-        self.parent().parent().installEventFilter(self)
-
-    def eventFilter(self, obj, event) -> bool:
-        if type(event) == QKeyEvent and event.key() == Qt.Key_Shift:
-            # 触发表格和表头的shift按键事件
-            ScrollableWidget.keyPressEvent(self, event)
-            ScrollableWidget.keyPressEvent(self.header_widget, event)
-            return True
-        return super().eventFilter(obj, event)
-
     def set_column_count(self):
         # 表格设置为5列
         self.setColumnCount(5)
+
+    def set_text_input_delegate(self):
+        super().set_text_input_delegate()
+        # 映射列名称不同组不能重复，即同行不重复
+        self.mapping_col_name_input_delegate = TextInputDelegate(self.parent_screen_rect,
+                                                                 DUPLICATE_MAPPING_COL_NAME_PROMPT,
+                                                                 self.get_unique_mapping_col_name_tuple)
+        [self.setItemDelegateForColumn(col, self.mapping_col_name_input_delegate)
+         for col in range(2, self.columnCount()) if (col - 2) % 3 == 0]
+
+        # 其他列，输入编辑器代理
+        self.text_input_delegate = TextInputDelegate(self.parent_screen_rect)
+        [self.setItemDelegateForColumn(col, self.text_input_delegate)
+         for col in range(2, self.columnCount()) if (col - 2) % 3 > 0]
+
+    def get_unique_mapping_col_name_tuple(self, index):
+        return tuple(self.item(index.row(), col).text() for col in range(1, self.columnCount())
+                     if col != index.column() and (col - 2) % 3 == 0)
 
     def setup_header(self):
         # 创建表头控件
@@ -118,7 +142,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
             # 开启同步列类型数据
             self.need_sync_col_type = True
             # 冻结表
-            self.frozen_column_table = ColTypeMappingFrozenTableWidget(self.parent())
+            self.frozen_column_table = ColTypeMappingFrozenTableWidget(self.parent(), self.parent_screen_rect)
             # 设置冻结列表格的位置
             self.update_frozen_table_geometry()
             # 当前表视图层次关系为：底表 --> 底表表头 --> 冻结列表格 --> 冻结列表头
@@ -164,33 +188,15 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def connect_other_signal(self):
         # 转发信号
         self.header_widget.header_check_changed.connect(self.header_check_changed.emit)
-        # 连接当前单元格变化信号
-        self.currentItemChanged.connect(self._current_item_change)
+        # 连接单元格变化信号
+        self.cellChanged.connect(self._cell_changed_slot)
 
-    def _current_item_change(self, current, previous):
-        # 如果当前单元格变化，且是从映射列名称单元格变化到其他单元格，那么校验映射列名称是否存在重复的情况，
-        # 如果名称重复，提示错误，并重新定位到之前的单元格，进入编辑状态
-        # 如果名称不重复，映射列名称所在列所有单元格都需要同步数据，因为对于映射列名称来说，每一列都应该是一致的
-        if previous and previous is not current and (previous.column() - 2) % 3 == 0:
-            mapping_col_name = previous.text()
-            if not mapping_col_name:
-                return
-            # 收集当前行其他组映射列名称
-            exists_mapping_col_names = [self.item(previous.row(), col_idx).text()
-                                        for col_idx in range(self.columnCount())
-                                        if col_idx != previous.column() and (col_idx - 2) % 3 == 0
-                                        and self.item(previous.row(), col_idx).text()]
-            # 如果重复，提示错误，重新定位之前的单元格，进入编辑状态
-            if mapping_col_name in exists_mapping_col_names:
-                pop_fail(DUPLICATE_MAPPING_COL_NAME_PROMPT.format(mapping_col_name),
-                         DUPLICATE_MAPPING_COL_NAME_TITLE, self.parent())
-                self.editItem(previous)
-                self.setCurrentItem(previous)
-            else:
-                self._sync_mapping_col_name(previous.column(), mapping_col_name)
-
-    def _sync_mapping_col_name(self, col, mapping_col_name):
-        [self.item(row_idx, col).setText(mapping_col_name) for row_idx in range(self.rowCount())]
+    def _cell_changed_slot(self, row, col):
+        # 当映射列名称 列中的单元格数据变化，且当前单元格被选中时，可以判定单元格刚编辑完成，
+        # 此时应该整列所有的单元格，保持数据一致，因为对于映射列名称来说，每一列都应该是一致的
+        if (col - 2) % 3 == 0 and self.item(row, col).isSelected():
+            mapping_col_name = self.item(row, col).text()
+            [self.item(row_idx, col).setText(mapping_col_name) for row_idx in range(self.rowCount())]
 
     def add_type_mapping(self, import_error_data=False):
         # 增加一个新的类型映射行
@@ -211,7 +217,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         # 重新计算表头复选框状态
         self.calculate_header_checked()
         # 同步上一行所有映射列名称数据
-        if not import_error_data:
+        if not import_error_data and row:
             self._sync_last_mapping_col_text(row)
 
     def check_box_clicked_slot(self, check_state, row_num):
@@ -228,19 +234,17 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
     def _sync_last_mapping_col_text(self, row):
         # 同步上一个映射列名称到当前列下面单元格，需要保持映射列名称一致
-        if row > 0:
-            # 找出所有映射列名称 列索引
-            mapping_col_idx_list = list(filter(lambda x: (x - 2) % 3 == 0, range(2, self.columnCount())))
-            for col_idx in mapping_col_idx_list:
-                last_mapping_col_name = self.item(row - 1, col_idx).text()
-                # 给当前列行赋值
-                self.item(row, col_idx).setText(last_mapping_col_name)
+        # 找出所有映射列名称 列索引
+        mapping_col_idx_tuple = tuple(filter(lambda x: (x - 2) % 3 == 0, range(2, self.columnCount())))
+        for col_idx in mapping_col_idx_tuple:
+            last_mapping_col_name = self.item(row - 1, col_idx).text()
+            # 给当前列行赋值
+            self.item(row, col_idx).setText(last_mapping_col_name)
 
     def del_type_mapping(self):
-        check_count = list(filter(lambda x:
-                                  self.cellWidget(x, 0).check_box.checkState() == Qt.Checked,
-                                  range(self.rowCount())))
-        if not pop_question(DEL_COL_TYPE_MAPPING_PROMPT.format(len(check_count)), DEL_COL_TYPE_MAPPING_TITLE, self):
+        check_count = len(tuple(filter(lambda x: self.cellWidget(x, 0).check_box.checkState() == Qt.Checked,
+                                       range(self.rowCount()))))
+        if not pop_question(DEL_COL_TYPE_MAPPING_PROMPT.format(check_count), DEL_COL_TYPE_MAPPING_TITLE, self):
             return
         # 移除类型映射行，根据选中情况来删除
         if self.frozen_column_table is not Ellipsis:
@@ -257,8 +261,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
          for row in range(self.rowCount())]
         # 表头同时增加3列
         self.header_widget.add_type_mapping_group()
-        # 设置编辑器代理
-        self.set_text_input_delegate(range(1, self.columnCount()))
+        # 重新设置一遍编辑器代理
+        self.set_text_input_delegate()
 
         # 添加类型映射组的时候，考虑构建冻结列表格
         self.setup_frozen_table()
@@ -276,9 +280,6 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         if not pop_question(DEL_MAPPING_GROUP_PROMPT.format(group_title),
                             DEL_MAPPING_GROUP_BOX_TITLE, self):
             return
-        # 先断开信号，因为删除组有可能会触发到单元格变化信号，进而触发映射列名称校验，
-        # 如果删除的组包含错误的映射列名称，那么这个校验是不必要的
-        self.currentItemChanged.disconnect()
         # 移除最后一个映射组
         column_count = self.columnCount()
         self.removeColumn(column_count - 1)
@@ -287,9 +288,6 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
         # 移除表头映射组
         self.header_widget.del_type_mapping_group()
-
-        # 重新连接信号
-        self.currentItemChanged.connect(self._current_item_change)
 
     def _sync_frozen_col_data(self):
         # 当前行数

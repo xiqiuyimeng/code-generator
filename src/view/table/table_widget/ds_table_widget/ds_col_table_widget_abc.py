@@ -8,7 +8,7 @@ from src.constant.table_constant import DS_TABLE_HEADER_LABELS
 from src.service.async_func.async_tab_table_task import AsyncSaveTabObjExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
-from src.view.table.table_item.table_item_delegate import ComboboxDelegate
+from src.view.table.table_item.table_item_delegate import ComboboxDelegate, TextInputDelegate
 from src.view.table.table_widget.table_widget_abc import TableWidgetABC
 
 _author_ = 'luwt'
@@ -29,7 +29,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.table_header: CheckBoxHeader = ...
         self.filling_table = False
         # 保存代理引用
-        self.combox_delegate = ...
+        self.combox_delegate: ComboboxDelegate = ...
+        self.text_input_delegate: TextInputDelegate = ...
         super().__init__(parent)
 
     def get_async_save_executor(self) -> AsyncSaveTabObjExecutor:
@@ -59,7 +60,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.combox_delegate = ComboboxDelegate()
         self.setItemDelegateForColumn(4, self.combox_delegate)
         # 第2,3,4,6列设置编辑代理项
-        self.set_text_input_delegate((1, 2, 3, 5))
+        self.text_input_delegate = TextInputDelegate(self.main_window.geometry())
+        [self.setItemDelegateForColumn(col, self.text_input_delegate) for col in (1, 2, 3, 5)]
 
     def get_header(self, header_labels) -> CheckBoxHeader: ...
 

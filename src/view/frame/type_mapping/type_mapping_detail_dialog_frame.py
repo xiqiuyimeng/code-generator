@@ -159,7 +159,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.table_frame_layout = QVBoxLayout(self.table_frame)
         # 将表格布局边距清空
         self.table_frame_layout.setContentsMargins(0, 0, 0, 0)
-        self.col_type_table_widget = ColTypeMappingTableWidget(self.table_frame)
+        self.col_type_table_widget = ColTypeMappingTableWidget(self.table_frame, self.parent_dialog.parent_screen_rect)
         self.table_frame_layout.addWidget(self.col_type_table_widget)
         self.col_type_layout.addWidget(self.table_frame)
 
@@ -228,10 +228,10 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
             if col_types:
                 self.col_type_table_widget.sync_col_types(col_types)
             else:
-                pop_fail(NO_COL_TYPES_PROMPT, GET_COL_TYPES_TITLE, self.frame)
+                pop_fail(NO_COL_TYPES_PROMPT, GET_COL_TYPES_TITLE, self)
         else:
             # 如果还未选择数据源类型，提示
-            pop_fail(NO_DS_TYPE_PROMPT, GET_DS_TYPE_TITLE, self.frame)
+            pop_fail(NO_DS_TYPE_PROMPT, GET_DS_TYPE_TITLE, self)
 
     def save_func(self):
         # 检查表格中数据是否可以提交

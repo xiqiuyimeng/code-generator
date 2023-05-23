@@ -70,5 +70,7 @@ GROUP_MAPPING_COL_NAME_DIFFERENT = '以下映射组的映射列名称，同组�
 GROUP_MAPPING_COL_NAME_DUPLICATE = '以下映射组的映射列名称，在其他映射组中已存在，请修改！\n\n{}'
 
 # 当映射列名称重复时提示
-DUPLICATE_MAPPING_COL_NAME_PROMPT = '映射列名称 [{}] 在其他映射组中已存在，请重新填写'
-DUPLICATE_MAPPING_COL_NAME_TITLE = '映射列名称唯一检查'
+DUPLICATE_MAPPING_COL_NAME_PROMPT = '映射列名称在其他映射组中已存在，请重新填写'
+
+# 数据源列类型重复提示语
+DUPLICATE_DS_COL_TYPE_PROMPT = '数据源列类型已存在，请重新填写'
