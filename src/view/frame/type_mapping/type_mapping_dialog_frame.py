@@ -6,9 +6,11 @@ from src.constant.export_import_constant import IMPORT_TYPE_MAPPING_TITLE, EXPOR
     PROCESS_ILLEGAL_TYPE_MAPPING_TITLE
 from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_BUTTON_TEXT, \
     ADD_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE, \
-    BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE, IMPORT_TYPE_MAPPING_BTN_TEXT, EXPORT_TYPE_MAPPING_BTN_TEXT
+    BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE, IMPORT_TYPE_MAPPING_BTN_TEXT, EXPORT_TYPE_MAPPING_BTN_TEXT, \
+    COPY_TYPE_MAPPING_BUTTON_TEXT, COPY_TYPE_MAPPING_BOX_TITLE
 from src.service.async_func.async_type_mapping_task import DelTypeMappingExecutor, BatchDelTypeMappingExecutor, \
-    ListTypeMappingExecutor, ExportTypeMappingExecutor, ImportTypeMappingExecutor, OverrideTypeMappingExecutor
+    ListTypeMappingExecutor, ExportTypeMappingExecutor, ImportTypeMappingExecutor, OverrideTypeMappingExecutor, \
+    CopyTypeMappingExecutor
 from src.view.dialog.export_dialog import ExportDialog
 from src.view.dialog.import_dialog import ImportDialog
 from src.view.dialog.type_mapping.ds_col_type_dialog import DsColTypeDialog
@@ -43,6 +45,7 @@ class TypeMappingDialogFrame(TableDialogFrame):
         self.open_ds_col_type_button.setText(DS_COL_TYPE_BUTTON_TEXT)
         self.add_row_button.setText(ADD_TYPE_MAPPING_BUTTON_TEXT)
         self.del_row_button.setText(DEL_TYPE_MAPPING_BUTTON_TEXT)
+        self.copy_row_button.setText(COPY_TYPE_MAPPING_BUTTON_TEXT)
         self.import_button.setText(IMPORT_TYPE_MAPPING_BTN_TEXT)
         self.export_button.setText(EXPORT_TYPE_MAPPING_BTN_TEXT)
 
@@ -76,6 +79,10 @@ class TypeMappingDialogFrame(TableDialogFrame):
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTypeMappingExecutor:
         return BatchDelTypeMappingExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
                                            del_title, self.table_widget.del_rows)
+
+    def get_copy_executor(self, copy_row_ids) -> CopyTypeMappingExecutor:
+        return CopyTypeMappingExecutor(copy_row_ids, self.parent_dialog, self.parent_dialog,
+                                       COPY_TYPE_MAPPING_BOX_TITLE, self.table_widget.add_rows)
 
     def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog:
         return ImportDialog(ImportTypeMappingExecutor, PROCESS_DUPLICATE_TYPE_MAPPING_TITLE,

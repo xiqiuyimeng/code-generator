@@ -14,8 +14,9 @@ from src.service.system_storage.conn_type import check_conn_type
 from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.struct_type import check_struct_type
 from src.service.system_storage.type_mapping_sqlite import TypeMappingSqlite, TypeMapping, ImportExportTypeMapping
-from src.service.util.import_export_util import convert_import_to_model_list, convert_import_to_model, group_model_list, \
-    add_group_list, check_repair_type_mapping_group_num
+from src.service.util.copy_util import copy_type_mapping
+from src.service.util.import_export_util import convert_import_to_model_list, convert_import_to_model, add_group_list, \
+    check_repair_type_mapping_group_num, batch_save_type_mapping, export_type_mapping
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -187,6 +188,47 @@ class BatchDelTypeMappingExecutor(LoadingMaskThreadExecutor):
 # ----------------------- 删除类型映射 end ----------------------- #
 
 
+# ----------------------- 复制类型映射 start ----------------------- #
+
+class CopyTypeMappingWorker(ThreadWorkerABC):
+    success_signal = pyqtSignal(list)
+
+    def __init__(self, type_mapping_ids):
+        super().__init__()
+        self.type_mapping_ids = type_mapping_ids
+        self.type_mapping_sqlite = TypeMappingSqlite()
+        self.col_type_mapping_sqlite = ColTypeMappingSqlite()
+
+    def do_run(self):
+        # 根据 type mapping ids 查询类型映射数据
+        type_mappings = export_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite,
+                                            self.type_mapping_ids)
+        # 获取所有类型映射名称
+        type_mapping_names = self.type_mapping_sqlite.get_all_mapping_names()
+        # 复制类型映射
+        copy_type_mappings = [copy_type_mapping(type_mapping, type_mapping_names)
+                              for type_mapping in type_mappings]
+        # 保存类型映射
+        batch_save_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite, copy_type_mappings)
+        self.success_signal.emit(copy_type_mappings)
+
+    def get_err_msg(self) -> str:
+        return '复制类型映射失败'
+
+
+class CopyTypeMappingExecutor(LoadingMaskThreadExecutor):
+
+    def __init__(self, type_mapping_ids, *args):
+        self.type_mapping_ids = type_mapping_ids
+        super().__init__(*args)
+
+    def get_worker(self) -> CopyTypeMappingWorker:
+        return CopyTypeMappingWorker(self.type_mapping_ids)
+
+
+# ----------------------- 复制类型映射 end ----------------------- #
+
+
 # ----------------------- 获取类型映射列表 start ----------------------- #
 
 class ListTypeMappingWorker(ThreadWorkerABC):
@@ -212,17 +254,6 @@ class ListTypeMappingExecutor(LoadingMaskThreadExecutor):
 
 
 # ----------------------- 导入类型映射 start ----------------------- #
-
-
-def batch_save_type_mapping(type_mapping_sqlite: TypeMappingSqlite,
-                            col_type_mapping_sqlite: ColTypeMappingSqlite, data_list):
-    # 批量保存类型映射
-    type_mapping_sqlite.batch_save_type_mappings(data_list)
-    # 保存列类型映射组信息
-    for type_mapping in data_list:
-        if type_mapping.type_mapping_cols:
-            col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols, type_mapping.id)
-
 
 class ImportTypeMappingWorker(ImportDataWorker):
 
@@ -361,19 +392,7 @@ class ExportTypeMappingWorker(ExportDataWorker):
         self.data_key = TYPE_MAPPING_DATA_KEY
 
     def export_data(self) -> list[dataclasses.dataclass]:
-        # 查询类型映射信息
-        type_mapping_list = TypeMappingSqlite().export_type_mapping_by_ids(self.row_ids)
-        if not type_mapping_list:
-            raise Exception('未获取到类型映射信息')
-        # 根据类型映射id查询类型映射组信息
-        col_type_mapping_list = ColTypeMappingSqlite().export_by_parent_ids(self.row_ids)
-        # 对映射组信息分组
-        if col_type_mapping_list:
-            col_type_mapping_dict = group_model_list(col_type_mapping_list, lambda x: x.parent_id)
-            # 类型映射匹配映射组信息
-            for type_mapping in type_mapping_list:
-                type_mapping.type_mapping_cols = col_type_mapping_dict.get(type_mapping.id)
-        return type_mapping_list
+        return export_type_mapping(TypeMappingSqlite(), ColTypeMappingSqlite(), self.row_ids)
 
     def get_err_msg(self) -> str:
         return '导出类型映射失败'

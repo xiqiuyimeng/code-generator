@@ -88,7 +88,7 @@ class DBTreeNode(SqlTreeNodeABC):
         # 再处理子节点线程
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
-            child_node = TableTreeNode(child_item, self.tree_widget, self.window)
+            child_node = TableTreeNode(child_item, self.tree_widget)
             # 将线程停止
             child_node.worker_terminate()
         # 删除库下的节点

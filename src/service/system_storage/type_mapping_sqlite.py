@@ -37,8 +37,8 @@ class TypeMapping(BasicSqliteDTO):
     comment: str = field(init=False, default=None)
     # 列类型映射表中，当前映射下最大的映射组号，用以渲染列类型映射表结构
     max_col_type_group_num: int = field(init=False, default=None)
-    # 类型映射列信息，映射列名：list
-    type_mapping_cols: dict = field(init=False, default=None)
+    # 类型映射列信息
+    type_mapping_cols: list = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -58,8 +58,8 @@ class ImportExportTypeMapping:
     comment: str = field(default=None)
     # 列类型映射表中，当前映射下最大的映射组号，用以渲染列类型映射表结构
     max_col_type_group_num: int = field(default=None)
-    # 类型映射列信息，映射列名：list
-    type_mapping_cols: dict = field(default=None)
+    # 类型映射列信息
+    type_mapping_cols: list = field(default=None)
 
     def convert_import(self, **kwargs):
         for k, v in kwargs.items():

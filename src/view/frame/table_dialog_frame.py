@@ -7,7 +7,7 @@ from src.view.dialog.custom_dialog_abc import StackedDialogABC
 from src.view.dialog.export_dialog import ExportDialog
 from src.view.dialog.import_dialog import ImportDialog
 from src.view.frame.dialog_frame_abc import DialogFrameABC
-from src.view.table.table_widget.custom_export_table_widget import CustomExportTableWidget
+from src.view.table.table_widget.custom_export_table_widget import CustomCopyExportTableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/3/8 13:27'
@@ -26,24 +26,28 @@ class TableDialogFrame(DialogFrameABC):
         self.add_row_button: QPushButton = ...
         # 删除行按钮
         self.del_row_button: QPushButton = ...
+        # 复制行按钮
+        self.copy_row_button: QPushButton = ...
         # 导入按钮
         self.import_button: QPushButton = ...
         # 导出按钮
         self.export_button: QPushButton = ...
         # 主体表格
-        self.table_widget: CustomExportTableWidget = ...
+        self.table_widget: CustomCopyExportTableWidget = ...
         # 读取表格数据列表执行器
         self.list_table_data_executor: LoadingMaskThreadExecutor = ...
         # 删除行数据执行器
         self.del_row_data_executor: LoadingMaskThreadExecutor = ...
         # 批量删除行数据执行器
         self.batch_del_row_data_executor: LoadingMaskThreadExecutor = ...
+        # 复制行数据执行器
+        self.copy_row_data_executor: LoadingMaskThreadExecutor = ...
         # 行具体信息对话框
         self.row_data_dialog: StackedDialogABC = ...
         # 导入数据对话框
-        self.import_data_dialog: ImportDialog = ...
+        self.import_rows_dialog: ImportDialog = ...
         # 导出数据对话框
-        self.export_data_dialog: ExportDialog = ...
+        self.export_rows_dialog: ExportDialog = ...
         super().__init__(*args, **kwargs)
 
     # ------------------------------ 创建ui界面 start ------------------------------ #
@@ -68,17 +72,19 @@ class TableDialogFrame(DialogFrameABC):
         self.operation_table_btn_layout.addWidget(first_operation_button, 0, 0, 1, 1)
         self.add_row_button = QPushButton(self)
         self.operation_table_btn_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
-        self.del_row_button = QPushButton(self)
+        self.del_row_button = QPushButton()
         self.operation_table_btn_layout.addWidget(self.del_row_button, 0, 2, 1, 1)
+        self.copy_row_button = QPushButton(self)
+        self.operation_table_btn_layout.addWidget(self.copy_row_button, 0, 3, 1, 1)
         self.setup_import_export_button()
 
     def setup_first_button(self) -> QPushButton: ...
 
     def setup_import_export_button(self):
         self.import_button = QPushButton(self)
-        self.operation_table_btn_layout.addWidget(self.import_button, 0, 3, 1, 1)
+        self.operation_table_btn_layout.addWidget(self.import_button, 0, 4, 1, 1)
         self.export_button = QPushButton(self)
-        self.operation_table_btn_layout.addWidget(self.export_button, 0, 4, 1, 1)
+        self.operation_table_btn_layout.addWidget(self.export_button, 0, 5, 1, 1)
 
     def make_table_widget(self): ...
 
@@ -93,16 +99,20 @@ class TableDialogFrame(DialogFrameABC):
         self.table_widget.row_edit_signal.connect(self.open_row_data_dialog)
         # 连接表格中行删除信号
         self.table_widget.row_del_signal.connect(self.del_row)
+        # 连接表格中行复制信号
+        self.table_widget.row_copy_signal.connect(self.copy_row)
         # 连接表格中行导出信号
-        self.table_widget.row_export_signal.connect(self.export_row_data)
+        self.table_widget.row_export_signal.connect(self.export_row)
         # 连接表头复选框状态变化信号
-        self.table_widget.header_widget.header_check_changed.connect(self.set_del_export_btn_available)
+        self.table_widget.header_widget.header_check_changed.connect(self.set_button_available)
         # 删除行按钮点击信号
         self.del_row_button.clicked.connect(self.del_rows)
+        # 复制行按钮点击信号
+        self.copy_row_button.clicked.connect(self.copy_rows)
         # 导入按钮
-        self.import_button.clicked.connect(self.import_data)
+        self.import_button.clicked.connect(self.import_rows)
         # 导出按钮
-        self.export_button.clicked.connect(self.export_data)
+        self.export_button.clicked.connect(self.export_rows)
         # 子类的其他信号
         self.connect_special_signal()
 
@@ -141,16 +151,21 @@ class TableDialogFrame(DialogFrameABC):
 
     def get_del_executor(self, row_id, item_name, row_index, del_title) -> LoadingMaskThreadExecutor: ...
 
-    def export_row_data(self, row_id):
-        self.do_export_data((row_id, ))
+    def copy_row(self, row_id):
+        self.do_copy_rows((row_id, ))
 
-    def set_del_export_btn_available(self, checked):
-        # 如果表格存在行，删除按钮和导出按钮状态根据传入状态变化，否则应该置为不可用
+    def export_row(self, row_id):
+        self.do_export_rows((row_id,))
+
+    def set_button_available(self, checked):
+        # 如果表格存在行，删除按钮、导出按钮和复制按钮状态根据传入状态变化，否则应该置为不可用
         if self.table_widget.rowCount():
             self.del_row_button.setDisabled(not checked)
+            self.copy_row_button.setDisabled(not checked)
             self.export_button.setDisabled(not checked)
         else:
             self.del_row_button.setDisabled(True)
+            self.copy_row_button.setDisabled(True)
             self.export_button.setDisabled(True)
 
     def del_rows(self):
@@ -166,10 +181,21 @@ class TableDialogFrame(DialogFrameABC):
 
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> LoadingMaskThreadExecutor: ...
 
-    def import_data(self):
+    def copy_rows(self):
+        # 收集所有选中项id
+        checked_ids = self.table_widget.get_all_checked_id_names()[0]
+        self.do_copy_rows(checked_ids)
+
+    def do_copy_rows(self, row_ids):
+        self.copy_row_data_executor = self.get_copy_executor(row_ids)
+        self.copy_row_data_executor.start()
+
+    def get_copy_executor(self, copy_row_ids) -> LoadingMaskThreadExecutor: ...
+
+    def import_rows(self):
         # 打开导入对话框
-        self.import_data_dialog = self.get_import_dialog(self.import_success_callback, self.get_row_data_dialog)
-        self.import_data_dialog.exec()
+        self.import_rows_dialog = self.get_import_dialog(self.import_success_callback, self.get_row_data_dialog)
+        self.import_rows_dialog.exec()
 
     def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog: ...
 
@@ -178,15 +204,15 @@ class TableDialogFrame(DialogFrameABC):
             self.table_widget.del_duplicate_rows(del_data_list)
         self.table_widget.add_rows(add_data_list)
 
-    def export_data(self):
+    def export_rows(self):
         # 收集所有选中项id
         checked_ids = self.table_widget.get_all_checked_id_names()[0]
-        self.do_export_data(checked_ids)
+        self.do_export_rows(checked_ids)
 
-    def do_export_data(self, row_ids):
+    def do_export_rows(self, row_ids):
         # 打开导出对话框
-        self.export_data_dialog = self.get_export_dialog(row_ids)
-        self.export_data_dialog.exec()
+        self.export_rows_dialog = self.get_export_dialog(row_ids)
+        self.export_rows_dialog.exec()
 
     def get_export_dialog(self, row_ids) -> ExportDialog: ...
 
@@ -203,7 +229,7 @@ class TableDialogFrame(DialogFrameABC):
     def get_list_table_data_executor(self) -> LoadingMaskThreadExecutor: ...
 
     def init_del_button_status(self):
-        # 设置删除按钮和导出按钮状态，初始不可用
-        self.set_del_export_btn_available(False)
+        # 初始化按钮状态
+        self.set_button_available(False)
 
     # ------------------------------ 后置处理 end ------------------------------ #

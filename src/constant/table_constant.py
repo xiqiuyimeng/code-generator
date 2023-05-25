@@ -29,6 +29,9 @@ ROW_CAT_EDIT_ICON = '表格行操作icon：查看编辑'
 ROW_DEL_TEXT = '删除'
 ROW_DEL_ICON = '表格行操作icon：删除'
 
+ROW_COPY_TEXT = '复制'
+ROW_COPY_ICON = '表格行操作icon：复制'
+
 ROW_EXPORT_TEXT = '导出'
 ROW_EXPORT_ICON = '表格行操作icon：导出'
 

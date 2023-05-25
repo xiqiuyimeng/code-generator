@@ -2,7 +2,7 @@
 import dataclasses
 
 from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT, DEFAULT_INPUT_WIDGET_TYPE
-from src.service.system_storage.template_config_sqlite import RequiredEnum, check_required_value_legal
+from src.service.system_storage.template_config_sqlite import RequiredEnum, check_required_value_legal, ConfigTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2023/5/15 14:11'
@@ -34,6 +34,8 @@ def group_model_list(data_list, get_group_key):
     return model_list_dict
 
 
+# ------------------------------ 导入导出类型映射 start ------------------------------ #
+
 def check_repair_type_mapping_group_num(mapping_col_group_dict):
     for group_idx, group_num in enumerate(sorted(mapping_col_group_dict)):
         # 如果组号不对，更新组号
@@ -49,6 +51,36 @@ def check_repair_type_mapping_group_num(mapping_col_group_dict):
             # 删除原有组
             del mapping_col_group_dict[group_num]
 
+
+def batch_save_type_mapping(type_mapping_sqlite, col_type_mapping_sqlite, data_list):
+    # 批量保存类型映射
+    type_mapping_sqlite.batch_save_type_mappings(data_list)
+    # 保存列类型映射组信息
+    for type_mapping in data_list:
+        if type_mapping.type_mapping_cols:
+            col_type_mapping_sqlite.batch_save(type_mapping.type_mapping_cols, type_mapping.id)
+
+
+def export_type_mapping(type_mapping_sqlite, col_type_mapping_sqlite, type_mapping_ids):
+    # 查询类型映射信息
+    type_mapping_list = type_mapping_sqlite.export_type_mapping_by_ids(type_mapping_ids)
+    if not type_mapping_list:
+        raise Exception('未获取到类型映射信息')
+    # 根据类型映射id查询类型映射组信息
+    col_type_mapping_list = col_type_mapping_sqlite.export_by_parent_ids(type_mapping_ids)
+    # 对映射组信息分组
+    if col_type_mapping_list:
+        col_type_mapping_dict = group_model_list(col_type_mapping_list, lambda x: x.parent_id)
+        # 类型映射匹配映射组信息
+        for type_mapping in type_mapping_list:
+            type_mapping.type_mapping_cols = col_type_mapping_dict.get(type_mapping.id)
+    return type_mapping_list
+
+
+# ------------------------------ 导入导出类型映射 end ------------------------------ #
+
+
+# ------------------------------ 导入导出模板 start ------------------------------ #
 
 def create_default_file_name(template_file_name_set, default_file_name, start_idx):
     current_file_name = default_file_name.format(start_idx)
@@ -104,3 +136,51 @@ def check_template_config(config_list, config_type):
         # 修正配置数据
         repair_template_config(config, config_type)
     return error_name_count, error_var_name_count
+
+
+def batch_save_template(template_sqlite, template_config_sqlite, template_file_sqlite, data_list):
+    # 批量保存模板
+    template_sqlite.batch_save_templates(data_list)
+    for template in data_list:
+        template_config_sqlite.batch_add_config_list(template.id, template.output_config_list,
+                                                     template.var_config_list)
+        if template.template_files:
+            template_file_sqlite.batch_add_template_files(template.id,
+                                                          template.template_files)
+
+
+def export_template(template_sqlite, template_file_sqlite, template_config_sqlite, template_ids):
+    # 1. 查询模板信息
+    template_list = template_sqlite.export_template_by_ids(template_ids)
+    if not template_list:
+        raise Exception('未获取到模板信息')
+    # 2. 查询模板文件
+    template_file_list = template_file_sqlite.export_files_by_parent_id(template_ids)
+
+    # 3. 文件按模板id分组
+    template_id_file_dict = group_model_list(template_file_list, lambda x: x.template_id)
+
+    # 4. 文件按output_config_id分组
+    template_output_file_dict = group_model_list(template_file_list, lambda x: x.output_config_id)
+
+    # 5. 查询模板配置
+    template_config_list = template_config_sqlite.export_config_by_template_ids(template_ids)
+
+    # 6. 配置分类，并将文件关联到对应的输出配置上
+    template_id_output_config_dict, template_id_var_config_dict = dict(), dict()
+    for config in template_config_list:
+        if config.config_type == ConfigTypeEnum.output_dir.value:
+            add_group_list(template_id_output_config_dict, lambda x: x.template_id, config)
+            # 关联文件
+            config.bind_file_list = template_output_file_dict.get(config.id)
+        elif config.config_type == ConfigTypeEnum.template_var.value:
+            add_group_list(template_id_var_config_dict, lambda x: x.template_id, config)
+
+    # 将模板配置、模板文件都关联到模板上
+    for template in template_list:
+        template.template_files = template_id_file_dict.get(template.id)
+        template.output_config_list = template_id_output_config_dict.get(template.id)
+        template.var_config_list = template_id_var_config_dict.get(template.id)
+    return template_list
+
+# ------------------------------ 导入导出模板 end ------------------------------ #

@@ -102,7 +102,7 @@ class ConnTreeNode(SqlTreeNodeABC):
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
             if child_item.childCount():
-                child_node = DBTreeNode(child_item, self.tree_widget, self.window)
+                child_node = DBTreeNode(child_item, self.tree_widget)
                 # 将线程停止
                 child_node.worker_terminate()
 
@@ -110,7 +110,7 @@ class ConnTreeNode(SqlTreeNodeABC):
         tab_indexes, tab_ids = list(), list()
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
-            child_node = DBTreeNode(child_item, self.tree_widget, self.window)
+            child_node = DBTreeNode(child_item, self.tree_widget)
             child_tab_index_list, child_tab_ids = child_node.get_tab_indexes_and_ids()
             tab_indexes.extend(child_tab_index_list)
             tab_ids.extend(child_tab_ids)

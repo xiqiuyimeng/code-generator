@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from src.constant.table_constant import TEMPLATE_TABLE_HEADER_LABELS
-from src.view.table.table_widget.custom_export_table_widget import CustomExportTableWidget
+from src.view.table.table_widget.custom_export_table_widget import CustomCopyExportTableWidget
 
 _author_ = 'luwt'
 _date_ = '2023/3/8 17:59'
 
 
-class TemplateTableWidget(CustomExportTableWidget):
+class TemplateTableWidget(CustomCopyExportTableWidget):
 
     def __init__(self, *args):
         super().__init__(TEMPLATE_TABLE_HEADER_LABELS, *args)
