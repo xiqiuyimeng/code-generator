@@ -27,7 +27,7 @@ def init_ds_type():
     ds_col_type_sqlite = DsColTypeSqlite()
     # 获取数据库中保存的数据源类型
     ds_types = ds_col_type_sqlite.get_ds_types()
-    ds_type_dict = dict(map(lambda x: (x.ds_col_type, x), ds_types))
+    ds_type_dict = {ds_type.ds_col_type: ds_type for ds_type in ds_types}
     # 遍历枚举获取实际的数据源类型
     add_ds_types, update_ds_types = list(), list()
     for item_order, conn_type in enumerate(ConnTypeEnum, start=1):
@@ -43,7 +43,7 @@ def init_ds_type():
         ds_col_type_sqlite.batch_update(update_ds_types)
     # 最后如果 ds_type_dict 中还有值，那么应当是需要删除的
     if ds_type_dict:
-        ds_col_type_sqlite.batch_delete_ds_types(tuple(map(lambda x: x.id, ds_type_dict.values())))
+        ds_col_type_sqlite.batch_delete_ds_types([ds_type.id for ds_type in ds_type_dict.values()])
 
 
 def init_data():

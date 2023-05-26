@@ -17,13 +17,13 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
     save_signal = pyqtSignal(TemplateFunc)
     edit_signal = pyqtSignal(TemplateFunc)
 
-    def __init__(self, parent_dialog, title, exists_func_name_tuple, template_func=None):
+    def __init__(self, parent_dialog, title, exists_func_names, template_func=None):
         self.dialog_data: TemplateFunc = ...
         self.new_dialog_data: TemplateFunc = ...
         self.text_editor: PyFuncEditor = ...
         self.add_func_executor: AddTemplateFuncExecutor = ...
         self.edit_func_executor: EditTemplateFuncExecutor = ...
-        super().__init__(parent_dialog, title, exists_func_name_tuple, template_func, False)
+        super().__init__(parent_dialog, title, exists_func_names, template_func, False)
 
     def get_new_dialog_data(self) -> TemplateFunc:
         return TemplateFunc()
@@ -91,7 +91,8 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-    def setup_input_limit_rule(self): ...
+    def setup_input_limit_rule(self):
+        ...
 
     def setup_placeholder_text(self):
         self.name_input.setPlaceholderText(TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT)
@@ -103,4 +104,3 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         self.text_editor.setPlainText(self.dialog_data.func_body)
 
     # ------------------------------ 后置处理 end ------------------------------ #
-

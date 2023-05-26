@@ -16,8 +16,8 @@ class TemplateDetailDialog(StackedDialogABC):
     edit_signal = pyqtSignal(Template)
     override_signal = pyqtSignal(list, list)
     
-    def __init__(self, exists_template_name_tuple, template_id=None):
-        self.exists_template_name_tuple = exists_template_name_tuple
+    def __init__(self, exists_template_names, template_id=None):
+        self.exists_template_names = exists_template_names
         self.template_id = template_id
         self.frame: TemplateDetailDialogFrame = ...
         super().__init__(EDIT_TEMPLATE_TITLE if template_id else CREATE_TEMPLATE_TITLE)
@@ -28,9 +28,7 @@ class TemplateDetailDialog(StackedDialogABC):
         self.setGeometry(self.window_geometry)
 
     def get_frame(self) -> TemplateDetailDialogFrame:
-        return TemplateDetailDialogFrame(self, self.dialog_title,
-                                         self.exists_template_name_tuple,
-                                         self.template_id)
+        return TemplateDetailDialogFrame(self, self.dialog_title, self.exists_template_names, self.template_id)
 
     def connect_signal(self):
         super().connect_signal()

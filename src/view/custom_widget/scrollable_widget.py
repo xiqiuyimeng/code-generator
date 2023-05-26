@@ -101,7 +101,8 @@ class ScrollableTextEdit(QPlainTextEdit, ScrollableZoomWidget):
                     # 如果空白数是4的倍数，那么一次移除4个空格，否则每次移除一个空格
                     if len(nearest_blank) and len(nearest_blank) % 4 == 0:
                         # 删除4个空白
-                        [tc.deletePreviousChar() for i in range(4)]
+                        for i in range(4):
+                            tc.deletePreviousChar()
                         return
         elif e.modifiers() == Qt.ShiftModifier and e.key() == Qt.Key_Return:
             # 将光标移动到末位

@@ -13,8 +13,8 @@ class SimpleNameCheckDialog(CustomSaveDialogABC):
     save_signal = pyqtSignal(str)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, exists_name_tuple, dialog_title, current_name=None):
-        self.exists_name_tuple = exists_name_tuple
+    def __init__(self, exists_names, dialog_title, current_name=None):
+        self.exists_names = exists_names
         self.current_name = current_name
         self.frame: SimpleNameCheckDialogFrame = ...
         super().__init__(dialog_title)
@@ -23,4 +23,4 @@ class SimpleNameCheckDialog(CustomSaveDialogABC):
         self.resize(self.window_geometry.width() * 0.3, self.window_geometry.height() * 0.2)
 
     def get_frame(self) -> SimpleNameCheckDialogFrame:
-        return SimpleNameCheckDialogFrame(self, self.dialog_title, self.exists_name_tuple, self.current_name)
+        return SimpleNameCheckDialogFrame(self, self.dialog_title, self.exists_names, self.current_name)

@@ -55,7 +55,8 @@ class CustomTableWidget(TableWidgetABC):
 
     def _do_add_row(self, row_data, row_index):
         self.insert_row(row_index)
-        checkbox_num_widget = make_checkbox_num_widget(row_index + 1, self.header_widget.calculate_header_check_state)
+        checkbox_num_widget = make_checkbox_num_widget(row_index + 1,
+                                                       self.header_widget.calculate_header_check_state)
         order_item = checkbox_num_widget.check_label
         setattr(order_item, 'row_data', row_data)
         self.setCellWidget(row_index, 0, checkbox_num_widget)
@@ -65,7 +66,8 @@ class CustomTableWidget(TableWidgetABC):
         self.setCellWidget(row_index, self.columnCount() - 1, self.make_operation_buttons(order_item, row_id))
         self.header_widget.calculate_header_check_state()
 
-    def do_fill_row(self, row_index, row_data, fill_create_time=True): ...
+    def do_fill_row(self, row_index, row_data, fill_create_time=True):
+        ...
 
     def make_operation_buttons(self, order_item, row_id):
         """
@@ -104,7 +106,8 @@ class CustomTableWidget(TableWidgetABC):
         self._do_add_row(row_data, self.rowCount())
 
     def add_rows(self, row_data_list):
-        [self.add_row(row_data) for row_data in row_data_list]
+        for row_data in row_data_list:
+            self.add_row(row_data)
 
     def del_row(self, row):
         self.removeRow(row)
@@ -144,4 +147,5 @@ class CustomTableWidget(TableWidgetABC):
         # 删除行后，重新计算表头复选框状态
         self.header_widget.calculate_header_check_state()
 
-    def del_duplicate_rows(self, duplicate_data_list): ...
+    def del_duplicate_rows(self, duplicate_data_list):
+        ...

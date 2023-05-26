@@ -9,7 +9,6 @@ from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, t
 _author_ = 'luwt'
 _date_ = '2023/3/9 8:46'
 
-
 table_name = 'template_config'
 
 sql_dict = {
@@ -158,7 +157,7 @@ class TemplateConfigSqlite(SqliteBasic):
         self.batch_add_config_list(template_id, output_config_list, var_config_list)
 
     def batch_del_config_list(self, template_ids):
-        ids_str = ','.join(map(lambda x: str(x), template_ids))
+        ids_str = ','.join([str(template_id) for template_id in template_ids])
         sql = f"{sql_dict.get('delete_by_template_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')

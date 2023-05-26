@@ -16,7 +16,8 @@ class SyntaxHighLighterABC(QSyntaxHighlighter):
         self.mappings = dict()
         self.add_mappings()
 
-    def add_mappings(self): ...
+    def add_mappings(self):
+        ...
 
     def highlightBlock(self, text):
         for pattern, text_format in self.mappings.items():

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import records
 
-from src.exception.exception import BusinessException
 from src.service.system_storage.conn_sqlite import SqlConnection
 from src.service.system_storage.conn_type import get_conn_type_by_type
 
@@ -18,7 +17,8 @@ class SqlDBExecutor:
         self.db: records.Database = ...
         self.connect_db()
 
-    def connect_db(self): ...
+    def connect_db(self):
+        ...
 
     def get_data(self, sql):
         return self.db.query(sql)
@@ -26,17 +26,23 @@ class SqlDBExecutor:
     def test_conn(self):
         self.db.get_connection()
 
-    def open_conn(self): ...
+    def open_conn(self):
+        ...
 
-    def open_db(self, db, check=True): ...
+    def open_db(self, db, check=True):
+        ...
 
-    def open_tb(self, db, tb, check=True): ...
+    def open_tb(self, db, tb, check=True):
+        ...
 
-    def check_db(self, db): ...
+    def check_db(self, db):
+        ...
 
-    def check_tb(self, db, tb): ...
+    def check_tb(self, db, tb):
+        ...
 
-    def get_sql_connect_url(self) -> str: ...
+    def get_sql_connect_url(self) -> str:
+        ...
 
 
 class InternetDBExecutor(SqlDBExecutor):
@@ -51,39 +57,43 @@ class InternetDBExecutor(SqlDBExecutor):
     def open_conn(self):
         query_db_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_db_sql
         db_records = self.get_data(query_db_sql)
-        return tuple(map(lambda x: map(lambda y: y, x.values()).__next__(), db_records.as_dict(ordered=True)))
+        return [[value for value in row.values()][0] for row in db_records.as_dict(ordered=True)]
 
     def open_db(self, db, check=True):
         if check:
             self.check_db(db)
         query_tb_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_tb_sql.format(db)
         db_records = self.get_data(query_tb_sql)
-        return tuple(map(lambda x: map(lambda y: y, x.values()).__next__(), db_records.as_dict(ordered=True)))
+        return [[value for value in row.values()][0] for row in db_records.as_dict(ordered=True)]
 
     def open_tb(self, db, tb, check=True):
         if check:
             self.check_tb(db, tb)
         query_col_sql = get_conn_type_by_type(self.sql_conn.conn_type).query_col_sql.format(db, tb)
         db_records = self.get_data(query_col_sql)
-        return tuple(map(lambda x: self.convert_tb_data(x), db_records.as_dict(ordered=True)))
+        return [self.convert_tb_data(row) for row in db_records.as_dict(ordered=True)]
 
     def check_db(self, db):
         check_db_sql = self.get_check_db_sql()
         db_records = self.get_data(check_db_sql.format(db)).all()
         if not db_records:
-            raise BusinessException(f'{db}库不存在')
+            raise Exception(f'{db}库不存在')
 
     def check_tb(self, db, tb):
         self.check_db(db)
         check_tb_sql = self.get_check_tb_sql()
         db_records = self.get_data(check_tb_sql.format(db, tb)).all()
         if not db_records:
-            raise BusinessException(f'{tb}表不存在')
+            raise Exception(f'{tb}表不存在')
 
-    def get_dialect_driver(self) -> str: ...
+    def get_dialect_driver(self) -> str:
+        ...
 
-    def get_check_db_sql(self) -> str: ...
+    def get_check_db_sql(self) -> str:
+        ...
 
-    def get_check_tb_sql(self) -> str: ...
+    def get_check_tb_sql(self) -> str:
+        ...
 
-    def convert_tb_data(self, db_record): ...
+    def convert_tb_data(self, db_record):
+        ...

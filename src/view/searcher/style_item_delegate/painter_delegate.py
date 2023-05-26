@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QStyle, QTreeWidgetItem, QListWidgetItem, QStyleOpti
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:05'
 
-
 # 默认空的rect
 none_rect = QRect(0, 0, 0, 0)
 
@@ -30,10 +29,10 @@ class ItemPainterContext:
         painter.translate(visual_rect.x(), visual_rect.y())
         # 小部件的水平方向margin，一个小部件会存在左右两个边距
         self.margin_h = style.pixelMetric(QStyle.PM_FocusFrameHMargin) + 1
-        self.painters = [CheckBoxItemPainter(self.item, self.margin_h, style, painter, visual_rect),
+        self.painters = (CheckBoxItemPainter(self.item, self.margin_h, style, painter, visual_rect),
                          IconItemPainter(self.item, self.margin_h, style, painter, visual_rect, self.parent),
                          TextItemPainter(item_text, selected_flag, search_flag, search_item_records,
-                                         self.item, self.margin_h, style, painter, visual_rect)]
+                                         self.item, self.margin_h, style, painter, visual_rect))
 
     def paint_item(self):
         left_x = 0
@@ -69,11 +68,14 @@ class ItemPainterABC(ABC):
         self.visual_rect = visual_rect
         self.match = ...
 
-    def match_type(self) -> bool: ...
+    def match_type(self) -> bool:
+        ...
 
-    def calculate_paint_rect(self, left_x): ...
+    def calculate_paint_rect(self, left_x):
+        ...
 
-    def paint_rect(self, rect): ...
+    def paint_rect(self, rect):
+        ...
 
 
 class CheckBoxItemPainter(ItemPainterABC):

@@ -60,16 +60,18 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.setItemDelegateForColumn(4, self.combox_delegate)
         # 第2,3,4,6列设置编辑代理项
         self.text_input_delegate = TextInputDelegate()
-        [self.setItemDelegateForColumn(col, self.text_input_delegate) for col in (1, 2, 3, 5)]
+        for col in (1, 2, 3, 5):
+            self.setItemDelegateForColumn(col, self.text_input_delegate)
 
-    def get_header(self, header_labels) -> CheckBoxHeader: ...
+    def get_header(self, header_labels) -> CheckBoxHeader:
+        ...
 
     def resizeEvent(self, e) -> None:
         self.table_header.setGeometry(self.frameWidth(), self.frameWidth(), self.viewport().width(),
                                       self.horizontalHeader().height())
         # 表头每列的宽度，应该跟表格内每列宽度一致
-        [self.table_header.horizontalHeader().resizeSection(col, self.columnWidth(col))
-         for col in range(self.columnCount())]
+        for col in range(self.columnCount()):
+            self.table_header.horizontalHeader().resizeSection(col, self.columnWidth(col))
         super().resizeEvent(e)
 
     def connect_other_signal(self):
@@ -113,17 +115,23 @@ class DsColTableWidgetABC(TableWidgetABC):
 
         self.filling_table = False
 
-    def make_checkbox_num_widget(self, row_index, col_data) -> QWidget: ...
+    def make_checkbox_num_widget(self, row_index, col_data) -> QWidget:
+        ...
 
-    def fill_post_process(self): ...
+    def fill_post_process(self):
+        ...
 
-    def add_checked_data(self, cols): ...
+    def add_checked_data(self, cols):
+        ...
 
-    def remove_checked_data(self, cols): ...
+    def remove_checked_data(self, cols):
+        ...
 
-    def remove_all_table_checked(self, cols): ...
+    def remove_all_table_checked(self, cols):
+        ...
 
-    def update_checked_data(self, col_data): ...
+    def update_checked_data(self, col_data):
+        ...
 
     def click_row_checkbox(self, checked, row):
         row = int(row) - 1

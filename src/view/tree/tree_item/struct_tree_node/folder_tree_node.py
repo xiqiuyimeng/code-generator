@@ -128,7 +128,7 @@ class FolderTreeNode(StructTreeNodeABC):
         if self.item.childCount() == 0:
             return Qt.Unchecked
         # 如果子元素全选，那么应该返回全选，如果子元素全未选，应该返回未选择，否则返回部分选择
-        check_set = set(map(lambda x: self.item.child(x).checkState(0), range(self.item.childCount())))
+        check_set = {self.item.child(idx).checkState(0) for idx in range(self.item.childCount())}
         if len(check_set) == 1:
             return check_set.pop()
         else:
@@ -156,8 +156,8 @@ class FolderTreeNode(StructTreeNodeABC):
         self.stop_child_worker(self.item, tab_indexes)
         if tab_indexes:
             tab_indexes.sort(reverse=True)
-            [self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
-             for index in tab_indexes]
+            for index in tab_indexes:
+                self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
         self.del_callback()
 
     def stop_child_worker(self, parent_item, tab_indexes):
@@ -206,4 +206,3 @@ class FolderTreeNode(StructTreeNodeABC):
         self.tree_widget.get_item_node(refreshed_item).refresh_success(refreshed_tab)
         # 停止动画
         self.refresh_folder_executor.stop_one_movie(refreshed_item)
-

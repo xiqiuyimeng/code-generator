@@ -20,8 +20,8 @@ class TemplateFileTabWidget(QTabWidget):
     def removeTab(self, index: int):
         """重写删除tab方法，在删除时，将tab页数据刷入模板文件对象"""
         # 一定能找到tab对应的列表项
-        list_index = tuple(filter(lambda x: self.tabText(index) == self.file_list_widget.item(x).text(),
-                                  range(self.file_list_widget.count())))[0]
+        list_index = [row for row in range(self.file_list_widget.count())
+                      if self.tabText(index) == self.file_list_widget.item(row).text()][0]
         list_item = self.file_list_widget.item(list_index)
         template_file_data = get_template_file_data(list_item)
         # 将tab页内保存的文本数据刷入对象中

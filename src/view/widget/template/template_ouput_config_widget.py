@@ -70,7 +70,8 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
     def auto_generate_config_callback(self, success_list, fail_list):
         if success_list:
             # 成功生成的配置，自动添加到表格中
-            [self.config_table.add_row(config) for config in success_list]
+            for config in success_list:
+                self.config_table.add_row(config)
         if fail_list:
             # 未成功生成配置的文件，提示
             pop_fail(GENERATE_CONFIG_FAIL_PROMPT.format('\n'.join(fail_list)), GENERATE_FILE_CONFIG_TITLE, self)
@@ -79,9 +80,9 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         if not self.config_table.rowCount():
             pop_fail(NO_OUTPUT_CONFIG_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, self)
             return
-        output_config_tuple = self.config_table.collect_data()
+        output_config_list = self.config_table.collect_data()
         unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
-        self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(output_config_tuple,
+        self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(output_config_list,
                                                                             unbind_config_files)
         self.maintain_file_config_dialog.bind_file_changed.connect(self.config_table.update_bind_file_num_rows)
         self.maintain_file_config_dialog.exec()

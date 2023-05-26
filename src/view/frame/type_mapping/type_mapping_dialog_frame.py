@@ -62,9 +62,9 @@ class TypeMappingDialogFrame(TableDialogFrame):
         self.ds_col_type_list_dialog.exec()
 
     def do_get_row_data_dialog(self, row_id) -> TypeMappingDetailDialog:
-        type_mapping_name_tuple = tuple(self.table_widget.item(row, 1).text()
-                                        for row in range(self.table_widget.rowCount()))
-        return TypeMappingDetailDialog(type_mapping_name_tuple, row_id)
+        type_mapping_names = [self.table_widget.item(row, 1).text()
+                              for row in range(self.table_widget.rowCount())]
+        return TypeMappingDetailDialog(type_mapping_names, row_id)
 
     def get_del_prompt_title(self):
         return DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE

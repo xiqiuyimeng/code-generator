@@ -24,7 +24,7 @@ class StructDialogFrameABC(DsDialogFrameABC):
     save_signal = pyqtSignal(OpenedTreeItem)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, parent_dialog, dialog_title, exists_struct_name_tuple, opened_struct_id,
+    def __init__(self, parent_dialog, dialog_title, exists_struct_names, opened_struct_id,
                  tree_widget, parent_folder_item):
         self.tree_widget = tree_widget
         # 父节点 opened item
@@ -50,7 +50,7 @@ class StructDialogFrameABC(DsDialogFrameABC):
         # 如果是编辑，需要读取数据库中存储的实际的结构体信息，用来回显
 
         super().__init__(parent_dialog, dialog_title.format(self.struct_type.display_name),
-                         exists_struct_name_tuple, opened_struct_id, placeholder_blank_width=1)
+                         exists_struct_names, opened_struct_id, placeholder_blank_width=1)
 
         # 调整布局比例
         self.frame_layout.setStretch(0, 2)
@@ -58,7 +58,8 @@ class StructDialogFrameABC(DsDialogFrameABC):
         self.frame_layout.setStretch(2, 4)
         self.frame_layout.setStretch(3, 1)
 
-    def get_struct_type(self) -> StructType: ...
+    def get_struct_type(self) -> StructType:
+        ...
 
     def get_new_dialog_data(self):
         return StructInfo()
@@ -84,7 +85,8 @@ class StructDialogFrameABC(DsDialogFrameABC):
         self.struct_text_syntax_highlighter.setDocument(self.struct_text_input.document())
         self.ds_info_layout.addRow(self.struct_text_label, self.struct_text_input)
 
-    def get_syntax_highlighter(self) -> SyntaxHighLighterABC: ...
+    def get_syntax_highlighter(self) -> SyntaxHighLighterABC:
+        ...
 
     def get_blank_left_buttons(self) -> tuple:
         # 按钮部分

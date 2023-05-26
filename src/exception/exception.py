@@ -9,10 +9,3 @@ class ThreadStopException(Exception):
     def __init__(self, err_msg):
         super().__init__()
         self.err_msg = err_msg
-
-
-class BusinessException(Exception):
-
-    def __init__(self, err_msg):
-        self.err_msg = err_msg
-        super().__init__(err_msg)

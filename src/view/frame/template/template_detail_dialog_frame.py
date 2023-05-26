@@ -38,7 +38,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     edit_signal = pyqtSignal(Template)
     override_signal = pyqtSignal(list, list)
 
-    def __init__(self, parent_dialog, dialog_title, exists_template_name_tuple, template_id=None):
+    def __init__(self, parent_dialog, dialog_title, exists_template_names, template_id=None):
         self.dialog_data: Template = ...
         self.new_dialog_data: Template = ...
         # 标记当前是否是用来展示导入错误数据详情页
@@ -80,7 +80,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.edit_template_executor: EditTemplateExecutor = ...
         # 覆盖导入模板执行器
         self.override_data_executor: OverrideTemplateExecutor = ...
-        super().__init__(parent_dialog, dialog_title, exists_template_name_tuple, template_id)
+        super().__init__(parent_dialog, dialog_title, exists_template_names, template_id)
 
     def get_new_dialog_data(self) -> Template:
         return Template()
@@ -209,8 +209,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         # 修改文件对象中的名称
         get_template_file_data(current_item).file_name = file_name
         # 搜索tab页，修改tab部件名称
-        current_tab_indexes = tuple(filter(lambda x: self.file_tab_widget.tabText(x) == original_file_name,
-                                           range(self.file_tab_widget.count())))
+        current_tab_indexes = [tab_idx for tab_idx in range(self.file_tab_widget.count())
+                               if self.file_tab_widget.tabText(tab_idx) == original_file_name]
         if current_tab_indexes:
             self.file_tab_widget.setTabText(current_tab_indexes[0], file_name)
 
@@ -236,8 +236,8 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
                 self.edit_template_executor.start()
             else:
                 # 如果名称存在，那么是覆盖模式
-                if self.new_dialog_data.template_name in self.exits_name_tuple:
-                    self.override_data_executor = OverrideTemplateExecutor([self.new_dialog_data, ], self, self,
+                if self.new_dialog_data.template_name in self.exits_names:
+                    self.override_data_executor = OverrideTemplateExecutor((self.new_dialog_data,), self, self,
                                                                            OVERRIDE_TEMPLATE_TITLE,
                                                                            success_callback=self.override_post_process)
                     self.override_data_executor.start()
@@ -272,9 +272,9 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         if not self.new_dialog_data.template_files:
             template_completable = pop_question(CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, self)
         else:
-            if tuple(filter(lambda x: x.output_config_id is None, self.new_dialog_data.template_files)):
+            if [file for file in self.new_dialog_data.template_files if file.output_config_id is None]:
                 template_completable = pop_question(CHECK_TP_FILE_CONFIG_PROMPT, CHECK_TP_FILE_CONFIG_TITLE, self)
-            elif tuple(filter(lambda x: not x.file_name_template, self.new_dialog_data.template_files)):
+            elif [file for file in self.new_dialog_data.template_files if not file.file_name_template]:
                 template_completable = pop_question(CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE, self)
         return template_completable
 
@@ -306,16 +306,17 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         # 回显文件列表
         self.file_list_widget.fill_list_widget(self.dialog_data.template_files)
         # 回显模板文件列表数据，按照tab顺序
-        reopen_tab_files = sorted(filter(lambda x: x.tab_opened, self.dialog_data.template_files),
+        reopen_tab_files = sorted([file for file in self.dialog_data.template_files if file.tab_opened],
                                   key=lambda x: x.tab_item_order)
-        [self.file_tab_widget.add_file_tab(template_file) for template_file in reopen_tab_files]
+        for template_file in reopen_tab_files:
+            self.file_tab_widget.add_file_tab(template_file)
         # 找出当前列表项
-        current_files = tuple(filter(lambda x: x.is_current, self.dialog_data.template_files))
+        current_files = [file for file in self.dialog_data.template_files if file.is_current]
         if current_files:
             self.file_list_widget.setCurrentRow(self.dialog_data.template_files.index(current_files[0]))
         # 找出当前tab页
         if reopen_tab_files:
-            current_tab_file = tuple(filter(lambda x: x.is_current_tab, reopen_tab_files))[0]
+            current_tab_file = [tab_file for tab_file in reopen_tab_files if tab_file.is_current_tab][0]
             self.file_tab_widget.setCurrentIndex(reopen_tab_files.index(current_tab_file))
         # 回显模板配置数据
         self.output_config_widget.config_table.fill_table(self.dialog_data.output_config_list)

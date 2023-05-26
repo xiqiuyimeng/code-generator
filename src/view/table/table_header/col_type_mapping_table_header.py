@@ -28,7 +28,8 @@ class ColTypeMappingTableHeaderABC(TableHeaderABC):
         # 设置表头文本
         self.setItem(0, 1, self.make_item(DS_COL_TYPE_TABLE_HEADER[0]))
 
-    def setup_other_item_span(self): ...
+    def setup_other_item_span(self):
+        ...
 
 
 class ColTypeMappingFrozenTableHeader(ColTypeMappingTableHeaderABC):
@@ -41,7 +42,8 @@ class ColTypeMappingFrozenTableHeader(ColTypeMappingTableHeaderABC):
     def setup_header_items(self):
         super().setup_header_items()
         # 隐藏前两列之后所有列
-        [self.setColumnHidden(col, True) for col in range(2, self.columnCount())]
+        for col in range(2, self.columnCount()):
+            self.setColumnHidden(col, True)
 
 
 class ColTypeMappingTableHeader(ColTypeMappingTableHeaderABC):

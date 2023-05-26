@@ -48,7 +48,7 @@ class SaveDialogFrame(DialogFrameABC):
         super().connect_signal()
         self.save_button.clicked.connect(self.save_func)
 
-    def save_func(self): ...
+    def save_func(self):
+        ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
-

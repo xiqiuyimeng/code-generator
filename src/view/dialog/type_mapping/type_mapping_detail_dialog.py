@@ -15,9 +15,9 @@ class TypeMappingDetailDialog(StackedDialogABC):
     save_signal = pyqtSignal(TypeMapping)
     edit_signal = pyqtSignal(TypeMapping)
     override_signal = pyqtSignal(list, list)
-    
-    def __init__(self, type_mapping_name_tuple, type_mapping_id=None):
-        self.type_mapping_name_tuple = type_mapping_name_tuple
+
+    def __init__(self, type_mapping_names, type_mapping_id=None):
+        self.type_mapping_names = type_mapping_names
         self.type_mapping_id = type_mapping_id
         self.frame: TypeMappingDetailDialogFrame = ...
         super().__init__(EDIT_TYPE_MAPPING_TITLE if type_mapping_id else CREATE_TYPE_MAPPING_TITLE)
@@ -26,9 +26,7 @@ class TypeMappingDetailDialog(StackedDialogABC):
         self.resize(self.window_geometry.width() * 0.7, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> TypeMappingDetailDialogFrame:
-        return TypeMappingDetailDialogFrame(self, self.dialog_title,
-                                            self.type_mapping_name_tuple,
-                                            self.type_mapping_id)
+        return TypeMappingDetailDialogFrame(self, self.dialog_title, self.type_mapping_names, self.type_mapping_id)
 
     def connect_signal(self):
         super().connect_signal()

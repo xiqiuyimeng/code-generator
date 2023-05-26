@@ -14,8 +14,8 @@ class TemplateFuncDetailDialog(CustomSaveDialogABC):
     save_signal = pyqtSignal(TemplateFunc)
     edit_signal = pyqtSignal(TemplateFunc)
 
-    def __init__(self, exists_func_name_tuple, title, template_func=None):
-        self.exists_func_name_tuple = exists_func_name_tuple
+    def __init__(self, exists_func_names, title, template_func=None):
+        self.exists_func_names = exists_func_names
         self.template_func = template_func
         self.frame: TemplateFuncDetailDialogFrame = ...
         super().__init__(title)
@@ -24,6 +24,4 @@ class TemplateFuncDetailDialog(CustomSaveDialogABC):
         self.resize(self.window_geometry.width() * 0.6, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> TemplateFuncDetailDialogFrame:
-        return TemplateFuncDetailDialogFrame(self, self.dialog_title,
-                                             self.exists_func_name_tuple,
-                                             self.template_func)
+        return TemplateFuncDetailDialogFrame(self, self.dialog_title, self.exists_func_names, self.template_func)

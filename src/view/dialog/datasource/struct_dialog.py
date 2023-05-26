@@ -16,8 +16,8 @@ class FolderDialog(CustomSaveDialogABC):
     save_signal = pyqtSignal(OpenedTreeItem)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, dialog_title, exists_folder_name_tuple, opened_folder_item, parent_folder_item):
-        self.exists_folder_name_tuple = exists_folder_name_tuple
+    def __init__(self, dialog_title, exists_folder_names, opened_folder_item, parent_folder_item):
+        self.exists_folder_names = exists_folder_names
         self.opened_folder_item = opened_folder_item
         self.parent_folder_item = parent_folder_item
         self.frame: FolderDialogFrame = ...
@@ -27,7 +27,7 @@ class FolderDialog(CustomSaveDialogABC):
         self.resize(self.window_geometry.width() * 0.3, self.window_geometry.height() * 0.3)
 
     def get_frame(self) -> FolderDialogFrame:
-        return FolderDialogFrame(self, self.dialog_title, self.exists_folder_name_tuple,
+        return FolderDialogFrame(self, self.dialog_title, self.exists_folder_names,
                                  self.opened_folder_item, self.parent_folder_item)
 
 
@@ -36,9 +36,9 @@ class StructDialogABC(CustomSaveDialogABC):
     save_signal = pyqtSignal(OpenedTreeItem)
     edit_signal = pyqtSignal(str)
 
-    def __init__(self, dialog_title, exists_struct_name_tuple, opened_struct_id,
+    def __init__(self, dialog_title, exists_struct_names, opened_struct_id,
                  tree_widget, parent_folder_item):
-        self.exists_struct_name_tuple = exists_struct_name_tuple
+        self.exists_struct_names = exists_struct_names
         self.opened_struct_id = opened_struct_id
         self.tree_widget = tree_widget
         self.parent_folder_item = parent_folder_item
@@ -54,5 +54,5 @@ class JsonStructDialog(StructDialogABC):
     """json结构体对话框"""
 
     def get_frame(self) -> JsonStructDialogFrame:
-        return JsonStructDialogFrame(self, self.dialog_title, self.exists_struct_name_tuple,
+        return JsonStructDialogFrame(self, self.dialog_title, self.exists_struct_names,
                                      self.opened_struct_id, self.tree_widget, self.parent_folder_item)

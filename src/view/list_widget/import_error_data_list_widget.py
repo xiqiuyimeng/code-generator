@@ -19,17 +19,21 @@ class ImportErrorDataListWidget(ListWidgetABC):
             self.addItem(item)
 
     def select_all_items(self):
-        [self.item(row).setCheckState(Qt.CheckState.Checked) for row in range(self.count())]
+        for row in range(self.count()):
+            self.item(row).setCheckState(Qt.CheckState.Checked)
 
     def unselect_all_items(self):
-        [self.item(row).setCheckState(Qt.CheckState.Unchecked) for row in range(self.count())]
+        for row in range(self.count()):
+            self.item(row).setCheckState(Qt.CheckState.Unchecked)
 
     def get_selected_data_list(self):
         return [get_import_error_data(self.item(row))
                 for row in range(self.count()) if self.item(row).checkState()]
 
     def remove_selected_items(self):
-        [self.takeItem(row) for row in reversed(range(self.count())) if self.item(row).checkState()]
+        for row in reversed(range(self.count())):
+            if self.item(row).checkState():
+                self.takeItem(row)
 
     def remove_item_by_name(self, data):
         for row in range(self.count()):

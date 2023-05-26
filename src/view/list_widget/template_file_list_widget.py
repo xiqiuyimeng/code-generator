@@ -23,7 +23,8 @@ class TemplateFileListWidget(CustomListWidget):
         self.doubleClicked.connect(self.open_tab)
 
     def fill_list_widget(self, template_files):
-        [self.add_list_file_item(template_file) for template_file in template_files]
+        for template_file in template_files:
+            self.add_list_file_item(template_file)
 
     def open_tab(self, idx):
         current_text = self.itemFromIndex(idx).text()
@@ -55,8 +56,8 @@ class TemplateFileListWidget(CustomListWidget):
         self.parent_dialog.output_config_widget.config_table.clear_bind_file_rows()
 
     def search_tab(self, text):
-        return tuple(filter(lambda x: self.parent_dialog.file_tab_widget.tabText(x) == text,
-                            range(self.parent_dialog.file_tab_widget.count())))
+        return [tab_idx for tab_idx in range(self.parent_dialog.file_tab_widget.count())
+                if self.parent_dialog.file_tab_widget.tabText(tab_idx) == text]
 
     def add_list_file_item(self, template_file):
         # 添加模板文件
@@ -71,14 +72,14 @@ class TemplateFileListWidget(CustomListWidget):
         file_tab_widget = self.parent_dialog.file_tab_widget
         current_tab_text = file_tab_widget.tabText(file_tab_widget.currentIndex())
         if current_tab_text:
-            current_index = tuple(filter(lambda x: self.item(x).text() == current_tab_text, range(self.count())))[0]
+            current_index = [row for row in range(self.count()) if self.item(row).text() == current_tab_text][0]
             self.setCurrentRow(current_index)
 
     def collect_template_files(self):
         file_tab_widget = self.parent_dialog.file_tab_widget
         # 将tab按名称，tab widget 放入字典，方便下面查询是否打开了tab
-        name_tab_dict = dict(map(lambda x: (file_tab_widget.tabText(x), file_tab_widget.widget(x)),
-                                 range(file_tab_widget.count())))
+        name_tab_dict = {file_tab_widget.tabText(tab_idx): file_tab_widget.widget(tab_idx)
+                         for tab_idx in range(file_tab_widget.count())}
         # 遍历列表项，收集数据，如果打开了tab页，文件内容使用tab页中的数据
         if not self.count():
             return

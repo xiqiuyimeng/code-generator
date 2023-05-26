@@ -48,9 +48,8 @@ class ImportDataWorker(ThreadWorkerABC):
         import_data_model_list: list = self.convert_to_model_list(import_data_list)
 
         # 数据去重，如果导入的数据内存在重复的，首先去重，再进行下面的处理
-        unique_model_list = list(dict([(row.get_name(), row)
-                                       for row in import_data_model_list
-                                       if row.get_name()]).values())
+        unique_model_list = list({row.get_name(): row
+                                  for row in import_data_model_list if row.get_name()}.values())
 
         # 前置处理，因为下面的校验会涉及数据库操作，允许子类预先将所有需要数据准备好
         self.pre_process_before_check_data()
@@ -68,9 +67,11 @@ class ImportDataWorker(ThreadWorkerABC):
     def convert_to_model_list(self, import_data_list):
         return [self.convert_to_model(import_data) for import_data in import_data_list]
 
-    def convert_to_model(self, import_data): ...
+    def convert_to_model(self, import_data):
+        ...
 
-    def pre_process_before_check_data(self): ...
+    def pre_process_before_check_data(self):
+        ...
 
     def collect_check_data(self, import_data_list):
         duplicate_rows, illegal_rows, duplicate_illegal_rows, legal_rows = list(), list(), list(), list()
@@ -94,9 +95,11 @@ class ImportDataWorker(ThreadWorkerABC):
                     duplicate_rows.append(data_row)
         return duplicate_rows, illegal_rows, duplicate_illegal_rows, legal_rows
 
-    def check_repair_illegal_data(self, data_row) -> int: ...
+    def check_repair_illegal_data(self, data_row) -> int:
+        ...
 
-    def import_data(self, data_list): ...
+    def import_data(self, data_list):
+        ...
 
 
 class ImportDataExecutor(LoadingMaskThreadExecutor):
@@ -150,9 +153,11 @@ class OverrideDataWorker(ThreadWorkerABC):
         self.batch_insert_data_list()
         self.success_signal.emit()
 
-    def batch_delete_origin_data(self): ...
+    def batch_delete_origin_data(self):
+        ...
 
-    def batch_insert_data_list(self): ...
+    def batch_insert_data_list(self):
+        ...
 
 
 class OverrideDataExecutor(LoadingMaskThreadExecutor):
@@ -164,6 +169,7 @@ class OverrideDataExecutor(LoadingMaskThreadExecutor):
     def success_post_process(self, *args):
         self.success_callback(self.data_list, self.data_list)
         pop_ok(f'覆盖 {len(self.data_list)} 条数据成功', self.error_box_title, self.window)
+
 
 # ----------------------- 覆盖数据 end ----------------------- #
 
@@ -198,7 +204,8 @@ class ExportDataWorker(ThreadWorkerABC):
             json.dump(result_json, f, ensure_ascii=False, indent=4)
         self.success_signal.emit()
 
-    def export_data(self) -> list[dataclasses.dataclass]: ...
+    def export_data(self) -> list[dataclasses.dataclass]:
+        ...
 
 
 class ExportDataExecutor(LoadingMaskThreadExecutor):

@@ -38,7 +38,8 @@ class ItemViewABC(QAbstractItemView, ScrollableWidget):
             # 右键菜单弹出位置跟随焦点位置
             menu.exec_(QCursor.pos())
 
-    def fill_menu(self, item, menu): ...
+    def fill_menu(self, item, menu):
+        ...
 
     def right_menu_func(self, action):
         """
@@ -50,7 +51,8 @@ class ItemViewABC(QAbstractItemView, ScrollableWidget):
         action_text = action.text()
         self.do_right_menu_func(item, action_text)
 
-    def do_right_menu_func(self, item, action_text): ...
+    def do_right_menu_func(self, item, action_text):
+        ...
 
 
 class DraggableItemViewABC(ItemViewABC):
@@ -92,9 +94,11 @@ class DraggableItemViewABC(ItemViewABC):
             self.deal_source_tree_item_data(source_item)
             source_item.parent().removeChild(source_item)
 
-    def deal_source_list_item_data(self, source_item): ...
+    def deal_source_list_item_data(self, source_item):
+        ...
 
-    def deal_source_tree_item_data(self, source_item): ...
+    def deal_source_tree_item_data(self, source_item):
+        ...
 
     def insert_item(self, source_item, current_item):
         if isinstance(self, QListWidget):
@@ -126,9 +130,11 @@ class DraggableItemViewABC(ItemViewABC):
             top_item.setExpanded(True)
             self.deal_new_tree_item_data(source_item, new_tree_item)
 
-    def deal_new_list_item_data(self, source_item, new_item): ...
+    def deal_new_list_item_data(self, source_item, new_item):
+        ...
 
-    def deal_new_tree_item_data(self, source_item, new_item): ...
+    def deal_new_tree_item_data(self, source_item, new_item):
+        ...
 
 
 def get_tree_top_item(item):

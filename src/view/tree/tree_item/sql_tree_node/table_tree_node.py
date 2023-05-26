@@ -57,7 +57,7 @@ class TableTreeNode(SqlTreeNodeABC):
         if tab:
             index = self.tree_widget.get_current_tab_widget().indexOf(tab)
             tab_bar = self.tree_widget.get_current_tab_widget().tab_bar
-            if tab_bar.check_tab_allow_close((index, )):
+            if tab_bar.check_tab_allow_close((index,)):
                 # 删除tab
                 tab_bar.remove_tab(index)
 

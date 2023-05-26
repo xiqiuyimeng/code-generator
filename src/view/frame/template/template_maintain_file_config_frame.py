@@ -14,8 +14,8 @@ _date_ = '2023/4/22 12:39'
 class TemplateMaintainFileConfigFrame(DialogFrameABC):
     """模板维护文件和输出配置关系的对话框框架"""
 
-    def __init__(self, output_config_tuple, unbind_file_list, *args):
-        self.output_config_tuple = output_config_tuple
+    def __init__(self, output_config_list, unbind_file_list, *args):
+        self.output_config_list = output_config_list
         self.unbind_file_list = unbind_file_list
         self._layout: QHBoxLayout = ...
         self.config_layout: QVBoxLayout = ...
@@ -53,7 +53,7 @@ class TemplateMaintainFileConfigFrame(DialogFrameABC):
 
     def fill_config_tree_widget(self):
         # 添加配置树列表数据
-        for config in self.output_config_tuple:
+        for config in self.output_config_list:
             config_item = QTreeWidgetItem(self.config_tree_widget)
             config_item.setText(0, config.config_name)
             # 保存配置数据

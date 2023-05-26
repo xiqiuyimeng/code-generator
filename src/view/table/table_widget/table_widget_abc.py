@@ -39,9 +39,11 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
 
         self.setup_other_ui()
 
-    def setup_other_ui(self): ...
+    def setup_other_ui(self):
+        ...
 
-    def fill_table(self, *args): ...
+    def fill_table(self, *args):
+        ...
 
     def connect_signal(self):
         # 需要开启鼠标追踪，才能实现tooltip
@@ -62,7 +64,8 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
             return True
         return super().eventFilter(obj, event)
 
-    def connect_other_signal(self): ...
+    def connect_other_signal(self):
+        ...
 
     def make_item(self, text=None):
         item = TableWidgetItem(self)
@@ -73,4 +76,3 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
         self.insertRow(row_index)
         # 行高设为原行高的1.5倍，主要为了美观
         self.setRowHeight(row_index, round(self.rowHeight(row_index) * 1.5))
-

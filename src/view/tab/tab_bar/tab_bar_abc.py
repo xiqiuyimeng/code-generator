@@ -52,7 +52,8 @@ class TabBarABC(QTabBar):
         """tab bar弹出右键菜单"""
         index = self.tabAt(pos)
         menu = QMenu()
-        [menu.addAction(QAction(option, menu)) for option in RIGHT_CLICK_MENU_NAMES]
+        for option in RIGHT_CLICK_MENU_NAMES:
+            menu.addAction(QAction(option, menu))
         # 右键菜单点击事件
         menu.triggered.connect(lambda action: self.handle_menu_func(action, index))
         # 右键菜单弹出位置跟随焦点位置
@@ -79,7 +80,7 @@ class TabBarABC(QTabBar):
         return True
 
     def close_current_tab(self, index):
-        if self.check_tab_allow_close((index, )):
+        if self.check_tab_allow_close((index,)):
             self.remove_tab(index)
 
     def close_other_tabs(self, index):
@@ -89,29 +90,34 @@ class TabBarABC(QTabBar):
         right_index_list = list(range(index + 1, self.count()))
         if self.check_tab_allow_close((*left_index_list, *right_index_list)):
             # 删除其他tab，先删除右边的，因为在删除的过程中，index会发生变化，所以要从大到小删除
-            [self.remove_tab(idx) for idx in reversed(right_index_list)]
+            for idx in reversed(right_index_list):
+                self.remove_tab(idx)
             # 再删除左边的
-            [self.remove_tab(idx) for idx in reversed(left_index_list)]
+            for idx in reversed(left_index_list):
+                self.remove_tab(idx)
 
     def close_all_tabs(self):
         index_list = range(0, self.count())
         if self.check_tab_allow_close(index_list):
             # 删除所有tab
-            [self.remove_tab(idx) for idx in reversed(index_list)]
+            for idx in reversed(index_list):
+                self.remove_tab(idx)
 
     def close_tabs_to_left(self, index):
         # 左侧的index
         left_index_list = range(0, index)
         if self.check_tab_allow_close(left_index_list):
             # 关闭标签页左边所有tab
-            [self.remove_tab(idx) for idx in reversed(left_index_list)]
+            for idx in reversed(left_index_list):
+                self.remove_tab(idx)
 
     def close_tabs_to_right(self, index):
         # 右侧的index
         right_index_list = range(index + 1, self.count())
         if self.check_tab_allow_close(right_index_list):
             # 关闭标签页右边所有tab
-            [self.remove_tab(idx) for idx in reversed(right_index_list)]
+            for idx in reversed(right_index_list):
+                self.remove_tab(idx)
 
     def remove_tab(self, index):
         self.parent.removeTab(index)
@@ -157,7 +163,8 @@ class DsTabBar(TabBarABC):
             pop_fail('\n\n'.join(prompt_list), CLOSE_TABLE_BOX_TITLE, get_window())
         return not (partially_checked_tables or refreshing_tables)
 
-    def partially_checked_table_prompt(self, tab_widget) -> str: ...
+    def partially_checked_table_prompt(self, tab_widget) -> str:
+        ...
 
     def remove_tab(self, index, batch_clear_checked=True, allow_emit_remove_signal=True):
         # 获取tab table
@@ -184,7 +191,8 @@ class DsTabBar(TabBarABC):
                 self.current_changed = True
             self.parent.async_save_executor.change_current(current_tab.table_tab)
 
-    def need_change_current(self, current_tab) -> bool: ...
+    def need_change_current(self, current_tab) -> bool:
+        ...
 
     def sort_tab(self):
         """在拖拉tab页签，松开鼠标时触发，对最终状态的tab widget进行排序并保存"""
@@ -205,4 +213,3 @@ class DsTabBar(TabBarABC):
                 self.parent.async_save_executor.sort_order(tab_table_list)
             # 重置标志位
             self.current_changed = False
-

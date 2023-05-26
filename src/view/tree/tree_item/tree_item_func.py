@@ -37,7 +37,7 @@ def link_table_checkbox(tree_item, check_state):
 
 
 def get_children_opened_ids(parent_item):
-    return list(map(lambda x: x.id, recursive_get_children_opened_items(parent_item)))
+    return [item.id for item in recursive_get_children_opened_items(parent_item)]
 
 
 def recursive_get_children_opened_items(parent_item):

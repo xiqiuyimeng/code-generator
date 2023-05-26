@@ -58,7 +58,7 @@ class ImportIllegalDataProcessDialogFrame(ImportErrorDataProcessDialogFrameABC):
 
     def save_callback(self, data):
         self.list_widget.remove_item_by_name(data)
-        self.import_success_callback((data, ))
+        self.import_success_callback((data,))
 
     def close(self) -> bool:
         self.parent_dialog.close()

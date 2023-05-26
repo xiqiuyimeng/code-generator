@@ -72,7 +72,8 @@ class ImportErrorDataProcessDialogFrameABC(DialogFrameABC):
         if selected_data_list:
             self.do_process_data(selected_data_list)
 
-    def do_process_data(self, selected_data_list): ...
+    def do_process_data(self, selected_data_list):
+        ...
 
     def allow_close(self):
         # 检查是否可以关闭，依据为，当前列表中是否存在未处理的数据
@@ -80,4 +81,3 @@ class ImportErrorDataProcessDialogFrameABC(DialogFrameABC):
             self.close()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
-

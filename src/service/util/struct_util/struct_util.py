@@ -25,9 +25,11 @@ class StructParser:
         load_content = self.load_content()
         return self.do_parse_content(load_content)
 
-    def load_content(self) -> object: ...
+    def load_content(self) -> object:
+        ...
 
-    def do_parse_content(self, load_content) -> list: ...
+    def do_parse_content(self, load_content) -> list:
+        ...
 
 
 class StructBeautifier:
@@ -38,4 +40,5 @@ class StructBeautifier:
     def beautify(self):
         return self.do_beautify()
 
-    def do_beautify(self) -> str: ...
+    def do_beautify(self) -> str:
+        ...

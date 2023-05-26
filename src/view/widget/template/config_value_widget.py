@@ -62,7 +62,8 @@ class ConfigValueWidgetABC(QWidget):
         self._layout.setColumnStretch(1, 10)
         self._layout.setColumnStretch(2, 70)
 
-    def setup_config_widget_ui(self): ...
+    def setup_config_widget_ui(self):
+        ...
 
     def set_text(self):
         if self.config.is_required:
@@ -80,11 +81,14 @@ class ConfigValueWidgetABC(QWidget):
         self.config_desc_value_label.setText(self.config.config_desc)
         self.set_other_text()
 
-    def set_other_text(self): ...
+    def set_other_text(self):
+        ...
 
-    def connect_signal(self): ...
+    def connect_signal(self):
+        ...
 
-    def collect_data(self): ...
+    def collect_data(self):
+        ...
 
 
 class LineEditConfigValueWidget(ConfigValueWidgetABC):
@@ -130,7 +134,8 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
         if exists_dir:
             self.set_dir(exists_dir)
 
-    def set_dir(self, exists_dir): ...
+    def set_dir(self, exists_dir):
+        ...
 
 
 class FileDialogConfigValueWidget(FileDialogConfigValueWidgetABC):

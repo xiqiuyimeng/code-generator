@@ -57,7 +57,8 @@ class DialogFrameABC(QFrame):
         self.title.setObjectName("dialog_title")
         self.frame_layout.addWidget(self.title)
 
-    def setup_content_ui(self): ...
+    def setup_content_ui(self):
+        ...
 
     def setup_button_ui(self):
         self.button_layout = QGridLayout()
@@ -70,24 +71,26 @@ class DialogFrameABC(QFrame):
         # 空白占位左侧的按钮组
         left_buttons = self.get_blank_left_buttons()
         if left_buttons:
-            [self.button_layout.addWidget(left_button, 0, idx, 1, 1)
-             for idx, left_button in enumerate(left_buttons, start=self.button_layout.count())]
+            for idx, left_button in enumerate(left_buttons, start=self.button_layout.count()):
+                self.button_layout.addWidget(left_button, 0, idx, 1, 1)
 
-        self.button_layout.addWidget(self.placeholder_blank,
-                                     0, self.button_layout.count(), 1, self.placeholder_blank_width)
+        self.button_layout.addWidget(self.placeholder_blank, 0, self.button_layout.count(),
+                                     1, self.placeholder_blank_width)
 
         # 空白占位右侧的按钮组
         right_buttons = self.get_blank_right_buttons()
         if right_buttons:
-            [self.button_layout.addWidget(right_button, 0, idx, 1, 1)
-             for idx, right_button in enumerate(right_buttons, start=self.get_blank_right_start_col_idx())]
+            for idx, right_button in enumerate(right_buttons, start=self.get_blank_right_start_col_idx()):
+                self.button_layout.addWidget(right_button, 0, idx, 1, 1)
 
         self.dialog_quit_button = QPushButton(self)
         self.button_layout.addWidget(self.dialog_quit_button, 0, self.get_blank_right_start_col_idx(), 1, 1)
 
-    def get_blank_left_buttons(self) -> tuple: ...
+    def get_blank_left_buttons(self) -> tuple:
+        ...
 
-    def get_blank_right_buttons(self) -> tuple: ...
+    def get_blank_right_buttons(self) -> tuple:
+        ...
 
     def get_blank_right_start_col_idx(self) -> int:
         return self.button_layout.count() + self.placeholder_blank_width - 1
@@ -99,7 +102,8 @@ class DialogFrameABC(QFrame):
         self.dialog_quit_button.setText(QUIT_BTN_TEXT)
         self.setup_other_label_text()
 
-    def setup_other_label_text(self): ...
+    def setup_other_label_text(self):
+        ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
@@ -111,14 +115,17 @@ class DialogFrameABC(QFrame):
         self.dialog_quit_button.clicked.connect(self.parent_dialog.close)
         self.connect_other_signal()
 
-    def open_help_dialog(self): ...
+    def open_help_dialog(self):
+        ...
 
-    def connect_other_signal(self): ...
+    def connect_other_signal(self):
+        ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
     # ------------------------------ 后置处理 start ------------------------------ #
 
-    def post_process(self): ...
+    def post_process(self):
+        ...
 
     # ------------------------------ 后置处理 end ------------------------------ #

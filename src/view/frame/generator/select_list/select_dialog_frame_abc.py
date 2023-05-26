@@ -49,7 +49,8 @@ class SelectDialogFrame(ChainDialogFrameABC):
             self.list_data_executor = self.get_list_data_executor()
             self.list_data_executor.start()
 
-    def get_list_data_executor(self) -> LoadingMaskThreadExecutor: ...
+    def get_list_data_executor(self) -> LoadingMaskThreadExecutor:
+        ...
 
     def fill_list_widget(self, data_list):
         """填充页面列表，获取数据库数据以后的回调函数"""
@@ -59,4 +60,5 @@ class SelectDialogFrame(ChainDialogFrameABC):
             # 默认选中第一个元素
             self.list_widget.setCurrentRow(0)
 
-    def get_item_names(self) -> iter: ...
+    def get_item_names(self) -> list:
+        ...

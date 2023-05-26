@@ -53,7 +53,7 @@ class StructSqlite(SqliteBasic):
 
     def select_list(self):
         rows = self._do_select(sql_dict.get('select_list'), StructInfo())
-        return list(map(lambda x: StructInfo(**x), rows.all()))
+        return [StructInfo(**row) for row in rows.all()]
 
     def delete_by_opened_item_id(self, opened_item_id):
         sql = f"{sql_dict.get('delete_by_opened_item_id')}{opened_item_id}"
@@ -61,7 +61,7 @@ class StructSqlite(SqliteBasic):
         log.info(f'删除[{self.table_name}]语句 ==> {sql}')
 
     def delete_by_opened_item_ids(self, opened_item_ids):
-        opened_item_id_list = ", ".join(map(lambda x: str(x), opened_item_ids))
+        opened_item_id_list = ", ".join([str(item_id) for item_id in opened_item_ids])
         sql = f"{sql_dict.get('delete_by_opened_item_ids')}({opened_item_id_list})"
         get_db_conn().query(sql)
         log.info(f'删除[{self.table_name}]语句 ==> {sql}')

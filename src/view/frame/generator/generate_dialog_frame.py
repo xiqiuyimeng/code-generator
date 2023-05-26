@@ -37,7 +37,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
         # 预览生成按钮
         self.preview_generate_button: QPushButton = ...
         # 按钮列表，在生成期间需要禁用
-        self.need_disable_button_list: list = ...
+        self.need_disable_button_tuple: list = ...
         # 生成执行器
         self.generate_executor: GenerateExecutor = ...
         # 预览生成执行器
@@ -107,7 +107,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
                                                   self.parent_dialog.template,
                                                   self.parent_dialog.output_config_input_dict,
                                                   self.parent_dialog.var_config_input_dict,
-                                                  self.need_disable_button_list,
+                                                  self.need_disable_button_tuple,
                                                   self.prepare_progress_bar.setValue,
                                                   self.generate_progress_bar.setValue,
                                                   self.generate_log_browser.append,
@@ -124,10 +124,10 @@ class GenerateDialogFrame(ChainDialogFrameABC):
         self.generate_log_browser.clear()
 
     def collect_need_disable_buttons(self):
-        if self.need_disable_button_list is Ellipsis:
+        if self.need_disable_button_tuple is Ellipsis:
             # 收集按钮列表
-            self.need_disable_button_list = [self.previous_frame_button, self.next_frame_button,
-                                             self.preview_generate_button, self.dialog_quit_button]
+            self.need_disable_button_tuple = (self.previous_frame_button, self.next_frame_button,
+                                              self.preview_generate_button, self.dialog_quit_button)
 
     def preview_generate(self):
         self.collect_need_disable_buttons()
@@ -136,7 +136,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
                                                                  self.parent_dialog.template,
                                                                  self.parent_dialog.output_config_input_dict,
                                                                  self.parent_dialog.var_config_input_dict,
-                                                                 self.need_disable_button_list,
+                                                                 self.need_disable_button_tuple,
                                                                  self.prepare_progress_bar.setValue,
                                                                  self.generate_progress_bar.setValue,
                                                                  self.generate_log_browser.append,

@@ -107,4 +107,4 @@ class DsTableTabSqlite(SqliteBasic):
     def select_by_opened_ids(opened_ids):
         sql = f"{sql_dict.get('select_by_opened_ids')} ({', '.join(opened_ids)})"
         rows = get_db_conn().query(sql)
-        return list(map(lambda x: DsTableTab(**x), rows.as_dict()))
+        return [DsTableTab(**row) for row in rows.as_dict()]

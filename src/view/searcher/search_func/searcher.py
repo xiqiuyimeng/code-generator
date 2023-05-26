@@ -8,7 +8,6 @@ from src.view.searcher.style_item_delegate.searcher_style_delegate import Search
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:02'
 
-
 letter_keys = [eval("Qt.Key_" + chr(i)) for i in range(65, 91)]
 num_keys = [eval(f'Qt.Key_{i}') for i in range(10)]
 
@@ -23,6 +22,7 @@ class Searcher:
     :param target 要搜索的目标，比如树，或者列表
     :param main_widget 主部件，用于停留dock窗口
     """
+
     def __init__(self, target, main_widget):
         self.target = target
         # dock 窗口
@@ -95,8 +95,10 @@ class Searcher:
             self.dock_widget.line_edit.sub_text()
             pop_items = self.match_item_records.pop()
             # 弹出匹配到的元素索引
-            [v.pop() for k, v in self.search_item_dict.items()
-             for item in pop_items if k == id(item)]
+            for k, v in self.search_item_dict.items():
+                for item in pop_items:
+                    if k == id(item):
+                        v.pop()
             # 如果已经删除了所有字符，或者能匹配到，将输入框文本变为正常颜色
             if not self.match_item_records or self.match_item_records[-1]:
                 self.dock_widget.line_edit.paint_right_color()
@@ -161,12 +163,17 @@ class Searcher:
         if self.match_item_records and self.match_item_records[-1]:
             self.target.set_selected_focus(self.match_item_records[-1][0])
 
-    def get_item_text(self, item) -> str: ...
+    def get_item_text(self, item) -> str:
+        ...
 
-    def search_post_process(self): ...
+    def search_post_process(self):
+        ...
 
-    def clear_row_index(self): ...
+    def clear_row_index(self):
+        ...
 
-    def iterate_search(self, text, match_items): ...
+    def iterate_search(self, text, match_items):
+        ...
 
-    def get_row_index(self, item) -> int: ...
+    def get_row_index(self, item) -> int:
+        ...

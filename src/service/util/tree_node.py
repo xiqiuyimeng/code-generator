@@ -74,8 +74,8 @@ class TreeData:
         node_data = add_data.get(item_level)
         if isinstance(node_data, (list, tuple)):
             # 如果是list类型，此时一定是最后一次处理，所以不必获取创建的node，如果节点是最后一个节点，那么进行排序
-            [self._create_node(parent_node, child_node_data, child_node_data is node_data[-1])
-             for child_node_data in node_data]
+            for child_node_data in node_data:
+                self._create_node(parent_node, child_node_data, child_node_data is node_data[-1])
         else:
             # 如果是单独的元素，直接处理
             node = self._create_node(parent_node, node_data)
@@ -164,7 +164,8 @@ class TreeData:
     def _remove_node(self, parent_node, node_data):
         # 如果node data是单个对象，直接删除，否则视为list，循环删除
         if isinstance(node_data, (tuple, list)):
-            [self._do_remove_node(parent_node, single_node_data) for single_node_data in node_data]
+            for single_node_data in node_data:
+                self._do_remove_node(parent_node, single_node_data)
         else:
             self._do_remove_node(parent_node, node_data)
 

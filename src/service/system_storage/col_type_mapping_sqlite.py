@@ -102,13 +102,13 @@ class ColTypeMappingSqlite(SqliteBasic):
             self.batch_insert(col_type_mappings)
 
     def delete_by_parent_ids(self, parent_ids):
-        ids_str = ','.join(map(lambda x: str(x), parent_ids))
+        ids_str = ','.join([str(parent_id) for parent_id in parent_ids])
         sql = f"{sql_dict.get('delete_by_parent_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据parent_id: {parent_ids} 删除')
 
     def export_by_parent_ids(self, parent_ids):
-        ids_str = ','.join(map(lambda x: str(x), parent_ids))
+        ids_str = ','.join([str(parent_id) for parent_id in parent_ids])
         sql = f"{sql_dict.get('export')} ({ids_str})"
         rows = get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据 parent_id: {parent_ids} 导出')

@@ -140,11 +140,11 @@ class PreviewFileDialogFrame(DialogFrameABC):
         if not current_item or current_item.childCount():
             pop_fail(NO_SELECTED_FILE_ITEM_PROMPT, PREVIEW_RENAME_FILE_NAME_TITLE, self)
         else:
-            # 收集不可重复的名称元祖
-            exists_file_name_tuple = tuple(current_item.parent().child(child_idx).text(0)
-                                           for child_idx in range(current_item.parent().childCount()))
+            # 收集不可重复的名称列表
+            exists_file_names = [current_item.parent().child(child_idx).text(0)
+                                 for child_idx in range(current_item.parent().childCount())]
             # 打开修改文件名对话框
-            self.rename_file_name_dialog = SimpleNameCheckDialog(exists_file_name_tuple,
+            self.rename_file_name_dialog = SimpleNameCheckDialog(exists_file_names,
                                                                  PREVIEW_RENAME_FILE_NAME_TITLE,
                                                                  current_item.text(0))
             self.rename_file_name_dialog.edit_signal.connect(lambda new_file_name:

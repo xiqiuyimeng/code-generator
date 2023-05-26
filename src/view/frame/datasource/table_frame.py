@@ -46,9 +46,11 @@ class TableFrameABC(QFrame):
         self.table_widget = ...
         self.add_table()
 
-    def get_header_label_text(self) -> str: ...
+    def get_header_label_text(self) -> str:
+        ...
 
-    def get_table_widget(self) -> DsColTableWidgetABC: ...
+    def get_table_widget(self) -> DsColTableWidgetABC:
+        ...
 
     def refresh_ui(self, column_list):
         self.column_list = column_list
@@ -85,6 +87,3 @@ class StructTableFrame(TableFrameABC):
 
     def get_table_widget(self) -> DsColTableWidgetABC:
         return StructDsColTableWidget(self.tree_widget, self, self.column_list)
-
-
-

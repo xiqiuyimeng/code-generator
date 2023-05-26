@@ -19,8 +19,8 @@ class TableItemInputDelegateDialogFrame(SaveDialogFrame):
         self.check_text_duplicate = check_text_duplicate
         # 当数据重复时，提示语
         self.duplicate_prompt = duplicate_prompt
-        # 已存在的数据元祖
-        self.exists_data_tuple = ...
+        # 已存在的数据列表
+        self.exists_data_list = ...
         self.text_editor: TextEditor = ...
         self.text_checker: QLabel = ...
         super().__init__(*args, need_help_button=False)
@@ -53,7 +53,7 @@ class TableItemInputDelegateDialogFrame(SaveDialogFrame):
 
     def check_text_available(self):
         if self.check_text_duplicate:
-            text_available = check_text_available(self.text_editor.toPlainText(), self.exists_data_tuple,
+            text_available = check_text_available(self.text_editor.toPlainText(), self.exists_data_list,
                                                   self.text_checker, self.duplicate_prompt)
             if text_available:
                 self.save_button.setDisabled(False)
@@ -69,5 +69,5 @@ class TableItemInputDelegateDialogFrame(SaveDialogFrame):
     def echo_dialog_data(self, data):
         self.text_editor.setPlainText(data)
 
-    def set_exists_data_tuple(self, exists_data_tuple):
-        self.exists_data_tuple = exists_data_tuple
+    def set_exists_data_list(self, exists_data_list):
+        self.exists_data_list = exists_data_list

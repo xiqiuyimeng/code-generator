@@ -42,7 +42,8 @@ class ConnWorkerABC(ThreadWorkerABC):
         # 实际的功能实现
         self.do_executor_func(executor)
 
-    def do_executor_func(self, executor: SqlDBExecutor): ...
+    def do_executor_func(self, executor: SqlDBExecutor):
+        ...
 
 
 # ---------------------------------------- 测试连接 start ---------------------------------------- #

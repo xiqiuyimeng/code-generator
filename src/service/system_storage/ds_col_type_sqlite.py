@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from itertools import groupby
 
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
 from src.service.util.db_id_generator import update_id_generator
+from src.service.util.group_util import group_model_list
 
 _author_ = 'luwt'
 _date_ = '2023/2/12 19:28'
@@ -49,17 +49,16 @@ class DsColTypeSqlite(SqliteBasic):
         ds_col_types = self.select(DsColType(), order_by='parent_id')
         if ds_col_types:
             # 以parent_id为key，进行分组
-            parent_id_group = groupby(ds_col_types, key=lambda x: x.parent_id)
-            parent_id_dict = dict(map(lambda x: (x[0], list(x[1])), parent_id_group))
-
+            parent_id_dict = group_model_list(ds_col_types, lambda x: x.parent_id)
+            # parent id 为 0 的是数据源类型
             ds_types = parent_id_dict.get(0)
             ds_types.sort(key=lambda x: x.item_order)
             ds_col_type_dict = dict()
             for ds_type in ds_types:
                 col_types = parent_id_dict.get(ds_type.id, list())
                 col_types.sort(key=lambda x: x.item_order)
-                # 映射为 ds_type: tuple ds_col_type
-                ds_col_type_dict[ds_type.ds_col_type] = list(map(lambda x: x.ds_col_type, col_types))
+                # 映射为 ds_type: list[ds_col_type]
+                ds_col_type_dict[ds_type.ds_col_type] = [col_type.ds_col_type for col_type in col_types]
             return ds_col_type_dict
 
     @transactional
@@ -105,9 +104,9 @@ class DsColTypeSqlite(SqliteBasic):
             query_param.parent_id = ds_type_obj.id
             col_types_exists = self.select(query_param)
             # 求差集，判断是否需要新增
-            exists_col_type_set = set(map(lambda x: x.ds_col_type, col_types_exists))
-            dff_set = col_types - exists_col_type_set
-            if dff_set:
+            exists_col_type_set = {col_type.ds_col_type for col_type in col_types_exists}
+            diff_set = col_types - exists_col_type_set
+            if diff_set:
                 # 移除当前数据源类型下所有列类型
                 delete_children_sql = sql_dict.get('delete_children')
                 get_db_conn().query(delete_children_sql, **{'parent_id': ds_type_obj.id})
@@ -120,12 +119,12 @@ class DsColTypeSqlite(SqliteBasic):
         log.info(f'查询{self.table_name}中所有数据源类型')
         sql = sql_dict.get('get_ds_type')
         ds_type_rows = get_db_conn().query(sql)
-        return list(map(lambda x: DsColType(**x), ds_type_rows.as_dict()))
+        return [DsColType(**row) for row in ds_type_rows.as_dict()]
 
     def batch_delete_ds_types(self, ds_type_ids):
         # 首先删除数据源类型
         self.batch_delete(ds_type_ids)
         # 再删除列类型
-        parent_ids = ','.join(map(lambda x: str(x), ds_type_ids))
+        parent_ids = ','.join([str(ds_type_id) for ds_type_id in ds_type_ids])
         delete_col_type_sql = f"{sql_dict.get('delete_children_by_parent_ids')}({parent_ids})"
         get_db_conn().query(delete_col_type_sql)

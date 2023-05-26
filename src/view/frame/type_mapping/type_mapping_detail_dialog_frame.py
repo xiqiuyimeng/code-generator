@@ -30,7 +30,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
     edit_signal = pyqtSignal(TypeMapping)
     override_signal = pyqtSignal(list, list)
 
-    def __init__(self, parent_dialog, dialog_title, type_mapping_name_tuple, type_mapping_id=None):
+    def __init__(self, parent_dialog, dialog_title, type_mapping_names, type_mapping_id=None):
         self.dialog_data: TypeMapping = ...
         self.new_dialog_data: TypeMapping = ...
         # 标记当前是否是用来展示导入错误数据详情页
@@ -82,7 +82,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         self.edit_type_mapping_executor: EditTypeMappingExecutor = ...
         # 覆盖导入类型映射执行器
         self.override_data_executor: OverrideTypeMappingExecutor = ...
-        super().__init__(parent_dialog, dialog_title, type_mapping_name_tuple, type_mapping_id)
+        super().__init__(parent_dialog, dialog_title, type_mapping_names, type_mapping_id)
 
     def get_new_dialog_data(self) -> TypeMapping:
         return TypeMapping()
@@ -251,8 +251,8 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
             self.edit_type_mapping_executor.start()
         else:
             # 如果名称存在，那么是覆盖模式
-            if self.new_dialog_data.mapping_name in self.exits_name_tuple:
-                self.override_data_executor = OverrideTypeMappingExecutor([self.new_dialog_data, ], self, self,
+            if self.new_dialog_data.mapping_name in self.exits_names:
+                self.override_data_executor = OverrideTypeMappingExecutor((self.new_dialog_data,), self, self,
                                                                           OVERRIDE_TYPE_MAPPING_TITLE,
                                                                           success_callback=self.override_post_process)
                 self.override_data_executor.start()

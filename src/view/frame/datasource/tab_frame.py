@@ -35,7 +35,8 @@ class TabFrameABC(QFrame):
         self.tab_widget.setAttribute(Qt.WA_TranslucentBackground, True)
         self._layout.addWidget(self.tab_widget)
 
-    def get_tab_widget(self) -> TabWidget: ...
+    def get_tab_widget(self) -> TabWidget:
+        ...
 
 
 class SqlTabFrame(TabFrameABC):

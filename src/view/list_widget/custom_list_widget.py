@@ -47,7 +47,8 @@ class CustomListWidget(ListWidgetABC):
                             self.parent()):
                 self.clear_items_func()
 
-    def edit_item_func(self, item): ...
+    def edit_item_func(self, item):
+        ...
 
     def remove_item_func(self, item):
         self.takeItem(self.row(item))
@@ -56,4 +57,4 @@ class CustomListWidget(ListWidgetABC):
         self.clear()
 
     def collect_item_text(self):
-        return tuple(self.item(row).text() for row in range(self.count()))
+        return [self.item(row).text() for row in range(self.count())]

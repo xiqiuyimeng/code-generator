@@ -61,9 +61,9 @@ class TemplateDialogFrame(TableDialogFrame):
         self.template_func_dialog.exec()
 
     def do_get_row_data_dialog(self, row_id) -> TemplateDetailDialog:
-        exists_template_name_tuple = tuple(self.table_widget.item(row, 1).text()
-                                           for row in range(self.table_widget.rowCount()))
-        return TemplateDetailDialog(exists_template_name_tuple, row_id)
+        exists_template_names = [self.table_widget.item(row, 1).text()
+                                 for row in range(self.table_widget.rowCount())]
+        return TemplateDetailDialog(exists_template_names, row_id)
 
     def get_del_prompt_title(self):
         return DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE

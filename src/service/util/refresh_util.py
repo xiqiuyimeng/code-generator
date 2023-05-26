@@ -16,7 +16,7 @@ def deal_opened_items(item_names, parent_id, data_type, level, ds_category, chan
     tree_item_sqlite = OpenedTreeItemSqlite()
     # 获取本地库中缓存的数据
     child_opened_records = tree_item_sqlite.get_children(parent_id, level, ds_category)
-    child_opened_record_dict = dict(map(lambda x: (x.item_name, x), child_opened_records))
+    child_opened_record_dict = {item.item_name: item for item in child_opened_records}
     # 组装新的元素
     refreshed_item_records = tree_item_sqlite.add_opened_child_item(item_names, parent_id, level, ds_category,
                                                                     data_type, init_checked, insert_db=False)
@@ -55,16 +55,16 @@ def deal_opened_items(item_names, parent_id, data_type, level, ds_category, chan
         else:
             # 如果元素不存在，则需要插入
             new_item_records.append(opened_record)
-    [delete_item_records.append(opened_item) for opened_item in child_opened_record_dict.values()]
+    delete_item_records = [opened_item for opened_item in child_opened_record_dict.values()]
     # 对上述集合分别处理
     if new_item_records:
         sort_order = True
         tree_item_sqlite.batch_insert(new_item_records)
     if update_item_records:
-        tree_item_sqlite.batch_update(tuple(map(lambda x: x[1], update_item_records)))
+        tree_item_sqlite.batch_update([update_record_tuple[1] for update_record_tuple in update_item_records])
     if delete_item_records:
         sort_order = True
-        delete_item_ids = tuple(map(lambda x: x.id, delete_item_records))
+        delete_item_ids = [del_item.id for del_item in delete_item_records]
         # 倒序排列
         delete_item_records.sort(key=lambda x: x.item_order, reverse=True)
         tree_item_sqlite.batch_delete(delete_item_ids)
@@ -83,7 +83,7 @@ def deal_opened_items(item_names, parent_id, data_type, level, ds_category, chan
 @transactional
 def refresh_tab_cols(db_item_record, executor, exists_records, col_signal, ds_type, emit_db_order=True):
     db_name = db_item_record.item_name
-    opened_id_record_dict = dict(map(lambda x: (str(x.id), x), exists_records))
+    opened_id_record_dict = {str(record.id): record for record in exists_records}
     opened_tabs = DsTableTabSqlite().select_by_opened_ids(opened_id_record_dict.keys())
     for tab in opened_tabs:
         tb_item_record = opened_id_record_dict.get(str(tab.parent_opened_id))

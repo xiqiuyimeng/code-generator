@@ -17,7 +17,8 @@ _date_ = '2023/4/6 9:09'
 class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
     """动态模板配置对话框框架，根据模板配置动态生成页面"""
 
-    def __init__(self, *args, template_config_list=None, template=None, get_template_func=None, preview_mode=False):
+    def __init__(self, *args, template_config_list=None, template=None,
+                 get_template_func=None, preview_mode=False):
         # 如果是预览模式，直接传递配置项列表
         self.template_config_list = template_config_list
         # 当前模板，记录当前使用的模板，方便对比，判断是否需要重新渲染页面
@@ -86,7 +87,8 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         else:
             return self.do_get_config_list()
 
-    def do_get_config_list(self) -> list: ...
+    def do_get_config_list(self) -> list:
+        ...
 
     def setup_content_scroll_area(self):
         self.content_scroll_area = ScrollArea()
@@ -130,7 +132,8 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
             return
         self.do_set_other_label_text()
 
-    def do_set_other_label_text(self): ...
+    def do_set_other_label_text(self):
+        ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
@@ -155,13 +158,14 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         # 只要不是回退，都需要收集数据
         if frame is not self.previous_frame:
             if self.config_widget_list is not Ellipsis:
-                self.config_data_dict = dict([(config.config.id, config.collect_data())
-                                              for config in self.config_widget_list])
+                self.config_data_dict = {config.config.id: config.collect_data()
+                                         for config in self.config_widget_list}
                 # 找出必填的变量配置id
-                required_var_ids = set(map(lambda x: x.id, filter(lambda x: x.is_required, self.get_config_list())))
+                required_var_ids = {config.id for config in self.get_config_list() if config.is_required}
                 if required_var_ids:
                     # 如果还有未填完的值，提示
-                    filled_var_ids = set(map(lambda x: x[0], filter(lambda x: x[1], self.config_data_dict.items())))
+                    filled_var_ids = {config_id for config_id, config_value in self.config_data_dict.items()
+                                      if config_value}
                     if not required_var_ids.issubset(filled_var_ids):
                         pop_fail(NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE, self)
                         return
@@ -173,7 +177,8 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
             self.config_data_dict = ...
         super().switch_frame(frame)
 
-    def update_parent_dialog_config_dict(self): ...
+    def update_parent_dialog_config_dict(self):
+        ...
 
     def show(self):
         super().show()
@@ -216,4 +221,3 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         # 如果下一个框架依然拥有 template，传递值，避免下一个框架重复读取数据库
         if hasattr(self.next_frame, 'template'):
             setattr(self.next_frame, 'template', self.template)
-

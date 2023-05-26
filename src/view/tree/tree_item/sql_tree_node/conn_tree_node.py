@@ -96,8 +96,8 @@ class ConnTreeNode(SqlTreeNodeABC):
         self.tree_widget.tree_data.del_node(del_data)
         # 移除界面中属于当前连接的tab页
         if tab_indexes:
-            [self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
-             for index in tab_indexes]
+            for index in tab_indexes:
+                self.tree_widget.get_current_tab_widget().tab_bar.remove_tab(index, False, False)
         # 停止子节点线程
         for i in range(self.item.childCount()):
             child_item = self.item.child(i)
@@ -223,7 +223,7 @@ class ConnTreeNode(SqlTreeNodeABC):
         index = conn_items.index(self.item)
         need_reorder_items = conn_items[index + 1:]
         if need_reorder_items:
-            reorder_items = tuple(map(lambda x: get_item_opened_record(x), need_reorder_items))
+            reorder_items = [get_item_opened_record(item) for item in need_reorder_items]
             for reorder_item in reorder_items:
                 reorder_item.item_order -= 1
             return reorder_items

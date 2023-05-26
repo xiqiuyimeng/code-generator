@@ -40,9 +40,11 @@ class DraggableWidgetABC(QWidget):
             # 鼠标按键松开，恢复标志位
             self.is_moving = False
 
-    def get_window_start_pos(self): ...
+    def get_window_start_pos(self):
+        ...
 
-    def do_move(self, move_distance): ...
+    def do_move(self, move_distance):
+        ...
 
 
 class DraggableWidget(DraggableWidgetABC):

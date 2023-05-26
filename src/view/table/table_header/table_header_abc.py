@@ -45,8 +45,10 @@ class TableHeaderABC(TableWidgetABC):
         self.setColumnCount(self.column_count)
 
         # 隐藏空白行列
-        [self.setRowHidden(idx, True) for idx in range(self.row_count, self.rowCount())]
-        [self.setColumnHidden(idx, True) for idx in range(self.column_count, self.columnCount())]
+        for idx in range(self.row_count, self.rowCount()):
+            self.setRowHidden(idx, True)
+        for idx in range(self.column_count, self.columnCount()):
+            self.setColumnHidden(idx, True)
 
         # 设置表头字体
         font = self.font()
@@ -59,7 +61,8 @@ class TableHeaderABC(TableWidgetABC):
         # 设置单元格
         self.setup_items()
 
-    def setup_item_span(self): ...
+    def setup_item_span(self):
+        ...
 
     def setup_items(self):
         checkbox_num_widget = self.get_checkbox_num_widget()
@@ -77,7 +80,8 @@ class TableHeaderABC(TableWidgetABC):
         self.header_clicked.emit(check_state)
         self.header_check_changed.emit(check_state)
 
-    def setup_header_items(self): ...
+    def setup_header_items(self):
+        ...
 
     def change_child_check_state(self, check_state):
         # 设置正在批量处理标志位

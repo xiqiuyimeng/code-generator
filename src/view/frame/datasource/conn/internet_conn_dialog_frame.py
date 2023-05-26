@@ -55,7 +55,8 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.pwd_value = QLineEdit(self)
         self.ds_info_layout.addRow(self.pwd_label, self.pwd_value)
 
-    def setup_special_conn_info_ui(self): ...
+    def setup_special_conn_info_ui(self):
+        ...
 
     def setup_conn_info_label(self):
         self.host_label.setText(HOST_TEXT)
@@ -64,7 +65,8 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.pwd_label.setText(PWD_TEXT)
         self.setup_special_conn_info_label()
 
-    def setup_special_conn_info_label(self): ...
+    def setup_special_conn_info_label(self):
+        ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
@@ -81,7 +83,8 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
             conn_param = *conn_param, *other_conn_info
         return conn_param
 
-    def collect_special_conn_info(self) -> tuple: ...
+    def collect_special_conn_info(self) -> tuple:
+        ...
 
     def connect_conn_info_signal(self):
         self.host_value.textEdited.connect(self.check_input)
@@ -90,7 +93,8 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.pwd_value.textEdited.connect(self.check_input)
         self.connect_special_conn_info_signal()
 
-    def connect_special_conn_info_signal(self): ...
+    def connect_special_conn_info_signal(self):
+        ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
@@ -105,7 +109,8 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.pwd_value.setMaxLength(50)
         self.setup_special_conn_info_input_limit_rule()
 
-    def setup_special_conn_info_input_limit_rule(self): ...
+    def setup_special_conn_info_input_limit_rule(self):
+        ...
 
     def setup_other_placeholder_text(self):
         self.port_value.setPlaceholderText(PORT_INPUT_PLACEHOLDER_TEXT)
@@ -114,7 +119,8 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.pwd_value.setPlaceholderText(PWD_MAX_LENGTH_PLACEHOLDER_TEXT)
         self.setup_special_conn_info_placeholder_text()
 
-    def setup_special_conn_info_placeholder_text(self): ...
+    def setup_special_conn_info_placeholder_text(self):
+        ...
 
     def setup_echo_other_data(self):
         self.host_value.setText(self.dialog_data.conn_info_type.host)
@@ -123,6 +129,7 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.pwd_value.setText(self.dialog_data.conn_info_type.pwd)
         self.setup_echo_special_conn_info_data()
 
-    def setup_echo_special_conn_info_data(self): ...
+    def setup_echo_special_conn_info_data(self):
+        ...
 
     # ------------------------------ 后置处理 end ------------------------------ #

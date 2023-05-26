@@ -44,8 +44,8 @@ class StructTreeWidget(TreeWidgetABC):
         level = opened_items[0].level
         # 如果是第一层节点，单独处理
         if level == self.top_item.level + 1:
-            [add_struct_tree_item(self, self, opened_item, opened_item.data_type.display_name)
-             for opened_item in opened_items]
+            for opened_item in opened_items:
+                add_struct_tree_item(self, self, opened_item, opened_item.data_type.display_name)
         else:
             # 如果是其他类型，按策略来执行
             self.reopen_tree_item(opened_items)

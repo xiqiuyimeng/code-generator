@@ -50,9 +50,11 @@ class TemplateConfigWidget(QWidget):
         self.config_table = self.get_table_widget()
         self.config_layout.addWidget(self.config_table)
 
-    def setup_other_button_ui(self): ...
+    def setup_other_button_ui(self):
+        ...
 
-    def get_table_widget(self) -> TemplateConfigTableWidgetABC: ...
+    def get_table_widget(self) -> TemplateConfigTableWidgetABC:
+        ...
 
     def setup_label_text(self):
         self.add_config_btn.setText(ADD_CONFIG_BTN_TEXT)
@@ -60,7 +62,8 @@ class TemplateConfigWidget(QWidget):
         self.preview_config_btn.setText(PREVIEW_CONFIG_BTN_TEXT)
         self.setup_other_label_text()
 
-    def setup_other_label_text(self): ...
+    def setup_other_label_text(self):
+        ...
 
     def connect_signal(self):
         self.add_config_btn.clicked.connect(lambda: self.open_config_row_dialog())
@@ -75,7 +78,8 @@ class TemplateConfigWidget(QWidget):
         self.preview_config_btn.clicked.connect(self.preview_template_config)
         self.connect_other_signal()
 
-    def connect_other_signal(self): ...
+    def connect_other_signal(self):
+        ...
 
     def open_config_row_dialog(self, config_data=None, row_index=None):
         # 获取配置项名称列表、配置变量名称列表，这两项都不可以重复
@@ -102,7 +106,8 @@ class TemplateConfigWidget(QWidget):
         self.preview_config_dialog = TemplateConfigPreviewDialog(self.config_type, self.config_table.collect_data())
         self.preview_config_dialog.exec()
 
-    def collect_template_config(self): ...
+    def collect_template_config(self):
+        ...
 
     def post_process(self):
         self.set_remove_btn_available(False)

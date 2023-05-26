@@ -56,13 +56,14 @@ class ReadTypeMappingExecutor(LoadingMaskThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return ReadTypeMappingWorker(self.type_mapping_id)
 
+
 # ----------------------- 读取类型映射信息 end ----------------------- #
 
 
 # ----------------------- 添加类型映射 start ----------------------- #
 
 class AddTypeMappingWorker(ThreadWorkerABC):
-    
+
     def __init__(self, type_mapping: TypeMapping):
         super().__init__()
         self.type_mapping = type_mapping
@@ -83,7 +84,7 @@ class AddTypeMappingWorker(ThreadWorkerABC):
 
 
 class AddTypeMappingExecutor(LoadingMaskThreadExecutor):
-    
+
     def __init__(self, type_mapping: TypeMapping, *args):
         self.type_mapping = type_mapping
         super().__init__(*args)
@@ -95,6 +96,7 @@ class AddTypeMappingExecutor(LoadingMaskThreadExecutor):
         pop_ok(f'[{self.type_mapping.mapping_name}]\n保存成功',
                self.error_box_title, self.window)
         super().success_post_process(*args)
+
 
 # ----------------------- 添加类型映射 end ----------------------- #
 
@@ -135,6 +137,7 @@ class EditTypeMappingExecutor(LoadingMaskThreadExecutor):
                self.error_box_title, self.window)
         super().success_post_process(*args)
 
+
 # ----------------------- 编辑类型映射 end ----------------------- #
 
 
@@ -169,7 +172,7 @@ class DelTypeMappingExecutor(LoadingMaskThreadExecutor):
         super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelTypeMappingWorker((self.type_mapping_id, ), (self.type_mapping_name, ))
+        return DelTypeMappingWorker((self.type_mapping_id,), (self.type_mapping_name,))
 
     def success_post_process(self, *args):
         self.success_callback(self.row_index)
@@ -184,6 +187,7 @@ class BatchDelTypeMappingExecutor(LoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return DelTypeMappingWorker(self.type_mapping_ids, self.type_mapping_names)
+
 
 # ----------------------- 删除类型映射 end ----------------------- #
 
@@ -249,6 +253,7 @@ class ListTypeMappingExecutor(LoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return ListTypeMappingWorker()
+
 
 # ----------------------- 获取类型映射列表 end ----------------------- #
 
@@ -316,7 +321,7 @@ class ImportTypeMappingWorker(ImportDataWorker):
             # 6. 映射列名称，同组内相同，不同组保持唯一性；数据源列类型不同组必须相同
             group_mapping_col_name_set, ds_col_type_set = set(), set()
             for group_num, mapping_col_list in mapping_col_group_dict.items():
-                if len(set([mapping_col.mapping_col_name for mapping_col in mapping_col_list])) != 1:
+                if len({mapping_col.mapping_col_name for mapping_col in mapping_col_list}) != 1:
                     illegal_data_count += 1
                 # 判断映射列名称是否重复
                 current_group_mapping_col_name = mapping_col_list[0].mapping_col_name
@@ -325,7 +330,7 @@ class ImportTypeMappingWorker(ImportDataWorker):
                 group_mapping_col_name_set.add(current_group_mapping_col_name)
 
                 # 7. 数据源列类型同组内保持唯一性，不同组必须相同
-                current_ds_col_type_set = set([mapping_col.ds_col_type for mapping_col in mapping_col_list])
+                current_ds_col_type_set = {mapping_col.ds_col_type for mapping_col in mapping_col_list}
                 # 同组保持不同
                 if len(current_ds_col_type_set) != len(mapping_col_list):
                     illegal_data_count += 1
@@ -349,6 +354,7 @@ class ImportTypeMappingExecutor(ImportDataExecutor):
 
     def get_worker(self) -> ImportTypeMappingWorker:
         return ImportTypeMappingWorker(self.file_path)
+
 
 # ----------------------- 导入类型映射 end ----------------------- #
 
@@ -379,6 +385,7 @@ class OverrideTypeMappingExecutor(OverrideDataExecutor):
 
     def get_worker(self) -> OverrideTypeMappingWorker:
         return OverrideTypeMappingWorker(self.data_list)
+
 
 # ----------------------- 覆盖数据 end ----------------------- #
 

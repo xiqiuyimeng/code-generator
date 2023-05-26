@@ -44,7 +44,8 @@ class ImportExportDialogFrameABC(DialogFrameABC):
         # 允许子类添加组件
         self.setup_child_content()
 
-    def setup_child_content(self): ...
+    def setup_child_content(self):
+        ...
 
     def get_blank_right_buttons(self) -> tuple:
         self.start_process_button = QPushButton(self)
@@ -63,7 +64,8 @@ class ImportExportDialogFrameABC(DialogFrameABC):
         # 操作按钮是否禁用应该根据是否存在文件路径决定
         self.start_process_button.setDisabled(not bool(file_path))
 
-    def choose_file(self): ...
+    def choose_file(self):
+        ...
 
     def process_data(self):
         self.process_data_executor = self.get_process_data_executor()

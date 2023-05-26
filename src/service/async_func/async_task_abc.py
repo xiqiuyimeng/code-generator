@@ -41,16 +41,19 @@ class ThreadWorkerABC(QThread):
         finally:
             self.do_finally()
 
-    def do_run(self): ...
+    def do_run(self):
+        ...
 
     def do_exception(self, e: Exception):
         err_msg = self.get_err_msg()
         log.exception(err_msg)
         self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
 
-    def get_err_msg(self) -> str: ...
+    def get_err_msg(self) -> str:
+        ...
 
-    def do_finally(self): ...
+    def do_finally(self):
+        ...
 
 
 # ----------------------- thread worker manager ABC -----------------------
@@ -105,13 +108,14 @@ class ThreadExecutorABC(QObject):
 
     def pre_process(self):
         """前置处理，异步任务开始前的一些准备工作"""
-        pass
+        ...
 
-    def get_worker(self) -> ThreadWorkerABC: ...
+    def get_worker(self) -> ThreadWorkerABC:
+        ...
 
     def post_process(self):
         """通用后置处理，任务结束后的一些通用工作"""
-        pass
+        ...
 
     def success_post_process(self, *args):
         if self.success_callback:
@@ -259,9 +263,11 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
         item.setIcon(0, item_icon)
         self.item_post_process(item)
 
-    def item_pre_process(self, item): ...
+    def item_pre_process(self, item):
+        ...
 
-    def item_post_process(self, item): ...
+    def item_post_process(self, item):
+        ...
 
 
 # ----------------------- refresh movie worker manager ABC -----------------------

@@ -7,7 +7,6 @@ from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, g
 _author_ = 'luwt'
 _date_ = '2023/3/28 10:51'
 
-
 table_name = 'template_func'
 
 sql_dict = {
@@ -91,8 +90,7 @@ class TemplateFuncSqlite(SqliteBasic):
         self.batch_insert(template_func_list)
 
     def batch_delete_by_names(self, template_func_list):
-        name_list_str = ','.join([f'"{template_func.func_name}"'
-                                  for template_func in template_func_list])
+        name_list_str = ','.join([f'"{template_func.func_name}"' for template_func in template_func_list])
         sql = f'{sql_dict.get("delete_by_names")} ({name_list_str})'
         log.info(f'{self.table_name} 根据名称删除模板方法')
         get_db_conn().query(sql)

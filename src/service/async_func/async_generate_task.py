@@ -91,10 +91,10 @@ class GenerateWorker(ThreadWorkerABC):
 
         # 6. 收集变量配置，k：输出变量名称，v：用户输入值
         self.generate_log_signal.emit('开始准备模板变量 >>>>>')
-        output_config_dict = dict(map(lambda x: (x.output_var_name, self.output_config_input_dict.get(x.id)),
-                                      self.template.output_config_list))
-        var_config_dict = dict(map(lambda x: (x.output_var_name, self.var_config_input_dict.get(x.id)),
-                                   self.template.var_config_list))
+        output_config_dict = {output_config.output_var_name: self.output_config_input_dict.get(output_config.id)
+                              for output_config in self.template.output_config_list}
+        var_config_dict = {var_config.output_var_name: self.var_config_input_dict.get(var_config.id)
+                           for var_config in self.template.var_config_list}
         self.prepare_progress_signal.emit(100)
         self.generate_log_signal.emit('准备模板变量完毕 =====')
         self.generate_log_signal.emit('---------- 生成准备工作完毕 ----------\n')
@@ -146,7 +146,7 @@ class GenerateWorker(ThreadWorkerABC):
                 self.generate_log_signal.emit(f'数据表：{table_name} 生成路径：{full_file_path}')
                 # 如果是预览生成，将文件发送出去；如果是生成到文件模式，直接写入文件
                 if self.save_file:
-                    with open(full_file_path, 'w', encoding='utf-8')as f:
+                    with open(full_file_path, 'w', encoding='utf-8') as f:
                         f.write(generated_content)
                 else:
                     # 解析路径结构
@@ -177,7 +177,7 @@ class GenerateWorker(ThreadWorkerABC):
 class GenerateExecutorABC(ThreadExecutorABC):
 
     def __init__(self, selected_data, type_mapping_id, template,
-                 output_config_input_dict, var_config_input_dict, button_list,
+                 output_config_input_dict, var_config_input_dict, disable_button_tuple,
                  prepare_progress_callback, generate_progress_callback,
                  generate_log_callback, *args, generate_file_callback=None,
                  save_file=True, err_msg=None):
@@ -186,7 +186,7 @@ class GenerateExecutorABC(ThreadExecutorABC):
         self.template = template
         self.output_config_input_dict = output_config_input_dict
         self.var_config_input_dict = var_config_input_dict
-        self.button_list = button_list
+        self.disable_button_tuple = disable_button_tuple
         self.prepare_progress_callback = prepare_progress_callback
         self.generate_progress_callback = generate_progress_callback
         self.generate_log_callback = generate_log_callback
@@ -203,7 +203,8 @@ class GenerateExecutorABC(ThreadExecutorABC):
 
     def pre_process(self):
         # 禁用这些按钮
-        [button.setDisabled(True) for button in self.button_list]
+        for button in self.disable_button_tuple:
+            button.setDisabled(True)
 
     def get_worker(self) -> ThreadWorkerABC:
         return GenerateWorker(self.selected_data, self.type_mapping_id, self.template,
@@ -212,7 +213,8 @@ class GenerateExecutorABC(ThreadExecutorABC):
 
     def post_process(self):
         # 恢复按钮状态
-        [button.setDisabled(False) for button in self.button_list]
+        for button in self.disable_button_tuple:
+            button.setDisabled(False)
 
 
 class GenerateExecutor(GenerateExecutorABC):
@@ -226,6 +228,7 @@ class PreviewGenerateExecutor(GenerateExecutorABC):
     def __init__(self, *args, generate_file_callback):
         super().__init__(*args, generate_file_callback=generate_file_callback,
                          save_file=False, err_msg='预览生成失败')
+
 
 # ----------------------- 生成 end ----------------------- #
 
@@ -246,7 +249,7 @@ class SaveFileWorker(ThreadWorkerABC):
             file_path, file_content = file_value
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
-            with open(os.path.join(file_path, file_name), 'w', encoding='utf-8')as f:
+            with open(os.path.join(file_path, file_name), 'w', encoding='utf-8') as f:
                 f.write(file_content)
             self.save_progress_signal.emit(idx * 100 // file_count)
         self.success_signal.emit()

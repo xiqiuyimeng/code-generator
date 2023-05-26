@@ -103,6 +103,7 @@ class DelStructExecutor(IconMovieThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return DelStructWorker(self.opened_item, self.reorder_items)
 
+
 # ---------------------------------------- 删除结构体 end ---------------------------------------- #
 
 
@@ -175,6 +176,7 @@ class QueryStructExecutor(LoadingMaskThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return QueryStructWorker(self.opened_struct_id)
 
+
 # ---------------------------------------- 查询结构体 end ---------------------------------------- #
 
 
@@ -193,7 +195,7 @@ class ListStructWorker(ThreadWorkerABC):
         # 读取结构体具体信息
         struct_info_list = StructSqlite().select_list()
         # 转换为dict，key：opened_item_id，value：struct info
-        struct_opened_dict = dict(map(lambda x: (x.opened_item_id, x), struct_info_list))
+        struct_opened_dict = {struct_info.opened_item_id: struct_info for struct_info in struct_info_list}
 
         ds_category = DsCategoryEnum.struct_ds_category.value.name
         # 读取打开记录表中的信息，获取所有的文件夹和结构体记录
@@ -242,6 +244,7 @@ class ListStructExecutor(LoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return ListStructWorker()
+
 
 # ---------------------------------------- 获取所有结构体 end ---------------------------------------- #
 
@@ -408,6 +411,7 @@ class ReadFileExecutor(LoadingMaskThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return ReadFileWorker(self.file_url, self.struct_type)
 
+
 # ---------------------------------------- 异步读取文件 end ---------------------------------------- #
 
 
@@ -440,6 +444,7 @@ class PrettyStructExecutor(LoadingMaskThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return PrettyStructWorker(self.data, self.beautifier_executor_type)
+
 
 # ---------------------------------------- 异步美化结构体 end ---------------------------------------- #
 
@@ -498,6 +503,7 @@ class OpenStructExecutor(IconMovieThreadExecutor):
 
     def get_worker(self) -> ThreadWorkerABC:
         return OpenStructWorker(get_item_opened_record(self.item))
+
 
 # ---------------------------------------- 打开结构体 end ---------------------------------------- #
 

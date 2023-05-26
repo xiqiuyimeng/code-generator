@@ -8,7 +8,6 @@ from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, g
 _author_ = 'luwt'
 _date_ = '2023/3/9 8:42'
 
-
 table_name = 'template_file'
 
 sql_dict = {
@@ -117,13 +116,13 @@ class TemplateFileSqlite(SqliteBasic):
     @transactional
     def batch_edit_template_files(self, template_id, template_files):
         # 由于是低频操作，可以简单做，删除原有数据，插入新数据
-        self.batch_del_template_files((template_id, ))
+        self.batch_del_template_files((template_id,))
         # 插入新数据
         if template_files:
             self.batch_add_template_files(template_id, template_files)
 
     def batch_del_template_files(self, template_ids):
-        ids_str = ','.join(map(lambda x: str(x), template_ids))
+        ids_str = ','.join([str(template_id) for template_id in template_ids])
         sql = f"{sql_dict.get('delete_by_template_ids')} ({ids_str})"
         get_db_conn().query(sql)
         log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')

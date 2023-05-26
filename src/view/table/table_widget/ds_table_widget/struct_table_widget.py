@@ -28,7 +28,8 @@ class StructDsColTableWidget(DsColTableWidgetABC):
     def batch_deal_checked(self, check_state):
         super().batch_deal_checked(check_state)
         # 检查每一行是否有子表，如果存在子表，联动子表复选框
-        [self.link_child_table_checked(check_state, row) for row in range(len(self.cols))]
+        for row in range(len(self.cols)):
+            self.link_child_table_checked(check_state, row)
 
     def make_checkbox_num_widget(self, row_index, col_data):
         if col_data.children:
@@ -62,7 +63,7 @@ class StructDsColTableWidget(DsColTableWidgetABC):
         # 找到给定行索引之前的所有行（row：列数据列表中的索引值）
         before_rows = self.cols[:row]
         # 之前行中存在的子表数
-        child_tables = len(list(filter(lambda x: x.has_child_table, before_rows)))
+        child_tables = len([row for row in before_rows if row.has_child_table])
         # 所以当前行的实际索引值 = 在列数据列表中的索引值 + 存在的子表数
         return row + child_tables
 
@@ -180,8 +181,9 @@ class StructDsColTableWidget(DsColTableWidgetABC):
 
     def recursive_update_children_checked(self, cols, checked):
         self.batch_update_check_state(cols, checked)
-        [self.recursive_update_children_checked(cols[child_row].children, checked)
-         for child_row in range(len(cols)) if cols[child_row].children]
+        for child_row in range(len(cols)):
+            if cols[child_row].children:
+                self.recursive_update_children_checked(cols[child_row].children, checked)
 
     def get_add_del_col_data(self, add_del_data, checked_cols):
         """根据选中数据获取表层次的数据，由于选择的列数据是最底层，所以需要依次推导出上一层节点，构造层次数据"""

@@ -43,7 +43,8 @@ class TreeSearcher(Searcher):
     def expand_selected_items(self):
         """展开选中的元素，如果当前元素是一个父节点，且其下子节点中存在选中元素，则展开父节点"""
         if self.match_item_records and self.match_item_records[-1]:
-            [self.recursive_expanded(item) for item in self.match_item_records[-1]]
+            for item in self.match_item_records[-1]:
+                self.recursive_expanded(item)
 
     def recursive_expanded(self, item):
         parent = item.parent()

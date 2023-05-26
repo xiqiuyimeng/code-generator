@@ -13,7 +13,8 @@ class StructTreeNodeABC(TreeNodeABC):
     def __init__(self, *args):
         super().__init__(*args)
 
-    def set_check_state(self, *args): ...
+    def set_check_state(self, *args):
+        ...
 
     def save_check_state(self):
         # 保存选中数据

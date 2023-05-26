@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 from enum import Enum
-from itertools import groupby
 
 from src.logger.log import logger as log
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.util.group_util import group_model_list
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:32'
@@ -107,7 +107,7 @@ class DsTableColInfoSqlite(SqliteBasic):
         # 在添加列的时候，将所有列的类型同步到数据源列类型表中
         if not ds_col_type_sqlite:
             ds_col_type_sqlite = DsColTypeSqlite()
-        ds_col_type_sqlite.batch_sync_col_types(ds_type, set(map(lambda x: x.data_type, columns)))
+        ds_col_type_sqlite.batch_sync_col_types(ds_type, {col.data_type for col in columns})
 
         # 考虑存在子集合的情况
         for col_info in columns:
@@ -124,7 +124,7 @@ class DsTableColInfoSqlite(SqliteBasic):
 
     @staticmethod
     def delete_by_parent_tab_ids(parent_tab_ids):
-        parent_tab_id_list = ", ".join(map(lambda x: str(x), parent_tab_ids))
+        parent_tab_id_list = ", ".join([str(parent_tab_id) for parent_tab_id in parent_tab_ids])
         delete_sql = f"{sql_dict.get('delete_by_parent_tab_ids')}({parent_tab_id_list})"
         get_db_conn().query(delete_sql)
         log.info(f"删除{table_name}语句 ==> {delete_sql}")
@@ -133,12 +133,10 @@ class DsTableColInfoSqlite(SqliteBasic):
         # 获取当前tab页下所有列数据
         cols = self._get_table_cols(parent_tab_id)
         # 列数据按照 parent_id 分组
-        cols_parent_id_group = groupby(sorted(cols, key=lambda x: x.parent_id), key=lambda x: x.parent_id)
-        cols_parent_id_dict = dict(map(lambda x: (x[0], list(x[1])), cols_parent_id_group))
+        cols_parent_id_dict = group_model_list(cols, lambda x: x.parent_id)
 
         # 找到所有父id对应的列数据，由于没有id为0的元素，所以这里会自动过滤掉父id为0，只会匹配其他有意义的父id
-        parent_id_cols = filter(lambda x: x.id in cols_parent_id_dict.keys(), cols)
-        parent_col_dict = dict(map(lambda x: (x.id, x), parent_id_cols))
+        parent_col_dict = {col.id: col for col in cols if col.id in cols_parent_id_dict}
 
         # 获取顶级节点数据，即 parent_id = 0
         top_cols = cols_parent_id_dict.get(0)

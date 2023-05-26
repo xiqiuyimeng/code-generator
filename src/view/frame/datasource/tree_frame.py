@@ -58,9 +58,11 @@ class TreeFrameABC(QFrame):
     def reopen_tree(self):
         self.tree_widget.reopen_tree()
 
-    def get_header_text(self) -> str: ...
+    def get_header_text(self) -> str:
+        ...
 
-    def get_tree_widget(self) -> TreeWidgetABC: ...
+    def get_tree_widget(self) -> TreeWidgetABC:
+        ...
 
 
 class SqlTreeFrame(TreeFrameABC):

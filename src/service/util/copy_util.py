@@ -11,7 +11,6 @@ from src.service.system_storage.type_mapping_sqlite import TypeMapping
 _author_ = 'luwt'
 _date_ = '2023/5/24 16:21'
 
-
 COPY_NAME_SUFFIX = '-copy'
 COPY_NAME_PATTERN = f'(.+{COPY_NAME_SUFFIX})(\\d*)$'
 
@@ -74,15 +73,15 @@ def copy_type_mapping(export_type_mapping, exists_name_list):
 
 def copy_template_file(export_template_file):
     template_file = TemplateFile()
-    [setattr(template_file, field.name, getattr(export_template_file, field.name))
-     for field in fields(export_template_file)]
+    for field in fields(export_template_file):
+        setattr(template_file, field.name, getattr(export_template_file, field.name))
     return template_file
 
 
 def copy_template_config(export_template_config: TemplateConfig):
     template_config = TemplateConfig()
-    [setattr(template_config, field.name, getattr(export_template_config, field.name))
-     for field in fields(export_template_config)]
+    for field in fields(export_template_config):
+        setattr(template_config, field.name, getattr(export_template_config, field.name))
     return template_config
 
 
@@ -121,6 +120,5 @@ def copy_template(export_template, exists_name_list):
     else:
         template.var_config_list = tuple()
     return template
-
 
 # ------------------------------ 复制模板 end ------------------------------ #

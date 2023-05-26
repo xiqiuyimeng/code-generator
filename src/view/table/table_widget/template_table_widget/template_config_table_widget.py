@@ -19,10 +19,11 @@ class TemplateConfigTableWidgetABC(CustomTableWidget):
     row_edit_signal = pyqtSignal(TemplateConfig, int)
 
     def do_fill_row(self, row_index, template_config, fill_create_time=True):
-        [self.setItem(row_index, col, self.make_item(data))
-         for col, data in enumerate(self.get_row_fill_data_tuple(template_config), 1)]
+        for col, data in enumerate(self.get_row_fill_data_tuple(template_config), 1):
+            self.setItem(row_index, col, self.make_item(data))
 
-    def get_row_fill_data_tuple(self, template_config) -> tuple: ...
+    def get_row_fill_data_tuple(self, template_config) -> tuple:
+        ...
 
     def emit_row_edit_signal(self, order_item, row_id):
         row_idx = int(order_item.text()) - 1
@@ -46,7 +47,7 @@ class TemplateConfigTableWidgetABC(CustomTableWidget):
             self.del_rows()
 
     def collect_data(self):
-        return tuple(self.get_row_data(row) for row in range(self.rowCount()))
+        return [self.get_row_data(row) for row in range(self.rowCount())]
 
     def get_row_data(self, row):
         # 收集数据
@@ -62,7 +63,7 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
         super().__init__(TEMPLATE_OUTPUT_CONFIG_HEADER_LABELS, *args)
 
     def get_row_fill_data_tuple(self, template_config) -> tuple:
-        return template_config.config_name, template_config.output_var_name, template_config.config_value_widget,\
+        return template_config.config_name, template_config.output_var_name, template_config.config_value_widget, \
             COMBO_BOX_YES_TXT if template_config.is_required else COMBO_BOX_NO_TXT, \
             len(template_config.bind_file_list) if template_config.bind_file_list else 0, \
             template_config.config_desc
@@ -145,7 +146,8 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
         self.item(row, 5).setText(str(bind_file_num))
 
     def update_bind_file_num_rows(self):
-        [self.update_bind_file_num_row(row) for row in range(self.rowCount())]
+        for row in range(self.rowCount()):
+            self.update_bind_file_num_row(row)
 
 
 class TemplateVarConfigTableWidget(TemplateConfigTableWidgetABC):
@@ -155,5 +157,5 @@ class TemplateVarConfigTableWidget(TemplateConfigTableWidgetABC):
         super().__init__(TEMPLATE_VAR_CONFIG_HEADER_LABELS, *args)
 
     def get_row_fill_data_tuple(self, template_config) -> tuple:
-        return template_config.config_name, template_config.output_var_name, template_config.config_value_widget,\
+        return template_config.config_name, template_config.output_var_name, template_config.config_value_widget, \
             COMBO_BOX_YES_TXT if template_config.is_required else COMBO_BOX_NO_TXT, template_config.config_desc

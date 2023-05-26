@@ -15,7 +15,8 @@ class SmartSearcherItemView(QAbstractItemView):
         super().__init__(parent)
         self.searcher = self.get_searcher()
 
-    def get_searcher(self): ...
+    def get_searcher(self):
+        ...
 
     def keyPressEvent(self, event):
         self.searcher.handle_search(event.key(), event.text(), super().keyPressEvent, event)

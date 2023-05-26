@@ -3,6 +3,7 @@ import dataclasses
 
 from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT, DEFAULT_INPUT_WIDGET_TYPE
 from src.service.system_storage.template_config_sqlite import RequiredEnum, check_required_value_legal, ConfigTypeEnum
+from src.service.util.group_util import group_model_list, add_group_list
 
 _author_ = 'luwt'
 _date_ = '2023/5/15 14:11'
@@ -15,23 +16,6 @@ def convert_import_to_model(import_model_class, model_class, data):
 
 def convert_import_to_model_list(import_model_class, model_class, data_list):
     return [convert_import_to_model(import_model_class, model_class, data) for data in data_list]
-
-
-def add_group_list(group_dict, get_group_key, data):
-    key = get_group_key(data)
-    data_group_list = group_dict.get(key)
-    # 如果之前没存储过，那么创建list
-    if data_group_list is None:
-        data_group_list = list()
-        group_dict[key] = data_group_list
-    data_group_list.append(data)
-
-
-def group_model_list(data_list, get_group_key):
-    model_list_dict = dict()
-    for data in data_list:
-        add_group_list(model_list_dict, get_group_key, data)
-    return model_list_dict
 
 
 # ------------------------------ 导入导出类型映射 start ------------------------------ #

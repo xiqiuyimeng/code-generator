@@ -78,9 +78,9 @@ def show_conn_dialog(sql_type, tree_widget, conn_id, title):
     :param title: 弹窗的标题，与操作保持一致，不作为弹窗中回显数据标志，以conn_info为回显标志
     """
     conn_items = tree_widget.get_top_level_items()
-    exists_conn_name_tuple = tuple(get_item_opened_record(conn_item).item_name for conn_item in conn_items)
+    exists_conn_names = [get_item_opened_record(conn_item).item_name for conn_item in conn_items]
     # 根据类型，动态获取对话框
-    dialog: ConnDialogABC = globals()[get_conn_dialog(sql_type)](title, exists_conn_name_tuple, conn_id)
+    dialog: ConnDialogABC = globals()[get_conn_dialog(sql_type)](title, exists_conn_names, conn_id)
     if title == ADD_CONN_DIALOG_TITLE:
         dialog.save_signal.connect(lambda opened_conn_record: add_conn_tree_item(tree_widget, opened_conn_record))
 
@@ -237,10 +237,10 @@ def show_struct_dialog(struct_type, tree_widget, opened_struct_id, title,
     # 动态智能获取父节点，父节点打开记录项
     if parent_item is None:
         parent_item, parent_opened_item = get_struct_parent_item(tree_widget, parent_item)
-    # 获取当前不允许重复的名称元祖
-    exists_struct_name_tuple = get_exists_struct_name_tuple(tree_widget, parent_opened_item, parent_item)
+    # 获取当前不允许重复的名称列表
+    exists_struct_names = get_exists_struct_names(tree_widget, parent_opened_item, parent_item)
     # 根据类型，动态获取对话框
-    dialog: StructDialogABC = globals()[get_struct_dialog(struct_type)](title, exists_struct_name_tuple,
+    dialog: StructDialogABC = globals()[get_struct_dialog(struct_type)](title, exists_struct_names,
                                                                         opened_struct_id, tree_widget,
                                                                         parent_opened_item)
     if title == ADD_STRUCT_DIALOG_TITLE:
@@ -266,13 +266,13 @@ def edit_folder_func(tree_widget, parent_opened_item, folder_info, parent_item):
     show_folder_dialog(tree_widget, parent_opened_item, EDIT_FOLDER_NAME, folder_info, parent_item)
 
 
-def get_exists_struct_name_tuple(tree_widget, parent_opened_item, parent_item):
+def get_exists_struct_names(tree_widget, parent_opened_item, parent_item):
     # 根据节点层次，获取子节点，得到当前不允许重复的名称列表
     if parent_opened_item is tree_widget.top_item:
         children_items = tree_widget.get_top_level_items()
     else:
         children_items = get_children_items(parent_item)
-    return tuple(get_item_opened_record(child_item).item_name for child_item in children_items)
+    return [get_item_opened_record(child_item).item_name for child_item in children_items]
 
 
 def show_folder_dialog(tree_widget, parent_opened_item, dialog_title, folder_info, parent_item):
@@ -284,10 +284,10 @@ def show_folder_dialog(tree_widget, parent_opened_item, dialog_title, folder_inf
     :param folder_info: 文件夹信息，也就是 opened item 对象
     :param parent_item: 树结构中的父节点
     """
-    # 根据节点层次，获取子节点，得到当前不允许重复的名称元祖
-    exists_folder_name_tuple = get_exists_struct_name_tuple(tree_widget, parent_opened_item, parent_item)
+    # 根据节点层次，获取子节点，得到当前不允许重复的名称列表
+    exists_folder_names = get_exists_struct_names(tree_widget, parent_opened_item, parent_item)
     # 打开对话框
-    folder_dialog = FolderDialog(dialog_title, exists_folder_name_tuple, folder_info, parent_opened_item)
+    folder_dialog = FolderDialog(dialog_title, exists_folder_names, folder_info, parent_opened_item)
     if dialog_title == CREATE_NEW_FOLDER:
         folder_dialog.save_signal.connect(lambda folder_item: add_struct_tree_item(tree_widget, parent_item,
                                                                                    folder_item, FOLDER_TYPE))

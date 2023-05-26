@@ -14,8 +14,8 @@ class TemplateMaintainFileConfigDialog(CustomDialogABC):
     # 绑定文件数变化信号
     bind_file_changed = pyqtSignal()
 
-    def __init__(self, output_config_tuple, unbind_file_list):
-        self.output_config_tuple = output_config_tuple
+    def __init__(self, output_config_list, unbind_file_list):
+        self.output_config_list = output_config_list
         self.unbind_file_list = unbind_file_list
         self.frame: TemplateMaintainFileConfigFrame = ...
         super().__init__(MAINTAIN_FILE_CONFIG_TITLE)
@@ -24,7 +24,7 @@ class TemplateMaintainFileConfigDialog(CustomDialogABC):
         self.resize(self.window_geometry.width() * 0.6, self.window_geometry.height() * 0.7)
 
     def get_frame(self) -> TemplateMaintainFileConfigFrame:
-        return TemplateMaintainFileConfigFrame(self.output_config_tuple, self.unbind_file_list,
+        return TemplateMaintainFileConfigFrame(self.output_config_list, self.unbind_file_list,
                                                self, self.dialog_title)
 
     def connect_signal(self):

@@ -7,7 +7,6 @@ from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, g
 _author_ = 'luwt'
 _date_ = '2023/2/12 11:46'
 
-
 table_name = 'type_mapping'
 
 sql_dict = {

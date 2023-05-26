@@ -164,6 +164,7 @@ class ListTemplateFuncExecutor(LoadingMaskThreadExecutor):
     def get_worker(self) -> ThreadWorkerABC:
         return ListTemplateFuncWorker()
 
+
 # ----------------------- 获取模板方法列表 end ----------------------- #
 
 
@@ -199,6 +200,7 @@ class ImportTemplateFuncExecutor(ImportDataExecutor):
     def get_worker(self) -> ImportTemplateFuncWorker:
         return ImportTemplateFuncWorker(self.file_path)
 
+
 # ----------------------- 导入模板方法 end ----------------------- #
 
 
@@ -224,6 +226,7 @@ class OverrideTemplateFuncExecutor(OverrideDataExecutor):
 
     def get_worker(self) -> OverrideTemplateFuncWorker:
         return OverrideTemplateFuncWorker(self.data_list)
+
 
 # ----------------------- 覆盖数据 end ----------------------- #
 

@@ -50,8 +50,7 @@ class ColTypeMappingTableWidgetABC(TableWidgetABC):
         self.setItemDelegateForColumn(1, self.ds_col_type_input_delegate)
 
     def get_exists_ds_col_types(self, index):
-        # 这里返回生成器即可
-        return tuple(self.item(row, 1).text() for row in range(self.rowCount()) if row != index.row())
+        return [self.item(row, 1).text() for row in range(self.rowCount()) if row != index.row()]
 
     def remove_row(self):
         rm_index_list = list()
@@ -60,7 +59,8 @@ class ColTypeMappingTableWidgetABC(TableWidgetABC):
             if cell_widget.check_box.checkState():
                 rm_index_list.append(row)
         # 执行删除
-        [self.removeRow(idx) for idx in sorted(rm_index_list, reverse=True)]
+        for idx in sorted(rm_index_list, reverse=True):
+            self.removeRow(idx)
         # 对行进行重排序
         for row in range(self.rowCount()):
             cell_widget = self.cellWidget(row, 0)
@@ -78,7 +78,8 @@ class ColTypeMappingFrozenTableWidget(ColTypeMappingTableWidgetABC):
     def setup_other_ui(self):
         super().setup_other_ui()
         # 隐藏2列之后的空白列
-        [self.setColumnHidden(idx, True) for idx in range(2, self.columnCount())]
+        for idx in range(2, self.columnCount()):
+            self.setColumnHidden(idx, True)
         # 关闭滚动条
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -119,18 +120,17 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         # 映射列名称不同组不能重复，即同行不重复
         self.mapping_col_name_input_delegate = TextInputDelegate(DUPLICATE_MAPPING_COL_NAME_PROMPT,
                                                                  self.get_exists_mapping_col_names)
-        [self.setItemDelegateForColumn(col, self.mapping_col_name_input_delegate)
-         for col in range(2, self.columnCount()) if (col - 2) % 3 == 0]
-
         # 其他列，输入编辑器代理
         self.text_input_delegate = TextInputDelegate()
-        [self.setItemDelegateForColumn(col, self.text_input_delegate)
-         for col in range(2, self.columnCount()) if (col - 2) % 3 > 0]
+        for col in range(2, self.columnCount()):
+            if (col - 2) % 3 == 0:
+                self.setItemDelegateForColumn(col, self.mapping_col_name_input_delegate)
+            elif (col - 2) % 3 > 0:
+                self.setItemDelegateForColumn(col, self.text_input_delegate)
 
     def get_exists_mapping_col_names(self, index):
-        # 返回生成器即可
-        return tuple(self.item(index.row(), col).text() for col in range(1, self.columnCount())
-                     if col != index.column() and (col - 2) % 3 == 0)
+        return [self.item(index.row(), col).text() for col in range(1, self.columnCount())
+                if col != index.column() and (col - 2) % 3 == 0]
 
     def setup_header(self):
         # 创建表头控件
@@ -195,7 +195,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         # 此时应该整列所有的单元格，保持数据一致，因为对于映射列名称来说，每一列都应该是一致的
         if (col - 2) % 3 == 0 and self.item(row, col).isSelected():
             mapping_col_name = self.item(row, col).text()
-            [self.item(row_idx, col).setText(mapping_col_name) for row_idx in range(self.rowCount())]
+            for row_idx in range(self.rowCount()):
+                self.item(row_idx, col).setText(mapping_col_name)
 
     def add_type_mapping(self, import_error_data=False):
         # 增加一个新的类型映射行
@@ -212,7 +213,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         self.insert_row(row)
         self.setCellWidget(row, 0, make_checkbox_num_widget(row + 1, self.check_box_clicked_slot))
         # 设置每个单元格
-        [self.setItem(row, col, self.make_item()) for col in range(self.columnCount())]
+        for col in range(self.columnCount()):
+            self.setItem(row, col, self.make_item())
         # 重新计算表头复选框状态
         self.calculate_header_checked()
         # 同步上一行所有映射列名称数据
@@ -234,15 +236,15 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def _sync_last_mapping_col_text(self, row):
         # 同步上一个映射列名称到当前列下面单元格，需要保持映射列名称一致
         # 找出所有映射列名称 列索引
-        mapping_col_idx_tuple = tuple(filter(lambda x: (x - 2) % 3 == 0, range(2, self.columnCount())))
-        for col_idx in mapping_col_idx_tuple:
+        mapping_col_idx_list = [idx for idx in range(2, self.columnCount()) if (idx - 2) % 3 == 0]
+        for col_idx in mapping_col_idx_list:
             last_mapping_col_name = self.item(row - 1, col_idx).text()
             # 给当前列行赋值
             self.item(row, col_idx).setText(last_mapping_col_name)
 
     def del_type_mapping(self):
-        check_count = len(tuple(filter(lambda x: self.cellWidget(x, 0).check_box.checkState() == Qt.Checked,
-                                       range(self.rowCount()))))
+        check_count = len([row for row in range(self.rowCount())
+                           if self.cellWidget(row, 0).check_box.checkState() == Qt.Checked])
         if not pop_question(DEL_COL_TYPE_MAPPING_PROMPT.format(check_count), DEL_COL_TYPE_MAPPING_TITLE, self):
             return
         # 移除类型映射行，根据选中情况来删除
@@ -254,10 +256,12 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def add_type_mapping_group(self):
         # 增加1组3列
         column_count = self.columnCount()
-        [self.insertColumn(col + column_count) for col in range(3)]
+        for col in range(3):
+            self.insertColumn(col + column_count)
         # 设置新增的单元格
-        [self.setItem(row, col + column_count, self.make_item()) for col in range(3)
-         for row in range(self.rowCount())]
+        for col in range(3):
+            for row in range(self.rowCount()):
+                self.setItem(row, col + column_count, self.make_item())
         # 表头同时增加3列
         self.header_widget.add_type_mapping_group()
         # 重新设置一遍编辑器代理
@@ -316,7 +320,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         self.setItem(row, 1, self.make_item(col_type))
 
     def sync_col_types(self, col_types):
-        exists_col_types = list(map(lambda x: self._get_col_type(x), range(self.rowCount())))
+        exists_col_types = [self._get_col_type(row) for row in range(self.rowCount())]
         for idx, col_type in enumerate(col_types):
             if col_type in exists_col_types:
                 continue
@@ -369,7 +373,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
                 fragmentary_data_prompt_list.append(f'[{self.header_widget.get_ds_col_type_title()}]')
                 break
         # 找出所有映射列名称和映射类型 列索引
-        mapping_col_idx_list = list(filter(lambda x: (x - 2) % 3 in (0, 1), range(2, self.columnCount())))
+        mapping_col_idx_list = [col for col in range(2, self.columnCount()) if (col - 2) % 3 in (0, 1)]
         for col_idx in mapping_col_idx_list:
             group_title = self.header_widget.get_mapping_group_title(col_idx)
             if (col_idx - 2) % 3 == 0:
@@ -387,7 +391,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         unique_mapping_col_names = set()
         while start_col_idx < self.columnCount():
             group_title = self.header_widget.get_mapping_group_title(start_col_idx)
-            if len(set(map(lambda x: self.item(x, start_col_idx).text(), range(self.rowCount())))) > 1:
+            if len({self.item(row, start_col_idx).text() for row in range(self.rowCount())}) > 1:
                 different_mapping_col_name_groups.append(f'[{group_title}]')
             else:
                 mapping_col_name = self.item(0, start_col_idx).text()
@@ -405,7 +409,8 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
         max_group_num = type_mapping.max_col_type_group_num
         # 首先渲染表结构，如果最大组号大于0，那么需要新增类型映射组
         if max_group_num:
-            [self.add_type_mapping_group() for group_num in range(max_group_num)]
+            for group_num in range(max_group_num):
+                self.add_type_mapping_group()
         # 渲染数据
         col_type_mappings = type_mapping.type_mapping_cols
         if not col_type_mappings:

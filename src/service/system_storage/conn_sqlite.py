@@ -57,7 +57,7 @@ class ConnSqlite(SqliteBasic):
 
     def get_conn_id_types(self):
         rows = self._do_select(sql_dict.get('select_id_type'), SqlConnection())
-        return list(map(lambda x: SqlConnection(**x), rows.as_dict()))
+        return [SqlConnection(**row) for row in rows.as_dict()]
 
     def get_conn_by_id(self, conn_id):
         conn_param = SqlConnection()

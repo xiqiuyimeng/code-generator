@@ -26,7 +26,8 @@ class TabWidget(QTabWidget):
     def get_current_widget(self):
         return self.currentWidget()
 
-    def get_tab_bar(self) -> DsTabBar: ...
+    def get_tab_bar(self) -> DsTabBar:
+        ...
 
     def connect_signal(self):
         # 删除tab页信号
@@ -45,4 +46,3 @@ class StructTabWidget(TabWidget):
 
     def get_tab_bar(self) -> DsTabBar:
         return StructTabBar(self)
-

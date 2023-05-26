@@ -10,6 +10,7 @@ _date_ = '2023/4/4 11:34'
 
 class SelectedDataDialogFrameABC(ChainDialogFrameABC):
     """选中数据展示对话框框架抽象类，主体为展示树结构"""
+
     def __init__(self, *args):
         # 选中数据展示树结构
         self.display_tree_widget = ...
@@ -24,7 +25,8 @@ class SelectedDataDialogFrameABC(ChainDialogFrameABC):
         self.display_tree_widget.expandAll()
         self.frame_layout.addWidget(self.display_tree_widget)
 
-    def setup_tree_ui(self): ...
+    def setup_tree_ui(self):
+        ...
 
     def setup_other_label_text(self):
         self.previous_frame_button.setText(RESELECT_BTN_TXT)

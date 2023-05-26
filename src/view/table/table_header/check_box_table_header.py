@@ -21,8 +21,8 @@ class CheckBoxHeader(TableHeaderABC):
         self.setItemDelegate(TableHeaderStyleDelegate())
 
     def setup_header_items(self):
-        [self.setItem(0, col, self.make_item(header_text))
-         for col, header_text in enumerate(self.header_labels, start=1)]
+        for col, header_text in enumerate(self.header_labels, start=1):
+            self.setItem(0, col, self.make_item(header_text))
 
 
 class CheckBoxHeaderWithButton(CheckBoxHeader):

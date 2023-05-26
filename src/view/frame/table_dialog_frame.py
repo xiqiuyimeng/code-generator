@@ -78,7 +78,8 @@ class TableDialogFrame(DialogFrameABC):
         self.operation_table_btn_layout.addWidget(self.copy_row_button, 0, 3, 1, 1)
         self.setup_import_export_button()
 
-    def setup_first_button(self) -> QPushButton: ...
+    def setup_first_button(self) -> QPushButton:
+        ...
 
     def setup_import_export_button(self):
         self.import_button = QPushButton(self)
@@ -86,7 +87,8 @@ class TableDialogFrame(DialogFrameABC):
         self.export_button = QPushButton(self)
         self.operation_table_btn_layout.addWidget(self.export_button, 0, 5, 1, 1)
 
-    def make_table_widget(self): ...
+    def make_table_widget(self):
+        ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
@@ -116,7 +118,8 @@ class TableDialogFrame(DialogFrameABC):
         # 子类的其他信号
         self.connect_special_signal()
 
-    def connect_special_signal(self): ...
+    def connect_special_signal(self):
+        ...
 
     def open_row_data_dialog(self, row_id=None, row_index=None):
         """打开添加或编辑行数据对话框"""
@@ -138,7 +141,8 @@ class TableDialogFrame(DialogFrameABC):
                 row_data_dialog.save_signal.connect(self.table_widget.add_row)
         return row_data_dialog
 
-    def do_get_row_data_dialog(self, row_id) -> StackedDialogABC: ...
+    def do_get_row_data_dialog(self, row_id) -> StackedDialogABC:
+        ...
 
     def del_row(self, row_id, row_index, item_name):
         del_prompt, del_title = self.get_del_prompt_title()
@@ -147,12 +151,14 @@ class TableDialogFrame(DialogFrameABC):
         self.del_row_data_executor = self.get_del_executor(row_id, item_name, row_index, del_title)
         self.del_row_data_executor.start()
 
-    def get_del_prompt_title(self) -> tuple: ...
+    def get_del_prompt_title(self) -> tuple:
+        ...
 
-    def get_del_executor(self, row_id, item_name, row_index, del_title) -> LoadingMaskThreadExecutor: ...
+    def get_del_executor(self, row_id, item_name, row_index, del_title) -> LoadingMaskThreadExecutor:
+        ...
 
     def copy_row(self, row_id):
-        self.do_copy_rows((row_id, ))
+        self.do_copy_rows((row_id,))
 
     def export_row(self, row_id):
         self.do_export_rows((row_id,))
@@ -177,9 +183,11 @@ class TableDialogFrame(DialogFrameABC):
         self.batch_del_row_data_executor = self.get_batch_del_executor(delete_ids, delete_names, batch_del_title)
         self.batch_del_row_data_executor.start()
 
-    def get_batch_del_prompt_title(self) -> tuple: ...
+    def get_batch_del_prompt_title(self) -> tuple:
+        ...
 
-    def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> LoadingMaskThreadExecutor: ...
+    def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> LoadingMaskThreadExecutor:
+        ...
 
     def copy_rows(self):
         # 收集所有选中项id
@@ -190,14 +198,16 @@ class TableDialogFrame(DialogFrameABC):
         self.copy_row_data_executor = self.get_copy_executor(row_ids)
         self.copy_row_data_executor.start()
 
-    def get_copy_executor(self, copy_row_ids) -> LoadingMaskThreadExecutor: ...
+    def get_copy_executor(self, copy_row_ids) -> LoadingMaskThreadExecutor:
+        ...
 
     def import_rows(self):
         # 打开导入对话框
         self.import_rows_dialog = self.get_import_dialog(self.import_success_callback, self.get_row_data_dialog)
         self.import_rows_dialog.exec()
 
-    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog: ...
+    def get_import_dialog(self, import_success_callback, get_row_data_dialog) -> ImportDialog:
+        ...
 
     def import_success_callback(self, add_data_list, del_data_list=None):
         if del_data_list:
@@ -214,7 +224,8 @@ class TableDialogFrame(DialogFrameABC):
         self.export_rows_dialog = self.get_export_dialog(row_ids)
         self.export_rows_dialog.exec()
 
-    def get_export_dialog(self, row_ids) -> ExportDialog: ...
+    def get_export_dialog(self, row_ids) -> ExportDialog:
+        ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
@@ -226,7 +237,8 @@ class TableDialogFrame(DialogFrameABC):
         # 设置删除行按钮初始状态
         self.init_del_button_status()
 
-    def get_list_table_data_executor(self) -> LoadingMaskThreadExecutor: ...
+    def get_list_table_data_executor(self) -> LoadingMaskThreadExecutor:
+        ...
 
     def init_del_button_status(self):
         # 初始化按钮状态
