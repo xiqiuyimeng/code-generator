@@ -33,7 +33,7 @@ class ImportDataWorker(ThreadWorkerABC):
         with open(self.file_path, 'r', encoding='utf-8') as f:
             file_data = f.read()
         # 文件格式必须是json
-        load_json: dict = load_json_str(file_data)
+        load_json: dict = load_json_str(file_data, json_type=dict)
         # 校验类型是否支持
         import_data_type = load_json.get(TYPE_KEY)
         if self.data_key != import_data_type:

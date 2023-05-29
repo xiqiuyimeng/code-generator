@@ -12,12 +12,13 @@ _date_ = '2023/1/13 12:33'
 # ---------------------------------------- 解析json结构体 start ---------------------------------------- #
 
 
-def load_json_str(raw_str):
+def load_json_str(raw_str, json_type=(dict, list)):
+    """加载json字符串，json类型应该包括字典，或者list类型"""
     try:
         load_json = json.loads(raw_str)
     except:
         raise Exception('使用json解析失败')
-    if not isinstance(load_json, dict):
+    if not isinstance(load_json, json_type):
         raise Exception('无法解析为json结构')
     return load_json
 
@@ -25,7 +26,9 @@ def load_json_str(raw_str):
 class JsonParser(StructParser):
 
     def load_content(self) -> dict:
-        return load_json_str(self.struct_content)
+        json_str = load_json_str(self.struct_content)
+        # 如果解析结果为json数组，那么取第一个值
+        return json_str[0] if isinstance(json_str, list) else json_str
 
     def do_parse_content(self, load_content_dict) -> list:
         return self.parse_json(load_content_dict)
