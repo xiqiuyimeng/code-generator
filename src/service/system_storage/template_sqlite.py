@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.util.dataclass_util import init, import_export
 
 _author_ = 'luwt'
 _date_ = '2023/3/8 18:03'
@@ -24,6 +25,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class Template(BasicSqliteDTO):
     # 模板名称
@@ -37,14 +39,11 @@ class Template(BasicSqliteDTO):
     # 模板变量配置列表
     var_config_list: list = field(init=False, default=None)
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
     def get_name(self):
         return self.template_name
 
 
+@import_export(('id',))
 @dataclass
 class ImportExportTemplate:
     # 模板名称
@@ -57,18 +56,6 @@ class ImportExportTemplate:
     output_config_list: list = field(default=None)
     # 模板变量配置列表
     var_config_list: list = field(default=None)
-
-    def convert_import(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-        return self
-
-    def convert_export(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k) or k == 'id':
-                setattr(self, k, v)
-        return self
 
 
 class TemplateSqlite(SqliteBasic):

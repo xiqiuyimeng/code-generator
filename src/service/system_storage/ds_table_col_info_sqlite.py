@@ -5,6 +5,7 @@ from enum import Enum
 from src.logger.log import logger as log
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.util.dataclass_util import init
 from src.service.util.group_util import group_model_list
 
 _author_ = 'luwt'
@@ -45,6 +46,7 @@ class ColTypeEnum(Enum):
     array = 'array'
 
 
+@init
 @dataclass
 class DsTableColInfo(BasicSqliteDTO):
     # 列名
@@ -73,12 +75,6 @@ class DsTableColInfo(BasicSqliteDTO):
     children: list = field(init=False, default=None)
     # 非数据库字段，指向父列数据
     parent_col: dataclass = field(init=False, default=None)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-        if kwargs.get('init'):
-            self.init_value()
 
     def handle_data_type(self):
         self.data_type = self.full_data_type.split("(")[0]

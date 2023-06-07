@@ -4,6 +4,7 @@ from enum import Enum
 
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.util.dataclass_util import init, import_export
 
 _author_ = 'luwt'
 _date_ = '2023/3/9 8:42'
@@ -31,6 +32,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class TemplateFile(BasicSqliteDTO):
     # 模板文件名称
@@ -52,11 +54,8 @@ class TemplateFile(BasicSqliteDTO):
     # 模板id，用来关联文件和模板
     template_id: int = field(init=False, default=None)
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
-
+@import_export(('template_id', 'output_config_id'))
 @dataclass
 class ImportExportTemplateFile:
     # 模板文件名称
@@ -73,18 +72,6 @@ class ImportExportTemplateFile:
     is_current_tab: int = field(default=None)
     # tab页顺序
     tab_item_order: int = field(default=None)
-
-    def convert_import(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-        return self
-
-    def convert_export(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k) or k == 'template_id' or k == 'output_config_id':
-                setattr(self, k, v)
-        return self
 
 
 class CurrentEnum(Enum):

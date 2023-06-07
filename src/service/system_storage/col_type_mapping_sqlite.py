@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.util.dataclass_util import init, import_export
 
 _author_ = 'luwt'
 _date_ = '2023/2/12 11:46'
@@ -27,6 +28,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class ColTypeMapping(BasicSqliteDTO):
     # 数据源列类型
@@ -42,11 +44,8 @@ class ColTypeMapping(BasicSqliteDTO):
     # 类型映射列表父id
     parent_id: int = field(init=False, default=None)
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
-
+@import_export(('parent_id',))
 @dataclass
 class ImportExportColTypeMapping:
     # 数据源列类型
@@ -59,18 +58,6 @@ class ImportExportColTypeMapping:
     import_desc: str = field(default=None)
     # 类型映射组，当一个列映射多组类型时，需要派生出多个组
     group_num: int = field(default=None)
-
-    def convert_import(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-        return self
-
-    def convert_export(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k) or k == 'parent_id':
-                setattr(self, k, v)
-        return self
 
 
 class ColTypeMappingSqlite(SqliteBasic):
@@ -93,7 +80,7 @@ class ColTypeMappingSqlite(SqliteBasic):
     @transactional
     def edit_col_type_mappings(self, col_type_mappings, parent_id):
         # 首先删除原数据
-        self.delete_by_parent_ids((parent_id, ))
+        self.delete_by_parent_ids((parent_id,))
         # 插入新数据
         if col_type_mappings:
             for order, col_type_mapping in enumerate(col_type_mappings, start=1):

@@ -4,6 +4,7 @@ from enum import Enum
 
 from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
+from src.service.util.dataclass_util import init
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:43'
@@ -23,14 +24,11 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class DsCategory(BasicSqliteDTO):
     name: str = field(default=None, init=False)
     is_current: int = field(default=None, init=False)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
 
 sql_ds_category_dict = {

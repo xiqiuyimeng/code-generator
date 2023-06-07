@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.util.dataclass_util import init, import_export
 
 _author_ = 'luwt'
 _date_ = '2023/3/28 10:51'
@@ -25,6 +26,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class TemplateFunc(BasicSqliteDTO):
     # 方法名称
@@ -32,32 +34,18 @@ class TemplateFunc(BasicSqliteDTO):
     # 方法体
     func_body: str = field(init=False, default=None)
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
     def get_name(self):
         return self.func_name
 
 
+# 类装饰器，需要接收参数，所以这里需要加括号，如果不加括号，wrapper方法将无法获取到类对象
+@import_export()
 @dataclass
 class ImportExportTemplateFunc:
     # 方法名称
     func_name: str = field(init=False, default=None)
     # 方法体
     func_body: str = field(init=False, default=None)
-
-    def convert_import(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-        return self
-
-    def convert_export(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-        return self
 
 
 class TemplateFuncSqlite(SqliteBasic):

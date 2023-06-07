@@ -6,6 +6,7 @@ from typing import List
 from src.logger.log import logger as log
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.util.dataclass_util import init
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:30'
@@ -28,6 +29,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class DsTableTab(BasicSqliteDTO):
     # 父id，指向opened_tree_item表
@@ -38,10 +40,6 @@ class DsTableTab(BasicSqliteDTO):
     ds_category: str = field(init=False, default=None)
     # col_list
     col_list: List[DsTableColInfo] = field(init=False, default=None)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
     def set_current(self):
         self.is_current = CurrentEnum.is_current.value

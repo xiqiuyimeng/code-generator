@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from src.service.system_storage.conn_type import mapping_conn_type
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
 from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
+from src.service.util.dataclass_util import init
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:26'
@@ -28,6 +29,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class SqlConnection(BasicSqliteDTO):
     conn_name: str = field(init=False, default=None)
@@ -36,14 +38,6 @@ class SqlConnection(BasicSqliteDTO):
     conn_info: str = field(init=False, default=None)
     # 根据 conn_info 映射的实体类
     conn_info_type: dataclass = field(init=False, default=None)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-        # 映射连接类型实体
-        if self.conn_info:
-            mapping_conn_type(self)
 
     def construct_conn_info(self):
         """根据conn_info_type实体构造conn_info"""
@@ -62,4 +56,7 @@ class ConnSqlite(SqliteBasic):
     def get_conn_by_id(self, conn_id):
         conn_param = SqlConnection()
         conn_param.id = conn_id
-        return self.select_one(conn_param)
+        conn = self.select_one(conn_param)
+        if conn.conn_info:
+            mapping_conn_type(conn)
+        return conn

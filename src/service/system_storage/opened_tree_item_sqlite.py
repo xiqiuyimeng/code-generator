@@ -4,6 +4,7 @@ from enum import Enum
 
 from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional, get_db_conn
+from src.service.util.dataclass_util import init
 
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
@@ -29,6 +30,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class OpenedTreeItem(BasicSqliteDTO):
     # 名称，对于sql数据源，是树的第一层元素，名称应以节点名为准，这里不做冗余，以id关联
@@ -50,10 +52,6 @@ class OpenedTreeItem(BasicSqliteDTO):
     # 数据类型，用以区分数据源中的各种类型，例如 sql数据源中的 ConnType，
     # 结构体数据源中的 StructType
     data_type: dataclass = field(init=False, default=None, compare=False)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
 
 class SqlTreeItemLevel(Enum):

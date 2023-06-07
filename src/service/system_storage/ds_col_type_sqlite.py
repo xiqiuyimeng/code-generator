@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.util.dataclass_util import init
 from src.service.util.db_id_generator import update_id_generator
 from src.service.util.group_util import group_model_list
 
@@ -28,16 +29,13 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class DsColType(BasicSqliteDTO):
     # 数据源列类型
     ds_col_type: str = field(init=False, default=None)
     # 父id，父id为0时，为数据源类型，大于0，则为数据列类型
     parent_id: int = field(init=False, default=None)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
 
 class DsColTypeSqlite(SqliteBasic):

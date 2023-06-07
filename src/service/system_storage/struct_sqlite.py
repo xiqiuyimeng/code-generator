@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
 from src.service.system_storage.struct_type import mapping_struct_type
+from src.service.util.dataclass_util import init
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:49'
@@ -27,6 +28,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class StructInfo(BasicSqliteDTO):
     opened_item_id: str = field(init=False, default=None, compare=False)
@@ -38,12 +40,6 @@ class StructInfo(BasicSqliteDTO):
     file_url: str = field(init=False, default=None)
     # 根据struct type映射为 StructType
     struct_type_info: dataclass = field(init=False, default=None, compare=False)
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-        mapping_struct_type(self)
 
 
 class StructSqlite(SqliteBasic):
@@ -69,4 +65,6 @@ class StructSqlite(SqliteBasic):
     def get_struct_info(self, opened_item_id):
         param = StructInfo()
         param.opened_item_id = opened_item_id
-        return self.select_one(param)
+        struct = self.select_one(param)
+        mapping_struct_type(struct)
+        return struct

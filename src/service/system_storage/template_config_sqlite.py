@@ -5,6 +5,7 @@ from enum import Enum
 from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional, get_db_conn
+from src.service.util.dataclass_util import init, import_export
 
 _author_ = 'luwt'
 _date_ = '2023/3/9 8:46'
@@ -33,6 +34,7 @@ sql_dict = {
 }
 
 
+@init
 @dataclass
 class TemplateConfig(BasicSqliteDTO):
     # 模板id
@@ -58,11 +60,8 @@ class TemplateConfig(BasicSqliteDTO):
     # 非数据库字段，统计关联的模板文件列表
     bind_file_list: list = field(init=False, default=None)
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
-
+@import_export(('template_id', 'id'))
 @dataclass
 class ImportExportTemplateConfig:
     # 配置项名称
@@ -85,18 +84,6 @@ class ImportExportTemplateConfig:
     range_values: str = field(init=False, default=None)
     # 非数据库字段，统计关联的模板文件列表
     bind_file_list: list = field(init=False, default=None)
-
-    def convert_import(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-        return self
-
-    def convert_export(self, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(self, k) or k == 'template_id' or k == 'id':
-                setattr(self, k, v)
-        return self
 
 
 class ConfigTypeEnum(Enum):
