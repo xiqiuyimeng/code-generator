@@ -8,9 +8,9 @@ from src.logger.log import logger as log
 from src.service.async_func.async_import_export_task import ImportDataWorker, ImportDataExecutor, OverrideDataWorker, \
     OverrideDataExecutor, ExportDataWorker, ExportDataExecutor
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.template_func_sqlite import TemplateFunc, TemplateFuncSqlite, ImportExportTemplateFunc
 from src.service.util.import_export_util import convert_import_to_model
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -63,7 +63,7 @@ class EditTemplateFuncWorker(ThreadWorkerABC):
 
     def do_run(self):
         log.info(f'开始编辑模板方法信息 [{self.template_func.func_name}]')
-        TemplateFuncSqlite().update(self.template_func)
+        TemplateFuncSqlite().update_by_id(self.template_func)
         self.success_signal.emit()
         log.info(f'编辑模板方法信息 [{self.template_func.func_name}] 结束')
 
@@ -100,7 +100,7 @@ class DelTemplateFuncWorker(ThreadWorkerABC):
 
     def do_run(self):
         log.info(f'开始删除模板方法 [{self.template_func_name}]')
-        TemplateFuncSqlite().delete(self.template_func_id)
+        TemplateFuncSqlite().delete_by_id(self.template_func_id)
         self.success_signal.emit()
         log.info(f'删除模板方法 [{self.template_func_name}] 成功')
 
@@ -151,7 +151,7 @@ class ListTemplateFuncWorker(ThreadWorkerABC):
 
     def do_run(self):
         log.info("读取模板方法列表")
-        template_list = TemplateFuncSqlite().select_by_order(TemplateFunc())
+        template_list = TemplateFuncSqlite().select_by_order()
         self.success_signal.emit(template_list)
         log.info("读取模板方法列表成功")
 
@@ -175,12 +175,13 @@ class ImportTemplateFuncWorker(ImportDataWorker):
     def __init__(self, *args):
         super().__init__(*args)
         self.data_key = TEMPLATE_FUNC_DATA_KEY
-        self.template_func_sqlite = TemplateFuncSqlite()
+        self.template_func_sqlite = ...
 
     def convert_to_model(self, import_data):
         return convert_import_to_model(ImportExportTemplateFunc, TemplateFunc, import_data)
 
     def pre_process_before_check_data(self):
+        self.template_func_sqlite = TemplateFuncSqlite()
         # 查出所有模板方法名称
         self.exists_names = self.template_func_sqlite.get_all_names()
 
@@ -210,9 +211,10 @@ class OverrideTemplateFuncWorker(OverrideDataWorker):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.template_func_sqlite = TemplateFuncSqlite()
+        self.template_func_sqlite = ...
 
     def batch_delete_origin_data(self):
+        self.template_func_sqlite = TemplateFuncSqlite()
         self.template_func_sqlite.batch_delete_by_names(self.data_list)
 
     def batch_insert_data_list(self):

@@ -2,11 +2,11 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.logger.log import logger as log
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init
 from src.service.util.group_util import group_model_list
+from src.service.util.system_storage_util import Condition
 
 _author_ = 'luwt'
 _date_ = '2022/10/8 12:32'
@@ -30,8 +30,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_by_parent_tab_id': f'delete from {table_name} where parent_tab_id = ',
-    'delete_by_parent_tab_ids': f'delete from {table_name} where parent_tab_id in ',
 }
 
 
@@ -88,7 +86,7 @@ class DsTableColInfo(BasicSqliteDTO):
 class DsTableColInfoSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, DsTableColInfo)
 
     def save_cols(self, columns, parent_tab_id, check_state, ds_type,
                   parent_id=None, ds_col_type_sqlite=None):
@@ -112,18 +110,13 @@ class DsTableColInfoSqlite(SqliteBasic):
             self.save_cols(col_info.children, parent_tab_id, check_state, ds_type,
                            col_info.id, ds_col_type_sqlite)
 
-    @staticmethod
-    def delete_by_parent_tab_id(parent_tab_id):
-        delete_sql = f"{sql_dict.get('delete_by_parent_tab_id')}{parent_tab_id}"
-        get_db_conn().query(delete_sql)
-        log.info(f"删除{table_name}语句 ==> {delete_sql}")
+    def delete_by_parent_tab_id(self, parent_tab_id):
+        condition = Condition(self.table_name).add('parent_tab_id', parent_tab_id)
+        self.delete_by_condition(condition)
 
-    @staticmethod
-    def delete_by_parent_tab_ids(parent_tab_ids):
-        parent_tab_id_list = ", ".join([str(parent_tab_id) for parent_tab_id in parent_tab_ids])
-        delete_sql = f"{sql_dict.get('delete_by_parent_tab_ids')}({parent_tab_id_list})"
-        get_db_conn().query(delete_sql)
-        log.info(f"删除{table_name}语句 ==> {delete_sql}")
+    def delete_by_parent_tab_ids(self, parent_tab_ids):
+        condition = Condition(self.table_name).add('parent_tab_id', parent_tab_ids, 'in')
+        self.delete_by_condition(condition)
 
     def get_tab_cols(self, parent_tab_id):
         # 获取当前tab页下所有列数据
@@ -148,11 +141,14 @@ class DsTableColInfoSqlite(SqliteBasic):
         return top_cols
 
     def _get_table_cols(self, parent_tab_id):
-        col_param = DsTableColInfo()
-        col_param.parent_tab_id = parent_tab_id
-        return self.select_by_order(col_param)
+        condition = Condition(self.table_name).add('parent_tab_id', parent_tab_id)
+        return self.select_by_order(condition=condition)
 
     def refresh_tab_cols(self, tab_id, columns, ds_type):
         self.delete_by_parent_tab_id(tab_id)
         # 默认数据应为未选中情况
         self.save_cols(columns, tab_id, CheckedEnum.unchecked.value, ds_type)
+
+    def get_col_list_by_tab_id(self, parent_tab_id):
+        condition = Condition(self.table_name).add('parent_tab_id', parent_tab_id)
+        return self.select_by_order(condition=condition)

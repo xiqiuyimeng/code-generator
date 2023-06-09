@@ -8,7 +8,6 @@ from src.logger.log import logger as log
 from src.service.async_func.async_import_export_task import ExportDataWorker, ExportDataExecutor, ImportDataWorker, \
     ImportDataExecutor, OverrideDataWorker, OverrideDataExecutor
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.template_config_sqlite import TemplateConfigSqlite, construct_output_config, \
     ConfigTypeEnum, ImportExportTemplateConfig, TemplateConfig
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite, ImportExportTemplateFile, TemplateFile
@@ -17,6 +16,7 @@ from src.service.util.copy_util import copy_template
 from src.service.util.import_export_util import convert_import_to_model, convert_import_to_model_list, \
     group_model_list, check_duplicate_template_file_name, check_template_config, batch_save_template, \
     export_template
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -34,9 +34,7 @@ class ReadTemplateWorker(ThreadWorkerABC):
     def do_run(self):
         log.info("开始读取模板详细信息")
         # 查询模板信息
-        param = Template()
-        param.id = self.template_id
-        template = TemplateSqlite().select_one(param)
+        template = TemplateSqlite().get_template_by_id(self.template_id)
         if not template:
             raise Exception('未查询到模板信息')
         # 查询模板文件列表
@@ -124,7 +122,7 @@ class EditTemplateWorker(ThreadWorkerABC):
     def do_run(self):
         log.info(f'开始编辑模板信息 [{self.template.template_name}]')
         # 首先更新模板信息
-        TemplateSqlite().update(self.template)
+        TemplateSqlite().update_by_id(self.template)
         # 保存模板输入配置信息
         TemplateConfigSqlite().batch_edit_config_list(self.template.id, self.template.output_config_list,
                                                       self.template.var_config_list)
@@ -168,7 +166,7 @@ class DelTemplateWorker(ThreadWorkerABC):
     def do_run(self):
         log.info(f'开始删除模板 [{self.template_names}]')
         # 首先删除模板
-        TemplateSqlite().batch_delete(self.template_ids)
+        TemplateSqlite().delete_by_ids(self.template_ids)
         TemplateFileSqlite().batch_del_template_files(self.template_ids)
         TemplateConfigSqlite().batch_del_config_list(self.template_ids)
         self.success_signal.emit()
@@ -215,21 +213,19 @@ class CopyTemplateWorker(ThreadWorkerABC):
     def __init__(self, template_ids):
         super().__init__()
         self.template_ids = template_ids
-        self.template_sqlite = TemplateSqlite()
-        self.template_file_sqlite = TemplateFileSqlite()
-        self.template_config_sqlite = TemplateConfigSqlite()
 
     def do_run(self):
+        template_sqlite = TemplateSqlite()
+        template_file_sqlite = TemplateFileSqlite()
+        template_config_sqlite = TemplateConfigSqlite()
         # 根据 template ids 查询模板数据
-        templates = export_template(self.template_sqlite, self.template_file_sqlite,
-                                    self.template_config_sqlite, self.template_ids)
+        templates = export_template(template_sqlite, template_file_sqlite, template_config_sqlite, self.template_ids)
         # 获取所有模板名称
-        template_names = self.template_sqlite.get_all_names()
+        template_names = template_sqlite.get_all_names()
         # 复制模板
         copy_templates = [copy_template(template, template_names) for template in templates]
         # 保存模板
-        batch_save_template(self.template_sqlite, self.template_config_sqlite,
-                            self.template_file_sqlite, copy_templates)
+        batch_save_template(template_sqlite, template_config_sqlite, template_file_sqlite, copy_templates)
         self.success_signal.emit(copy_templates)
 
     def get_err_msg(self) -> str:
@@ -257,7 +253,7 @@ class ListTemplateWorker(ThreadWorkerABC):
     def do_run(self):
         log.info("读取模板列表")
         # 读取数据库中缓存的模板列表
-        template_list = TemplateSqlite().select_by_order(Template())
+        template_list = TemplateSqlite().select_by_order()
         self.success_signal.emit(template_list)
         log.info("读取模板列表成功")
 
@@ -322,8 +318,7 @@ class AutoGenerateOutputConfigWorker(ThreadWorkerABC):
         success_list, fail_list = list(), list()
         # 每个文件生成一个配置
         for file in self.file_list:
-            output_config = construct_output_config(self.config_name_list,
-                                                    self.var_name_list, file.file_name)
+            output_config = construct_output_config(self.config_name_list, self.var_name_list, file.file_name)
             if output_config:
                 # 顺利生成，添加到成功列表中，绑定关联文件
                 output_config.bind_file_list = [file]
@@ -360,9 +355,7 @@ class ImportTemplateWorker(ImportDataWorker):
     def __init__(self, *args):
         super().__init__(*args)
         self.data_key = TEMPLATE_DATA_KEY
-        self.template_sqlite = TemplateSqlite()
-        self.template_file_sqlite = TemplateFileSqlite()
-        self.template_config_sqlite = TemplateConfigSqlite()
+        self.template_sqlite = ...
 
     def convert_to_model(self, import_data):
         template = convert_import_to_model(ImportExportTemplate, Template, import_data)
@@ -399,6 +392,7 @@ class ImportTemplateWorker(ImportDataWorker):
         return template
 
     def pre_process_before_check_data(self):
+        self.template_sqlite = TemplateSqlite()
         # 查出所有的模板名称
         self.exists_names = self.template_sqlite.get_all_names()
 
@@ -427,8 +421,7 @@ class ImportTemplateWorker(ImportDataWorker):
     @transactional
     def import_data(self, data_list):
         # 批量保存模板
-        batch_save_template(self.template_sqlite, self.template_config_sqlite,
-                            self.template_file_sqlite, data_list)
+        batch_save_template(self.template_sqlite, TemplateConfigSqlite(), TemplateFileSqlite(), data_list)
 
     def get_err_msg(self) -> str:
         return '导入模板失败'
@@ -449,13 +442,17 @@ class OverrideTemplateWorker(OverrideDataWorker):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.template_sqlite = ...
+        self.template_file_sqlite = ...
+        self.template_config_sqlite = ...
+
+    def batch_delete_origin_data(self):
         self.template_sqlite = TemplateSqlite()
         self.template_file_sqlite = TemplateFileSqlite()
         self.template_config_sqlite = TemplateConfigSqlite()
 
-    def batch_delete_origin_data(self):
         id_list = self.template_sqlite.get_id_by_names(self.data_list)
-        self.template_sqlite.batch_delete(id_list)
+        self.template_sqlite.delete_by_ids(id_list)
         self.template_file_sqlite.batch_del_template_files(id_list)
         self.template_config_sqlite.batch_del_config_list(id_list)
 

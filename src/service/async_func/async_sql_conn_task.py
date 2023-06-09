@@ -10,10 +10,10 @@ from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskTh
 from src.service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
 from src.service.system_storage.conn_type import get_conn_type_by_type
 from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
-from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite, DsTableColInfo
-from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
+from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
-from src.service.system_storage.sqlite_abc import transactional
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 from src.view.tree.tree_item.tree_item_func import get_children_opened_ids, get_item_opened_record
 
@@ -77,16 +77,16 @@ class DelConnWorker(ThreadWorkerABC):
     @transactional
     def do_run(self):
         # 删除连接
-        ConnSqlite().delete(self.conn_id)
+        ConnSqlite().delete_by_id(self.conn_id)
         # 根据连接id，删除打开记录表中的记录
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
-        opened_tree_item_sqlite.batch_delete(self.delete_opened_ids)
+        opened_tree_item_sqlite.delete_by_ids(self.delete_opened_ids)
         # 对被影响到的连接项进行重排序
         if self.reorder_items:
             opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
         if self.tab_ids:
             # 删除tab
-            DsTableTabSqlite().batch_delete(self.tab_ids)
+            DsTableTabSqlite().delete_by_ids(self.tab_ids)
             # 删除 数据列信息
             DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
         log.info(f'[{self.conn_name}]{DEL_CONN_SUCCESS_PROMPT}')
@@ -135,22 +135,11 @@ class EditConnWorker(ThreadWorkerABC):
 
     @transactional
     def do_run(self):
-        ConnSqlite().update(self.connection)
+        ConnSqlite().update_by_id(self.connection)
         if self.name_changed:
-            self.update_opened_record()
+            OpenedTreeItemSqlite().update_conn_opened_record(self.connection.id, self.connection.conn_name)
         log.info(f'[{self.connection.conn_name}]{SAVE_CONN_SUCCESS_PROMPT}')
         self.success_signal.emit()
-
-    def update_opened_record(self):
-        opened_tree_item_sqlite = OpenedTreeItemSqlite()
-        opened_tree_item_param = OpenedTreeItem()
-        opened_tree_item_param.parent_id = self.connection.id
-        opened_tree_item_param.level = SqlTreeItemLevel.conn_level.value
-        opened_tree_item_param.ds_category = DsCategoryEnum.sql_ds_category.value.name
-        opened_conn_tree_item = opened_tree_item_sqlite.select_one(opened_tree_item_param)
-        if opened_tree_item_param:
-            opened_conn_tree_item.item_name = self.connection.conn_name
-            opened_tree_item_sqlite.update(opened_conn_tree_item)
 
     def get_err_msg(self) -> str:
         return f'[{self.connection.conn_name}]{SAVE_CONN_FAIL_PROMPT}'
@@ -184,7 +173,7 @@ class ListConnWorker(ThreadWorkerABC):
     tab_info_signal = pyqtSignal(list)
 
     def do_run(self):
-        # 首选读取存储的连接，这里需要连表 opened_tree_item_sqlite 获取连接的顺序
+        # 首选读取存储的连接，这里需要连表 opened_item_sqlite 获取连接的顺序
         connections = ConnSqlite().get_conn_id_types()
 
         # 查询 OpenedItem
@@ -192,12 +181,11 @@ class ListConnWorker(ThreadWorkerABC):
         max_level = SqlTreeItemLevel.tb_level.value
         ds_category = DsCategoryEnum.sql_ds_category.value.name
 
-        opened_tree_item_sqlite = OpenedTreeItemSqlite()
+        opened_item_sqlite = OpenedTreeItemSqlite()
         for conn in connections:
             conn_type = get_conn_type_by_type(conn.conn_type)
             # 深度优先查找
-            children_generator = opened_tree_item_sqlite.recursive_get_children(conn.id, level,
-                                                                                ds_category, max_level)
+            children_generator = opened_item_sqlite.recursive_get_children(conn.id, level, ds_category, max_level)
             for children in children_generator:
                 for child in children:
                     child.data_type = conn_type
@@ -211,13 +199,10 @@ class ListConnWorker(ThreadWorkerABC):
         self.success_signal.emit()
 
     def get_tab_cols(self):
-        tab_param = DsTableTab()
-        tab_param.ds_category = DsCategoryEnum.sql_ds_category.value.name
-        tab_list = DsTableTabSqlite().select_by_order(tab_param)
+        tab_list = DsTableTabSqlite().get_ds_category_tabs(DsCategoryEnum.sql_ds_category.value.name)
+        col_info_sqlite = DsTableColInfoSqlite()
         for tab in tab_list:
-            col_param = DsTableColInfo()
-            col_param.parent_tab_id = tab.id
-            tab.col_list = DsTableColInfoSqlite().select_by_order(col_param)
+            tab.col_list = col_info_sqlite.get_col_list_by_tab_id(tab.id)
         self.tab_info_signal.emit(tab_list)
 
     def get_err_msg(self) -> str:
@@ -280,10 +265,10 @@ class CloseConnDBWorker(ThreadWorkerABC):
     @transactional
     def do_run(self):
         # 首先删除 opened item 表
-        OpenedTreeItemSqlite().batch_delete(self.child_opened_ids)
+        OpenedTreeItemSqlite().delete_by_ids(self.child_opened_ids)
         if self.tab_ids:
             # 删除tab
-            DsTableTabSqlite().batch_delete(self.tab_ids)
+            DsTableTabSqlite().delete_by_ids(self.tab_ids)
             # 删除 数据列信息
             DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
         self.success_signal.emit()

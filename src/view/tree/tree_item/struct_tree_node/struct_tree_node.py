@@ -113,8 +113,7 @@ class StructTreeNode(StructTreeNodeABC):
             self.edit_struct()
         # 删除结构体
         elif func == DEL_STRUCT_ACTION.format(self.item_name):
-            if pop_question(DEL_STRUCT_PROMPT, DEL_STRUCT_ACTION.format(self.item_name), self.window) \
-                    and self.close_item():
+            if pop_question(DEL_STRUCT_PROMPT, DEL_STRUCT_ACTION.format(self.item_name), self.window):
                 self.del_struct()
         # 刷新
         elif func == REFRESH_STRUCT_ACTION.format(self.item_name):
@@ -140,13 +139,22 @@ class StructTreeNode(StructTreeNodeABC):
     def del_struct(self):
         # 删除结构体后，应该对同级别的其他项进行重排序
         reorder_items = self.get_need_reorder_items()
+        tab = get_item_opened_tab(self.item)
+        table_tab = tab.table_tab if tab else None
         self.del_struct_executor = DelStructExecutor(get_item_opened_record(self.item), reorder_items,
-                                                     self.item, self.window, DEL_STRUCT_BOX_TITLE,
+                                                     table_tab, self.item, self.window, DEL_STRUCT_BOX_TITLE,
                                                      self.del_struct_callback)
         self.del_struct_executor.start()
 
     def del_struct_callback(self):
         self.worker_terminate()
+        # 移除tab
+        tab = get_item_opened_tab(self.item)
+        if tab:
+            index = self.tree_widget.get_current_tab_widget().indexOf(tab)
+            tab_bar = self.tree_widget.get_current_tab_widget().tab_bar
+            # tab页不必触发信号，因为删除线程已经处理过tab数据
+            tab_bar.remove_tab(index, False, False)
         self.del_callback()
 
     def close_tab_callback(self):

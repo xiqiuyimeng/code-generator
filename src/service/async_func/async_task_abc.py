@@ -6,7 +6,7 @@ from PyQt5.QtGui import QMovie, QIcon
 
 from src.exception.exception import ThreadStopException
 from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import set_thread_terminate
+from src.service.util.system_storage_util import close_connection, set_thread_terminate
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.loading_widget import LoadingMaskWidget, RefreshLoadingMaskWidget
 from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, get_item_opened_record
@@ -39,6 +39,8 @@ class ThreadWorkerABC(QThread):
             if not isinstance(e, ThreadStopException):
                 self.do_exception(e)
         finally:
+            # 清理数据库连接资源
+            close_connection()
             self.do_finally()
 
     def do_run(self):

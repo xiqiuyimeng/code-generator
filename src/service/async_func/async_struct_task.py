@@ -11,10 +11,10 @@ from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab, DsTableTabSqlite
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, CheckedEnum
-from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.struct_sqlite import StructSqlite, StructInfo
 from src.service.system_storage.struct_type import FolderTypeEnum, get_struct_type
 from src.service.util.struct_util import *
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_children_opened_ids, get_item_opened_tab
 
@@ -72,10 +72,11 @@ class AddStructExecutor(LoadingMaskThreadExecutor):
 
 class DelStructWorker(ThreadWorkerABC):
 
-    def __init__(self, opened_item, reorder_items):
+    def __init__(self, opened_item, reorder_items, table_tab):
         super().__init__()
         self.opened_item = opened_item
         self.reorder_items = reorder_items
+        self.table_tab = table_tab
 
     @transactional
     def do_run(self):
@@ -83,9 +84,13 @@ class DelStructWorker(ThreadWorkerABC):
         StructSqlite().delete_by_opened_item_id(self.opened_item.id)
         # 删除 opened item 记录
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
-        opened_tree_item_sqlite.delete(self.opened_item.id)
+        opened_tree_item_sqlite.delete_by_id(self.opened_item.id)
         # 重新排序需要排序的 opened item
         opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
+        # 删除tab
+        if self.table_tab:
+            DsTableTabSqlite().remove_tab(self.table_tab)
+            DsTableColInfoSqlite().delete_by_parent_tab_id(self.table_tab.id)
         log.info(f'{self.opened_item.item_name}删除成功')
         self.success_signal.emit()
 
@@ -95,13 +100,14 @@ class DelStructWorker(ThreadWorkerABC):
 
 class DelStructExecutor(IconMovieThreadExecutor):
 
-    def __init__(self, opened_item, reorder_items, *args):
+    def __init__(self, opened_item, reorder_items, table_tab, *args):
         self.opened_item = opened_item
         self.reorder_items = reorder_items
+        self.table_tab = table_tab
         super().__init__(*args)
 
     def get_worker(self) -> ThreadWorkerABC:
-        return DelStructWorker(self.opened_item, self.reorder_items)
+        return DelStructWorker(self.opened_item, self.reorder_items, self.table_tab)
 
 
 # ---------------------------------------- 删除结构体 end ---------------------------------------- #
@@ -118,12 +124,12 @@ class EditStructWorker(ThreadWorkerABC):
     @transactional
     def do_run(self):
         # 更新结构体
-        StructSqlite().update(self.struct_info)
+        StructSqlite().update_by_id(self.struct_info)
         # 更新打开记录
         update_param = OpenedTreeItem()
         update_param.id = self.struct_info.opened_item_id
         update_param.item_name = self.struct_info.struct_name
-        OpenedTreeItemSqlite().update(update_param)
+        OpenedTreeItemSqlite().update_by_id(update_param)
         self.success_signal.emit()
 
     def get_err_msg(self) -> str:
@@ -216,11 +222,10 @@ class ListStructWorker(ThreadWorkerABC):
         log.info('获取所有结构体成功')
 
     def get_tab_cols(self):
-        tab_param = DsTableTab()
-        tab_param.ds_category = DsCategoryEnum.struct_ds_category.value.name
-        tab_list = DsTableTabSqlite().select_by_order(tab_param)
+        tab_list = DsTableTabSqlite().get_ds_category_tabs(DsCategoryEnum.struct_ds_category.value.name)
+        col_info_sqlite = DsTableColInfoSqlite()
         for tab in tab_list:
-            tab.col_list = DsTableColInfoSqlite().get_tab_cols(tab.id)
+            tab.col_list = col_info_sqlite.get_tab_cols(tab.id)
         self.tab_info_signal.emit(tab_list)
 
     def do_finally(self):
@@ -261,9 +266,7 @@ class AddFolderWorker(ThreadWorkerABC):
         super().__init__()
 
     def do_run(self):
-        opened_item = OpenedTreeItemSqlite().add_struct_opened_item(self.folder_name,
-                                                                    self.parent_id,
-                                                                    self.level)
+        opened_item = OpenedTreeItemSqlite().add_struct_opened_item(self.folder_name, self.parent_id, self.level)
         opened_item.data_type = FolderTypeEnum.folder_type.value
         self.success_signal.emit(opened_item)
 
@@ -299,7 +302,7 @@ class EditFolderWorker(ThreadWorkerABC):
         self.folder_item = folder_item
 
     def do_run(self):
-        OpenedTreeItemSqlite().update(self.folder_item)
+        OpenedTreeItemSqlite().update_by_id(self.folder_item)
         self.success_signal.emit()
 
     def get_err_msg(self) -> str:
@@ -340,13 +343,13 @@ class DelFolderWorker(ThreadWorkerABC):
         StructSqlite().delete_by_opened_item_ids(self.delete_opened_ids)
         # 删除 opened item 记录
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
-        opened_tree_item_sqlite.batch_delete(self.delete_opened_ids)
+        opened_tree_item_sqlite.delete_by_ids(self.delete_opened_ids)
         # 对被影响到的连接项进行重排序
         if self.reorder_items:
             opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
         if self.tab_ids:
             # 删除tab
-            DsTableTabSqlite().batch_delete(self.tab_ids)
+            DsTableTabSqlite().delete_by_ids(self.tab_ids)
             # 删除 数据列信息
             DsTableColInfoSqlite().delete_by_parent_tab_ids(self.tab_ids)
         self.success_signal.emit()
@@ -573,14 +576,13 @@ class RefreshFolderWorker(ThreadWorkerABC):
         super().__init__()
         self.struct_items = struct_items
         self.folder_name = folder_name
-        self.struct_sqlite = StructSqlite()
-        self.table_info_sqlite = DsTableColInfoSqlite()
 
     def do_run(self):
+        struct_sqlite = StructSqlite()
         # 循环处理
         for item, opened_record, table_tab in self.struct_items:
             struct_parser_type = opened_record.data_type.parse_executor
-            struct_info = self.struct_sqlite.get_struct_info(opened_record.id)
+            struct_info = struct_sqlite.get_struct_info(opened_record.id)
             if struct_info:
                 struct_parser = globals()[struct_parser_type](struct_info.content)
                 column_list = struct_parser.parse()

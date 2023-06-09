@@ -4,7 +4,7 @@ import copy
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
-from src.service.system_storage.sqlite_abc import transactional
+from src.service.util.system_storage_util import transactional
 
 _author_ = 'luwt'
 _date_ = '2023/1/29 20:55'
@@ -67,7 +67,7 @@ def deal_opened_items(item_names, parent_id, data_type, level, ds_category, chan
         delete_item_ids = [del_item.id for del_item in delete_item_records]
         # 倒序排列
         delete_item_records.sort(key=lambda x: x.item_order, reverse=True)
-        tree_item_sqlite.batch_delete(delete_item_ids)
+        tree_item_sqlite.delete_by_ids(delete_item_ids)
     # 发射信号
     changed_signal.emit({
         'new': new_item_records,
@@ -85,10 +85,11 @@ def refresh_tab_cols(db_item_record, executor, exists_records, col_signal, ds_ty
     db_name = db_item_record.item_name
     opened_id_record_dict = {str(record.id): record for record in exists_records}
     opened_tabs = DsTableTabSqlite().select_by_opened_ids(opened_id_record_dict.keys())
+    col_info_sqlite = DsTableColInfoSqlite()
     for tab in opened_tabs:
         tb_item_record = opened_id_record_dict.get(str(tab.parent_opened_id))
         columns = executor.open_tb(db_name, tb_item_record.item_name, check=False)
-        DsTableColInfoSqlite().refresh_tab_cols(tab.id, columns, ds_type)
+        col_info_sqlite.refresh_tab_cols(tab.id, columns, ds_type)
         tab.col_list = columns
         if emit_db_order:
             col_signal.emit((tab, db_item_record.item_order, tb_item_record.item_order))

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 
-from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.system_storage.struct_type import mapping_struct_type
 from src.service.util.dataclass_util import init
+from src.service.util.system_storage_util import SelectCol, Condition
 
 _author_ = 'luwt'
 _date_ = '2022/11/11 16:49'
@@ -22,9 +22,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'select_list': f'select opened_item_id, struct_type from {table_name}',
-    'delete_by_opened_item_id': f'delete from {table_name} where opened_item_id = ',
-    'delete_by_opened_item_ids': f'delete from {table_name} where opened_item_id in ',
 }
 
 
@@ -45,26 +42,25 @@ class StructInfo(BasicSqliteDTO):
 class StructSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, StructInfo)
 
     def select_list(self):
-        rows = self._do_select(sql_dict.get('select_list'), StructInfo())
-        return [StructInfo(**row) for row in rows.all()]
+        select_col = SelectCol(self.table_name).add('opened_item_id').add('struct_type')
+        struct_list = self.select(select_cols=select_col)
+        for struct in struct_list:
+            mapping_struct_type(struct)
+        return struct_list
 
     def delete_by_opened_item_id(self, opened_item_id):
-        sql = f"{sql_dict.get('delete_by_opened_item_id')}{opened_item_id}"
-        get_db_conn().query(sql)
-        log.info(f'删除[{self.table_name}]语句 ==> {sql}')
+        condition = Condition(self.table_name).add('opened_item_id', opened_item_id)
+        self.delete_by_condition(condition)
 
     def delete_by_opened_item_ids(self, opened_item_ids):
-        opened_item_id_list = ", ".join([str(item_id) for item_id in opened_item_ids])
-        sql = f"{sql_dict.get('delete_by_opened_item_ids')}({opened_item_id_list})"
-        get_db_conn().query(sql)
-        log.info(f'删除[{self.table_name}]语句 ==> {sql}')
+        condition = Condition(self.table_name).add('opened_item_id', opened_item_ids, 'in')
+        self.delete_by_condition(condition)
 
     def get_struct_info(self, opened_item_id):
-        param = StructInfo()
-        param.opened_item_id = opened_item_id
-        struct = self.select_one(param)
+        condition = Condition(self.table_name).add('opened_item_id', opened_item_id)
+        struct = self.select_one(condition=condition)
         mapping_struct_type(struct)
         return struct

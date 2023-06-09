@@ -2,8 +2,9 @@
 from dataclasses import dataclass, field
 
 from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
+from src.service.util.system_storage_util import get_cursor, SelectCol, Condition
 
 _author_ = 'luwt'
 _date_ = '2023/3/28 10:51'
@@ -20,9 +21,6 @@ sql_dict = {
     update_time datetime
     );''',
     'drop': f'drop table {table_name}',
-    'select_all_names': f'select func_name from {table_name}',
-    'delete_by_names': f'delete from {table_name} where func_name in ',
-    'export_by_ids': f'select func_name, func_body from {table_name} where id in ',
 }
 
 
@@ -51,7 +49,7 @@ class ImportExportTemplateFunc:
 class TemplateFuncSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, TemplateFunc)
 
     def save_template_func(self, template_func):
         template_func.item_order = self.get_max_order()
@@ -59,17 +57,15 @@ class TemplateFuncSqlite(SqliteBasic):
 
     def drop_template_func_table(self):
         log.info(f'清空表 {self.table_name}')
-        get_db_conn().query(sql_dict.get('drop'))
+        get_cursor().execute(sql_dict.get('drop'))
 
     def get_all_func(self):
-        param = TemplateFunc()
-        return self.select_by_order(param)
+        return self.select_by_order()
 
     def get_all_names(self):
-        sql = sql_dict.get('select_all_names')
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 获取所有模板方法名称')
-        return [row.get('func_name') for row in rows.as_dict()]
+        select_col = SelectCol(self.table_name).add('func_name')
+        rows = self.select_by_order(select_cols=select_col)
+        return [row.func_name for row in rows]
 
     def batch_save_template_funcs(self, template_func_list):
         max_order = self.get_max_order()
@@ -78,14 +74,11 @@ class TemplateFuncSqlite(SqliteBasic):
         self.batch_insert(template_func_list)
 
     def batch_delete_by_names(self, template_func_list):
-        name_list_str = ','.join([f'"{template_func.func_name}"' for template_func in template_func_list])
-        sql = f'{sql_dict.get("delete_by_names")} ({name_list_str})'
-        log.info(f'{self.table_name} 根据名称删除模板方法')
-        get_db_conn().query(sql)
+        func_names = [template_func.func_name for template_func in template_func_list]
+        condition = Condition(self.table_name).add('func_name', func_names, 'in')
+        self.delete_by_condition(condition)
 
     def export_template_func_by_ids(self, template_func_ids):
-        id_str = ','.join([str(func_id) for func_id in template_func_ids])
-        sql = f'{sql_dict.get("export_by_ids")} ({id_str})'
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据id导出模板方法')
-        return [ImportExportTemplateFunc().convert_export(**row) for row in rows.as_dict()]
+        select_col = SelectCol(self.table_name).add('func_name').add('func_body')
+        condition = Condition(self.table_name).add('id', template_func_ids, 'in')
+        return self.select_by_order(return_type=ImportExportTemplateFunc, select_cols=select_col, condition=condition)

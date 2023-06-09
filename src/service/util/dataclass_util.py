@@ -29,8 +29,7 @@ def import_export(key_cols=tuple()):
             for k, v in kwargs.items():
                 if hasattr(cls_obj, k) or k in key_cols:
                     setattr(cls_obj, k, v)
-            return cls_obj
-        cls.convert_export = convert_export_method
+        cls.__init__ = convert_export_method
         return cls
     return wrapper
 

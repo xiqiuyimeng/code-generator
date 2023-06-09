@@ -5,6 +5,7 @@ from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, ExpandedEnum, OpenedTreeItemSqlite, \
     CurrentEnum
+from src.service.util.system_storage_util import close_connection
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record
 
 _author_ = 'luwt'
@@ -21,15 +22,17 @@ class ItemChangedWorker(ThreadWorkerABC):
         while True:
             method, opened_item = self.queue.get()
             if method == 'item_collapsed':
-                OpenedTreeItemSqlite().update(opened_item)
+                OpenedTreeItemSqlite().update_by_id(opened_item)
             elif method == 'item_expanded':
-                OpenedTreeItemSqlite().update(opened_item)
+                OpenedTreeItemSqlite().update_by_id(opened_item)
             elif method == 'current_item_changed':
                 OpenedTreeItemSqlite().item_current_changed(opened_item)
             elif method == 'item_checked':
                 OpenedTreeItemSqlite().update_checked(opened_item)
             elif method == 'item_child_checked':
                 OpenedTreeItemSqlite().update_child_checked(opened_item)
+            # 使用完及时关闭数据库连接
+            close_connection()
             log.debug(f'{method}: {opened_item}')
 
     def do_exception(self, e: Exception):

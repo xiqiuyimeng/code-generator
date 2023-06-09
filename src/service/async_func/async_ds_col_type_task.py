@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
-from src.service.system_storage.sqlite_abc import transactional
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'

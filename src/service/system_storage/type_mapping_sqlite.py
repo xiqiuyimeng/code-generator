@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 
-from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
+from src.service.util.system_storage_util import Condition, SelectCol
 
 _author_ = 'luwt'
 _date_ = '2023/2/12 11:46'
@@ -21,9 +21,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'export': f'select id, mapping_name, ds_type, comment, max_col_type_group_num from {table_name} where id in ',
-    'all_mapping_names': f'select mapping_name from {table_name}',
-    'get_id_by_names': f'select id from {table_name} where mapping_name in '
 }
 
 
@@ -63,22 +60,20 @@ class ImportExportTypeMapping:
 class TypeMappingSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, TypeMapping)
 
     def save_type_mapping(self, type_mapping):
         type_mapping.item_order = self.get_max_order()
         self.insert(type_mapping)
 
     def get_type_mapping_by_id(self, type_mapping_id):
-        param = TypeMapping()
-        param.id = type_mapping_id
-        return self.select_one(param)
+        condition = Condition(self.table_name).add('id', type_mapping_id)
+        return self.select_one(condition=condition)
 
     def get_all_mapping_names(self):
-        sql = sql_dict.get('all_mapping_names')
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 获取所有映射名称')
-        return [row.get('mapping_name') for row in rows.as_dict()]
+        select_col = SelectCol(self.table_name).add('mapping_name')
+        rows = self.select_by_order(select_cols=select_col)
+        return [row.mapping_name for row in rows]
 
     def batch_save_type_mappings(self, type_mapping_list):
         max_order = self.get_max_order()
@@ -87,15 +82,19 @@ class TypeMappingSqlite(SqliteBasic):
         self.batch_insert(type_mapping_list)
 
     def get_id_by_names(self, type_mapping_list):
-        name_str = ','.join([f'"{type_mapping.mapping_name}"' for type_mapping in type_mapping_list])
-        sql = f"{sql_dict.get('get_id_by_names')} ({name_str})"
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据名称查询id')
-        return [row.get('id') for row in rows.as_dict()]
+        select_col = SelectCol(self.table_name).add('id')
+        mapping_names = [type_mapping.mapping_name for type_mapping in type_mapping_list]
+        condition = Condition(self.table_name).add('mapping_name', mapping_names, 'in')
+        rows = self.select_by_order(select_cols=select_col, condition=condition)
+        return [row.id for row in rows]
 
     def export_type_mapping_by_ids(self, type_mapping_ids):
-        ids_str = ','.join([str(type_mapping_id) for type_mapping_id in type_mapping_ids])
-        sql = f"{sql_dict.get('export')} ({ids_str})"
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据 id: {type_mapping_ids} 导出')
-        return [ImportExportTypeMapping().convert_export(**row) for row in rows.as_dict()]
+        select_col = SelectCol(self.table_name)
+        select_col.add('id')
+        select_col.add('mapping_name')
+        select_col.add('ds_type')
+        select_col.add('comment')
+        select_col.add('max_col_type_group_num')
+        condition = Condition(self.table_name).add('id', type_mapping_ids, 'in')
+        return self.select_by_order(return_type=ImportExportTypeMapping,
+                                    select_cols=select_col, condition=condition)

@@ -27,7 +27,8 @@ def get_id(table_name, id_count):
 def init_id_generator(get_sqlite_sequence_func):
     # 初始化每个表的id生成器
     sequence_list = get_sqlite_sequence_func()
-    for table_sequence in sequence_list:
+    for row_data in sequence_list:
+        table_sequence = dict(row_data)
         generator = generate_id(table_sequence.get('seq') + 1)
         generator.__next__()
         table_id_generator_dict[table_sequence.get('name')] = generator

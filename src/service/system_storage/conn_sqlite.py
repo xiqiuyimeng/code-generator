@@ -7,6 +7,7 @@ from src.service.system_storage.conn_type import mapping_conn_type
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
 from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 from src.service.util.dataclass_util import init
+from src.service.util.system_storage_util import Condition
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:26'
@@ -47,16 +48,14 @@ class SqlConnection(BasicSqliteDTO):
 class ConnSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, SqlConnection)
 
     def get_conn_id_types(self):
-        rows = self._do_select(sql_dict.get('select_id_type'), SqlConnection())
-        return [SqlConnection(**row) for row in rows.as_dict()]
+        return self.select(select_cols=sql_dict.get('select_id_type'))
 
     def get_conn_by_id(self, conn_id):
-        conn_param = SqlConnection()
-        conn_param.id = conn_id
-        conn = self.select_one(conn_param)
+        condition = Condition(self.table_name).add('id', conn_id)
+        conn = self.select_one(condition=condition)
         if conn.conn_info:
             mapping_conn_type(conn)
         return conn

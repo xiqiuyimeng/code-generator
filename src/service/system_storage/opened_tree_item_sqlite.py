@@ -3,8 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional, get_db_conn
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init
+from src.service.util.system_storage_util import Condition, transactional, get_cursor
 
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
@@ -25,7 +26,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'batch_delete': f'delete from {table_name} where id in',
     'max_level': f'select max(level) as max_level from {table_name} where ds_category = ',
 }
 
@@ -78,14 +78,14 @@ class CheckedEnum(Enum):
 class OpenedTreeItemSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, OpenedTreeItem)
 
     def open_item(self, opened_item_id):
         opened_item = OpenedTreeItem()
         opened_item.id = opened_item_id
         opened_item.is_current = CurrentEnum.is_current.value
         opened_item.expanded = ExpandedEnum.expanded.value
-        self.update(opened_item)
+        self.update_by_id(opened_item)
 
     def add_opened_child_item(self, child_item_names, opened_item_id, child_level,
                               ds_category, data_type, init_checked=True, insert_db=True):
@@ -112,10 +112,10 @@ class OpenedTreeItemSqlite(SqliteBasic):
     @transactional
     def item_current_changed(self, opened_item: OpenedTreeItem):
         # 找出当前数据源类型中当前项，全部置为非当前
-        item_param = OpenedTreeItem()
-        item_param.is_current = CurrentEnum.is_current.value
-        item_param.ds_category = opened_item.ds_category
-        origin_current_items = self.select(item_param)
+        condition = Condition(self.table_name)
+        condition.add('is_current', CurrentEnum.is_current.value)
+        condition.add('ds_category', opened_item.ds_category)
+        origin_current_items = self.select(condition=condition)
 
         update_params = list()
         if origin_current_items:
@@ -126,7 +126,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
                 update_params.append(update_item)
             self.batch_update(update_params)
 
-        self.update(opened_item)
+        self.update_by_id(opened_item)
 
     def recursive_get_children(self, parent_id, level, ds_category, max_level=None):
         if max_level is not None and level > max_level:
@@ -142,11 +142,11 @@ class OpenedTreeItemSqlite(SqliteBasic):
                                                        max_level)
 
     def get_children(self, parent_id, level, ds_category):
-        opened_param = OpenedTreeItem()
-        opened_param.ds_category = ds_category
-        opened_param.level = level
-        opened_param.parent_id = parent_id
-        return self.select_by_order(opened_param)
+        condition = Condition(self.table_name)
+        condition.add('ds_category', ds_category)
+        condition.add('level', level)
+        condition.add('parent_id', parent_id)
+        return self.select_by_order(condition=condition)
 
     def add_conn_opened_item(self, conn_id, conn_name):
         conn_item = OpenedTreeItem()
@@ -160,7 +160,16 @@ class OpenedTreeItemSqlite(SqliteBasic):
         self.insert(conn_item)
         return conn_item
 
-    @transactional
+    def update_conn_opened_record(self, conn_id, conn_name):
+        condition = Condition(self.table_name)
+        condition.add('parent_id', conn_id)
+        condition.add('level', SqlTreeItemLevel.conn_level.value)
+        condition.add('ds_category', DsCategoryEnum.sql_ds_category.value.name)
+        opened_conn_tree_item = self.select_one(condition=condition)
+        if opened_conn_tree_item:
+            opened_conn_tree_item.item_name = conn_name
+            self.update_by_id(opened_conn_tree_item)
+
     def add_struct_opened_item(self, name, parent_id, level):
         ds_category = DsCategoryEnum.struct_ds_category.value.name
         opened_tree_item = OpenedTreeItem()
@@ -171,12 +180,11 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_tree_item.level = level
         opened_tree_item.ds_category = ds_category
         opened_tree_item.checked = CheckedEnum.unchecked.value
-        max_order_param = {
-            'ds_category': ds_category,
-            'level': level,
-            'parent_id': parent_id
-        }
-        opened_tree_item.item_order = self.get_max_order(max_order_param)
+        condition = Condition(self.table_name)
+        condition.add('ds_category', ds_category)
+        condition.add('level', level)
+        condition.add('parent_id', parent_id)
+        opened_tree_item.item_order = self.get_max_order(condition)
         self.insert(opened_tree_item)
         return opened_tree_item
 
@@ -193,16 +201,18 @@ class OpenedTreeItemSqlite(SqliteBasic):
         update_param = OpenedTreeItem()
         update_param.id = opened_record.id
         update_param.checked = opened_record.checked
-        self.update(update_param)
+        self.update_by_id(update_param)
 
     def update_child_checked(self, opened_record):
         # 批量更新所有子项选中状态
         update_param = OpenedTreeItem()
         update_param.checked = opened_record.checked
-        self.update(update_param, {'parent_id': opened_record.id})
+        self.update_by_condition(update_param, Condition(self.table_name).add('parent_id', opened_record.id))
 
     @staticmethod
     def get_max_level(ds_category):
         max_level_sql = f'{sql_dict.get("max_level")}"{ds_category}"'
-        result = get_db_conn().query(max_level_sql).as_dict()
-        return result[0].get('max_level') if result else -1
+        cursor = get_cursor()
+        cursor.execute(max_level_sql)
+        result = cursor.fetchone()
+        return dict(result).get('max_level') if result else -1

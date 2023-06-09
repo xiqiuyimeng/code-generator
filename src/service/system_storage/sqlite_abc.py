@@ -1,27 +1,13 @@
 # -*- coding: utf-8 -*-
-import os
-import threading
 from dataclasses import dataclass, field
-from datetime import datetime
 
-import records
-from sqlalchemy.pool import SingletonThreadPool
-
-from src.constant.constant import SYS_DB_PATH
-from src.exception.exception import ThreadStopException
 from src.logger.log import logger as log
 from src.service.util.db_id_generator import update_id_generator, get_id
+from src.service.util.system_storage_util import get_cursor, get_now_str, batch_operate, Condition, get_field_list, \
+    SelectCol, update_table_field_dict
 
 _author_ = 'luwt'
 _date_ = '2022/5/11 10:25'
-
-db_name = os.path.join(SYS_DB_PATH, 'generator_db')
-table_field_dict = dict()
-thread_id_db_dict = dict()
-# 批量操作数据库时，参数个数上限
-batch_operate_count = 100
-# 查询sqlite sequence 的sql
-sqlite_sequence_sql = f'select * from sqlite_sequence'
 
 
 @dataclass
@@ -32,301 +18,216 @@ class BasicSqliteDTO:
     update_time: str = field(default=None, init=False, compare=False)
 
 
-def get_db():
-    if not os.path.exists(SYS_DB_PATH):
-        os.makedirs(SYS_DB_PATH)
-    db = records.Database(f'sqlite:///{db_name}',
-                          poolclass=SingletonThreadPool,
-                          connect_args={'check_same_thread': False})
-    # 放入缓存
-    thread_id_db_dict[threading.get_ident()] = db
-    return db
-
-
-def transactional(f):
-    def do_transaction(*args, **kw):
-        thread_id = threading.get_ident()
-        # 获取db_conn
-        db_conn = get_db_conn()
-        # 如果是 Database 对象，那么证明前面没有事务，获取连接，替换缓存中的 Database 对象，
-        # 如果不是 Database 对象，说明是 Connection 对象，那么应该已经处于事务中，直接使用即可
-        if isinstance(db_conn, records.Database):
-            cache_db, allow_close_conn = True, True
-            new_db = get_db()
-            conn = new_db.get_connection()
-            # 放入缓存
-            thread_id_db_dict[thread_id] = conn
-        else:
-            conn = db_conn
-            cache_db, allow_close_conn = False, False
-        # 开启事务
-        tx = conn.transaction()
-        try:
-            func_result = f(*args, **kw)
-            tx.commit()
-            return func_result
-        except Exception as e:
-            tx.rollback()
-            log.exception("操作本地数据库事务错误：", e)
-            raise e
-        finally:
-            if cache_db:
-                # 将原来的 Database 对象重新放回去
-                thread_id_db_dict[thread_id] = db_conn
-            if allow_close_conn:
-                # 关闭当前事务创建的连接
-                conn.close()
-
-    return do_transaction
-
-
-def allow_thread_running():
-    if thread_id_db_dict.get(f'{threading.get_ident()}-terminate'):
-        raise ThreadStopException('线程结束')
-
-
-def set_thread_terminate(thread_id, thread_terminate):
-    thread_id_db_dict[f'{thread_id}-terminate'] = thread_terminate
-
-
-def get_db_conn():
-    # 首先检查是否可以继续执行
-    allow_thread_running()
-    # 如果从缓存中取不到，则获取一个新的对象
-    current_thread_db = thread_id_db_dict.get(threading.get_ident())
-    return current_thread_db if current_thread_db else get_db()
-
-
-def batch_operate(batch_params, batch_func):
-    # 如果批量操作数量过多，应该分批来执行，每批100个元素
-    if len(batch_params) > batch_operate_count:
-        start, end = 0, batch_operate_count
-        while start < len(batch_params):
-            batch_func(batch_params[start: end])
-            start += batch_operate_count
-            end += batch_operate_count
-    else:
-        batch_func(batch_params)
-
-
-def get_sqlite_sequence():
-    db_record = get_db_conn().query(sqlite_sequence_sql)
-    return db_record.as_dict()
-
-
 class SqliteBasic:
+    """
+    操作sqlite数据库的基类，
+    约定：每个表必须有id且为自增主键，
+         每个表必须有create_time自动初始化，
+         每个表必须有update_time自动更新，
+         每个表应该有item_order，描述顺序关系
+    """
 
-    def __init__(self, table_name, sql_dict):
-        """
-        操作sqlite数据库的基类，
-        约定：每个表必须有id且为自增主键，
-            每个表必须有create_time自动初始化，
-            每个表必须有update_time自动更新，
-            每个表应该有item_order，描述顺序关系
-        """
+    def __init__(self, table_name, sql_dict, model_type):
         self.table_name = table_name
+        self.model_type = model_type
         self._create_table_sql = sql_dict.get('create')
-        self._check_table_sql = f'PRAGMA table_info (\'{self.table_name}\')'
+        self._check_table_sql = f'PRAGMA table_info ("{self.table_name}")'
         self._create_table()
 
-        # 常用的增删改查sql
-        self._id_clause_sql = 'where id = :id'
+        # 常用sql
         self._insert_sql = f'insert into {self.table_name}'
         self._update_sql = f'update {self.table_name} set'
-        self._delete_sql = f'delete from {self.table_name} {self._id_clause_sql}'
-        self._select_sql = f'select * from {self.table_name}'
-        self._select_count_sql = f'select count(*) as count from {self.table_name}'
-        self._field_list_sql = f'PRAGMA table_info("{self.table_name}")'
+        self._delete_sql = f'delete from {self.table_name}'
         self._max_order_sql = f'select ifnull(max(item_order), 0) as max_order from {self.table_name}'
 
     def _create_table(self):
-        check_success = get_db_conn().query(self._check_table_sql).all()
+        cursor = get_cursor()
+        cursor.execute(self._check_table_sql)
+        data = cursor.fetchone()
+        check_success = data and dict(data)
         if not check_success:
             # 如果表不存在，需要重新创建
-            get_db_conn().query(self._create_table_sql)
+            cursor.execute(self._create_table_sql)
             # 创建完成后，需要同步更新id生成器
             update_id_generator(self.table_name)
-
-    def get_field_list(self):
-        field_list = table_field_dict.get(self.table_name)
-        if not field_list:
-            rows = get_db_conn().query(self._field_list_sql)
-            field_list = [row.get('name') for row in rows.as_dict()]
-            table_field_dict[self.table_name] = field_list
-        return field_list
+            # 更新表字段
+            update_table_field_dict(self.table_name)
 
     def insert(self, insert_obj: BasicSqliteDTO):
         """新增记录方法，根据约定，id由数据库管理，创建时间、更新时间传入当前时间"""
-        insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        insert_obj.create_time = get_now_str()
+        insert_obj.update_time = get_now_str()
         # 分配id
         insert_obj.id = get_id(self.table_name, 1)[0]
         # 过滤掉不合法的field
         insert_dict = self.filter_illegal_field(insert_obj)
 
         if insert_dict:
-            field_str = ", ".join(insert_dict.keys())
-            value_placeholder_str = ", ".join([f':{value}' for value in insert_dict.keys()])
-            insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
+            insert_sql = f'{self._insert_sql} ({", ".join(insert_dict)}) ' \
+                         f'values ({", ".join("?" * len(insert_dict))})'
+            param = tuple(insert_dict.values())
             log.info(f'插入[{self.table_name}]语句 ==> {insert_sql}')
-            log.info(f'插入[{self.table_name}]参数 ==> {insert_dict}')
+            log.info(f'插入[{self.table_name}]参数 ==> {param}')
+            get_cursor().execute(insert_sql, param)
 
-            get_db_conn().query(insert_sql, **insert_dict)
-
+    @batch_operate
     def batch_insert(self, insert_objs):
-        batch_operate(insert_objs, self._batch_insert)
-
-    def _batch_insert(self, insert_objs):
         """批量插入"""
         id_list = get_id(self.table_name, len(insert_objs))
         for idx, insert_obj in enumerate(insert_objs):
-            insert_obj.create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            insert_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            insert_obj.create_time = get_now_str()
+            insert_obj.update_time = get_now_str()
             # 分配id
             insert_obj.id = id_list[idx]
         insert_dict_list = [self.filter_illegal_field(insert_data) for insert_data in insert_objs]
 
-        field_str = ", ".join(insert_dict_list[0].keys())
-        value_placeholder_str = ", ".join([f':{value}' for value in insert_dict_list[0].keys()])
-        insert_sql = f'{self._insert_sql} ({field_str}) values ({value_placeholder_str})'
+        insert_sql = f'{self._insert_sql} ({", ".join(insert_dict_list[0])}) ' \
+                     f'values ({", ".join("?" * len(insert_dict_list[0]))})'
+        params = [tuple(row_dict.values()) for row_dict in insert_dict_list]
         log.info(f'批量插入[{self.table_name}]语句 ==> {insert_sql}')
-        log.info(f'批量插入[{self.table_name}]参数 ==> {insert_dict_list}')
+        log.info(f'批量插入[{self.table_name}]参数 ==> {params}')
+        get_cursor().executemany(insert_sql, params)
 
-        get_db_conn().bulk_query(insert_sql, insert_dict_list)
+    def delete_by_id(self, obj_id):
+        self.delete_by_condition(Condition(self.table_name).add('id', obj_id))
 
-    def delete(self, obj_id):
-        log.info(f'删除[{self.table_name}]语句 ==> {self._delete_sql}')
-        log.info(f'删除[{self.table_name}]参数 ==> {obj_id}')
-        get_db_conn().query(self._delete_sql, **{"id": obj_id})
+    @batch_operate
+    def delete_by_ids(self, obj_ids):
+        self.delete_by_condition(Condition(self.table_name).add('id', obj_ids, 'in'))
 
-    def batch_delete(self, obj_ids):
-        batch_operate(obj_ids, self._batch_delete)
+    def delete_by_condition(self, condition: Condition):
+        self.delete(condition, condition.params)
 
-    def _batch_delete(self, obj_ids):
-        log.info(f'批量删除[{self.table_name}]语句 ==> {self._delete_sql}')
-        log.info(f'批量删除[{self.table_name}]参数 ==> {obj_ids}')
-        get_db_conn().bulk_query(self._delete_sql, [{'id': obj_id} for obj_id in obj_ids])
+    def delete(self, where_clause, params):
+        delete_sql = f'{self._delete_sql} {where_clause}'
+        log.info(f'删除[{self.table_name}]语句 ==> {delete_sql}')
+        log.info(f'删除[{self.table_name}]参数 ==> {params}')
+        get_cursor().execute(delete_sql, params)
 
-    def update(self, update_obj: BasicSqliteDTO, condition=None):
-        """更新记录方法，根据id（如果存在condition，以condition为准）更新，创建时间不修改，更新时间传入当前时间"""
-        update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        update_dict = self.filter_illegal_field(update_obj)
-        update_dict.pop('create_time')
+    def update_by_id(self, update_obj: BasicSqliteDTO):
+        """更新记录方法，根据id更新"""
+        self.update_by_condition(update_obj, Condition(self.table_name).add('id', update_obj.id))
 
-        # 只更新除id以外不为空的属性
-        update_field_list = [k for k, v in update_dict.items() if v is not None and k != 'id']
+    def update_by_condition(self, update_obj: BasicSqliteDTO, condition: Condition):
+        self.update(update_obj, condition, condition.params)
 
-        # 收集更新的value dict
-        update_val_dict = {"id": update_dict.get("id")}
-        for update_field in update_field_list:
-            update_val_dict[update_field] = update_dict.get(update_field)
+    def construct_update_set_sql(self, update_dict):
+        # 只更新除id和创建时间以外不为空的属性
+        update_field_list = [k for k, v in update_dict.items() if v is not None and k not in ('id', 'create_time')]
 
         if update_field_list:
-            update_field_str = ", ".join([f'{field_str} = :{field_str}' for field_str in update_field_list])
-            if condition:
-                clause_sql_list = list()
-                for k, v in condition.items():
-                    clause_sql_list.append(f'{k} = {v}')
-                clause_sql = f'where {" and ".join(clause_sql_list)}'
-            else:
-                clause_sql = self._id_clause_sql
-            update_sql = f'{self._update_sql} {update_field_str} {clause_sql}'
-            log.info(f'更新[{self.table_name}]语句 ==> {update_sql}')
-            log.info(f'更新[{self.table_name}]参数 ==> {update_val_dict}')
+            update_field_str = ", ".join([f'{field_str} = ?' for field_str in update_field_list])
+            # 拼接sql
+            return f'{self._update_sql} {update_field_str}', update_field_list
 
-            get_db_conn().query(update_sql, **update_val_dict)
+    def update(self, update_obj: BasicSqliteDTO, where_clause, condition_params):
+        """更新记录，创建时间不修改，更新时间为当前时间"""
+        update_obj.update_time = get_now_str()
+        update_dict = self.filter_illegal_field(update_obj)
 
+        # 获取sql和更新字段列表
+        update_set_sql, update_field_list = self.construct_update_set_sql(update_dict)
+        update_sql = f'{update_set_sql} {where_clause}'
+        # 收集更新的value list
+        update_values = [update_dict.get(update_field) for update_field in update_field_list]
+        update_values.extend(condition_params)
+        log.info(f'更新[{self.table_name}]语句 ==> {update_sql}')
+        log.info(f'更新[{self.table_name}]参数 ==> {update_values}')
+        get_cursor().execute(update_sql, update_values)
+
+    @batch_operate
     def batch_update(self, update_objs):
-        batch_operate(update_objs, self._batch_update)
-
-    def _batch_update(self, update_objs):
         """批量更新"""
         update_dict_list = list()
         for update_obj in update_objs:
-            update_obj.update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            update_obj.update_time = get_now_str()
             update_dict = self.filter_illegal_field(update_obj)
-            update_dict.pop('create_time')
             update_dict_list.append(update_dict)
 
-        # 只更新除id以外不为空的属性
-        update_field_list = [k for k, v in update_dict_list[0].items() if v is not None and k != 'id']
+        # 获取sql和更新字段列表
+        update_set_sql, update_field_list = self.construct_update_set_sql(update_dict_list[0])
 
-        # 收集value list
+        # 收集更新的value list
         update_value_list = list()
-        for update_obj_dict in update_dict_list:
-            update_val_dict = {"id": update_obj_dict.get("id")}
-            for update_field in update_field_list:
-                update_val_dict[update_field] = update_obj_dict.get(update_field)
-            update_value_list.append(update_val_dict)
+        for update_dict in update_dict_list:
+            row_values = [update_dict.get(update_field) for update_field in update_field_list]
+            row_values.append(update_dict.get('id'))
+            update_value_list.append(row_values)
 
-        if update_field_list:
-            update_field_str = ", ".join([f'{field_str} = :{field_str}' for field_str in update_field_list])
-            update_sql = f'{self._update_sql} {update_field_str} {self._id_clause_sql}'
-            log.info(f'批量更新[{self.table_name}]语句 ==> {update_sql}')
-            log.info(f'批量更新[{self.table_name}]参数 ==> {update_value_list}')
+        condition = Condition(self.table_name).add('id', update_objs[0].id)
 
-            get_db_conn().bulk_query(update_sql, update_value_list)
+        update_sql = f'{update_set_sql} {condition}'
+        log.info(f'批量更新[{self.table_name}]语句 ==> {update_sql}')
+        log.info(f'批量更新[{self.table_name}]参数 ==> {update_value_list}')
+        get_cursor().executemany(update_sql, update_value_list)
 
-    def select_by_order(self, select_obj, sort_order='asc'):
-        return self.select(select_obj, order_by='item_order', sort_order=sort_order)
+    def select_by_order(self, return_type=None, select_cols: SelectCol = None,
+                        condition: Condition = None, sort_order='asc'):
+        return self.select(return_type, select_cols, condition, order_by='item_order', sort_order=sort_order)
 
-    def select(self, select_obj, order_by=None, sort_order='asc'):
+    def select(self, return_type=None, select_cols: SelectCol = None, condition: Condition = None,
+               order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询"""
-        rows = self._do_select(self._select_sql, select_obj, order_by, sort_order)
+        rows = self.select_by_condition(select_cols, condition, order_by, sort_order)
         # 映射为参数对象类
-        return [select_obj.__class__(**row) for row in rows.as_dict()]
+        if not return_type:
+            return_type = self.model_type
+        return [return_type(**dict(row)) for row in rows]
 
-    def select_one(self, select_obj, order_by=None, sort_order='asc'):
+    def select_one(self, return_type=None, select_cols: SelectCol = None, condition: Condition = None,
+                   order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询，返回第一条"""
-        result = self._do_select(self._select_sql, select_obj, order_by, sort_order).as_dict()
+        result = self.select_by_condition(select_cols, condition, order_by, sort_order, fetch_all=False)
         # 映射为参数对象类
-        return select_obj.__class__(**result[0]) if result else None
+        if not return_type:
+            return_type = self.model_type
+        return return_type(**dict(result)) if result else None
 
-    def select_count(self, select_obj, order_by=None, sort_order='asc'):
-        """根据条件查询，查询存在的记录数量"""
-        rows = self._do_select(self._select_count_sql, select_obj, order_by, sort_order)
-        return rows.first().as_dict().get('count')
+    def select_by_condition(self, select_cols: SelectCol = None, condition: Condition = None,
+                            order_by=None, sort_order='asc', fetch_all=True):
+        if not select_cols:
+            select_cols = SelectCol(self.table_name)
+        if not condition:
+            condition = Condition(self.table_name)
+        return self._do_select(select_cols, condition, condition.params, order_by, sort_order, fetch_all)
 
-    def _do_select(self, sql, select_obj, order_by=None, sort_order='asc'):
-        """根据条件查询，查询存在的记录数量"""
-        select_sql = sql
-        # 过滤掉不合法的field
-        select_dict = self.filter_illegal_field(select_obj)
-
-        select_field_list = [k for k, v in select_dict.items() if v is not None]
-        select_value_dict = dict()
-        if select_field_list:
-            select_clause = ' and '.join([f'{select_field} = :{select_field}' for select_field in select_field_list])
-            select_sql = f'{sql} where {select_clause}'
-            # 收集查询value
-            for select_field in select_field_list:
-                select_value_dict[select_field] = select_dict[select_field]
-
+    def _do_select(self, select_col_sql, where_clause=None, params=None, order_by=None,
+                   sort_order='asc', fetch_all=True):
+        """根据条件查询"""
+        select_sql = str(select_col_sql)
+        if where_clause:
+            select_sql += f' {where_clause}'
         if order_by:
-            select_sql = f'{select_sql} order by {order_by} {sort_order}'
-
+            select_sql += f' order by {order_by} {sort_order}'
         log.info(f'查询[{self.table_name}]语句 ==> {select_sql}')
-        log.info(f'查询[{self.table_name}]参数 ==> {select_value_dict}')
-        return get_db_conn().query(select_sql, **select_value_dict)
+        cursor = get_cursor()
+        if params:
+            log.info(f'查询[{self.table_name}]参数 ==> {params}')
+            cursor.execute(select_sql, params)
+        else:
+            cursor.execute(select_sql)
+        if fetch_all:
+            return cursor.fetchall()
+        else:
+            return cursor.fetchone()
 
     def filter_illegal_field(self, data):
         # 过滤掉不合法的field
         legal_fields_dict = dict()
-        for db_field in self.get_field_list():
+        for db_field in get_field_list(self.table_name):
             if hasattr(data, db_field):
                 legal_fields_dict[db_field] = getattr(data, db_field)
         return legal_fields_dict
 
-    def get_max_order(self, condition_dict=None):
+    def get_max_order(self, condition: Condition = None):
         max_order_sql = self._max_order_sql
-        if condition_dict:
-            clause_list = list()
-            for key in condition_dict.keys():
-                clause_list.append(f'{key} = :{key}')
-            max_order_sql = f'{max_order_sql} where {" and ".join(clause_list)}'
-            db_record = get_db_conn().query(max_order_sql, **condition_dict)
-        else:
-            db_record = get_db_conn().query(max_order_sql)
         log.info(f"查询 {self.table_name} 最大order值语句 ==> {max_order_sql}")
-        log.info(f"查询 {self.table_name} 最大order值参数 ==> {condition_dict}")
-        return db_record.first().max_order + 1
+        cursor = get_cursor()
+        if condition:
+            max_order_sql += f' {condition}'
+            log.info(f"查询 {self.table_name} 最大order值参数 ==> {condition.params}")
+            cursor.execute(max_order_sql, condition.params)
+        else:
+            cursor.execute(max_order_sql)
+        row = cursor.fetchone()
+        return dict(row).get('max_order') + 1

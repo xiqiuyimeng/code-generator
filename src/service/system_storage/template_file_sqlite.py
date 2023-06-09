@@ -2,9 +2,9 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
+from src.service.util.system_storage_util import Condition, transactional
 
 _author_ = 'luwt'
 _date_ = '2023/3/9 8:42'
@@ -27,8 +27,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_by_template_ids': f'delete from {table_name} where template_id in ',
-    'export_by_template_ids': f'select * from {table_name} where template_id in ',
 }
 
 
@@ -87,12 +85,11 @@ class TabOpenedEnum(Enum):
 class TemplateFileSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, TemplateFile)
 
     def get_by_template_id(self, template_id):
-        param = TemplateFile()
-        param.template_id = template_id
-        return self.select_by_order(param)
+        condition = Condition(self.table_name).add('template_id', template_id)
+        return self.select_by_order(condition=condition)
 
     def batch_add_template_files(self, template_id, template_files):
         for idx, template_file in enumerate(template_files, start=1):
@@ -109,14 +106,9 @@ class TemplateFileSqlite(SqliteBasic):
             self.batch_add_template_files(template_id, template_files)
 
     def batch_del_template_files(self, template_ids):
-        ids_str = ','.join([str(template_id) for template_id in template_ids])
-        sql = f"{sql_dict.get('delete_by_template_ids')} ({ids_str})"
-        get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')
+        condition = Condition(self.table_name).add('template_id', template_ids, 'in')
+        self.delete_by_condition(condition)
 
     def export_files_by_parent_id(self, template_ids):
-        id_str = ','.join([str(template_id) for template_id in template_ids])
-        sql = f'{sql_dict.get("export_by_template_ids")} ({id_str})'
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据模板id导出')
-        return [ImportExportTemplateFile().convert_export(**row) for row in rows.as_dict()]
+        condition = Condition(self.table_name).add('template_id', template_ids, 'in')
+        return self.select_by_order(return_type=ImportExportTemplateFile, condition=condition)

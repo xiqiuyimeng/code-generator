@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
 
-from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
+from src.service.util.system_storage_util import transactional, Condition
 
 _author_ = 'luwt'
 _date_ = '2023/2/12 11:46'
@@ -23,8 +23,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_by_parent_ids': f'delete from {table_name} where parent_id in ',
-    'export': f'select * from {table_name} where parent_id in ',
 }
 
 
@@ -63,12 +61,11 @@ class ImportExportColTypeMapping:
 class ColTypeMappingSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, ColTypeMapping)
 
     def get_by_parent_id(self, parent_id):
-        param = ColTypeMapping()
-        param.parent_id = parent_id
-        return self.select_by_order(param)
+        condition = Condition(self.table_name).add('parent_id', parent_id)
+        return self.select_by_order(condition=condition)
 
     def batch_save(self, col_type_mappings, parent_id):
         # 批量保存
@@ -89,14 +86,8 @@ class ColTypeMappingSqlite(SqliteBasic):
             self.batch_insert(col_type_mappings)
 
     def delete_by_parent_ids(self, parent_ids):
-        ids_str = ','.join([str(parent_id) for parent_id in parent_ids])
-        sql = f"{sql_dict.get('delete_by_parent_ids')} ({ids_str})"
-        get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据parent_id: {parent_ids} 删除')
+        self.delete_by_condition(Condition(self.table_name).add('parent_id', parent_ids, 'in'))
 
     def export_by_parent_ids(self, parent_ids):
-        ids_str = ','.join([str(parent_id) for parent_id in parent_ids])
-        sql = f"{sql_dict.get('export')} ({ids_str})"
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据 parent_id: {parent_ids} 导出')
-        return [ImportExportColTypeMapping().convert_export(**row) for row in rows.as_dict()]
+        condition = Condition(self.table_name).add('parent_id', parent_ids, 'in')
+        return self.select_by_order(return_type=ImportExportColTypeMapping, condition=condition)

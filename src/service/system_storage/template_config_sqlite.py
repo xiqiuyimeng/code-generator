@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT
-from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, transactional, get_db_conn
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
+from src.service.util.system_storage_util import Condition, transactional
 
 _author_ = 'luwt'
 _date_ = '2023/3/9 8:46'
@@ -29,8 +29,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'delete_by_template_ids': f'delete from {table_name} where template_id in ',
-    'export_by_template_ids': f'select * from {table_name} where template_id in ',
 }
 
 
@@ -107,12 +105,11 @@ def check_required_value_legal(value):
 class TemplateConfigSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, TemplateConfig)
 
     def get_by_template_id(self, template_id):
-        param = TemplateConfig()
-        param.template_id = template_id
-        config_list = self.select_by_order(param)
+        condition = Condition(self.table_name).add('template_id', template_id)
+        config_list = self.select_by_order(condition=condition)
         # 根据类型分组
         output_config_list, var_config_list = list(), list()
         for config in config_list:
@@ -144,17 +141,12 @@ class TemplateConfigSqlite(SqliteBasic):
         self.batch_add_config_list(template_id, output_config_list, var_config_list)
 
     def batch_del_config_list(self, template_ids):
-        ids_str = ','.join([str(template_id) for template_id in template_ids])
-        sql = f"{sql_dict.get('delete_by_template_ids')} ({ids_str})"
-        get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据 template_ids: {template_ids} 删除')
+        condition = Condition(self.table_name).add('template_id', template_ids, 'in')
+        self.delete_by_condition(condition)
 
     def export_config_by_template_ids(self, template_ids):
-        id_str = ','.join([str(template_id) for template_id in template_ids])
-        sql = f'{sql_dict.get("export_by_template_ids")} ({id_str})'
-        rows = get_db_conn().query(sql)
-        log.info(f'{self.table_name} 根据模板id导出')
-        return [ImportExportTemplateConfig().convert_export(**row) for row in rows.as_dict()]
+        condition = Condition(self.table_name).add('template_id', template_ids, 'in')
+        return self.select_by_order(return_type=ImportExportTemplateConfig, condition=condition)
 
 
 def get_var_name(var_name_list, order=1):

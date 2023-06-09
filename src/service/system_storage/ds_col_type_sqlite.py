@@ -2,10 +2,11 @@
 from dataclasses import dataclass, field
 
 from src.logger.log import logger as log
-from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic, get_db_conn, transactional
+from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init
 from src.service.util.db_id_generator import update_id_generator
 from src.service.util.group_util import group_model_list
+from src.service.util.system_storage_util import transactional, Condition
 
 _author_ = 'luwt'
 _date_ = '2023/2/12 19:28'
@@ -22,10 +23,6 @@ sql_dict = {
     create_time datetime,
     update_time datetime
     );''',
-    'truncate': f'delete from {table_name}',
-    'delete_children': f'delete from {table_name} where parent_id = :parent_id',
-    'delete_children_by_parent_ids': f'delete from {table_name} where parent_id in ',
-    'get_ds_type': f'select * from {table_name} where parent_id = 0',
 }
 
 
@@ -41,10 +38,10 @@ class DsColType(BasicSqliteDTO):
 class DsColTypeSqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, DsColType)
 
     def get_all_ds_col_types(self):
-        ds_col_types = self.select(DsColType(), order_by='parent_id')
+        ds_col_types = self.select(order_by='parent_id')
         if ds_col_types:
             # 以parent_id为key，进行分组
             parent_id_dict = group_model_list(ds_col_types, lambda x: x.parent_id)
@@ -61,8 +58,8 @@ class DsColTypeSqlite(SqliteBasic):
 
     @transactional
     def truncate_table(self):
-        truncate_sql = sql_dict.get('truncate')
-        get_db_conn().query(truncate_sql)
+        condition = Condition(self.table_name)
+        self.delete_by_condition(condition)
         # 将id 生成器重置
         update_id_generator(table_name)
         log.info(f'清空表{self.table_name}成功')
@@ -87,10 +84,10 @@ class DsColTypeSqlite(SqliteBasic):
         return ds_col_types
 
     def get_ds_type(self, ds_type):
-        query_param = DsColType()
-        query_param.ds_col_type = ds_type
-        query_param.parent_id = 0
-        return self.select_one(query_param)
+        condition = Condition(self.table_name)
+        condition.add('ds_col_type', ds_type)
+        condition.add('parent_id', 0)
+        return self.select_one(condition=condition)
 
     def batch_sync_col_types(self, ds_type, col_types):
         """在保存数据表列的时候，批量同步列的类型，以动态维护数据源列类型"""
@@ -98,31 +95,31 @@ class DsColTypeSqlite(SqliteBasic):
         ds_type_obj = self.get_ds_type(ds_type)
         if ds_type_obj:
             # 查询列类型
-            query_param = DsColType()
-            query_param.parent_id = ds_type_obj.id
-            col_types_exists = self.select(query_param)
+            condition = Condition(self.table_name).add('parent_id', ds_type_obj.id)
+            col_types_exists = self.select(condition=condition)
             # 求差集，判断是否需要新增
             exists_col_type_set = {col_type.ds_col_type for col_type in col_types_exists}
             diff_set = col_types - exists_col_type_set
             if diff_set:
                 # 移除当前数据源类型下所有列类型
-                delete_children_sql = sql_dict.get('delete_children')
-                get_db_conn().query(delete_children_sql, **{'parent_id': ds_type_obj.id})
+                self.delete_children(ds_type_obj.id)
                 # 批量插入：新的列类型 + 已经存在的列类型，这样可以进行排序
                 all_col_types = sorted(col_types | exists_col_type_set)
                 new_col_types = self.batch_assemble_ds_col_types(all_col_types, ds_type_obj.id)
                 self.batch_insert(new_col_types)
 
+    def delete_children(self, parent_id):
+        condition = Condition(self.table_name).add('parent_id', parent_id)
+        self.delete_by_condition(condition)
+
     def get_ds_types(self):
         log.info(f'查询{self.table_name}中所有数据源类型')
-        sql = sql_dict.get('get_ds_type')
-        ds_type_rows = get_db_conn().query(sql)
-        return [DsColType(**row) for row in ds_type_rows.as_dict()]
+        condition = Condition(self.table_name).add('parent_id', 0)
+        return self.select_by_order(condition=condition)
 
     def batch_delete_ds_types(self, ds_type_ids):
         # 首先删除数据源类型
-        self.batch_delete(ds_type_ids)
+        self.delete_by_ids(ds_type_ids)
         # 再删除列类型
-        parent_ids = ','.join([str(ds_type_id) for ds_type_id in ds_type_ids])
-        delete_col_type_sql = f"{sql_dict.get('delete_children_by_parent_ids')}({parent_ids})"
-        get_db_conn().query(delete_col_type_sql)
+        condition = Condition(self.table_name).add('parent_id', ds_type_ids, 'in')
+        self.delete_by_condition(condition)

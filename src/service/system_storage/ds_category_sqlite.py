@@ -3,8 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
-from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO, transactional, get_db_conn
+from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 from src.service.util.dataclass_util import init
+from src.service.util.system_storage_util import get_cursor, transactional
 
 _author_ = 'luwt'
 _date_ = '2022/9/15 17:43'
@@ -51,15 +52,15 @@ class DsCategoryEnum(Enum):
 class DsCategorySqlite(SqliteBasic):
 
     def __init__(self):
-        super().__init__(table_name, sql_dict)
+        super().__init__(table_name, sql_dict, DsCategory)
 
     @staticmethod
     def drop_table():
-        get_db_conn().query(sql_dict.get('drop'))
+        get_cursor().execute(sql_dict.get('drop'))
 
     @transactional
     def switch_ds_category(self, target_ds_category):
-        ds_categories = self.select(DsCategory())
+        ds_categories = self.select_by_order()
         update_ds_categories = list()
         for ds_category in ds_categories:
             update_ds_category = DsCategory()

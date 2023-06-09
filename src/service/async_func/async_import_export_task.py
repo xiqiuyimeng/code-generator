@@ -7,9 +7,9 @@ from PyQt5.QtCore import pyqtSignal
 
 from src.constant.export_import_constant import TYPE_KEY, DATA_KEY
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from src.service.system_storage.sqlite_abc import transactional
 from src.service.util.path_util import check_path_legal
 from src.service.util.struct_util.json_util import load_json_str
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok, pop_question
 
 _author_ = 'luwt'

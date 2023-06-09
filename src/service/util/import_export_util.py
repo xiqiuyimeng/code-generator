@@ -129,8 +129,7 @@ def batch_save_template(template_sqlite, template_config_sqlite, template_file_s
         template_config_sqlite.batch_add_config_list(template.id, template.output_config_list,
                                                      template.var_config_list)
         if template.template_files:
-            template_file_sqlite.batch_add_template_files(template.id,
-                                                          template.template_files)
+            template_file_sqlite.batch_add_template_files(template.id, template.template_files)
 
 
 def export_template(template_sqlite, template_file_sqlite, template_config_sqlite, template_ids):

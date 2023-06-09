@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
-from src.service.system_storage.sqlite_abc import transactional, get_sqlite_sequence
 from src.service.system_storage.struct_type import StructTypeEnum
 from src.service.util.db_id_generator import init_id_generator
+from src.service.util.system_storage_util import get_sqlite_sequence, transactional
 
 _author_ = 'luwt'
 _date_ = '2023/2/27 9:03'

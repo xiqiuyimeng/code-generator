@@ -11,12 +11,12 @@ from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskTh
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMappingSqlite, ImportExportColTypeMapping, \
     ColTypeMapping
 from src.service.system_storage.conn_type import check_conn_type
-from src.service.system_storage.sqlite_abc import transactional
 from src.service.system_storage.struct_type import check_struct_type
 from src.service.system_storage.type_mapping_sqlite import TypeMappingSqlite, TypeMapping, ImportExportTypeMapping
 from src.service.util.copy_util import copy_type_mapping
 from src.service.util.import_export_util import convert_import_to_model_list, convert_import_to_model, add_group_list, \
     check_repair_type_mapping_group_num, batch_save_type_mapping, export_type_mapping
+from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 
 _author_ = 'luwt'
@@ -113,7 +113,7 @@ class EditTypeMappingWorker(ThreadWorkerABC):
     def do_run(self):
         log.info(f'开始编辑类型映射信息 [{self.type_mapping.mapping_name}]')
         # 首先更新类型映射信息
-        TypeMappingSqlite().update(self.type_mapping)
+        TypeMappingSqlite().update_by_id(self.type_mapping)
         # 处理列类型映射信息
         ColTypeMappingSqlite().edit_col_type_mappings(self.type_mapping.type_mapping_cols, self.type_mapping.id)
         self.success_signal.emit()
@@ -154,7 +154,7 @@ class DelTypeMappingWorker(ThreadWorkerABC):
     def do_run(self):
         log.info(f'开始删除类型映射 [{self.type_mapping_names}]')
         # 首先删除类型映射
-        TypeMappingSqlite().batch_delete(self.type_mapping_ids)
+        TypeMappingSqlite().delete_by_ids(self.type_mapping_ids)
         ColTypeMappingSqlite().delete_by_parent_ids(self.type_mapping_ids)
         self.success_signal.emit()
         log.info(f'删除类型映射 [{self.type_mapping_names}] 成功')
@@ -200,20 +200,19 @@ class CopyTypeMappingWorker(ThreadWorkerABC):
     def __init__(self, type_mapping_ids):
         super().__init__()
         self.type_mapping_ids = type_mapping_ids
-        self.type_mapping_sqlite = TypeMappingSqlite()
-        self.col_type_mapping_sqlite = ColTypeMappingSqlite()
 
     def do_run(self):
+        type_mapping_sqlite = TypeMappingSqlite()
+        col_type_mapping_sqlite = ColTypeMappingSqlite()
         # 根据 type mapping ids 查询类型映射数据
-        type_mappings = export_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite,
-                                            self.type_mapping_ids)
+        type_mappings = export_type_mapping(type_mapping_sqlite, col_type_mapping_sqlite, self.type_mapping_ids)
         # 获取所有类型映射名称
-        type_mapping_names = self.type_mapping_sqlite.get_all_mapping_names()
+        type_mapping_names = type_mapping_sqlite.get_all_mapping_names()
         # 复制类型映射
         copy_type_mappings = [copy_type_mapping(type_mapping, type_mapping_names)
                               for type_mapping in type_mappings]
         # 保存类型映射
-        batch_save_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite, copy_type_mappings)
+        batch_save_type_mapping(type_mapping_sqlite, col_type_mapping_sqlite, copy_type_mappings)
         self.success_signal.emit(copy_type_mappings)
 
     def get_err_msg(self) -> str:
@@ -241,7 +240,7 @@ class ListTypeMappingWorker(ThreadWorkerABC):
     def do_run(self):
         log.info("读取类型映射列表")
         # 读取数据库中缓存的类型映射列表
-        type_mapping_list = TypeMappingSqlite().select_by_order(TypeMapping())
+        type_mapping_list = TypeMappingSqlite().select_by_order()
         self.success_signal.emit(type_mapping_list)
         log.info("读取类型映射列表成功")
 
@@ -265,8 +264,7 @@ class ImportTypeMappingWorker(ImportDataWorker):
     def __init__(self, *args):
         super().__init__(*args)
         self.data_key = TYPE_MAPPING_DATA_KEY
-        self.type_mapping_sqlite = TypeMappingSqlite()
-        self.col_type_mapping_sqlite = ColTypeMappingSqlite()
+        self.type_mapping_sqlite = ...
 
     def convert_to_model(self, import_data):
         type_mapping = convert_import_to_model(ImportExportTypeMapping, TypeMapping, import_data)
@@ -277,6 +275,7 @@ class ImportTypeMappingWorker(ImportDataWorker):
         return type_mapping
 
     def pre_process_before_check_data(self):
+        self.type_mapping_sqlite = TypeMappingSqlite()
         # 查出所有的类型映射名称
         self.exists_names = self.type_mapping_sqlite.get_all_mapping_names()
 
@@ -344,7 +343,7 @@ class ImportTypeMappingWorker(ImportDataWorker):
     @transactional
     def import_data(self, data_list):
         # 批量保存类型映射
-        batch_save_type_mapping(self.type_mapping_sqlite, self.col_type_mapping_sqlite, data_list)
+        batch_save_type_mapping(self.type_mapping_sqlite, ColTypeMappingSqlite(), data_list)
 
     def get_err_msg(self) -> str:
         return '导入类型映射失败'
@@ -365,12 +364,15 @@ class OverrideTypeMappingWorker(OverrideDataWorker):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.type_mapping_sqlite = ...
+        self.col_type_mapping_sqlite = ...
+
+    def batch_delete_origin_data(self):
         self.type_mapping_sqlite = TypeMappingSqlite()
         self.col_type_mapping_sqlite = ColTypeMappingSqlite()
 
-    def batch_delete_origin_data(self):
         id_list = self.type_mapping_sqlite.get_id_by_names(self.data_list)
-        self.type_mapping_sqlite.batch_delete(id_list)
+        self.type_mapping_sqlite.delete_by_ids(id_list)
         self.col_type_mapping_sqlite.delete_by_parent_ids(id_list)
 
     def batch_insert_data_list(self):
