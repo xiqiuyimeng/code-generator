@@ -1,43 +1,60 @@
 # -*- coding: utf-8 -*-
-from src.constant.sql_constant import ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL
-from src.service.sql_ds_executor.db_executor import InternetDBExecutor
+import cx_Oracle
+
+from src.service.sql_ds_executor.db_executor import SqlDBExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2023/2/7 11:03'
 
 
-class OracleDBExecutor(InternetDBExecutor):
+class OracleDBExecutor(SqlDBExecutor):
 
-    def get_sql_connect_url(self) -> str:
-        return f'oracle://{self.conn_info.user}:{self.conn_info.pwd}@' \
-               f'{self.conn_info.host}:{self.conn_info.port}/?service_name={self.conn_info.service_name}'
+    def connect_db(self):
+        dsn = cx_Oracle.makedsn(host=self.conn_info.host,
+                                port=self.conn_info.port,
+                                service_name=self.conn_info.service_name)
+        conn = cx_Oracle.connect(user=self.conn_info.user,
+                                 password=self.conn_info.pwd,
+                                 dsn=dsn)
+        self.cursor = conn.cursor()
 
-    def get_check_db_sql(self) -> str:
-        return ORACLE_CHECK_DB_SQL
+    def parse_db_name(self, row) -> str:
+        return row[0]
 
-    def get_check_tb_sql(self) -> str:
-        return ORACLE_CHECK_TB_SQL
+    def parse_tb_name(self, row) -> str:
+        return row[0]
 
-    def convert_tb_data(self, db_record):
+    def parse_col_data(self, row) -> DsTableColInfo:
+        """
+        row：元祖，每个参数含义
+        0 列名
+        1 数据类型
+        2 数据长度
+        3 数据精度
+        4 小数点右边的位数
+        5 使用的字符类型
+        6 备注
+        7 是否主键
+        """
         table_info = DsTableColInfo()
-        table_info.col_name = db_record.get('column_name')
-        data_type: str = db_record.get('data_type')
+        table_info.col_name = row[0]
+        data_type: str = row[1]
         if "(" not in data_type:
-            char_used = db_record.get('char_used')
+            char_used = row[5]
             if char_used:
-                data_length = db_record.get('data_length')
+                data_length = row[2]
                 if char_used == "C":
                     data_type = f'{data_type}({data_length >> 2}char)'
                 elif char_used == "B":
                     data_type = f'{data_type}({data_length})'
             else:
-                data_precision = db_record.get('data_precision')
+                data_precision = row[3]
                 if data_precision:
-                    data_type = f'{data_type}({data_precision},{db_record.get("data_scale")})'
+                    data_type = f'{data_type}({data_precision},{row[4]})'
         table_info.full_data_type = data_type
-        table_info.is_pk = db_record.get('primary_key') == 'Y'
-        table_info.col_comment = db_record.get('comments')
+        table_info.is_pk = row[7] == 'Y'
+        table_info.col_comment = row[6]
         table_info.checked = CheckedEnum.unchecked.value
         table_info.handle_data_type()
         table_info.col_type = ColTypeEnum.col.value

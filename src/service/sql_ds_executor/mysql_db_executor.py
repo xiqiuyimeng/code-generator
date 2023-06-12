@@ -1,32 +1,37 @@
 # -*- coding: utf-8 -*-
-from src.constant.sql_constant import MYSQL_CHECK_DB_SQL, MYSQL_CHECK_TB_SQL
-from src.service.sql_ds_executor.db_executor import InternetDBExecutor
+import pymysql
+
+from src.service.sql_ds_executor.db_executor import SqlDBExecutor
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
 
 
-class MySqlDBExecutor(InternetDBExecutor):
+class MySqlDBExecutor(SqlDBExecutor):
 
-    def get_dialect_driver(self) -> str:
-        return 'mysql+pymysql'
+    def connect_db(self):
+        conn = pymysql.connect(host=self.conn_info.host,
+                               port=self.conn_info.port,
+                               user=self.conn_info.user,
+                               passwd=self.conn_info.pwd,
+                               charset='utf8mb4',
+                               cursorclass=pymysql.cursors.DictCursor)
+        self.cursor = conn.cursor()
 
-    def get_check_db_sql(self) -> str:
-        return MYSQL_CHECK_DB_SQL
+    def parse_db_name(self, row) -> str:
+        return tuple(row.values())[0]
 
-    def get_check_tb_sql(self) -> str:
-        return MYSQL_CHECK_TB_SQL
+    def parse_tb_name(self, row) -> str:
+        return tuple(row.values())[0]
 
-    def convert_tb_data(self, db_record):
+    def parse_col_data(self, row) -> DsTableColInfo:
         table_info = DsTableColInfo()
-        table_info.col_name = db_record.get('Field')
-        table_info.full_data_type = db_record.get('Type')
-        table_info.is_pk = db_record.get('Key') == 'PRI'
-        table_info.col_comment = db_record.get('Comment')
+        table_info.col_name = row.get('Field')
+        table_info.full_data_type = row.get('Type')
+        table_info.is_pk = row.get('Key') == 'PRI'
+        table_info.col_comment = row.get('Comment')
         table_info.checked = CheckedEnum.unchecked.value
         table_info.handle_data_type()
         table_info.col_type = ColTypeEnum.col.value
         return table_info
-
-

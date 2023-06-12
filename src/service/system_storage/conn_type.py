@@ -8,7 +8,8 @@ from src.constant.ds_type_constant import SQLITE_TYPE, SQLITE_DISPLAY_NAME, SQLI
     ORACLE_TB, ORACLE_COL
 from src.constant.sql_constant import SQLITE_QUERY_DB_SQL, SQLITE_QUERY_TB_SQL, SQLITE_QUERY_COL_SQL, \
     MYSQL_QUERY_DB_SQL, MYSQL_QUERY_TB_SQL, MYSQL_QUERY_COL_SQL, ORACLE_QUERY_DB_SQL, ORACLE_QUERY_TB_SQL, \
-    ORACLE_QUERY_COL_SQL
+    ORACLE_QUERY_COL_SQL, SQLITE_CHECK_DB_SQL, SQLITE_CHECK_TB_SQL, MYSQL_CHECK_DB_SQL, MYSQL_CHECK_TB_SQL, \
+    ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 17:59'
@@ -62,8 +63,12 @@ class ConnType:
     db_executor: str = field(init=False)
     # 查询数据库列表sql
     query_db_sql: str = field(init=False)
+    # 检查数据库是否存在sql
+    check_db_sql: str = field(init=False)
     # 查询数据库表名列表sql
     query_tb_sql: str = field(init=False)
+    # 检查数据库表是否存在sql
+    check_tb_sql: str = field(init=False)
     # 查询数据库列sql
     query_col_sql: str = field(init=False)
 
@@ -79,7 +84,9 @@ class ConnTypeEnum(Enum):
     sqlite.type_dialog = 'SqliteConnDialog'
     sqlite.db_executor = 'SqliteDBExecutor'
     sqlite.query_db_sql = SQLITE_QUERY_DB_SQL
+    sqlite.check_db_sql = SQLITE_CHECK_DB_SQL
     sqlite.query_tb_sql = SQLITE_QUERY_TB_SQL
+    sqlite.check_tb_sql = SQLITE_CHECK_TB_SQL
     sqlite.query_col_sql = SQLITE_QUERY_COL_SQL
 
     mysql = ConnType()
@@ -92,7 +99,9 @@ class ConnTypeEnum(Enum):
     mysql.type_dialog = 'MysqlConnDialog'
     mysql.db_executor = 'MySqlDBExecutor'
     mysql.query_db_sql = MYSQL_QUERY_DB_SQL
+    mysql.check_db_sql = MYSQL_CHECK_DB_SQL
     mysql.query_tb_sql = MYSQL_QUERY_TB_SQL
+    mysql.check_tb_sql = MYSQL_CHECK_TB_SQL
     mysql.query_col_sql = MYSQL_QUERY_COL_SQL
 
     oracle = ConnType()
@@ -105,7 +114,9 @@ class ConnTypeEnum(Enum):
     oracle.type_dialog = 'OracleConnDialog'
     oracle.db_executor = 'OracleDBExecutor'
     oracle.query_db_sql = ORACLE_QUERY_DB_SQL
+    oracle.check_db_sql = ORACLE_CHECK_DB_SQL
     oracle.query_tb_sql = ORACLE_QUERY_TB_SQL
+    oracle.check_tb_sql = ORACLE_CHECK_TB_SQL
     oracle.query_col_sql = ORACLE_QUERY_COL_SQL
 
 
