@@ -92,6 +92,8 @@ class OpenConnWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor: SqlDBExecutor):
         db_names = executor.open_conn()
+        if not db_names:
+            raise Exception('没有找到数据库')
         self.modifying_db_task = True
         db_opened_items = self.save_opened_items(db_names)
         self.modifying_db_task = False
@@ -160,6 +162,8 @@ class RefreshConnWorker(ConnWorkerABC):
         if not child_opened_records:
             return
         tb_names = executor.open_db(db_record.item_name)
+        if not tb_names:
+            raise Exception('未获取到表')
         exists_tb_records = deal_opened_items(tb_names, db_record.id, data_type, level,
                                               ds_category, self.table_changed_signal,
                                               parent_item_order=db_record.item_order)
@@ -203,11 +207,11 @@ class OpenDBWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor: SqlDBExecutor):
         tb_names = executor.open_db(self.db_name)
-        tb_opened_items = list()
-        if tb_names:
-            self.modifying_db_task = True
-            tb_opened_items = self.save_opened_items(tb_names)
-            self.modifying_db_task = False
+        if not tb_names:
+            raise Exception('未获取到表')
+        self.modifying_db_task = True
+        tb_opened_items = self.save_opened_items(tb_names)
+        self.modifying_db_task = False
         self.success_signal.emit(tb_opened_items)
         log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}]{OPEN_DB_SUCCESS_PROMPT}')
 
@@ -254,6 +258,8 @@ class RefreshDBWorker(ConnWorkerABC):
         if self.child_count:
             # 读取库下最新的表名列表
             tb_names = executor.open_db(self.db_name)
+            if not tb_names:
+                raise Exception('未获取到表')
             self.modifying_db_task = True
             data_type = self.conn_opened_record.data_type
             level = SqlTreeItemLevel.tb_level.value
@@ -308,6 +314,8 @@ class OpenTBWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor: SqlDBExecutor):
         columns = executor.open_tb(self.db_name, self.tb_name)
+        if not columns:
+            raise Exception('未获取到列')
         table_tab = self.save_opened_items(columns)
         log.info(f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_SUCCESS_PROMPT}')
         self.success_signal.emit(table_tab)
@@ -365,6 +373,8 @@ class RefreshTBWorker(ConnWorkerABC):
         # 如果表之前tab页已经打开，尝试获取新的列数据
         if self.tab:
             columns = executor.open_tb(self.db_name, self.tb_name, check=False)
+            if not columns:
+                raise Exception('未获取到列')
             self.tab.col_list = columns
             # 获取成功后，删除原数据
             self.modifying_db_task = True
