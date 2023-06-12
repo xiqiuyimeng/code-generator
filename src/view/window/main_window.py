@@ -7,6 +7,7 @@ from src.constant.window_constant import SWITCH_DS_CATEGORY_TITLE, DS_CATEGORY_N
 from src.service.async_func.async_ds_category_task import InitDsCategoryExecutor, SwitchDsCategoryExecutor
 from src.service.system_storage.ds_category_sqlite import DsCategory
 from src.service.util.ds_category_util import get_current_ds_category
+from src.service.util.system_storage_util import close_conn
 from src.view.bar.menubar import Menubar
 from src.view.bar.titlebar import TitleBar
 from src.view.bar.toolbar import ToolBar
@@ -121,3 +122,7 @@ class MainWindow(QMainWindow):
             self.switch_ds_category_executor.start()
         else:
             pop_ok(DS_CATEGORY_NO_CHANGE_MSG.format(ds_category), SWITCH_DS_CATEGORY_TITLE, self)
+
+    def close(self):
+        close_conn()
+        super().close()

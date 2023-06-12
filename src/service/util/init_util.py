@@ -3,7 +3,7 @@ from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
 from src.service.system_storage.struct_type import StructTypeEnum
 from src.service.util.db_id_generator import init_id_generator
-from src.service.util.system_storage_util import get_sqlite_sequence, transactional
+from src.service.util.system_storage_util import get_sqlite_sequence, transactional, release_connection
 
 _author_ = 'luwt'
 _date_ = '2023/2/27 9:03'
@@ -47,7 +47,11 @@ def init_ds_type():
 
 
 def init_data():
-    # 初始化id生成器
-    init_id_generator(get_sqlite_sequence)
-    # 初始化类型映射-数据源列类型中保存的数据源类型
-    init_ds_type()
+    try:
+        # 初始化id生成器
+        init_id_generator(get_sqlite_sequence)
+        # 初始化类型映射-数据源列类型中保存的数据源类型
+        init_ds_type()
+    finally:
+        # 主线程使用的连接需要手动释放
+        release_connection()

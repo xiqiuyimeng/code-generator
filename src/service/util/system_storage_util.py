@@ -26,18 +26,26 @@ batch_operate_count = 100
 sqlite_sequence_sql = 'select * from sqlite_sequence'
 # 查询表结构字段sql
 field_list_sql = 'PRAGMA table_info("{}")'
-# sqlite是否正在处理手动开启的事务
-sqlite_in_transaction = False
+# sqlite连接是否正在使用，如果在使用，那么其他线程需要等待
+conn_in_use = False
+# 在获取游标的时候，加锁
 lock = Lock()
 
+# 创建一个全局的连接，操作本地数据库只使用一个连接，避免多连接并发造成sqlite锁定的问题
+conn = sqlite3.connect(db_name, check_same_thread=False)
+# 将查询结果转为行对象，可以使用 dict 将结果直接转为字典对象
+conn.row_factory = sqlite3.Row
 
-def set_in_transaction(in_transaction):
-    global sqlite_in_transaction
-    sqlite_in_transaction = in_transaction
+
+def set_conn_in_use(in_use):
+    global conn_in_use
+    conn_in_use = in_use
 
 
 def allow_thread_running():
-    if thread_id_cursor_dict.get(f'{threading.get_ident()}-terminate'):
+    key = f'{threading.get_ident()}-terminate'
+    if key in thread_id_cursor_dict:
+        del thread_id_cursor_dict[key]
         raise ThreadStopException('线程结束')
 
 
@@ -45,22 +53,16 @@ def set_thread_terminate(thread_id, thread_terminate):
     thread_id_cursor_dict[f'{thread_id}-terminate'] = thread_terminate
 
 
-def get_db_conn():
-    # 首先检查是否可以继续执行
-    allow_thread_running()
-    # 如果从缓存中取不到，则获取一个新的对象
-    current_thread_db = thread_id_cursor_dict.get(threading.get_ident())
-    return current_thread_db if current_thread_db else get_db_cursor()
-
-
 def get_db_cursor():
-    conn = sqlite3.connect(db_name)
-    # 将查询结果转为行对象，可以使用 dict 将结果直接转为字典对象
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    # 放入缓存
-    thread_id_cursor_dict[threading.get_ident()] = cursor
-    return cursor
+    while conn_in_use:
+        log.info("连接被其他线程占用，需要等待")
+        pass
+    with lock:
+        set_conn_in_use(True)
+        cursor = conn.cursor()
+        # 放入缓存
+        thread_id_cursor_dict[threading.get_ident()] = cursor
+        return cursor
 
 
 def get_cursor():
@@ -71,41 +73,31 @@ def get_cursor():
     return current_thread_cursor if current_thread_cursor else get_db_cursor()
 
 
-def close_connection():
+def release_connection():
+    """释放当前线程使用的连接"""
     thread_id = threading.get_ident()
     if thread_id in thread_id_cursor_dict:
         current_thread_cursor = thread_id_cursor_dict.pop(thread_id)
         current_thread_cursor.connection.commit()
-        current_thread_cursor.close()
-        current_thread_cursor.connection.close()
+        set_conn_in_use(False)
+
+
+def close_conn():
+    conn.close()
 
 
 def transactional(func):
     def do_transaction(*args, **kwargs):
-        thread_id = threading.get_ident()
         # 获取 游标
         cursor = get_cursor()
-        # 判断当前连接是否处在事务中，
+        # 判断当前连接是否处在事务中
         # 如果已经在事务中，直接使用，事务的控制交由外层事务控制
         if cursor.connection.in_transaction:
             func_result = func(*args, **kwargs)
             return func_result
         else:
-            # 连接如果不在事务中，那么可以直接关闭
-            cursor.connection.commit()
-            cursor.close()
-            cursor.connection.close()
-            # 开启事务时，加锁，避免多个事务同时进行，导致sqlite锁定
-            lock.acquire()
-            set_in_transaction(True)
-            # 如果不在事务中，那么需要重新获取游标，并开启事务
-            # 获取一个新的游标和连接，在当前事务中，始终使用新获取的游标来操作
-            new_cursor = get_db_cursor()
-            conn = new_cursor.connection
-            # 开启事务
-            new_cursor.execute('begin')
-            # 放入缓存
-            thread_id_cursor_dict[thread_id] = new_cursor
+            # 连接如果不在事务中，那么可以直接开启事务
+            cursor.execute('begin')
             try:
                 func_result = func(*args, **kwargs)
                 conn.commit()
@@ -114,14 +106,6 @@ def transactional(func):
                 conn.rollback()
                 log.exception("操作本地数据库事务错误：", e)
                 raise e
-            finally:
-                # 关闭当前事务使用的游标和连接
-                new_cursor.close()
-                conn.close()
-                set_in_transaction(False)
-                # 清除连接，后续函数需要连接游标，应重新获取
-                del thread_id_cursor_dict[thread_id]
-                lock.release()
 
     return do_transaction
 
@@ -165,10 +149,6 @@ def update_table_field_dict(table_name):
     if table_name in table_field_dict:
         del table_field_dict[table_name]
     get_field_list(table_name)
-
-
-def str_lambda(str_param):
-    return f'"{str_param}"'
 
 
 class Condition:
