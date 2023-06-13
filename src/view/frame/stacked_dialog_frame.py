@@ -2,6 +2,7 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QStackedWidget, QSpacerItem
 
 from src.constant.type_mapping_dialog_constant import SAVE_DATA_TIPS
+from src.view.frame.frame_func import construct_list_stacked_ui
 from src.view.frame.name_check_dialog_frame import NameCheckDialogFrame
 from src.view.list_widget.list_widget_abc import ListWidgetABC
 
@@ -37,22 +38,10 @@ class StackedDialogFrame(NameCheckDialogFrame):
         # 增加一点间距
         self.frame_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        self.stacked_layout = QHBoxLayout(self)
-        self.frame_layout.addLayout(self.stacked_layout)
-
-        self.list_widget = ListWidgetABC(self)
+        # 构建堆栈式窗口
+        construct_list_stacked_ui(ListWidgetABC, self.frame_layout, self, 3, 20)
         # 填充左边列表项
         self.fill_list_widget()
-        self.list_widget.setCurrentRow(0)
-        self.stacked_layout.addWidget(self.list_widget)
-
-        # 创建堆栈式窗口
-        self.stacked_widget = QStackedWidget(self)
-        self.stacked_layout.addWidget(self.stacked_widget)
-
-        self.stacked_layout.setStretch(0, 3)
-        self.stacked_layout.setStretch(1, 20)
-
         # 填充右侧堆栈式窗口
         self.fill_stacked_widget()
 
@@ -72,9 +61,5 @@ class StackedDialogFrame(NameCheckDialogFrame):
 
     def check_data_changed(self) -> bool:
         return True
-
-    def connect_other_signal(self):
-        self.list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
-        super().connect_other_signal()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #

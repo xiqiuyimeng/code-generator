@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLineEdit, QLabel, QAction
+from PyQt5.QtWidgets import QLineEdit, QLabel, QAction, QVBoxLayout, QHBoxLayout, QStackedWidget, QFrame
 
 from src.constant.dialog_constant import NAME_UNCHANGED_PROMPT, NAME_AVAILABLE, NAME_EXISTS
 from src.constant.icon_enum import get_icon
@@ -76,3 +76,25 @@ def check_text_available(text: str, exists_data_list, duplicate_checker: QLabel,
         duplicate_checker.setText(duplicate_prompt)
         duplicate_checker.setStyleSheet(style)
     return text_available
+
+
+# ---------------------------------------- 构造左边列表，右边堆栈式窗口布局 ---------------------------------------- #
+
+def construct_list_stacked_ui(list_widget_type: type, frame_layout: QVBoxLayout,
+                              parent_frame: QFrame, left_stretch, right_stretch):
+    # 创建布局，放置列表部件和堆栈式窗口部件
+    parent_frame.stacked_layout = QHBoxLayout(parent_frame)
+    frame_layout.addLayout(parent_frame.stacked_layout)
+    # 创建列表部件
+    parent_frame.list_widget = list_widget_type(parent_frame)
+    parent_frame.list_widget.setCurrentRow(0)
+    parent_frame.stacked_layout.addWidget(parent_frame.list_widget)
+    # 创建堆栈式窗口
+    parent_frame.stacked_widget = QStackedWidget(parent_frame)
+    parent_frame.stacked_layout.addWidget(parent_frame.stacked_widget)
+    # 设置左右比例
+    parent_frame.stacked_layout.setStretch(0, left_stretch)
+    parent_frame.stacked_layout.setStretch(1, right_stretch)
+
+    # 连接信号
+    parent_frame.list_widget.currentRowChanged.connect(parent_frame.stacked_widget.setCurrentIndex)

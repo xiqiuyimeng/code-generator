@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton, QLabel, QHBoxLayout, QStackedWidget, QListWidgetItem
+from PyQt5.QtWidgets import QPushButton, QLabel, QStackedWidget, QListWidgetItem
 
 from src.constant.type_mapping_dialog_constant import SAVE_DATA_TIPS, ADD_DS_COL_TYPE_BUTTON_TEXT, \
     ADD_DS_COL_TYPE_TITLE, ADD_COL_TYPE_LIST_TITLE, DS_COL_TYPE_LIST_BOX_TITLE
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor, SaveDsColTypeExecutor
 from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
+from src.view.frame.frame_func import construct_list_stacked_ui
 from src.view.frame.save_dialog_frame import SaveDialogFrame
 from src.view.list_widget.col_type_list_widget import ColTypeListWidget
 from src.view.list_widget.display_list_widget import DsTypeListWidget
@@ -25,10 +26,9 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         # 保存数据源列类型列表执行器
         self.save_ds_col_type_executor: SaveDsColTypeExecutor = ...
         self.tips_label: QLabel = ...
-        self._layout: QHBoxLayout = ...
         # 堆栈式窗口
         self.stacked_widget: QStackedWidget = ...
-        self.ds_type_list_widget: DsTypeListWidget = ...
+        self.list_widget: DsTypeListWidget = ...
         # 添加编辑数据源列类型项对话框
         self.save_ds_col_type_dialog: SimpleNameCheckDialog = ...
         # 为了美观，将表格布局扩大，容纳5个元素，中间为空白占位label
@@ -43,14 +43,8 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         self.tips_label.setText(SAVE_DATA_TIPS)
         self.frame_layout.addWidget(self.tips_label)
 
-        self._layout = QHBoxLayout(self)
-        self.frame_layout.addLayout(self._layout)
-
-        self.ds_type_list_widget = DsTypeListWidget(self)
-        self._layout.addWidget(self.ds_type_list_widget)
         # 构建堆栈式窗口
-        self.stacked_widget = QStackedWidget(self)
-        self._layout.addWidget(self.stacked_widget)
+        construct_list_stacked_ui(DsTypeListWidget, self.frame_layout, self, 1, 1)
 
     def get_blank_left_buttons(self) -> tuple:
         self.add_ds_col_type_button = QPushButton(self)
@@ -64,11 +58,10 @@ class DsColTypeDialogFrame(SaveDialogFrame):
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def connect_other_signal(self):
-        self.ds_type_list_widget.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
         self.add_ds_col_type_button.clicked.connect(lambda: self.open_save_col_type_dialog(ADD_DS_COL_TYPE_TITLE))
 
     def open_save_col_type_dialog(self, dialog_title, col_type=None):
-        current_ds_type = self.ds_type_list_widget.currentItem().text()
+        current_ds_type = self.list_widget.currentItem().text()
         # 打开添加数据源列类型对话框
         self.save_ds_col_type_dialog = SimpleNameCheckDialog(self.ds_col_type_dict.get(current_ds_type),
                                                              dialog_title, col_type)
@@ -82,7 +75,7 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         # 获取当前的列类型列表控件
         col_type_list_widget = self.stacked_widget.currentWidget()
         col_type_item = col_type_list_widget.currentItem()
-        col_types = self.ds_col_type_dict.get(self.ds_type_list_widget.currentItem().text())
+        col_types = self.ds_col_type_dict.get(self.list_widget.currentItem().text())
         col_types[col_types.index(col_type_item.text())] = col_type
         col_type_item.setText(col_type)
 
@@ -90,7 +83,7 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         # 获取当前的列类型列表控件
         col_type_list_widget = self.stacked_widget.currentWidget()
         col_type_list_widget.addItem(QListWidgetItem(col_type))
-        col_types = self.ds_col_type_dict.get(self.ds_type_list_widget.currentItem().text())
+        col_types = self.ds_col_type_dict.get(self.list_widget.currentItem().text())
         col_types.append(col_type)
 
     def save_func(self):
@@ -116,8 +109,8 @@ class DsColTypeDialogFrame(SaveDialogFrame):
             self.fill_col_types()
 
     def fill_ds_types(self):
-        self.ds_type_list_widget.fill_list_widget(self.ds_col_type_dict.keys())
-        self.ds_type_list_widget.setCurrentRow(0)
+        self.list_widget.fill_list_widget(self.ds_col_type_dict.keys())
+        self.list_widget.setCurrentRow(0)
 
     def fill_col_types(self):
         for col_types in self.ds_col_type_dict.values():
