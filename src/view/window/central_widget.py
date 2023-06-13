@@ -60,7 +60,7 @@ class CentralWidget(QWidget):
         self.tree_frame.reopen_tree()
 
         self.horizontal_splitter.setStretchFactor(0, 1)
-        self.horizontal_splitter.setStretchFactor(1, 3)
+        self.horizontal_splitter.setStretchFactor(1, 4)
 
         self.horizontal_splitter.setStretchFactor(2, 1)
-        self.horizontal_splitter.setStretchFactor(3, 3)
+        self.horizontal_splitter.setStretchFactor(3, 4)
