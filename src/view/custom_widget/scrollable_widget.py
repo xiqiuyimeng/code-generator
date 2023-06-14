@@ -58,6 +58,13 @@ class ScrollArea(QScrollArea, ScrollableWidget):
         """设置画布部件，滚动区域的原理为：在画布之上进行滚动，像用放大镜看画布一样"""
         self.setWidget(canvas_widget)
 
+    def wheelEvent(self, e: QtGui.QWheelEvent):
+        """如果当前按键为 ctrl + 滚轮，那么跳过，否则会导致滚动和缩放一起进行"""
+        if e.modifiers() == Qt.ControlModifier:
+            pass
+        else:
+            ScrollableWidget.wheelEvent(self, e)
+
 
 class ScrollableZoomWidget(ScrollableWidget):
 
