@@ -87,7 +87,6 @@ def construct_list_stacked_ui(list_widget_type: type, frame_layout: QVBoxLayout,
     frame_layout.addLayout(parent_frame.stacked_layout)
     # 创建列表部件
     parent_frame.list_widget = list_widget_type(parent_frame)
-    parent_frame.list_widget.setCurrentRow(0)
     parent_frame.stacked_layout.addWidget(parent_frame.list_widget)
     # 创建堆栈式窗口
     parent_frame.stacked_widget = QStackedWidget(parent_frame)

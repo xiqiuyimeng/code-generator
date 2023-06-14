@@ -42,6 +42,7 @@ class StackedDialogFrame(NameCheckDialogFrame):
         construct_list_stacked_ui(ListWidgetABC, self.frame_layout, self, 3, 20)
         # 填充左边列表项
         self.fill_list_widget()
+        self.list_widget.setCurrentRow(0)
         # 填充右侧堆栈式窗口
         self.fill_stacked_widget()
 
