@@ -26,6 +26,7 @@ class DialogFrameABC(QFrame):
         self.placeholder_blank: QLabel = ...
         self.help_button: QPushButton = ...
         self.dialog_quit_button: QPushButton = ...
+        self.help_dialog = ...
 
         # 构建界面
         self.setup_ui()
@@ -116,6 +117,12 @@ class DialogFrameABC(QFrame):
         self.connect_other_signal()
 
     def open_help_dialog(self):
+        # 为了避免循环依赖问题，在打开对话框时再引用帮助对话框
+        from src.view.dialog.help_dialog import HelpDialog
+        self.help_dialog = HelpDialog(self.get_help_info_type())
+        self.help_dialog.exec()
+
+    def get_help_info_type(self) -> str:
         ...
 
     def connect_other_signal(self):

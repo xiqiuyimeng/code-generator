@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal, Qt
 
+from src.constant.help.help_constant import TEMPLATE_FUNC_DETAIL_HELP
 from src.constant.template_dialog_constant import EDIT_FUNC_BOX_TITLE, CREATE_FUNC_BOX_TITLE, \
     TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT
 from src.service.async_func.async_template_func_task import AddTemplateFuncExecutor, EditTemplateFuncExecutor
@@ -37,6 +38,9 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return TEMPLATE_FUNC_DETAIL_HELP
 
     def collect_input(self):
         self.new_dialog_data.func_name = self.name_input.text()

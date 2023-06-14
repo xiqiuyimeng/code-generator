@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QAction, QPushButton, QFormLayout
 from src.constant.ds_dialog_constant import STRUCT_NAME_TEXT, STRUCT_FILE_URL_TEXT, STRUCT_CONTENT_TEXT, \
     PRETTY_STRUCT_TEXT, CHOOSE_STRUCT_FILE_TEXT, READ_STRUCT_FILE_BOX_TITLE, PRETTY_STRUCT_BOX_TITLE, \
     EDIT_STRUCT_BOX_TITLE, ADD_STRUCT_BOX_TITLE, QUERY_STRUCT_BOX_TITLE
+from src.constant.help.help_constant import STRUCT_DS_HELP
 from src.constant.icon_enum import get_icon
 from src.service.async_func.async_struct_task import ReadFileExecutor, PrettyStructExecutor, AddStructExecutor, \
     EditStructExecutor, QueryStructExecutor
@@ -103,6 +104,9 @@ class StructDialogFrameABC(DsDialogFrameABC):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return STRUCT_DS_HELP
 
     def check_input(self):
         super().check_input()

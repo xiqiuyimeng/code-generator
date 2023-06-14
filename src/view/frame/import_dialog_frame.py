@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QFileDialog
 
 from src.constant.export_import_constant import IMPORT_FILE_PROMPT, IMPORT_FILE_LABEL_TEXT, \
     START_IMPORT_BTN_TEXT, CHOOSE_IMPORT_FILE_TEXT
+from src.constant.help.help_constant import IMPORT_DATA_HELP
 from src.service.async_func.async_import_export_task import ImportDataExecutor
 from src.view.dialog.import_error_data_process_dialog import ImportErrorDataProcessDialog
 from src.view.frame.import_export_dialog_frame_abc import ImportExportDialogFrameABC
@@ -40,6 +41,9 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return IMPORT_DATA_HELP
 
     def choose_file(self):
         file_url = QFileDialog.getOpenFileName(self, CHOOSE_IMPORT_FILE_TEXT, '')

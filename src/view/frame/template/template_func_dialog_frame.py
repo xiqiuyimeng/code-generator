@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QPushButton, QListWidgetItem, QGridLayout, QLabel
 from src.constant.export_import_constant import PROCESS_DUPLICATE_TEMPLATE_FUNC_TITLE, OVERRIDE_TEMPLATE_FUNC_TITLE, \
     IMPORT_TEMPLATE_FUNC_TITLE, EXPORT_TEMPLATE_FUNC_FILE_NAME, \
     EXPORT_TEMPLATE_FUNC_TITLE
+from src.constant.help.help_constant import TEMPLATE_FUNC_TABLE_HELP
 from src.constant.template_dialog_constant import CREATE_NEW_FUNC_BTN_TEXT, CREATE_NEW_FUNC_TITLE, \
     TEMPLATE_FUNC_LIST_TITLE, IMPORT_TEMPLATE_FUNC_BTN_TEXT, EXPORT_TEMPLATE_FUNC_BTN_TEXT
 from src.service.async_func.async_template_func_task import ListTemplateFuncExecutor, ImportTemplateFuncExecutor, \
@@ -66,6 +67,9 @@ class TemplateFuncDialogFrame(DialogFrameABC):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return TEMPLATE_FUNC_TABLE_HELP
 
     def connect_other_signal(self):
         self.create_new_func_btn.clicked.connect(lambda: self.open_create_func_dialog(CREATE_NEW_FUNC_TITLE))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QPushButton, QLabel, QStackedWidget, QListWidgetItem
 
+from src.constant.help.help_constant import DS_COL_TYPE_HELP
 from src.constant.type_mapping_dialog_constant import SAVE_DATA_TIPS, ADD_DS_COL_TYPE_BUTTON_TEXT, \
     ADD_DS_COL_TYPE_TITLE, ADD_COL_TYPE_LIST_TITLE, DS_COL_TYPE_LIST_BOX_TITLE
 from src.service.async_func.async_ds_col_type_task import ListDsColTypeExecutor, SaveDsColTypeExecutor
@@ -56,6 +57,9 @@ class DsColTypeDialogFrame(SaveDialogFrame):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return DS_COL_TYPE_HELP
 
     def connect_other_signal(self):
         self.add_ds_col_type_button.clicked.connect(lambda: self.open_save_col_type_dialog(ADD_DS_COL_TYPE_TITLE))

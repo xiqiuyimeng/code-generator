@@ -2,6 +2,7 @@
 from PyQt5.QtWidgets import QPushButton, QLabel, QGridLayout
 
 from src.constant.export_import_constant import SELECT_ALL_BTN_TEXT, UNSELECT_ALL_BTN_TEXT
+from src.constant.help.help_constant import IMPORT_ERROR_DATA_HELP
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 from src.view.list_widget.import_error_data_list_widget import ImportErrorDataListWidget
 
@@ -56,6 +57,9 @@ class ImportErrorDataProcessDialogFrameABC(DialogFrameABC):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return IMPORT_ERROR_DATA_HELP
 
     def connect_other_signal(self):
         self.select_all_button.clicked.connect(self.list_widget.select_all_items)

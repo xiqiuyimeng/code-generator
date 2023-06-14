@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter
     QTabWidget
 
 from src.constant.export_import_constant import OVERRIDE_TEMPLATE_TITLE
+from src.constant.help.help_constant import TEMPLATE_DETAIL_HELP
 from src.constant.template_dialog_constant import TEMPLATE_INFO_TEXT, TEMPLATE_CONFIG_TEXT, TEMPLATE_FILE_TEXT, \
     TEMPLATE_NAME, TEMPLATE_DESC, ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
     EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
@@ -174,6 +175,9 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return TEMPLATE_DETAIL_HELP
 
     def collect_input(self):
         # 收集基本信息数据

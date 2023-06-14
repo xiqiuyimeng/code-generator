@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel, QFileDialog
 
 from src.constant.export_import_constant import EXPORT_SELECTED_DATA_LABEL_TEXT, EXPORT_OUTPUT_PATH_LABEL_TEXT, \
     START_EXPORT_BTN_TEXT, EXPORT_SELECTED_DATA_DESC_TEXT, CHOOSE_EXPORT_DIR_TEXT
+from src.constant.help.help_constant import EXPORT_DATA_HELP
 from src.service.async_func.async_import_export_task import ExportDataExecutor
 from src.view.frame.import_export_dialog_frame_abc import ImportExportDialogFrameABC
 
@@ -41,6 +42,10 @@ class ExportDialogFrame(ImportExportDialogFrameABC):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return EXPORT_DATA_HELP
+
     def choose_file(self):
         dir_url = QFileDialog.getSaveFileName(self, CHOOSE_EXPORT_DIR_TEXT, self.file_path_linedit.text())
         if dir_url[0]:

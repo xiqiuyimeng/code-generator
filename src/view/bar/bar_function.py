@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from src.constant.bar_constant import NO_SELECTED_DATA, GENERATE_ACTION
+from src.constant.help.help_constant import CENTRAL_HELP
 from src.view.box.message_box import pop_ok
 from src.view.dialog.generator.generator_dialog import GeneratorDialog
+from src.view.dialog.help_dialog import HelpDialog
 from src.view.dialog.template.template_dialog import TemplateDialog
 from src.view.dialog.type_mapping.type_mapping_dialog import TypeMappingDialog
 from src.view.tree.tree_widget.tree_function import add_conn_func, add_struct_func
@@ -65,3 +67,8 @@ def clear_data(main_window):
     selected_data.clear_tree()
     # 设置树的复选框为非选中，并检查是否有打开的表，将状态同步到表格复选框，保存树和表格复选框状态
     tree_widget.set_tree_unchecked()
+
+
+def open_help_dialog():
+    """打开帮助信息对话框"""
+    HelpDialog(CENTRAL_HELP).exec()

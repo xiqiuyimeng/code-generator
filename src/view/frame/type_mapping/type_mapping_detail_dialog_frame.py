@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QLabel, QGridLayout, QPushButton, QFrame
 
 from src.constant.export_import_constant import OVERRIDE_TYPE_MAPPING_TITLE
+from src.constant.help.help_constant import TYPE_MAPPING_DETAIL_HELP
 from src.constant.type_mapping_dialog_constant import TYPE_MAPPING_INFO_TEXT, TYPE_MAPPING_COL_TABLE_TEXT, \
     TYPE_MAPPING_NAME, DS_TYPE_TEXT, TYPE_MAPPING_COMMENT_TEXT, SYNC_DS_COL_TYPE_BTN_TEXT, \
     ADD_COL_TYPE_MAPPING_BTN_TEXT, DEL_COL_TYPE_MAPPING_BTN_TEXT, ADD_MAPPING_GROUP_BTN_TEXT, \
@@ -176,6 +177,9 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return TYPE_MAPPING_DETAIL_HELP
 
     def collect_input(self):
         # 收集基本信息数据

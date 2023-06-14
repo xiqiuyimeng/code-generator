@@ -2,6 +2,7 @@
 from PyQt5.QtCore import pyqtSignal
 
 from src.constant.ds_dialog_constant import EDIT_FOLDER_BOX_TITLE, ADD_FOLDER_BOX_TITLE
+from src.constant.help.help_constant import FOLDER_HELP
 from src.service.async_func.async_struct_task import AddFolderExecutor, EditFolderExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.view.frame.name_check_dialog_frame import NameCheckDialogFrame
@@ -27,6 +28,9 @@ class FolderDialogFrame(NameCheckDialogFrame):
                          opened_folder_item, read_storage=False)
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return FOLDER_HELP
 
     def save_func(self):
         new_folder_name = self.name_input.displayText()

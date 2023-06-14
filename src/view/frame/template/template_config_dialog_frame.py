@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QAction, QGridLayout, QComboBox, 
     QPushButton
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
+from src.constant.help.help_constant import TEMPLATE_CONFIG_HELP
 from src.constant.template_dialog_constant import CONFIG_NAME_TEXT, VAR_NAME_TEXT, WIDGET_LABEL_TEXT, \
     CONFIG_DESC_TEXT, IS_REQUIRED_TEXT, DEFAULT_VALUE_TEXT, PLACEHOLDER_TEXT, VALUE_RANGE_TEXT, \
     ADD_VALUE_BTN_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT, ADD_RANGE_VALUE_BOX_TITLE, VAR_NAME_REG_RULE, \
@@ -218,6 +219,9 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return TEMPLATE_CONFIG_HELP
 
     def connect_child_signal(self):
         self.connect_text_edit_signal()

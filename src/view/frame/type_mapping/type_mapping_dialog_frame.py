@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QPushButton
 from src.constant.export_import_constant import IMPORT_TYPE_MAPPING_TITLE, EXPORT_TYPE_MAPPING_TITLE, \
     EXPORT_TYPE_MAPPING_FILE_NAME, PROCESS_DUPLICATE_TYPE_MAPPING_TITLE, OVERRIDE_TYPE_MAPPING_TITLE, \
     PROCESS_ILLEGAL_TYPE_MAPPING_TITLE
+from src.constant.help.help_constant import TYPE_MAPPING_TABLE_HELP
 from src.constant.type_mapping_dialog_constant import DS_COL_TYPE_BUTTON_TEXT, \
     ADD_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_BUTTON_TEXT, DEL_TYPE_MAPPING_PROMPT, DEL_TYPE_MAPPING_BOX_TITLE, \
     BATCH_DEL_TYPE_MAPPING_PROMPT, TYPE_MAPPING_BOX_TITLE, IMPORT_TYPE_MAPPING_BTN_TEXT, EXPORT_TYPE_MAPPING_BTN_TEXT, \
@@ -52,6 +53,9 @@ class TypeMappingDialogFrame(TableDialogFrame):
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
     # ------------------------------ 信号槽处理 start ------------------------------ #
+
+    def get_help_info_type(self) -> str:
+        return TYPE_MAPPING_TABLE_HELP
 
     def connect_special_signal(self):
         self.open_ds_col_type_button.clicked.connect(self.open_ds_col_type_list_dialog)
