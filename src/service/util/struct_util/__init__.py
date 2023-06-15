@@ -6,4 +6,9 @@ _author_ = 'luwt'
 _date_ = '2023/1/31 13:56'
 
 
-__all__ = ['StructParser', 'StructBeautifier', 'JsonParser', 'JsonBeautifier']
+__all__ = [
+    'StructParser',
+    'StructBeautifier',
+    'JsonParser',
+    'JsonBeautifier'
+]

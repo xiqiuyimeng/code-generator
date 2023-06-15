@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QTreeWidgetItem
 
-from src.constant.help.help_constant import TEMPLATE_MAINTAIN_FILE_CONFIG_HELP
+from src.constant.help.help_constant import TEMPLATE_FILE_OUTPUT_CONFIG_HELP
 from src.constant.template_dialog_constant import OUTPUT_CONFIG_LIST_HEADER_TEXT, FILE_LIST_HEADER_TEXT
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 from src.view.list_widget.template_maintain_file_config_list_widget import TemplateMaintainFileConfigListWidget
@@ -78,6 +78,6 @@ class TemplateMaintainFileConfigFrame(DialogFrameABC):
     # ------------------------------ 信号槽处理 start ------------------------------ #
 
     def get_help_info_type(self) -> str:
-        return TEMPLATE_MAINTAIN_FILE_CONFIG_HELP
+        return TEMPLATE_FILE_OUTPUT_CONFIG_HELP
 
     # ------------------------------ 信号槽处理 end ------------------------------ #

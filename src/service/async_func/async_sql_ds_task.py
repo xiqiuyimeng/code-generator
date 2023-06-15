@@ -56,7 +56,10 @@ class TestConnWorker(ConnWorkerABC):
         self.success_signal.emit()
 
     def get_err_msg(self) -> str:
-        return f'[{self.conn_opened_record.item_name}]{TEST_CONN_FAIL_PROMPT}'
+        if self.conn_opened_record.item_name:
+            return f'[{self.conn_opened_record.item_name}]{TEST_CONN_FAIL_PROMPT}'
+        else:
+            return TEST_CONN_FAIL_PROMPT
 
 
 class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):

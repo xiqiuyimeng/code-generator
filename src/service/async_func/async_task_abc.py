@@ -49,7 +49,7 @@ class ThreadWorkerABC(QThread):
     def do_exception(self, e: Exception):
         err_msg = self.get_err_msg()
         log.exception(err_msg)
-        self.error_signal.emit(f'{err_msg}\n{e.args[0]}')
+        self.error_signal.emit(f'{err_msg}\n{e}')
 
     def get_err_msg(self) -> str:
         ...

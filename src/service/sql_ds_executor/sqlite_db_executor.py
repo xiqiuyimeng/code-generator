@@ -11,7 +11,8 @@ _date_ = '2022/10/1 12:52'
 class SqliteDBExecutor(SqlDBExecutor):
 
     def connect_db(self):
-        conn = sqlite3.connect(self.conn_info.file_url, check_same_thread=False)
+        # 以uri只读模式连接，避免当文件不存在时，创建出一个新的
+        conn = sqlite3.connect(f'file:/{self.conn_info.file_url}?mode=ro', check_same_thread=False)
         # 查询结果可以以字典形式展现
         conn.row_factory = sqlite3.Row
         self.cursor = conn.cursor()
