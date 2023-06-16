@@ -2,6 +2,7 @@
 from src.constant.bar_constant import NO_SELECTED_DATA, GENERATE_ACTION
 from src.constant.help.help_constant import CENTRAL_HELP
 from src.view.box.message_box import pop_ok
+from src.view.dialog.about_dialog import AboutDialog
 from src.view.dialog.generator.generator_dialog import GeneratorDialog
 from src.view.dialog.help_dialog import HelpDialog
 from src.view.dialog.template.template_dialog import TemplateDialog
@@ -72,3 +73,8 @@ def clear_data(main_window):
 def open_help_dialog():
     """打开帮助信息对话框"""
     HelpDialog(CENTRAL_HELP).exec()
+
+
+def open_about_dialog():
+    """打开关于信息对话框"""
+    AboutDialog().exec()

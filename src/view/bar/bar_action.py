@@ -10,7 +10,7 @@ from src.service.system_storage.conn_type import ConnTypeEnum
 from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.struct_type import StructTypeEnum
 from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_struct_dialog, refresh, \
-    open_type_mapping_dialog, open_template_dialog, open_help_dialog
+    open_type_mapping_dialog, open_template_dialog, open_help_dialog, open_about_dialog
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
@@ -113,4 +113,5 @@ def add_help_action(main_window):
 def add_about_action(main_window):
     about_action = QAction(get_icon(ABOUT_ACTION), ABOUT_ACTION, main_window)
     about_action.setStatusTip(ABOUT_ACTION_TIP)
+    about_action.triggered.connect(lambda: open_about_dialog())
     return about_action
