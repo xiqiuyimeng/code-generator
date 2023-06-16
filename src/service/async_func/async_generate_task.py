@@ -40,39 +40,39 @@ class GenerateWorker(ThreadWorkerABC):
 
     def do_run(self):
         generate_type = '生成到文件' if self.save_file else '预览生成'
-        start_log = f'{generate_type} 开始!'
+        start_log = f'<p style="color: blue;">{generate_type} 开始!</p><br>'
         log.info(start_log)
         self.generate_log_signal.emit(start_log)
 
-        self.generate_log_signal.emit('---------- 开始生成准备工作 ----------')
+        self.generate_log_signal.emit('<p style="color: royalblue;">---------- 开始生成准备工作 ----------</p><br>')
         # 1. 首先判断，如果是生成到文件，是否存在模板输出配置，不存在则提示退出
         if self.save_file:
-            self.generate_log_signal.emit('检查模板输出配置是否存在 =====')
+            self.generate_log_signal.emit('<p style="color: deeppink">检查模板输出配置是否存在 =====</p><br>')
             if not self.template.output_config_list:
                 raise Exception('未检测到模板文件输出配置，无法生成到文件，退出！')
         # 2. 获取模板文件
-        self.generate_log_signal.emit('开始准备模板文件数据 >>>>>')
+        self.generate_log_signal.emit('<p style="color: deeppink">开始准备模板文件数据 >>>>></p><br>')
         template_files = TemplateFileSqlite().get_by_template_id(self.template.id)
         # 检测模板文件是否存在，如果不存在，则提示退出
         if not template_files:
             raise Exception('未能获取到模板文件，无法生成代码，退出！')
         self.prepare_progress_signal.emit(20)
-        self.generate_log_signal.emit('准备模板文件数据完毕 =====')
+        self.generate_log_signal.emit('<p style="color: deeppink">准备模板文件数据完毕 =====</p><br>')
 
         # 3. 获取类型映射列数据
-        self.generate_log_signal.emit('开始准备类型映射数据 >>>>>')
+        self.generate_log_signal.emit('<p style="color: mediumblue">开始准备类型映射数据 >>>>></p><br>')
         type_mapping_dict = self.get_type_mapping_dict()
         self.prepare_progress_signal.emit(40)
-        self.generate_log_signal.emit('准备类型映射数据完毕 =====')
+        self.generate_log_signal.emit('<p style="color: mediumblue">准备类型映射数据完毕 =====</p><br>')
 
         # 4. 检查完善选中数据，如果选中数据没有列数据，需要补充列数据
-        self.generate_log_signal.emit('开始准备数据表列数据 >>>>>')
+        self.generate_log_signal.emit('<p style="color: magenta">开始准备数据表列数据 >>>>></p><br>')
         table_col_dict = convert_complete_table_cols(self.selected_data, type_mapping_dict)
         self.prepare_progress_signal.emit(60)
-        self.generate_log_signal.emit('准备数据表列数据完毕 =====')
+        self.generate_log_signal.emit('<p style="color: magenta">准备数据表列数据完毕 =====</p><br>')
 
         # 5. 获取模板方法
-        self.generate_log_signal.emit('开始准备模板方法 >>>>>')
+        self.generate_log_signal.emit('<p style="color: orangered">开始准备模板方法 >>>>></p><br>')
         template_func_list = TemplateFuncSqlite().get_all_func()
         template_func_dict = dict()
         for template_func in template_func_list:
@@ -84,23 +84,24 @@ class GenerateWorker(ThreadWorkerABC):
             except Exception as e:
                 # 如果加载方法失败，说明方法本身有问题
                 load_func_err_msg = f'方法[{template_func.func_name}]加载失败！请检查方法语法是否正确'
-                self.generate_log_signal.emit(load_func_err_msg)
+                self.generate_log_signal.emit(f'<p style="color: red; background-color: yellow;">'
+                                              f'{load_func_err_msg}</p><br>')
                 log.exception(load_func_err_msg, e)
         self.prepare_progress_signal.emit(80)
-        self.generate_log_signal.emit('准备模板方法完毕 =====')
+        self.generate_log_signal.emit('<p style="color: orangered">准备模板方法完毕 =====</p><br>')
 
         # 6. 收集变量配置，k：输出变量名称，v：用户输入值
-        self.generate_log_signal.emit('开始准备模板变量 >>>>>')
+        self.generate_log_signal.emit('<p style="color: darkcyan">开始准备模板变量 >>>>></p><br>')
         output_config_dict = {output_config.output_var_name: self.output_config_input_dict.get(output_config.id)
                               for output_config in self.template.output_config_list}
         var_config_dict = {var_config.output_var_name: self.var_config_input_dict.get(var_config.id)
                            for var_config in self.template.var_config_list}
         self.prepare_progress_signal.emit(100)
-        self.generate_log_signal.emit('准备模板变量完毕 =====')
-        self.generate_log_signal.emit('---------- 生成准备工作完毕 ----------\n')
+        self.generate_log_signal.emit('<p style="color: darkcyan">准备模板变量完毕 =====</p><br>')
+        self.generate_log_signal.emit('<p style="color: royalblue">---------- 生成准备工作完毕 ----------</p><br>')
 
         # 7. 准备字段开始生成
-        self.generate_log_signal.emit('********** 开始生成 **********')
+        self.generate_log_signal.emit('<p style="color: coral">********** 开始生成 **********</p><br>')
         # 需要生成的总文件数为 表数 × 模板文件数
         total_file_count = len(table_col_dict) * len(template_files)
         current_file_index = 0
@@ -110,8 +111,9 @@ class GenerateWorker(ThreadWorkerABC):
             # 如果没有获取到用户输入路径或路径不合法，跳过
             if not file_path or not check_path_legal(file_path):
                 current_file_index += len(table_col_dict)
-                self.generate_log_signal.emit(f'模板文件：{template_file.file_name}，'
-                                              f'当前输出路径为：{file_path}，输出路径不合法，跳过！')
+                self.generate_log_signal.emit(f'<p style="color: red; background-color: yellow;">'
+                                              f'模板文件：{template_file.file_name}，'
+                                              f'当前输出路径为：{file_path}，输出路径不合法，跳过！</p><br>')
                 # 计算当前进度
                 self.generate_progress_signal.emit(current_file_index * 100 // total_file_count)
                 continue
@@ -143,7 +145,8 @@ class GenerateWorker(ThreadWorkerABC):
                 # 计算当前进度
                 self.generate_progress_signal.emit(current_file_index * 100 // total_file_count)
                 # 日志信号
-                self.generate_log_signal.emit(f'数据表：{table_name} 生成路径：{full_file_path}')
+                self.generate_log_signal.emit(f'<p style="color: darkgreen">数据表：{table_name} '
+                                              f'生成路径：{full_file_path}</p><br>')
                 # 如果是预览生成，将文件发送出去；如果是生成到文件模式，直接写入文件
                 if self.save_file:
                     with open(full_file_path, 'w', encoding='utf-8') as f:
@@ -151,11 +154,11 @@ class GenerateWorker(ThreadWorkerABC):
                 else:
                     # 解析路径结构
                     self.generate_file_signal.emit(file_name, generated_content, file_path)
-        self.generate_log_signal.emit('********** 生成完毕 **********')
+        self.generate_log_signal.emit('<p style="color: coral">********** 生成完毕 **********</p><br>')
         self.success_signal.emit()
         end_log = f'{generate_type} 结束!'
         log.info(end_log)
-        self.generate_log_signal.emit(end_log)
+        self.generate_log_signal.emit(f'<p style="color: blue">{end_log}</p>')
 
     def get_type_mapping_dict(self):
         col_type_mapping_list = ColTypeMappingSqlite().get_by_parent_id(self.type_mapping_id)

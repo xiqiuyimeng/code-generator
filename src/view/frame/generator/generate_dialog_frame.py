@@ -110,7 +110,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
                                                   self.need_disable_button_tuple,
                                                   self.prepare_progress_bar.setValue,
                                                   self.generate_progress_bar.setValue,
-                                                  self.generate_log_browser.append,
+                                                  self.generate_log_browser.insertHtml,
                                                   self.parent_dialog, GENERATE_TO_FILE_TITLE)
         self.before_generate_work()
         # 开始生成
@@ -139,7 +139,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
                                                                  self.need_disable_button_tuple,
                                                                  self.prepare_progress_bar.setValue,
                                                                  self.generate_progress_bar.setValue,
-                                                                 self.generate_log_browser.append,
+                                                                 self.generate_log_browser.insertHtml,
                                                                  self.parent_dialog, PREVIEW_GENERATE_TITLE,
                                                                  self.open_preview_dialog,
                                                                  generate_file_callback=self.collect_preview_data)
