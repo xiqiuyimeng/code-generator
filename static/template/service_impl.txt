@@ -1,10 +1,13 @@
-{% if service_impl_package %}
-package {{service_impl_package}};
+{% set class = template_func.hump_class_name(table_name) %}
+{% set hump_class = template_func.hump_property_name(table_name) %}
+{% set key, key_type = template_func.get_key(col_list, 'java_type') %}
+{% if var_config.service_impl_package %}
+package {{var_config.service_impl_package}};
 {% endif %}
 
-import {{mapper_namespace}};
-import {{model_namespace}};
-import {{service_namespace}};
+import {{ var_config.mapper_package }}.{{ class }}Mapper;
+import {{ var_config.model_package }}.{{ class }};
+import {{ var_config.service_package }}.{{ class }}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,33 +15,33 @@ import java.util.List;
 
 
 @Service
-public class {{cls_name}}ServiceImpl implements {{cls_name}}Service {
+public class {{ class }}ServiceImpl implements {{ class }}Service {
 
     @Autowired
-    private {{cls_name}}Mapper {{hump_cls_name}}Mapper;
+    private {{ class }}Mapper {{ hump_class }}Mapper;
 
     @Override
-    public {{cls_name}} get{{cls_name}}({{param}} {{key}}) {
-        return {{hump_cls_name}}Mapper.selectByPrimaryKey({{key}});
+    public {{ class }} get{{ class }}({{ key_type }} {{ key }}) {
+        return {{ hump_class }}Mapper.selectByPrimaryKey({{key}});
     }
 
     @Override
-    public void add{{cls_name}}({{cls_name}} {{hump_cls_name}}) {
-        {{hump_cls_name}}Mapper.insertSelective({{hump_cls_name}});
+    public void add{{ class }}({{ class }} {{ hump_class }}) {
+        {{ hump_class }}Mapper.insertSelective({{ hump_class }});
     }
 
     @Override
-    public void delete{{cls_name}}({{param}} {{key}}) {
-        {{hump_cls_name}}Mapper.deleteByPrimaryKey({{key}});
+    public void delete{{ class }}({{ key_type }} {{ key }}) {
+        {{ hump_class }}Mapper.deleteByPrimaryKey({{key}});
     }
 
     @Override
-    public void edit{{cls_name}}({{cls_name}} {{hump_cls_name}}) {
-        {{hump_cls_name}}Mapper.updateByPrimaryKeySelective({{hump_cls_name}});
+    public void edit{{ class }}({{ class }} {{ hump_class }}) {
+        {{ hump_class }}Mapper.updateByPrimaryKeySelective({{ hump_class }});
     }
 
     @Override
-    public List<{{cls_name}}> get{{cls_name}}List() {
-        return {{hump_cls_name}}Mapper.get{{cls_name}}List();
+    public List<{{ class }}> get{{ class }}List() {
+        return {{ hump_class }}Mapper.get{{ class }}List();
     }
 }

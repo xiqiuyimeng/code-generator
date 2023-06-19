@@ -133,7 +133,9 @@ class CustomTableWidget(TableWidgetABC):
             check_num_widget = self.cellWidget(row_idx, 0)
             # 如果选中，收集到列表中
             if check_num_widget.check_box.checkState():
-                checked_ids.append(int(check_num_widget.check_label.row_data.id))
+                row_id = check_num_widget.check_label.row_data.id
+                if row_id:
+                    checked_ids.append(int(row_id))
                 checked_names.append(self.item(row_idx, 1).text())
         return checked_ids, checked_names
 

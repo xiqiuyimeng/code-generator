@@ -1,39 +1,39 @@
-﻿{% if model_package %}
-package {{model_package}};
+﻿{% set import_list = template_func.get_import_desc(col_list, 'java_type') %}
+{% if var_config.model_package %}
+package {{ var_config.model_package }};
 {% endif %}
-{% if import_list %}
 
-{% for import in import_list %}
-{{import}}
+{% if import_list %}
+{% for import_desc in import_list %}
+{{ import_desc }};
 {% endfor %}
 {% endif %}
-
-{% if lombok %}
+{% if var_config.lombok == 'True' %}
 import lombok.Data;
-
-@Data
-{% else %}
 {% endif %}
-public class {{cls_name}}{
 
-    {% for data in java_list %}
+
+{% if var_config.lombok == 'True' %}
+@Data
+{% endif %}
+public class {{ template_func.hump_class_name(table_name) }}{
+
+    {% for data in col_list %}
     {% if data.comment %}
-    private {{data.java_type}} {{data.name}};  //{{data.comment}}
-    {% else %}
-    private {{data.java_type}} {{data.name}};
+    {{ template_func.handle_comment(data.comment) }}
     {% endif %}
+    private {{ data.java_type.mapping_type if data.java_type else 'undefined' }} {{ template_func.hump_property_name(data.name) }};
 
     {% endfor %}
-    {% if lombok %}
-    {% else %}
+    {% if var_config.lombok == 'False' %}
     {# ---getter和setter---- #}
-    {% for data in java_list %}
-    public {{data.java_type}} get{{data.name.replace(data.name[0], data.name[0].upper(), 1)}}() {
-        return {{data.name}};
+    {% for data in col_list %}
+    public {{ data.java_type.mapping_type if data.java_type else 'undefined' }} get{{ template_func.hump_class_name(data.name) }}() {
+        return {{ template_func.hump_property_name(data.name) }};
     }
 
-    public void set{{data.name.replace(data.name[0], data.name[0].upper(), 1)}}({{data.java_type}} {{data.name}}) {
-        this.{{data.name}} = {{data.name}};
+    public void set{{ template_func.hump_class_name(data.name) }}({{ data.java_type.mapping_type if data.java_type else 'undefined' }} {{ template_func.hump_property_name(data.name) }}) {
+        this.{{ template_func.hump_property_name(data.name) }} = {{ template_func.hump_property_name(data.name) }};
     }
 
     {% endfor %}

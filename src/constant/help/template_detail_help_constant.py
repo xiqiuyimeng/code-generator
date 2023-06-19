@@ -34,7 +34,7 @@ TEMPLATE_CONFIG_HELP_TEXT = '<p>模板配置包含两部分</p>' \
 
 TEMPLATE_FILE_LABEL_TEXT = '模板文件：'
 TEMPLATE_FILE_HELP_TEXT = '<p>提供对模板文件的管理功能，下面是关于模板文件详细介绍<p class=import>需要注意的是，' \
-                          '在模板中获取到的数据通常应当都是字符串类型，例如将 python 中的布尔 False 传入，' \
+                          '在模板中获取到的数据通常都是字符串类型，例如将 python 中的布尔 False 传入，' \
                           '在模板中实际获取到的也是 "False"，如果需要转为布尔类型，需要在模板方法中进行转化</p></p>' \
                           '<ol>' \
                           '  <li>文件名：主要作用是在模板文件列表中作唯一性区分</li>' \
@@ -67,7 +67,7 @@ TEMPLATE_FILE_HELP_TEXT = '<p>提供对模板文件的管理功能，下面是�
                           '            "import_desc": "引包声明",\n' \
                           '        },\n' \
                           '        "comment": "字段备注",\n' \
-                          '        "is_pk": "False",\n' \
+                          '        "is_pk": False,\n' \
                           '        "col_type": "col",\n' \
                           '        "children": [],\n' \
                           '    }\n' \
@@ -97,7 +97,7 @@ TEMPLATE_FILE_HELP_TEXT = '<p>提供对模板文件的管理功能，下面是�
                           '            "import_desc": "引包声明",\n' \
                           '        },\n' \
                           '        "comment": "字段备注",\n' \
-                          '        "is_pk": "False",\n' \
+                          '        "is_pk": False,\n' \
                           '        "col_type": "col",\n' \
                           '        "children": [],\n' \
                           '    }\n' \
@@ -105,7 +105,9 @@ TEMPLATE_FILE_HELP_TEXT = '<p>提供对模板文件的管理功能，下面是�
                           '</pre>' \
                           '<p class=import>需要注意的是：如果当前数据类型，在类型映射中找不到，' \
                           '那么在字段对象中将不会出现映射组信息，所以在调用映射组信息字段时，需要判断是否存在，引用示例：<br>' \
-                          '{{ col_data.mapping1.mapping_type if col_data.mapping1 is defined else "undefined" }}</p>' \
+                          '{{ col_data.mapping1.mapping_type if col_data.mapping1 is defined else "undefined" }}<br>' \
+                          '或者：{{ col_data.mapping1.mapping_type if col_data.mapping1 else "undefined" }}<br>' \
+                          '另外，在数据列字段中，is_pk 属性为布尔变量</p>' \
                           '         </li>' \
                           '         <li>comment：字段的备注，来源于数据表</li>' \
                           '         <li>is_pk：字段是否是主键，来源于数据表</li>' \

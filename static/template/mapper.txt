@@ -1,28 +1,30 @@
-{% if mapper_package %}
-package {{mapper_package}};
+{% set class = template_func.hump_class_name(table_name) %}
+{% set property = template_func.hump_property_name(table_name) %}
+{% set key, key_type = template_func.get_key(col_list, 'java_type') %}
+{% if var_config.mapper_package %}
+package {{ var_config.mapper_package }};
 {% endif %}
 
-import {{model_namespace}};
+import {{ var_config.model_package }}.{{ class }};
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+
 @Mapper
-public interface {{cls_name}}Mapper {
+public interface {{ class }}Mapper {
 
-    int deleteByPrimaryKey({{param}} {{key}});
+    {{ template_func.hump_class_name(table_name) }} selectByPrimaryKey({{ key_type }} {{ key }});
 
-    int insert({{cls_name}} {{hump_cls_name}});
+    int deleteByPrimaryKey({{ key_type }} {{ key }});
 
-    int insertSelective({{cls_name}} {{hump_cls_name}});
+    int insert({{ class }} {{ property }});
 
-    {{cls_name}} selectByPrimaryKey({{param}} {{key}});
+    int insertSelective({{ class }} {{ property }});
 
-    {% if need_update %}
-    int updateByPrimaryKeySelective({{cls_name}} {{hump_cls_name}});
+    int updateByPrimaryKey({{ class }} {{ property }});
 
-    int updateByPrimaryKey({{cls_name}} {{hump_cls_name}});
+    int updateByPrimaryKeySelective({{ class }} {{ property }});
 
-    {% endif %}
-    List<{{cls_name}}> get{{cls_name}}List();
+    List<{{ class }}> get{{ class }}List();
 }

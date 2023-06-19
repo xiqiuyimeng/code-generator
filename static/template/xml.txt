@@ -1,122 +1,80 @@
+{% set class = template_func.hump_class_name(table_name) %}
+{% set hump_class = template_func.hump_property_name(table_name) %}
+{% set key, key_type = template_func.get_key(col_list, 'java_type') %}
+{% set key_jdbc = template_func.get_key_jdbc_str(col_list, 'jdbc_type') %}
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="{{mapper_namespace}}">
-    <resultMap id="BaseResultMap" type="{{model_namespace}}">
-        {% for result in result_map %}
-        <result column="{{result.column_name}}" property="{{result.name}}" jdbcType="{{result.jdbc_type}}"/>
+<mapper namespace="{{ var_config.mapper_package }}.{{ class }}Mapper">
+    <resultMap id="BaseResultMap" type="{{ var_config.model_package }}.{{ class }}">
+        {% for data in col_list %}
+        <result column="{{ data.name }}" property="{{ template_func.hump_property_name(data.name) }}" jdbcType="{{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}"/>
         {% endfor %}
     </resultMap>
     <sql id="Base_Column_List">
-        {% for column in columns %}
-        {{column}}
-        {% endfor %}
+        {{ template_func.get_base_sql_col(col_list, 9) }}
     </sql>
-    {% if mapper %}
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="{{java_type}}">
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="{{ key_type }}">
         select
         <include refid="Base_Column_List"/>
-        from {{table_name}}
-        {% for param in params %}
-        {% if loop.first %}
-        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% else %}
-        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% endif %}
-        {% endfor %}
+        from {{ table_name }}
+        where {{ key_jdbc }}
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="{{java_type}}" >
-        delete from {{table_name}}
-        {% for param in params %}
-        {% if loop.first %}
-        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% else %}
-        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% endif %}
-        {% endfor %}
+    <delete id="deleteByPrimaryKey" parameterType="{{ key_type }}" >
+        delete from {{ table_name }}
+        where {{ key_jdbc }}
     </delete>
-    {% endif %}
-    <insert id="insert" parameterType="{{model_namespace}}" >
-        insert into {{table_name}} (
-        {% for result in result_map %}
-        {% if loop.last %}
-        {{result.column_name}}
-        {% else %}
-        {{result.column_name~', '}}
-        {% endif %}
-        {% endfor %}
+    <insert id="insert" parameterType="{{ var_config.model_package }}.{{ class }}" >
+        insert into {{ table_name }} (
+            {{ template_func.get_base_sql_col(col_list, 13) }}
         )
         values (
-        {% for result in result_map %}
-        {% if loop.last %}
-        #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}'}}
-        {% else %}
-        #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
-        {% endif %}
-        {% endfor %}
+            {{ template_func.get_insert_value_str(col_list, 'jdbc_type', 13) }}
         )
     </insert>
-    <insert id="insertSelective" parameterType="{{model_namespace}}" >
-        insert into {{table_name}}
+    <insert id="insertSelective" parameterType="{{ var_config.model_package }}.{{ class }}" >
+        insert into {{ table_name }}
         <trim prefix="(" suffix=")" suffixOverrides="," >
-            {% for result in result_map %}
-            <if test="{{result.name}} != null" >
-                {{result.column_name}},
+            {% for data in col_list %}
+            <if test="{{ template_func.hump_property_name(data.name) }} != null" >
+                {{ data.name }},
             </if>
             {% endfor %}
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
-            {% for result in result_map %}
-            <if test="{{result.name}} != null" >
-                #{{'{'}}{{result.name}},jdbcType={{result.jdbc_type}}{{'}, '}}
+            {% for data in col_list %}
+            <if test="{{ template_func.hump_property_name(data.name) }} != null" >
+                #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}
             </if>
             {% endfor %}
         </trim>
     </insert>
-    {% if need_update %}
-    <update id="updateByPrimaryKey" parameterType="{{model_namespace}}" >
-        update {{table_name}}
-        {% for update_column in update_columns %}
+    <update id="updateByPrimaryKey" parameterType="{{ var_config.model_package }}.{{ class }}" >
+        update {{ table_name }}
+        {% for data in col_list | selectattr('is_pk', '==', False) %}
         {% if loop.first %}
-        set {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
+        set {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}
         {% elif loop.last %}
-          {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}}
+          {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}'}}
         {% else %}
-          {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}, '}}
+          {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}
         {% endif %}
         {% endfor %}
-        {% if mapper %}
-        {% for param in params %}
-        {% if loop.first %}
-        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% else %}
-        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
+        where {{ key_jdbc }}
     </update>
-    <update id="updateByPrimaryKeySelective" parameterType="{{model_namespace}}" >
-        update {{table_name}}
+    <update id="updateByPrimaryKeySelective" parameterType="{{ var_config.model_package }}.{{ class }}" >
+        update {{ table_name }}
         <set>
-        {% for update_column in update_columns %}
-            <if test="{{update_column.name}} != null" >
-                {{update_column.column_name}} = #{{'{'}}{{update_column.name}},jdbcType={{update_column.jdbc_type}}{{'}'}},
+        {% for data in col_list | selectattr('is_pk', '==', False) %}
+            <if test="{{ template_func.hump_property_name(data.name) }} != null" >
+                {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}'}},
             </if>
         {% endfor %}
         </set>
-        {% if mapper %}
-        {% for param in params %}
-        {% if loop.first %}
-        where {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% else %}
-        and {{param.column_name}} = #{{'{'}}{{param.name}},jdbcType={{param.jdbc_type}}{{'}'}}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
+        where {{ key_jdbc }}
     </update>
-    {% endif %}
-    <select id="get{{cls_name}}List" resultMap="BaseResultMap">
+    <select id="get{{ class }}List" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from {{table_name}}
+        from {{ table_name }}
     </select>
 </mapper>

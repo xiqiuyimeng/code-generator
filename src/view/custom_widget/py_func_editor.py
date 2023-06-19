@@ -86,7 +86,6 @@ class PyFuncEditor(TextEditor):
 
     def parse_func_name(self) -> str:
         split_lines = self.toPlainText().splitlines()
-        result_func_name = ''
         for line in split_lines:
             code_text = self._get_code_text(line)
             # 如果代码文本中，只有空白，跳过
@@ -94,5 +93,4 @@ class PyFuncEditor(TextEditor):
                 continue
             func_name_result = re.findall(self.func_name_pattern, code_text)
             if func_name_result:
-                result_func_name = func_name_result[0]
-        return result_func_name
+                return func_name_result[0]

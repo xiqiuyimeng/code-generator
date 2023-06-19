@@ -153,6 +153,7 @@ def get_var_name(var_name_list, order=1):
     var_name = f'var_{order}'
     if var_name in var_name_list:
         return get_var_name(var_name_list, order + 1)
+    var_name_list.append(var_name)
     return var_name
 
 

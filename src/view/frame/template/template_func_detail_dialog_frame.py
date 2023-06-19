@@ -58,7 +58,7 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         self.text_editor.textChanged.connect(self.check_input)
 
     def parse_func_name(self):
-        # 解析方法名，如果存在多个，取最后一个
+        # 解析方法名，如果存在多个，取第一个
         self.name_input.setText(self.text_editor.parse_func_name())
 
     def save_func(self):
@@ -94,6 +94,7 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         # 清除焦点
         self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.help_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def setup_input_limit_rule(self):
         ...
