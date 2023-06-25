@@ -85,8 +85,8 @@ EDIT_VAR_CONFIG_TITLE = '编辑模板变量配置'
 
 # 控件类型
 CONFIG_INPUT_WIDGET_TYPE_DICT = {
-    '文本输入框': 'LineEditConfigValueWidget',
     '文本输入框 + 文件夹对话框': 'LineEditFileDialogConfigValueWidget',
+    '文本输入框': 'LineEditConfigValueWidget',
     '文本编辑区': 'TextEditorConfigValueWidget',
     '下拉框列表': 'ComboBoxConfigValueWidget',
     '文件夹对话框': 'FileDialogConfigValueWidget',
