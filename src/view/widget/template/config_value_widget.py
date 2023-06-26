@@ -73,7 +73,8 @@ class ConfigValueWidgetABC(QWidget):
                 self.required_label_palette.setColor(QPalette.WindowText, Qt.red)
             self.required_label.setText('*')
             self.required_label.setPalette(self.required_label_palette)
-        # 配置项名称
+        # 配置项名称，设置自动换行
+        self.config_name_label.setWordWrap(True)
         self.config_name_label.setText(self.config.config_name)
         # 配置项说明label文本
         self.config_desc_label.setText(CONFIG_DESC_TEXT)
