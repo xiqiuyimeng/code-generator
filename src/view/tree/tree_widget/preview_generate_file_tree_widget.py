@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os.path
 
 from src.constant.generator_dialog_constant import PREVIEW_TREE_FOLDER_ICON, PREVIEW_TREE_FILE_ICON
 from src.constant.icon_enum import get_icon
@@ -28,16 +27,9 @@ class PreviewGenerateFileTreeWidget(DisplayTreeWidget):
         file_path_item = self.file_path_item_dict.get(file_path)
         # 如果不存在，创建
         if not file_path_item:
-            # 首先获取父节点
-            parent_dir, child_path = os.path.split(file_path)
-            # 如果拆分后存在子路径，那么父目录还可以继续拆解
-            if child_path:
-                parent_item = self.get_file_path_item(parent_dir)
-                file_path_item = make_display_tree_item(parent_item, child_path, self.folder_icon)
-            else:
-                # 创建顶层节点
-                file_path_item = make_display_tree_item(self, parent_dir, self.folder_icon)
-                self.addTopLevelItem(file_path_item)
+            # 创建父节点
+            file_path_item = make_display_tree_item(self, file_path, self.folder_icon)
+            self.addTopLevelItem(file_path_item)
             # 保存到缓存中
             self.file_path_item_dict[file_path] = file_path_item
         return file_path_item
