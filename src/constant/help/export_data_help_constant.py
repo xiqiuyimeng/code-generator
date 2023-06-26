@@ -7,11 +7,10 @@ _date_ = '2023/6/15 11:37'
 OVERVIEW_TEXT = '导出数据旨在支持保存传输数据'
 
 EXPORT_DATA_TYPE_LABEL_TEXT = '导出数据类型：'
-EXPORT_DATA_TYPE_HELP_TEXT = '目前支持三种数据类型导出' \
+EXPORT_DATA_TYPE_HELP_TEXT = '目前支持两种数据类型导出' \
                              '<ol>' \
                              '  <li>类型映射</li>' \
                              '  <li>模板</li>' \
-                             '  <li>模板方法</li>' \
                              '</ol>'
 
 EXPORT_FILE_LABEL_TEXT = '导出文件：'

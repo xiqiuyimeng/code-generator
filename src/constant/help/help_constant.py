@@ -16,8 +16,8 @@ TEMPLATE_TABLE_HELP = '模板管理'
 TEMPLATE_DETAIL_HELP = '模板详情'
 TEMPLATE_CONFIG_HELP = '模板配置详情'
 TEMPLATE_FILE_OUTPUT_CONFIG_MAINTAIN_HELP = '模板文件输出配置维护'
-TEMPLATE_FUNC_TABLE_HELP = '模板方法管理'
 TEMPLATE_FUNC_DETAIL_HELP = '模板方法详情'
+TEMPLATE_COPY_FUNC_HELP = '复制其他模板方法'
 IMPORT_DATA_HELP = '导入数据'
 IMPORT_ERROR_DATA_HELP = '导入数据异常处理'
 EXPORT_DATA_HELP = '导出数据'
@@ -34,8 +34,8 @@ HELP_TYPE_DICT = {
     TEMPLATE_DETAIL_HELP: 'TemplateDetailHelpWidget',
     TEMPLATE_CONFIG_HELP: 'TemplateConfigHelpWidget',
     TEMPLATE_FILE_OUTPUT_CONFIG_MAINTAIN_HELP: 'TemplateFileOutputConfigMaintainHelpWidget',
-    TEMPLATE_FUNC_TABLE_HELP: 'TemplateFuncTableHelpWidget',
     TEMPLATE_FUNC_DETAIL_HELP: 'TemplateFuncDetailHelpWidget',
+    TEMPLATE_COPY_FUNC_HELP: 'TemplateCopyFuncHelpWidget',
     IMPORT_DATA_HELP: 'ImportDataHelpWidget',
     IMPORT_ERROR_DATA_HELP: 'ImportErrorDataHelpWidget',
     EXPORT_DATA_HELP: 'ExportDataHelpWidget',

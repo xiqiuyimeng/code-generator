@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QPushButton
 
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 
@@ -10,9 +10,7 @@ _date_ = '2023/4/4 12:36'
 class ChainDialogFrameABC(DialogFrameABC):
     """链式调用对话框框架抽象类"""
 
-    def __init__(self, parent_dialog_layout, *args):
-        # 父对话框布局，在布局中添加和移除框架，实现页面切换
-        self.parent_dialog_layout: QVBoxLayout = parent_dialog_layout
+    def __init__(self, *args):
         # 上一个框架
         self.previous_frame: DialogFrameABC = ...
         # 下一个框架
@@ -39,9 +37,9 @@ class ChainDialogFrameABC(DialogFrameABC):
 
     def switch_frame(self, frame: DialogFrameABC):
         if frame is not Ellipsis:
-            self.parent_dialog_layout.removeWidget(self)
+            self.parent_dialog.layout().removeWidget(self)
             self.hide()
-            self.parent_dialog_layout.addWidget(frame)
+            self.parent_dialog.layout().addWidget(frame)
             if frame.isHidden():
                 frame.show()
         else:

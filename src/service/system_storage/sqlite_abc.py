@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
+from typing import Union
 
 from src.logger.log import logger as log
 from src.service.util.db_id_generator import update_id_generator, get_id
@@ -161,12 +162,12 @@ class SqliteBasic:
         log.info(f'批量更新[{self.table_name}]参数 ==> {update_value_list}')
         get_cursor().executemany(update_sql, update_value_list)
 
-    def select_by_order(self, return_type=None, select_cols: SelectCol = None,
-                        condition: Condition = None, sort_order='asc'):
+    def select_by_order(self, return_type=None, select_cols: Union[SelectCol, str] = None,
+                        condition: Union[Condition, str] = None, sort_order='asc'):
         return self.select(return_type, select_cols, condition, order_by='item_order', sort_order=sort_order)
 
-    def select(self, return_type=None, select_cols: SelectCol = None, condition: Condition = None,
-               order_by=None, sort_order='asc'):
+    def select(self, return_type=None, select_cols: Union[SelectCol, str] = None,
+               condition: Union[Condition, str] = None, order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询"""
         rows = self.select_by_condition(select_cols, condition, order_by, sort_order)
         # 映射为参数对象类
@@ -174,8 +175,8 @@ class SqliteBasic:
             return_type = self.model_type
         return [return_type(**dict(row)) for row in rows]
 
-    def select_one(self, return_type=None, select_cols: SelectCol = None, condition: Condition = None,
-                   order_by=None, sort_order='asc'):
+    def select_one(self, return_type=None, select_cols: Union[SelectCol, str] = None,
+                   condition: Union[Condition, str] = None, order_by=None, sort_order='asc'):
         """根据条件查询，根据不为空的属性作为条件进行查询，返回第一条"""
         result = self.select_by_condition(select_cols, condition, order_by, sort_order, fetch_all=False)
         # 映射为参数对象类
@@ -183,7 +184,8 @@ class SqliteBasic:
             return_type = self.model_type
         return return_type(**dict(result)) if result else None
 
-    def select_by_condition(self, select_cols: SelectCol = None, condition: Condition = None,
+    def select_by_condition(self, select_cols: Union[SelectCol, str] = None,
+                            condition: Union[Condition, str] = None,
                             order_by=None, sort_order='asc', fetch_all=True):
         if not select_cols:
             select_cols = SelectCol(self.table_name)

@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+from src.constant.template_dialog_constant import CHECK_VAR_CONFIG_NAME_PROMPT, CHECK_VAR_CONFIG_NAME_TITLE, \
+    CHECK_VAR_CONFIG_VAR_NAME_PROMPT, CHECK_VAR_CONFIG_VAR_NAME_TITLE
 from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
+from src.service.util.import_export_util import check_template_config
+from src.view.box.message_box import pop_fail
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import TemplateVarConfigTableWidget
 from src.view.widget.template.template_config_widget import TemplateConfigWidget
 
@@ -15,3 +19,7 @@ class TemplateVarConfigWidget(TemplateConfigWidget):
 
     def get_table_widget(self) -> TemplateVarConfigTableWidget:
         return TemplateVarConfigTableWidget(self)
+
+    def get_check_title_prompt(self) -> tuple:
+        return CHECK_VAR_CONFIG_NAME_PROMPT, CHECK_VAR_CONFIG_NAME_TITLE, \
+            CHECK_VAR_CONFIG_VAR_NAME_PROMPT, CHECK_VAR_CONFIG_VAR_NAME_TITLE

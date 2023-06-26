@@ -28,10 +28,10 @@ class TemplateConfigPreviewDialog(CustomDialogABC):
 
     def get_frame(self) -> DynamicTemplateConfigDialogFrameABC:
         if self.config_type:
-            return DynamicVarConfigDialogFrame(self.dialog_layout, self, self.dialog_title,
+            return DynamicVarConfigDialogFrame(self, self.dialog_title,
                                                template_config_list=self.template_config_list,
                                                preview_mode=True)
         else:
-            return DynamicOutputConfigDialogFrame(self.dialog_layout, self, self.dialog_title,
+            return DynamicOutputConfigDialogFrame(self, self.dialog_title,
                                                   template_config_list=self.template_config_list,
                                                   preview_mode=True)

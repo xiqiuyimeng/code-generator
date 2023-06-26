@@ -4,7 +4,8 @@ _author_ = 'luwt'
 _date_ = '2023/6/15 11:36'
 
 
-OVERVIEW_TEXT = '模板方法详情页，包含方法名和方法编辑区两部分，这里的方法统一都是 python 方法，不支持其他语言'
+OVERVIEW_TEXT = '模板方法详情页，包含方法名和方法编辑区两部分，这里的方法统一都是 python 方法，不支持其他语言' \
+                '<p class="import">需要注意的是，所有操作必须在点击模板保存按钮后才会保存修改，否则离开模板编辑页面，将丢弃所有修改</p>'
 
 TEMPLATE_FUNC_NAME_LABEL_TEXT = '模板方法名：'
 TEMPLATE_FUNC_NAME_HELP_TEXT = '模板方法名无法输入，只能由系统从方法编辑区提取解析出来，并且如果方法编辑区编写了多个方法，' \

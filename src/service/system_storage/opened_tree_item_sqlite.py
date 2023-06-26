@@ -5,7 +5,7 @@ from enum import Enum
 from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init
-from src.service.util.system_storage_util import Condition, transactional, get_cursor
+from src.service.util.system_storage_util import Condition, transactional
 
 _author_ = 'luwt'
 _date_ = '2022/10/2 9:31'
@@ -209,10 +209,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         update_param.checked = opened_record.checked
         self.update_by_condition(update_param, Condition(self.table_name).add('parent_id', opened_record.id))
 
-    @staticmethod
-    def get_max_level(ds_category):
+    def get_max_level(self, ds_category):
         max_level_sql = f'{sql_dict.get("max_level")}"{ds_category}"'
-        cursor = get_cursor()
-        cursor.execute(max_level_sql)
-        result = cursor.fetchone()
+        result = self.select_by_condition(select_cols=max_level_sql, fetch_all=False)
         return dict(result).get('max_level') if result else -1

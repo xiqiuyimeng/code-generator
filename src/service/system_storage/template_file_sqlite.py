@@ -92,6 +92,8 @@ class TemplateFileSqlite(SqliteBasic):
         return self.select_by_order(condition=condition)
 
     def batch_add_template_files(self, template_id, template_files):
+        if not template_files:
+            return
         for idx, template_file in enumerate(template_files, start=1):
             template_file.template_id = template_id
             template_file.item_order = idx
@@ -102,8 +104,7 @@ class TemplateFileSqlite(SqliteBasic):
         # 由于是低频操作，可以简单做，删除原有数据，插入新数据
         self.batch_del_template_files((template_id,))
         # 插入新数据
-        if template_files:
-            self.batch_add_template_files(template_id, template_files)
+        self.batch_add_template_files(template_id, template_files)
 
     def batch_del_template_files(self, template_ids):
         condition = Condition(self.table_name).add('template_id', template_ids, 'in')

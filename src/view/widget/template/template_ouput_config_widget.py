@@ -3,9 +3,11 @@ from PyQt5.QtWidgets import QPushButton
 
 from src.constant.template_dialog_constant import AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT, MAINTAIN_FILE_CONFIG_BTN_TEXT, \
     NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, \
-    NO_OUTPUT_CONFIG_PROMPT
+    NO_OUTPUT_CONFIG_PROMPT, CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, \
+    CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE
 from src.service.async_func.async_template_task import AutoGenerateOutputConfigExecutor
 from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
+from src.service.util.import_export_util import check_template_config
 from src.view.dialog.template.template_maintain_file_config_dialog import TemplateMaintainFileConfigDialog
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import \
     TemplateOutputConfigTableWidget
@@ -54,7 +56,7 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
         self.maintain_file_config_btn.clicked.connect(self.maintain_file_config)
 
     def auto_generate_config(self):
-        unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
+        unbind_config_files = self.parent_frame.collect_unbind_config_files()
         if not unbind_config_files:
             pop_fail(NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, self)
         else:
@@ -81,8 +83,12 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
             pop_fail(NO_OUTPUT_CONFIG_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, self)
             return
         output_config_list = self.config_table.collect_data()
-        unbind_config_files = self.parent_frame.file_list_widget.collect_unbind_config_files()
+        unbind_config_files = self.parent_frame.collect_unbind_config_files()
         self.maintain_file_config_dialog = TemplateMaintainFileConfigDialog(output_config_list,
                                                                             unbind_config_files)
         self.maintain_file_config_dialog.bind_file_changed.connect(self.config_table.update_bind_file_num_rows)
         self.maintain_file_config_dialog.exec()
+
+    def get_check_title_prompt(self) -> tuple:
+        return CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, \
+            CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE

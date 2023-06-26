@@ -8,28 +8,11 @@ _date_ = '2023/3/9 9:38'
 TEMPLATE_LIST_TITLE = '模板列表'
 TEMPLATE_LIST_BOX_TITLE = '模板列表'
 
-# 打开方法区对话框按钮
-FUNC_DIALOG_BTN_TEXT = '模板常用方法'
 ADD_TEMPLATE_BTN_TEXT = '添加模板'
 DEL_TEMPLATE_BTN_TEXT = '删除模板'
 COPY_TEMPLATE_BTN_TEXT = '复制模板'
 IMPORT_TEMPLATE_BTN_TEXT = '导入模板'
 EXPORT_TEMPLATE_BTN_TEXT = '导出模板'
-
-# 模板常用方法对话框
-TEMPLATE_FUNC_TITLE = '模板常用方法'
-TEMPLATE_FUNC_LIST_TITLE = '模板常用方法列表'
-TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT = '方法名将自动根据方法体解析，不可重复'
-CREATE_NEW_FUNC_BTN_TEXT = '创建方法'
-CREATE_NEW_FUNC_TITLE = '创建方法'
-CREATE_FUNC_BOX_TITLE = '创建方法'
-EDIT_FUNC_BOX_TITLE = '编辑方法'
-# 删除方法对话框标题
-DEL_TEMPLATE_FUNC_BOX_TITLE = '删除模板方法'
-CLEAR_TEMPLATE_FUNC_BOX_TITLE = '清空模板方法'
-# 导入导出模板方法按钮
-IMPORT_TEMPLATE_FUNC_BTN_TEXT = '导入模板方法'
-EXPORT_TEMPLATE_FUNC_BTN_TEXT = '导出模板方法'
 
 # 复制模板消息对话框标题
 COPY_TEMPLATE_BOX_TITLE = '复制模板'
@@ -48,17 +31,13 @@ EDIT_TEMPLATE_BOX_TITLE = '编辑模板'
 
 # 模板详情页左侧列表项
 TEMPLATE_INFO_TEXT = '基本信息'
-TEMPLATE_FILE_TEXT = '模板文件'
 TEMPLATE_CONFIG_TEXT = '模板配置'
+TEMPLATE_FILE_TEXT = '模板文件'
+TEMPLATE_FUNC_TEXT = '模板方法'
 
 # 模板详情页
 TEMPLATE_NAME = '模板名称：'
 TEMPLATE_DESC = '模板说明：'
-
-# 模板文件页
-CREATE_FILE_TITLE = '新建模板文件'
-ADD_FILE_BTN_TEXT = '新建模板文件'
-LOCATE_FILE_BTN_TEXT = '定位'
 
 # 模板配置页
 TEMPLATE_OUTPUT_DIR_TAB_TEXT = '模板输出路径配置详情'
@@ -162,3 +141,34 @@ CHECK_VAR_CONFIG_NAME_TITLE = '检查模板变量配置名称'
 CHECK_VAR_CONFIG_NAME_PROMPT = '模板变量配置，配置项名称存在空值或重复项，请打开变量配置详情页，进行数据修正'
 CHECK_VAR_CONFIG_VAR_NAME_TITLE = '检查模板变量配置变量名称'
 CHECK_VAR_CONFIG_VAR_NAME_PROMPT = '模板变量配置，输出变量名称存在空值或重复项，请打开变量配置详情页，进行数据修正'
+
+# 模板文件页
+CREATE_FILE_TITLE = '新建模板文件'
+ADD_FILE_BTN_TEXT = '新建模板文件'
+LOCATE_FILE_BTN_TEXT = '定位'
+
+# 模板方法页
+SELECT_ALL_BTN_TEXT = '全选'
+UNSELECT_BTN_TEXT = '取消全选'
+COPY_OTHER_TP_FUNC_BTN_TEXT = '从其他模板复制方法'
+CREATE_NEW_FUNC_BTN_TEXT = '创建方法'
+CREATE_NEW_FUNC_TITLE = '创建方法'
+DEL_FUNC_BTN_TEXT = '删除方法'
+# 模板方法对话框
+TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT = '方法名将自动根据方法体解析，不可重复'
+
+# 模板方法复制对话框
+HAS_FUNC_TEMPLATE_LIST_TITLE = '拥有模板方法的模板列表'
+HAS_FUNC_TEMPLATE_LIST_BOX_TITLE = '读取拥有模板方法的模板列表'
+TEMPLATE_FUNC_TITLE = '{} 模板方法列表'
+TEMPLATE_FUNC_BOX_TITLE = '读取 {}'
+# 按钮
+SELECT_ALL_FUNC_BTN_TEXT = '全选'
+UNSELECT_ALL_FUNC_BTN_TEXT = '取消选择'
+COPY_FUNC_BTN_TEXT = '复制方法'
+BACK_TO_TEMPLATE_BTN_TEXT = '返回模板列表'
+# 消息框
+COPY_FUNC_BOX_TITLE = '复制模板方法'
+COPY_FUNC_DUPLICATE_PROMPT = '以下模板方法已经存在，是否覆盖？\n    {}'
+COPY_FUNC_SUCCESS_BOX_TITLE = '复制模板方法成功'
+COPY_FUNC_SUCCESS_PROMPT = '复制模板方法成功，此次共复制 {} 个模板方法！'

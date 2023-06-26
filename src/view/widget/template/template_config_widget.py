@@ -2,6 +2,8 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QPushButton
 
 from src.constant.template_dialog_constant import ADD_CONFIG_BTN_TEXT, REMOVE_CONFIG_BTN_TEXT, PREVIEW_CONFIG_BTN_TEXT
+from src.service.util.import_export_util import check_template_config
+from src.view.box.message_box import pop_fail
 from src.view.dialog.template.template_config_dialog import TemplateConfigDialog
 from src.view.dialog.template.template_config_preview_dialog import TemplateConfigPreviewDialog
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import TemplateConfigTableWidgetABC
@@ -100,14 +102,30 @@ class TemplateConfigWidget(QWidget):
             self.remove_config_btn.setDisabled(True)
 
     def preview_template_config(self):
-        # 收集数据
-        self.collect_template_config()
         # 预览配置页
         self.preview_config_dialog = TemplateConfigPreviewDialog(self.config_type, self.config_table.collect_data())
         self.preview_config_dialog.exec()
 
     def collect_template_config(self):
-        ...
+        return self.config_table.collect_data()
 
     def post_process(self):
         self.set_remove_btn_available(False)
+
+    def echo_config_table(self, config_list):
+        self.config_table.fill_table(config_list)
+
+    def check_config_completable(self, config_list) -> bool:
+        if config_list:
+            error_name_count, error_var_name_count = check_template_config(config_list, self.config_type)
+            check_title_prompt = self.get_check_title_prompt()
+            if error_name_count:
+                pop_fail(check_title_prompt[0], check_title_prompt[1], self)
+                return False
+            if error_var_name_count:
+                pop_fail(check_title_prompt[2], check_title_prompt[3], self)
+                return False
+        return True
+
+    def get_check_title_prompt(self) -> tuple:
+        ...

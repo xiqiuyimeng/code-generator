@@ -1,31 +1,20 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSplitter, QFrame, QPushButton, \
-    QTabWidget
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QTabWidget
 
 from src.constant.export_import_constant import OVERRIDE_TEMPLATE_TITLE
 from src.constant.help.help_constant import TEMPLATE_DETAIL_HELP
 from src.constant.template_dialog_constant import TEMPLATE_INFO_TEXT, TEMPLATE_CONFIG_TEXT, TEMPLATE_FILE_TEXT, \
-    TEMPLATE_NAME, TEMPLATE_DESC, ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
-    EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
-    TEMPLATE_VAR_CONFIG_TAB_TEXT, CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, \
-    CHECK_TP_FILE_CONFIG_TITLE, CHECK_TP_FILE_CONFIG_PROMPT, CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE, \
-    CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, \
-    CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE, CHECK_VAR_CONFIG_NAME_PROMPT, CHECK_VAR_CONFIG_NAME_TITLE, \
-    CHECK_VAR_CONFIG_VAR_NAME_PROMPT, CHECK_VAR_CONFIG_VAR_NAME_TITLE
+    TEMPLATE_NAME, TEMPLATE_DESC, EDIT_TEMPLATE_BOX_TITLE, ADD_TEMPLATE_BOX_TITLE, READ_TEMPLATE_BOX_TITLE, \
+    TEMPLATE_OUTPUT_DIR_TAB_TEXT, \
+    TEMPLATE_VAR_CONFIG_TAB_TEXT, TEMPLATE_FUNC_TEXT
 from src.service.async_func.async_template_task import AddTemplateExecutor, EditTemplateExecutor, \
     ReadTemplateExecutor, OverrideTemplateExecutor
-from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
-from src.service.system_storage.template_file_sqlite import TemplateFile
 from src.service.system_storage.template_sqlite import Template
-from src.service.util.import_export_util import check_template_config
-from src.view.box.message_box import pop_question, pop_fail
 from src.view.custom_widget.text_editor import TextEditor
-from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
 from src.view.frame.stacked_dialog_frame import StackedDialogFrame
-from src.view.list_widget.list_item_func import get_template_file_data
-from src.view.list_widget.template_file_list_widget import TemplateFileListWidget
-from src.view.tab.tab_widget.template_file_tab_widget import TemplateFileTabWidget
+from src.view.widget.template.template_file_widget import TemplateFileWidget
+from src.view.widget.template.template_func_widget import TemplateFuncWidget
 from src.view.widget.template.template_ouput_config_widget import TemplateOutputConfigWidget
 from src.view.widget.template.template_var_config_widget import TemplateVarConfigWidget
 
@@ -58,22 +47,10 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.var_config_widget: TemplateVarConfigWidget = ...
 
         # 第三个窗口，模板文件页窗口
-        self.template_file_widget: QWidget = ...
-        self.template_file_layout: QHBoxLayout = ...
-        self.file_splitter: QSplitter = ...
-        self.file_list_frame: QFrame = ...
-        self.file_list_layout: QVBoxLayout = ...
-        # 文件列标顶部
-        self.file_list_header_layout: QHBoxLayout = ...
-        self.create_new_file_button: QPushButton = ...
-        self.locate_file_button: QPushButton = ...
-        # 文件列表
-        self.file_list_widget: TemplateFileListWidget = ...
-        # 文件tab页
-        self.file_tab_frame: QFrame = ...
-        self.file_tab_layout: QVBoxLayout = ...
-        self.file_tab_widget: TemplateFileTabWidget = ...
-        self.file_name_check_dialog: SimpleNameCheckDialog = ...
+        self.template_file_widget: TemplateFileWidget = ...
+
+        # 第四个窗口，模板方法窗口
+        self.template_func_widget: TemplateFuncWidget = ...
 
         # 添加模板执行器
         self.add_template_executor: AddTemplateExecutor = ...
@@ -92,6 +69,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.list_widget.addItem(TEMPLATE_INFO_TEXT)
         self.list_widget.addItem(TEMPLATE_CONFIG_TEXT)
         self.list_widget.addItem(TEMPLATE_FILE_TEXT)
+        self.list_widget.addItem(TEMPLATE_FUNC_TEXT)
 
     def fill_stacked_widget(self):
         # 第一个窗口，模板名称、模板说明输入框
@@ -108,12 +86,12 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.setup_template_config_ui()
 
         # 第三个窗口，模板文件页
-        self.template_file_widget = QWidget(self)
+        self.template_file_widget = TemplateFileWidget()
         self.stacked_widget.addWidget(self.template_file_widget)
-        self.template_file_layout = QHBoxLayout()
-        self.template_file_widget.setLayout(self.template_file_layout)
-        # 模板文件页
-        self.setup_template_file_ui()
+
+        # 第四个窗口，模板方法窗口
+        self.template_func_widget = TemplateFuncWidget(self.dialog_data)
+        self.stacked_widget.addWidget(self.template_func_widget)
 
     def setup_template_info_ui(self):
         # 构建模板名称输入表单
@@ -133,44 +111,9 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         self.var_config_widget = TemplateVarConfigWidget()
         self.config_tab_widget.addTab(self.var_config_widget, TEMPLATE_VAR_CONFIG_TAB_TEXT)
 
-    def setup_template_file_ui(self):
-        # 构建模板文件页
-        self.file_splitter = QSplitter(self)
-        # 不隐藏控件
-        self.file_splitter.setChildrenCollapsible(False)
-        # 竖直方向分割器，子项添加为frame，如果直接添加控件，无法调控比例
-        self.file_splitter.setOrientation(Qt.Horizontal)
-        self.template_file_layout.addWidget(self.file_splitter)
-
-        self.file_list_frame = QFrame(self.file_splitter)
-        self.file_list_layout = QVBoxLayout(self.file_list_frame)
-        self.file_list_layout.setContentsMargins(0, 0, 0, 0)
-        # 文件列表顶部按钮区
-        self.file_list_header_layout = QHBoxLayout(self.file_list_frame)
-        self.file_list_layout.addLayout(self.file_list_header_layout)
-        self.create_new_file_button = QPushButton(self.file_list_frame)
-        self.file_list_header_layout.addWidget(self.create_new_file_button)
-        self.locate_file_button = QPushButton(self.file_list_frame)
-        self.file_list_header_layout.addWidget(self.locate_file_button)
-        # 文件列表
-        self.file_list_widget = TemplateFileListWidget(self, self.open_create_file_dialog, self.file_list_frame)
-        self.file_list_layout.addWidget(self.file_list_widget)
-
-        # 文件tab页
-        self.file_tab_frame = QFrame(self.file_splitter)
-        self.file_tab_layout = QVBoxLayout(self.file_tab_frame)
-        self.file_tab_layout.setContentsMargins(0, 0, 0, 0)
-        self.file_tab_widget = TemplateFileTabWidget(self.file_list_widget, self.file_tab_frame)
-        self.file_tab_layout.addWidget(self.file_tab_widget)
-
-        self.file_splitter.setStretchFactor(0, 1)
-        self.file_splitter.setStretchFactor(1, 6)
-
     def setup_other_label_text(self):
         self.name_label.setText(TEMPLATE_NAME)
         self.template_desc_label.setText(TEMPLATE_DESC)
-        self.create_new_file_button.setText(ADD_FILE_BTN_TEXT)
-        self.locate_file_button.setText(LOCATE_FILE_BTN_TEXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #
 
@@ -183,48 +126,16 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
         # 收集基本信息数据
         self.new_dialog_data.template_name = self.name_input.text()
         self.new_dialog_data.template_desc = self.template_desc_text_edit.toPlainText()
-        # 收集模板文件数据
-        self.new_dialog_data.template_files = self.file_list_widget.collect_template_files()
         # 收集模板配置数据
-        self.new_dialog_data.output_config_list = self.output_config_widget.config_table.collect_data()
-        self.new_dialog_data.var_config_list = self.var_config_widget.config_table.collect_data()
+        self.new_dialog_data.output_config_list = self.output_config_widget.collect_template_config()
+        self.new_dialog_data.var_config_list = self.var_config_widget.collect_template_config()
+        # 收集模板文件数据
+        self.new_dialog_data.template_files = self.template_file_widget.collect_template_files()
+        # 收集模板方法数据
+        self.new_dialog_data.template_func_list = self.template_func_widget.collect_template_func_list()
 
     def button_available(self) -> bool:
         return all((self.new_dialog_data.template_name, self.name_available))
-
-    def connect_child_signal(self):
-        self.create_new_file_button.clicked.connect(lambda: self.open_create_file_dialog(CREATE_FILE_TITLE))
-        self.locate_file_button.clicked.connect(self.file_list_widget.locate_file)
-
-    def open_create_file_dialog(self, dialog_title, current_file_name=None):
-        self.file_name_check_dialog = SimpleNameCheckDialog(self.file_list_widget.collect_item_text(),
-                                                            dialog_title, current_file_name)
-        if current_file_name:
-            self.file_name_check_dialog.edit_signal.connect(self.edit_file_name)
-        else:
-            self.file_name_check_dialog.save_signal.connect(self.add_template_file)
-        self.file_name_check_dialog.exec()
-
-    def edit_file_name(self, file_name):
-        # 编辑模板文件名称
-        current_item = self.file_list_widget.currentItem()
-        original_file_name = current_item.text()
-        current_item.setText(file_name)
-        # 修改文件对象中的名称
-        get_template_file_data(current_item).file_name = file_name
-        # 搜索tab页，修改tab部件名称
-        current_tab_indexes = [tab_idx for tab_idx in range(self.file_tab_widget.count())
-                               if self.file_tab_widget.tabText(tab_idx) == original_file_name]
-        if current_tab_indexes:
-            self.file_tab_widget.setTabText(current_tab_indexes[0], file_name)
-
-    def add_template_file(self, file_name):
-        template_file = TemplateFile()
-        template_file.file_name = file_name
-        # 添加列表项
-        self.file_list_widget.add_list_file_item(template_file)
-        # 添加tab
-        self.file_tab_widget.add_file_tab(template_file)
 
     def save_func(self):
         # 手动收集数据
@@ -253,34 +164,9 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
     def check_template_completable(self):
         # 检查配置数据是否正确，主要是针对于回显过来的数据，例如导入的数据，进行校验
-        if self.new_dialog_data.output_config_list:
-            error_name_count, error_var_name_count = check_template_config(self.new_dialog_data.output_config_list,
-                                                                           ConfigTypeEnum.output_dir.value)
-            if error_name_count:
-                pop_fail(CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, self)
-                return
-            if error_var_name_count:
-                pop_fail(CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE, self)
-                return
-        if self.new_dialog_data.var_config_list:
-            error_name_count, error_var_name_count = check_template_config(self.new_dialog_data.var_config_list,
-                                                                           ConfigTypeEnum.template_var.value)
-            if error_name_count:
-                pop_fail(CHECK_VAR_CONFIG_NAME_PROMPT, CHECK_VAR_CONFIG_NAME_TITLE, self)
-                return
-            if error_var_name_count:
-                pop_fail(CHECK_VAR_CONFIG_VAR_NAME_PROMPT, CHECK_VAR_CONFIG_VAR_NAME_TITLE, self)
-                return
-        # 校验模板文件是否存在，模板文件是否关联了输出路径配置，模板文件名称模板是否存在，如果没有，提示
-        template_completable = True
-        if not self.new_dialog_data.template_files:
-            template_completable = pop_question(CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, self)
-        else:
-            if [file for file in self.new_dialog_data.template_files if file.output_config_id is None]:
-                template_completable = pop_question(CHECK_TP_FILE_CONFIG_PROMPT, CHECK_TP_FILE_CONFIG_TITLE, self)
-            elif [file for file in self.new_dialog_data.template_files if not file.file_name_template]:
-                template_completable = pop_question(CHECK_FILE_NAME_TP_PROMPT, CHECK_FILE_NAME_TP_TITLE, self)
-        return template_completable
+        return self.output_config_widget.check_config_completable(self.new_dialog_data.output_config_list) \
+            and self.var_config_widget.check_config_completable(self.new_dialog_data.var_config_list) \
+            and self.template_file_widget.check_file_completable(self.new_dialog_data.template_files)
 
     def add_post_process(self):
         self.save_signal.emit(self.new_dialog_data)
@@ -307,26 +193,18 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
     def setup_echo_other_data(self):
         self.template_desc_text_edit.setPlainText(self.dialog_data.template_desc)
-        # 回显文件列表
-        self.file_list_widget.fill_list_widget(self.dialog_data.template_files)
-        # 回显模板文件列表数据，按照tab顺序
-        reopen_tab_files = sorted([file for file in self.dialog_data.template_files if file.tab_opened],
-                                  key=lambda x: x.tab_item_order)
-        for template_file in reopen_tab_files:
-            self.file_tab_widget.add_file_tab(template_file)
-        # 找出当前列表项
-        current_files = [file for file in self.dialog_data.template_files if file.is_current]
-        if current_files:
-            self.file_list_widget.setCurrentRow(self.dialog_data.template_files.index(current_files[0]))
-        # 找出当前tab页
-        if reopen_tab_files:
-            current_tab_file = [tab_file for tab_file in reopen_tab_files if tab_file.is_current_tab][0]
-            self.file_tab_widget.setCurrentIndex(reopen_tab_files.index(current_tab_file))
         # 回显模板配置数据
-        self.output_config_widget.config_table.fill_table(self.dialog_data.output_config_list)
-        self.var_config_widget.config_table.fill_table(self.dialog_data.var_config_list)
+        self.output_config_widget.echo_config_table(self.dialog_data.output_config_list)
+        self.var_config_widget.echo_config_table(self.dialog_data.var_config_list)
+        # 回显文件列表
+        self.template_file_widget.echo_template_files(self.dialog_data.template_files)
+        # 回显方法列表
+        self.template_func_widget.echo_template_func_list(self.dialog_data.template_func_list)
         # 如果是回显导入的错误数据，那么将保存按钮打开
         if self.import_error_data:
             self.save_button.setDisabled(False)
 
     # ------------------------------ 后置处理 end ------------------------------ #
+
+    def collect_unbind_config_files(self):
+        return self.template_file_widget.collect_unbind_config_files()

@@ -2,9 +2,7 @@
 from PyQt5.QtCore import pyqtSignal, Qt
 
 from src.constant.help.help_constant import TEMPLATE_FUNC_DETAIL_HELP
-from src.constant.template_dialog_constant import EDIT_FUNC_BOX_TITLE, CREATE_FUNC_BOX_TITLE, \
-    TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT
-from src.service.async_func.async_template_func_task import AddTemplateFuncExecutor, EditTemplateFuncExecutor
+from src.constant.template_dialog_constant import TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT
 from src.service.system_storage.template_func_sqlite import TemplateFunc
 from src.view.custom_widget.py_func_editor import PyFuncEditor
 from src.view.frame.name_check_dialog_frame import NameCheckDialogFrame
@@ -22,8 +20,6 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         self.dialog_data: TemplateFunc = ...
         self.new_dialog_data: TemplateFunc = ...
         self.text_editor: PyFuncEditor = ...
-        self.add_func_executor: AddTemplateFuncExecutor = ...
-        self.edit_func_executor: EditTemplateFuncExecutor = ...
         super().__init__(parent_dialog, title, exists_func_names, template_func, False)
 
     def get_new_dialog_data(self) -> TemplateFunc:
@@ -64,23 +60,9 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
     def save_func(self):
         # 如果存在原数据，说明是编辑
         if self.dialog_data:
-            self.new_dialog_data.id = self.dialog_data.id
-            self.edit_func_executor = EditTemplateFuncExecutor(self.new_dialog_data, self.parent_dialog,
-                                                               self.parent_dialog, EDIT_FUNC_BOX_TITLE,
-                                                               self.edit_post_process)
-            self.edit_func_executor.start()
+            self.edit_signal.emit(self.new_dialog_data)
         else:
-            self.add_func_executor = AddTemplateFuncExecutor(self.new_dialog_data, self.parent_dialog,
-                                                             self.parent_dialog, CREATE_FUNC_BOX_TITLE,
-                                                             self.add_post_process)
-            self.add_func_executor.start()
-
-    def add_post_process(self):
-        self.save_signal.emit(self.new_dialog_data)
-        self.parent_dialog.close()
-
-    def edit_post_process(self):
-        self.edit_signal.emit(self.new_dialog_data)
+            self.save_signal.emit(self.new_dialog_data)
         self.parent_dialog.close()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
@@ -101,6 +83,10 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
 
     def setup_placeholder_text(self):
         self.name_input.setPlaceholderText(TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT)
+
+    def check_edit(self):
+        """判断是否是编辑"""
+        return self.dialog_data
 
     def get_old_name(self) -> str:
         return self.dialog_data.func_name

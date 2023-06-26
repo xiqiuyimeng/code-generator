@@ -5,6 +5,7 @@ from dataclasses import fields
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMapping
 from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.service.system_storage.template_file_sqlite import TemplateFile
+from src.service.system_storage.template_func_sqlite import TemplateFunc
 from src.service.system_storage.template_sqlite import Template
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 
@@ -78,6 +79,13 @@ def copy_template_file(export_template_file):
     return template_file
 
 
+def copy_template_func(export_template_func):
+    template_func = TemplateFunc()
+    for field in fields(export_template_func):
+        setattr(template_func, field.name, getattr(export_template_func, field.name))
+    return template_func
+
+
 def copy_template_config(export_template_config: TemplateConfig):
     template_config = TemplateConfig()
     for field in fields(export_template_config):
@@ -119,6 +127,10 @@ def copy_template(export_template, exists_name_list):
                                     for var_config in export_template.var_config_list]
     else:
         template.var_config_list = tuple()
+    # 复制模板方法
+    if export_template.template_func_list:
+        template.template_func_list = [copy_template_func(template_func)
+                                       for template_func in export_template.template_func_list]
     return template
 
 # ------------------------------ 复制模板 end ------------------------------ #

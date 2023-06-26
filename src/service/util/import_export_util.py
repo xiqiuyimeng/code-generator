@@ -122,17 +122,36 @@ def check_template_config(config_list, config_type):
     return error_name_count, error_var_name_count
 
 
-def batch_save_template(template_sqlite, template_config_sqlite, template_file_sqlite, data_list):
+def check_template_func_name(template_func_list):
+    # 检查名称是否重复、是否为空
+    error_count = 0
+    func_name_set = set()
+    for template_func in template_func_list:
+        if not template_func.func_name:
+            error_count += 1
+        elif template_func.func_name in func_name_set:
+            error_count += 1
+        else:
+            func_name_set.add(template_func.func_name)
+    return error_count
+
+
+def batch_save_template(template_sqlite, template_config_sqlite, template_file_sqlite,
+                        template_func_sqlite, template_list):
     # 批量保存模板
-    template_sqlite.batch_save_templates(data_list)
-    for template in data_list:
+    template_sqlite.batch_save_templates(template_list)
+    for template in template_list:
+        # 保存配置
         template_config_sqlite.batch_add_config_list(template.id, template.output_config_list,
                                                      template.var_config_list)
-        if template.template_files:
-            template_file_sqlite.batch_add_template_files(template.id, template.template_files)
+        # 保存模板文件
+        template_file_sqlite.batch_add_template_files(template.id, template.template_files)
+        # 保存模板方法
+        template_func_sqlite.batch_add_template_func_list(template.id, template.template_func_list)
 
 
-def export_template(template_sqlite, template_file_sqlite, template_config_sqlite, template_ids):
+def export_template(template_sqlite, template_file_sqlite, template_config_sqlite,
+                    template_func_sqlite, template_ids):
     # 1. 查询模板信息
     template_list = template_sqlite.export_template_by_ids(template_ids)
     if not template_list:
@@ -159,11 +178,15 @@ def export_template(template_sqlite, template_file_sqlite, template_config_sqlit
         elif config.config_type == ConfigTypeEnum.template_var.value:
             add_group_list(template_id_var_config_dict, lambda x: x.template_id, config)
 
-    # 将模板配置、模板文件都关联到模板上
+    # 7. 查询模板方法
+    template_func_list = template_func_sqlite.export_func_list_by_template_id(template_ids)
+
+    # 将模板配置、模板文件、模板方法都关联到模板上
     for template in template_list:
-        template.template_files = template_id_file_dict.get(template.id)
         template.output_config_list = template_id_output_config_dict.get(template.id)
         template.var_config_list = template_id_var_config_dict.get(template.id)
+        template.template_files = template_id_file_dict.get(template.id)
+        template.template_func_list = template_func_list
     return template_list
 
 # ------------------------------ 导入导出模板 end ------------------------------ #

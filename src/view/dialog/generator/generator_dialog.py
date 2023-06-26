@@ -62,40 +62,35 @@ class GeneratorDialog(CustomDialogABC):
     def get_frame(self) -> SelectedDataDialogFrameABC:
         # 根据类型判断，展示为sql还是结构体对话框框架
         if self.ds_category == DsCategoryEnum.sql_ds_category.value.name:
-            return SqlSelectedDataDialogFrame(self.selected_data, self.dialog_layout,
-                                              self, SQL_CONFIRM_SELECTED_TITLE)
+            return SqlSelectedDataDialogFrame(self.selected_data, self, SQL_CONFIRM_SELECTED_TITLE)
         elif self.ds_category == DsCategoryEnum.struct_ds_category.value.name:
-            return StructSelectedDataDialogFrame(self.selected_data, self.dialog_layout,
-                                                 self, STRUCT_CONFIRM_SELECTED_TITLE)
+            return StructSelectedDataDialogFrame(self.selected_data, self, STRUCT_CONFIRM_SELECTED_TITLE)
 
     def setup_frame_chain(self):
         # 类型映射框架
-        self.select_type_mapping_frame = SelectTypeMappingDialogFrame(self.dialog_layout, self,
-                                                                      SELECT_TYPE_MAPPING_TITLE)
+        self.select_type_mapping_frame = SelectTypeMappingDialogFrame(self, SELECT_TYPE_MAPPING_TITLE)
         self.frame.set_next_frame(self.select_type_mapping_frame)
         self.select_type_mapping_frame.set_previous_frame(self.frame)
 
         # 模板框架
-        self.select_template_frame = SelectTemplateDialogFrame(self.dialog_layout, self, SELECT_TEMPLATE_TITLE)
+        self.select_template_frame = SelectTemplateDialogFrame(self, SELECT_TEMPLATE_TITLE)
         self.select_type_mapping_frame.set_next_frame(self.select_template_frame)
         self.select_template_frame.set_previous_frame(self.select_type_mapping_frame)
 
         # 动态模板输出配置框架
-        self.dynamic_output_config_frame = DynamicOutputConfigDialogFrame(self.dialog_layout, self,
-                                                                          FILL_TEMPLATE_OUTPUT_CONFIG_TITLE,
+        self.dynamic_output_config_frame = DynamicOutputConfigDialogFrame(self, FILL_TEMPLATE_OUTPUT_CONFIG_TITLE,
                                                                           get_template_func=self.get_template)
         self.select_template_frame.set_next_frame(self.dynamic_output_config_frame)
         self.dynamic_output_config_frame.set_previous_frame(self.select_template_frame)
 
         # 动态模板变量配置框架
-        self.dynamic_var_config_frame = DynamicVarConfigDialogFrame(self.dialog_layout, self,
-                                                                    FILL_TEMPLATE_VAR_CONFIG_TITLE,
+        self.dynamic_var_config_frame = DynamicVarConfigDialogFrame(self, FILL_TEMPLATE_VAR_CONFIG_TITLE,
                                                                     get_template_func=self.get_template)
         self.dynamic_output_config_frame.set_next_frame(self.dynamic_var_config_frame)
         self.dynamic_var_config_frame.set_previous_frame(self.dynamic_output_config_frame)
 
         # 生成页面框架
-        self.generate_frame = GenerateDialogFrame(self.dialog_layout, self, GENERATE_TITLE)
+        self.generate_frame = GenerateDialogFrame(self, GENERATE_TITLE)
         self.dynamic_var_config_frame.set_next_frame(self.generate_frame)
         self.generate_frame.set_previous_frame(self.dynamic_var_config_frame)
 

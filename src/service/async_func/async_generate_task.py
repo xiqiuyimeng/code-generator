@@ -73,7 +73,7 @@ class GenerateWorker(ThreadWorkerABC):
 
         # 5. 获取模板方法
         self.generate_log_signal.emit('<p style="color: orangered">开始准备模板方法 >>>>></p><br>')
-        template_func_list = TemplateFuncSqlite().get_all_func()
+        template_func_list = TemplateFuncSqlite().get_by_template_id(self.template.id)
         template_func_dict = dict()
         for template_func in template_func_list:
             try:
