@@ -708,16 +708,21 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
 }
 
 
+/* 消息框按钮 */
 QMessageBox QPushButton {
-    background-color: #0074D9;
+    background-color: DarkCyan;
     color: white;
     border-radius: 4px;
     padding: 4px;
     width: 60%;
 }
-/* 悬浮 */
+/* 悬浮样式 */
 QMessageBox QPushButton:hover {
-    background-color: #001F3F;
+    background-color: MediumSlateBlue;
+}
+/* 悬浮样式 */
+QMessageBox QPushButton:pressed {
+    background-color: DarkCyan;
 }
 
 /**************************************** 按钮样式设置 end ****************************************/

@@ -12,7 +12,7 @@ class SqliteDBExecutor(SqlDBExecutor):
 
     def connect_db(self):
         # 以uri只读模式连接，避免当文件不存在时，创建出一个新的
-        conn = sqlite3.connect(f'file:/{self.conn_info.file_url}?mode=ro', check_same_thread=False)
+        conn = sqlite3.connect(f'file:/{self.conn_info.file_url}?mode=ro', uri=True, check_same_thread=False)
         # 查询结果可以以字典形式展现
         conn.row_factory = sqlite3.Row
         self.cursor = conn.cursor()
