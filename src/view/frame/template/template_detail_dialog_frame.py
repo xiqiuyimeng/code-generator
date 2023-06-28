@@ -100,6 +100,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
 
         # 模板说明文本输入框
         self.template_desc_label = QLabel(self)
+        self.template_desc_label.setObjectName('form_label')
         self.template_desc_text_edit = TextEditor(self)
         self.name_layout.addRow(self.template_desc_label, self.template_desc_text_edit)
 

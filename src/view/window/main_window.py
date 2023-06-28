@@ -123,6 +123,11 @@ class MainWindow(QMainWindow):
         else:
             pop_ok(DS_CATEGORY_NO_CHANGE_MSG.format(ds_category), SWITCH_DS_CATEGORY_TITLE, self)
 
+    def resizeEvent(self, event):
+        # 在窗口大小变化时，标题栏宽度随之变化
+        self.titlebar.setFixedWidth(self.width())
+        super().resizeEvent(event)
+
     def close(self):
         close_conn()
         super().close()

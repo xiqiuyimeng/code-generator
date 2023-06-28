@@ -84,6 +84,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
     def setup_other_content_ui(self):
         self.var_name_label = QLabel(self)
+        self.var_name_label.setObjectName('form_label')
         self.var_name_input = QLineEdit(self)
         self.var_name_input.setObjectName('var_name_input')
 
@@ -94,6 +95,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
         # 配置项说明
         self.desc_label = QLabel()
+        self.desc_label.setObjectName('form_label')
         self.desc_input = TextEditor()
         self.name_layout.addRow(self.desc_label, self.desc_input)
         # 名称表单布局左侧增加间距，因为堆栈式窗口本身会占据一定空间，所以会导致堆栈式窗口内的部件靠右
@@ -106,6 +108,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
         # 配置项控件
         self.widget_label = QLabel()
+        self.widget_label.setObjectName('form_label')
         # 增加左侧间距
         self.widget_label.setContentsMargins(margins)
         self.widget_layout.addWidget(self.widget_label, 0, 0, 1, 1)
@@ -115,6 +118,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.widget_layout.addWidget(QLabel(), 0, 2, 1, 1)
         # 是否必填
         self.is_required_label = QLabel()
+        self.is_required_label.setObjectName('form_label')
         self.widget_layout.addWidget(self.is_required_label, 0, 3, 1, 1)
         self.is_required_combox = QComboBox()
         self.widget_layout.addWidget(self.is_required_combox, 0, 4, 1, 1)
@@ -138,11 +142,13 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.stacked_widget.addWidget(self.input_widget)
         # 默认值
         self.default_value_label = QLabel()
+        self.default_value_label.setObjectName('form_label')
         self.input_layout.addWidget(self.default_value_label, 0, 0, 1, 1)
         self.default_value_input = QLineEdit()
         self.input_layout.addWidget(self.default_value_input, 0, 1, 1, 1)
         # 占位文本
         self.placeholder_label = QLabel()
+        self.placeholder_label.setObjectName('form_label')
         self.input_layout.addWidget(self.placeholder_label, 1, 0, 1, 1)
         self.placeholder_input = QLineEdit()
         self.input_layout.addWidget(self.placeholder_input, 1, 1, 1, 1)
@@ -151,11 +157,12 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.input_layout.setColumnStretch(1, 11)
 
     def setup_text_edit_widget(self):
-        self.text_edit_widget = QWidget()
+        self.text_edit_widget = QWidget(self)
         self.text_edit_layout = QGridLayout(self.text_edit_widget)
         self.stacked_widget.addWidget(self.text_edit_widget)
         # 默认值
         self.default_text_edit_value_label = QLabel()
+        self.default_text_edit_value_label.setObjectName('form_label')
         self.text_edit_layout.addWidget(self.default_text_edit_value_label, 0, 0, 1, 1)
         self.default_text_edit_value_input = TextEditor()
         self.text_edit_layout.addWidget(self.default_text_edit_value_input, 0, 1, 1, 1)
@@ -173,6 +180,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.stacked_widget.addWidget(self.combox_widget)
         # 取值范围
         self.value_range_label = QLabel()
+        self.value_range_label.setObjectName('form_label')
         self.combox_layout.addWidget(self.value_range_label, 0, 0, 1, 1)
         self.value_range_list_widget = ValueRangeListWidget(self.open_save_range_value_dialog, self.combox_widget)
         self.combox_layout.addWidget(self.value_range_list_widget, 0, 1, 3, 1)
@@ -180,11 +188,13 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.default_value_combo_box_layout = QFormLayout()
         self.combox_layout.addLayout(self.default_value_combo_box_layout, 0, 2, 1, 1)
         self.default_combox_value_label = QLabel()
+        self.default_combox_value_label.setObjectName('form_label')
         self.default_value_combo_box = QComboBox()
         self.default_value_combo_box_layout.addRow(self.default_combox_value_label, self.default_value_combo_box)
 
         # 添加值按钮
         self.add_value_button = QPushButton()
+        self.add_value_button.setObjectName('create_button')
         self.combox_layout.addWidget(self.add_value_button, 1, 2, 1, 1)
 
     def setup_choose_dir_widget(self):

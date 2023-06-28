@@ -36,6 +36,7 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
         self.ds_info_layout = QFormLayout()
         # 主机地址
         self.host_label = QLabel(self)
+        self.host_label.setObjectName('form_label')
         self.host_value = QLineEdit(self)
         self.ds_info_layout.addRow(self.host_label, self.host_value)
 
@@ -44,21 +45,24 @@ class InternetConnDialogFrame(ConnDialogFrameABC):
 
         # 端口号
         self.port_label = QLabel(self)
+        self.port_label.setObjectName('form_label')
         self.port_value = QLineEdit(self)
         self.ds_info_layout.addRow(self.port_label, self.port_value)
         # 用户名
         self.user_label = QLabel(self)
+        self.user_label.setObjectName('form_label')
         self.user_value = QLineEdit(self)
         self.ds_info_layout.addRow(self.user_label, self.user_value)
         # 密码
         self.pwd_label = QLabel(self)
+        self.pwd_label.setObjectName('form_label')
         self.pwd_value = QLineEdit(self)
         self.ds_info_layout.addRow(self.pwd_label, self.pwd_value)
 
     def setup_special_conn_info_ui(self):
         ...
 
-    def setup_conn_info_label(self):
+    def setup_conn_info_label_text(self):
         self.host_label.setText(HOST_TEXT)
         self.port_label.setText(PORT_TEXT)
         self.user_label.setText(USERNAME_TEXT)

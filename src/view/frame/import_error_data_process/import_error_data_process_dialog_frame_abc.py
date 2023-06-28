@@ -34,14 +34,18 @@ class ImportErrorDataProcessDialogFrameABC(DialogFrameABC):
         self.frame_layout.addLayout(self.top_button_layout)
 
         self.select_all_button = QPushButton(self)
+        self.select_all_button.setObjectName('select_button')
         self.top_button_layout.addWidget(self.select_all_button, 0, 0, 1, 1)
         self.unselect_all_button = QPushButton(self)
+        self.unselect_all_button.setObjectName('unselect_button')
         self.top_button_layout.addWidget(self.unselect_all_button, 0, 1, 1, 1)
         self.top_button_blank_label = QLabel(self)
         self.top_button_layout.addWidget(self.top_button_blank_label, 0, 2, 1, 2)
         self.skip_button = QPushButton(self)
+        self.skip_button.setObjectName('skip_button')
         self.top_button_layout.addWidget(self.skip_button, 0, 3, 1, 1)
         self.process_button = QPushButton(self)
+        self.process_button.setObjectName('process_button')
         self.top_button_layout.addWidget(self.process_button, 0, 4, 1, 1)
 
         # 列表区

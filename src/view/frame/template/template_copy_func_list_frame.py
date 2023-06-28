@@ -37,13 +37,16 @@ class TemplateCopyFuncListFrame(DialogFrameABC):
         self.header_button_layout = QHBoxLayout()
         self.frame_layout.addLayout(self.header_button_layout)
         self.select_all_button = QPushButton()
+        self.select_all_button.setObjectName('select_button')
         self.header_button_layout.addWidget(self.select_all_button)
         self.unselect_all_button = QPushButton()
+        self.unselect_all_button.setObjectName('unselect_button')
         self.header_button_layout.addWidget(self.unselect_all_button)
         # 增加空白label
         self.header_button_layout.addWidget(QLabel())
         self.header_button_layout.addWidget(QLabel())
         self.copy_func_button = QPushButton()
+        self.copy_func_button.setObjectName('copy_row_button')
         self.header_button_layout.addWidget(self.copy_func_button)
         # 创建方法列表控件
         self.func_list_widget = CopyTemplateFuncListWidget(self)
@@ -51,6 +54,7 @@ class TemplateCopyFuncListFrame(DialogFrameABC):
 
     def get_blank_right_buttons(self) -> tuple:
         self.back_button = QPushButton(self)
+        self.back_button.setObjectName('to_previous_button')
         return self.back_button,
 
     def setup_other_label_text(self):

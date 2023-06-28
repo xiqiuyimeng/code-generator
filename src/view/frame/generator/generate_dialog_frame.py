@@ -54,18 +54,21 @@ class GenerateDialogFrame(ChainDialogFrameABC):
 
         # 准备工作进度
         self.prepare_progress_label = QLabel(self)
+        self.prepare_progress_label.setObjectName('form_label')
         self.prepare_progress_bar = QProgressBar(self)
         self.prepare_progress_bar.setAlignment(Qt.AlignCenter)
         self.generator_layout.addRow(self.prepare_progress_label, self.prepare_progress_bar)
 
         # 生成进度
         self.generate_progress_label = QLabel(self)
+        self.generate_progress_label.setObjectName('form_label')
         self.generate_progress_bar = QProgressBar(self)
         self.generate_progress_bar.setAlignment(Qt.AlignCenter)
         self.generator_layout.addRow(self.generate_progress_label, self.generate_progress_bar)
 
         # 工作日志
         self.generate_log_label = QLabel(self)
+        self.generate_log_label.setObjectName('form_label')
         self.generate_log_label.setAlignment(Qt.AlignTop)
         self.generate_log_browser = ScrollableTextBrowser(self)
         self.generator_layout.addRow(self.generate_log_label, self.generate_log_browser)
@@ -74,6 +77,7 @@ class GenerateDialogFrame(ChainDialogFrameABC):
         left_buttons = super().get_blank_left_buttons()
         # 增加预览生成按钮
         self.preview_generate_button = QPushButton(self)
+        self.preview_generate_button.setObjectName('preview_generate_button')
         return *left_buttons, self.preview_generate_button
 
     def setup_other_label_text(self):

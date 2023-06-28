@@ -45,18 +45,22 @@ class ConfigValueWidgetABC(QWidget):
     def setup_ui(self):
         self._layout = QGridLayout(self)
         self.required_label = QLabel()
+        self.required_label.setObjectName('form_label')
         self.required_label.setAlignment(Qt.AlignTop)
         self._layout.addWidget(self.required_label, 0, 0, 1, 1)
         self.config_name_label = QLabel()
         self.config_name_label.setAlignment(Qt.AlignTop)
+        self.config_name_label.setObjectName('form_label')
         self._layout.addWidget(self.config_name_label, 0, 1, 1, 1)
         self.config_layout = QHBoxLayout()
         self.setup_config_widget_ui()
         self._layout.addLayout(self.config_layout, 0, 2, 1, 1)
         self.config_desc_label = QLabel()
         self.config_desc_label.setAlignment(Qt.AlignTop)
+        self.config_desc_label.setObjectName('form_label')
         self._layout.addWidget(self.config_desc_label, 1, 1, 1, 1)
         self.config_desc_value_label = QLabel()
+        self.config_desc_value_label.setAlignment(Qt.AlignTop)
         self._layout.addWidget(self.config_desc_value_label, 1, 2, 1, 1)
         self._layout.setColumnStretch(0, 1)
         self._layout.setColumnStretch(1, 10)
@@ -122,6 +126,7 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
 
     def setup_config_widget_ui(self):
         self.open_file_dialog_button = QPushButton()
+        self.open_file_dialog_button.setObjectName('choose_dir_button')
         self.config_layout.addWidget(self.open_file_dialog_button)
 
     def set_other_text(self):

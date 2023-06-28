@@ -24,7 +24,9 @@ class ChainDialogFrameABC(DialogFrameABC):
     def get_blank_left_buttons(self) -> tuple:
         # 按钮部分
         self.previous_frame_button = QPushButton(self)
+        self.previous_frame_button.setObjectName('to_previous_button')
         self.next_frame_button = QPushButton(self)
+        self.next_frame_button.setObjectName('to_next_button')
         return self.previous_frame_button, self.next_frame_button
 
     # ------------------------------ 创建ui界面 end ------------------------------ #

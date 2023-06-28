@@ -41,7 +41,6 @@ class DsColTypeDialogFrame(SaveDialogFrame):
         # 温馨提示
         self.tips_label = QLabel()
         self.tips_label.setObjectName('tips_label')
-        self.tips_label.setText(SAVE_DATA_TIPS)
         self.frame_layout.addWidget(self.tips_label)
 
         # 构建堆栈式窗口
@@ -49,9 +48,11 @@ class DsColTypeDialogFrame(SaveDialogFrame):
 
     def get_blank_left_buttons(self) -> tuple:
         self.add_ds_col_type_button = QPushButton(self)
+        self.add_ds_col_type_button.setObjectName('create_row_button')
         return self.add_ds_col_type_button,
 
     def setup_other_label_text(self):
+        self.tips_label.setText(SAVE_DATA_TIPS)
         self.add_ds_col_type_button.setText(ADD_DS_COL_TYPE_BUTTON_TEXT)
 
     # ------------------------------ 创建ui界面 end ------------------------------ #

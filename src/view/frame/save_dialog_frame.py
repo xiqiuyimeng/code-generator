@@ -33,6 +33,7 @@ class SaveDialogFrame(DialogFrameABC):
 
     def get_blank_right_buttons(self) -> tuple:
         self.save_button = QPushButton(self)
+        self.save_button.setObjectName('save_button')
         return self.save_button,
 
     def setup_label_text(self):

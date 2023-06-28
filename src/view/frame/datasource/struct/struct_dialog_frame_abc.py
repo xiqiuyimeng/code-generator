@@ -6,7 +6,6 @@ from src.constant.ds_dialog_constant import STRUCT_NAME_TEXT, STRUCT_FILE_URL_TE
     PRETTY_STRUCT_TEXT, CHOOSE_STRUCT_FILE_TEXT, READ_STRUCT_FILE_BOX_TITLE, PRETTY_STRUCT_BOX_TITLE, \
     EDIT_STRUCT_BOX_TITLE, ADD_STRUCT_BOX_TITLE, QUERY_STRUCT_BOX_TITLE
 from src.constant.help.help_constant import STRUCT_DS_HELP
-from src.constant.icon_enum import get_icon
 from src.service.async_func.async_struct_task import ReadFileExecutor, PrettyStructExecutor, AddStructExecutor, \
     EditStructExecutor, QueryStructExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
@@ -15,6 +14,7 @@ from src.service.system_storage.struct_type import StructType
 from src.view.custom_widget.syntax_highlighter.syntax_highlighter_abc import SyntaxHighLighterABC
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.frame.datasource.ds_dialog_frame_abc import DsDialogFrameABC
+from src.view.frame.frame_func import construct_lineedit_file_action
 
 _author_ = 'luwt'
 _date_ = '2023/4/3 13:52'
@@ -71,15 +71,13 @@ class StructDialogFrameABC(DsDialogFrameABC):
         # 结构体信息布局
         self.ds_info_layout = QFormLayout()
         # 结构体文件地址
-        self.struct_file_url_label = QLabel(self)
-        self.struct_file_url_linedit = QLineEdit(self)
-        self.struct_file_action = QAction()
-        self.struct_file_action.setIcon(get_icon(self.struct_type.display_name))
-        self.struct_file_url_linedit.addAction(self.struct_file_action, QLineEdit.ActionPosition.TrailingPosition)
+        self.struct_file_url_label, self.struct_file_url_linedit, \
+            self.struct_file_action = construct_lineedit_file_action()
         self.ds_info_layout.addRow(self.struct_file_url_label, self.struct_file_url_linedit)
 
         # 结构体内容文本框
         self.struct_text_label = QLabel(self)
+        self.struct_text_label.setObjectName('form_label')
         self.struct_text_input = TextEditor(self)
         # 构建语法高亮器
         self.struct_text_syntax_highlighter = self.get_syntax_highlighter()
@@ -92,6 +90,7 @@ class StructDialogFrameABC(DsDialogFrameABC):
     def get_blank_left_buttons(self) -> tuple:
         # 按钮部分
         self.pretty_button = QPushButton(self)
+        self.pretty_button.setObjectName('pretty_button')
         return self.pretty_button,
 
     def setup_other_label_text(self):

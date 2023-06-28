@@ -38,6 +38,7 @@ class TemplateFileTabWidget(QTabWidget):
         file_name_layout = QFormLayout()
         tab_layout.addLayout(file_name_layout)
         file_name_label = QLabel()
+        file_name_label.setObjectName('form_label')
         file_name_edit = QLineEdit()
         file_name_layout.addRow(file_name_label, file_name_edit)
 

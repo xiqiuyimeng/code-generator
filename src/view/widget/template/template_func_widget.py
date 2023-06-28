@@ -42,18 +42,23 @@ class TemplateFuncWidget(QWidget):
         self.func_list_header_layout = QHBoxLayout(self)
         self._layout.addLayout(self.func_list_header_layout)
         # 全选按钮
-        self.select_button = QPushButton()
+        self.select_button = QPushButton(self)
+        self.select_button.setObjectName('select_button')
         self.func_list_header_layout.addWidget(self.select_button)
         self.unselect_button = QPushButton()
+        self.unselect_button.setObjectName('unselect_button')
         self.func_list_header_layout.addWidget(self.unselect_button)
         # 从其他模板复制方法按钮
-        self.copy_other_tp_func_button = QPushButton()
+        self.copy_other_tp_func_button = QPushButton(self)
+        self.copy_other_tp_func_button.setObjectName('copy_row_button')
         self.func_list_header_layout.addWidget(self.copy_other_tp_func_button)
         # 创建新方法按钮
         self.create_new_func_button = QPushButton()
+        self.create_new_func_button.setObjectName('create_row_button')
         self.func_list_header_layout.addWidget(self.create_new_func_button)
         # 删除方法按钮
         self.delete_func_button = QPushButton()
+        self.delete_func_button.setObjectName('del_row_button')
         self.func_list_header_layout.addWidget(self.delete_func_button)
 
         # 方法列表

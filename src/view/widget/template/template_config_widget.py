@@ -41,10 +41,13 @@ class TemplateConfigWidget(QWidget):
         self.config_btn_layout = QGridLayout()
         self.config_layout.addLayout(self.config_btn_layout)
         self.add_config_btn = QPushButton()
+        self.add_config_btn.setObjectName('create_row_button')
         self.config_btn_layout.addWidget(self.add_config_btn, 0, 0, 1, 1)
         self.remove_config_btn = QPushButton()
+        self.remove_config_btn.setObjectName('del_row_button')
         self.config_btn_layout.addWidget(self.remove_config_btn, 0, 1, 1, 1)
         self.preview_config_btn = QPushButton()
+        self.preview_config_btn.setObjectName('preview_config_button')
         self.config_btn_layout.addWidget(self.preview_config_btn, 0, 2, 1, 1)
         self.setup_other_button_ui()
 

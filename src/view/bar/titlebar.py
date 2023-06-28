@@ -73,11 +73,9 @@ class TitleBar(DraggableWidget):
         self.parent.showMaximized()
         self.restore_button.setVisible(True)
         self.max_button.setVisible(False)
-        self.setFixedWidth(self.parent.width())
 
     def restore_window(self):
         """窗口还原"""
         self.parent.showNormal()
         self.restore_button.setVisible(False)
         self.max_button.setVisible(True)
-        self.setFixedWidth(self.parent.width())

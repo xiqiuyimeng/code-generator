@@ -57,8 +57,10 @@ class TemplateFileWidget(QWidget):
         self.file_list_header_layout = QHBoxLayout(self.file_list_frame)
         self.file_list_layout.addLayout(self.file_list_header_layout)
         self.create_new_file_button = QPushButton(self.file_list_frame)
+        self.create_new_file_button.setObjectName('create_button')
         self.file_list_header_layout.addWidget(self.create_new_file_button)
         self.locate_file_button = QPushButton(self.file_list_frame)
+        self.locate_file_button.setObjectName('locate_button')
         self.file_list_header_layout.addWidget(self.locate_file_button)
         # 文件列表
         self.file_list_widget = TemplateFileListWidget(self, self.open_create_file_dialog, self.file_list_frame)

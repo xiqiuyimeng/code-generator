@@ -80,9 +80,11 @@ class PreviewFileDialogFrame(DialogFrameABC):
         self.tree_frame_layout.addLayout(self.tree_header_layout)
         # 定位按钮
         self.locate_button = QPushButton(self.tree_frame)
+        self.locate_button.setObjectName('locate_button')
         self.tree_header_layout.addWidget(self.locate_button)
         # 重命名文件按钮
         self.rename_file_name_button = QPushButton(self.tree_frame)
+        self.rename_file_name_button.setObjectName('create_button')
         self.tree_header_layout.addWidget(self.rename_file_name_button)
 
     def fill_tree_tab(self):
@@ -97,6 +99,7 @@ class PreviewFileDialogFrame(DialogFrameABC):
 
     def get_blank_left_buttons(self) -> tuple:
         self.save_file_button = QPushButton(self)
+        self.save_file_button.setObjectName('save_button')
         return self.save_file_button,
 
     def setup_other_label_text(self):

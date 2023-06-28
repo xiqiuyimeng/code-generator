@@ -50,16 +50,17 @@ class ConnDialogFrameABC(DsDialogFrameABC):
 
     def get_blank_left_buttons(self) -> tuple:
         self.test_conn_button = QPushButton(self)
+        self.test_conn_button.setObjectName('test_conn_button')
         return self.test_conn_button,
 
     def setup_other_label_text(self):
         self.name_label.setText(CONN_NAME_TEXT)
         # 连接信息
-        self.setup_conn_info_label()
+        self.setup_conn_info_label_text()
         # 按钮文本
         self.test_conn_button.setText(TEST_CONN_BTN_TEXT)
 
-    def setup_conn_info_label(self):
+    def setup_conn_info_label_text(self):
         ...
 
     # ------------------------------ 创建ui界面 end ------------------------------ #

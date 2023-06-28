@@ -17,3 +17,5 @@ DS_TYPE_COMBO_BOX_PLACEHOLDER_TXT = '请选择数据源类型'
 # 通用下拉框值：是、否
 COMBO_BOX_YES_TXT = '是'
 COMBO_BOX_NO_TXT = '否'
+
+CHOOSE_FILE_ICON = '选择文件icon'

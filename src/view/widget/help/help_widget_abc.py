@@ -21,6 +21,7 @@ class HelpWidgetABC(ScrollArea):
     def setup_ui(self):
         # 画布，用来承载控件
         self.canvas_content_frame = QFrame()
+        self.canvas_content_frame.setObjectName('help_canvas_content_frame')
         # 设置画布控件
         self.set_canvas_widget(self.canvas_content_frame)
         # 画布布局
@@ -64,6 +65,7 @@ class HelpWidgetABC(ScrollArea):
     def add_row_label(self, label_text, help_label_text):
         label = QLabel()
         label.setAlignment(Qt.AlignTop)
+        label.setObjectName('form_label')
         label.setText(label_text)
         help_label = QLabel()
         help_label.setAlignment(Qt.AlignTop)
@@ -77,6 +79,7 @@ class HelpWidgetABC(ScrollArea):
     def add_row_text_browser(self, label_text, browser_text):
         label = QLabel()
         label.setAlignment(Qt.AlignTop)
+        label.setObjectName('form_label')
         label.setText(label_text)
         content_browser = ScrollableTextBrowser()
         # 自动换行
@@ -93,6 +96,6 @@ class HelpWidgetABC(ScrollArea):
 
         font_metrics = QFontMetrics(content_browser.currentFont())
         line_height = font_metrics.height()
-        # 为了美观，高度增加一行
-        content_browser.setFixedHeight(doc.size().height() + line_height)
+        # 为了美观，高度增加两行
+        content_browser.setFixedHeight(doc.size().height() + (line_height << 1))
         self.canvas_content_layout.addRow(label, content_browser)

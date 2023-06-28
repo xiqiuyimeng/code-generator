@@ -121,7 +121,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 构建数据源类型下拉框
         self.ds_type_combo_box_layout = QFormLayout()
         self.ds_type_label = QLabel(self)
-
+        self.ds_type_label.setObjectName('form_label')
         self.ds_type_combo_box = DsTypeComboBox(self)
         self.ds_type_combo_box_layout.addRow(self.ds_type_label, self.ds_type_combo_box)
         self.type_mapping_info_layout.addLayout(self.ds_type_combo_box_layout)
@@ -130,6 +130,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
         # 备注文本输入框
         self.type_mapping_comment_layout = QFormLayout()
         self.type_mapping_comment_label = QLabel(self)
+        self.type_mapping_comment_label.setObjectName('form_label')
         self.type_mapping_comment_text_edit = TextEditor(self)
         self.type_mapping_comment_layout.addRow(self.type_mapping_comment_label,
                                                 self.type_mapping_comment_text_edit)
@@ -145,14 +146,19 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
 
         # 构建按钮
         self.sync_ds_col_type_button = QPushButton(self)
+        self.sync_ds_col_type_button.setObjectName('sync_ds_col_type_button')
         self.col_type_button_layout.addWidget(self.sync_ds_col_type_button, 0, 0, 1, 1)
         self.add_mapping_button = QPushButton(self)
+        self.add_mapping_button.setObjectName('create_row_button')
         self.col_type_button_layout.addWidget(self.add_mapping_button, 0, 1, 1, 1)
         self.del_mapping_button = QPushButton(self)
+        self.del_mapping_button.setObjectName('del_row_button')
         self.col_type_button_layout.addWidget(self.del_mapping_button, 0, 2, 1, 1)
         self.add_mapping_group_button = QPushButton(self)
+        self.add_mapping_group_button.setObjectName('create_row_button')
         self.col_type_button_layout.addWidget(self.add_mapping_group_button, 0, 3, 1, 1)
         self.del_mapping_group_button = QPushButton(self)
+        self.del_mapping_group_button.setObjectName('del_row_button')
         self.col_type_button_layout.addWidget(self.del_mapping_group_button, 0, 4, 1, 1)
 
         # 构建表格

@@ -51,6 +51,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.name_layout = QFormLayout()
 
         self.name_label = QLabel(self)
+        self.name_label.setObjectName('form_label')
 
         self.name_input = QLineEdit(self)
         self.name_input.setObjectName('name_input')

@@ -21,7 +21,7 @@ SERVICE_NAME_TEXT = '服务：'
 PORT_TEXT = "端口号："
 USERNAME_TEXT = "用户名："
 PWD_TEXT = "密码："
-SQLITE_FILE_URL_TXT = "文件："
+SQLITE_FILE_URL_TXT = "sqlite文件："
 CHOOSE_SQLITE_FILE = "选择文件"
 # mysql 默认host、端口、用户名
 MYSQL_DEFAULT_HOST = "localhost"

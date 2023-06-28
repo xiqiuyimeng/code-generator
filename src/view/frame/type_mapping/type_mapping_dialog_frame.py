@@ -40,6 +40,7 @@ class TypeMappingDialogFrame(TableDialogFrame):
 
     def setup_first_button(self) -> QPushButton:
         self.open_ds_col_type_button = QPushButton(self)
+        self.open_ds_col_type_button.setObjectName('open_ds_col_type_button')
         return self.open_ds_col_type_button
 
     def setup_other_label_text(self):

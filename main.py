@@ -7,6 +7,7 @@ import sys
 import win32gui
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 
 from src.constant.window_constant import WINDOW_TITLE
 from src.logger.log import logger as log
@@ -17,6 +18,7 @@ from src.view.window.main_window_func import set_window
 
 # 引入静态资源
 from static import image_rc
+from static import style_rc
 
 pyi_splash_spec = importlib.util.find_spec("pyi_splash")
 if pyi_splash_spec is not None:
@@ -74,6 +76,7 @@ if __name__ == "__main__":
     # 获取当前屏幕分辨率
     desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())
+    app.setFont(QFont('Microsoft YaHei', 9))
     screen_rect = desktop.screenGeometry()
     main_window = MainWindow(screen_rect)
     # 保存引用

@@ -71,7 +71,7 @@ class TextEditor(ScrollableTextEdit):
             selection = QTextEdit.ExtraSelection()
 
             # 设置高亮背景色
-            line_color = QColor(Qt.blue).lighter(160)
+            line_color = QColor('DeepSkyBlue').lighter(160)
 
             selection.format.setBackground(line_color)
             selection.format.setProperty(QTextFormat.FullWidthSelection, True)
@@ -99,6 +99,7 @@ class TextEditor(ScrollableTextEdit):
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bottom >= event.rect().top():
                 painter.setPen(Qt.black)
+                painter.setFont(self.font())
                 painter.drawText(0, top, self.lineNumberArea.width(),
                                  self.fontMetrics().height(), Qt.AlignRight,
                                  str(block_num + 1))

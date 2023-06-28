@@ -93,7 +93,8 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
     def setup_content_scroll_area(self):
         self.content_scroll_area = ScrollArea()
         # 画布控件
-        self.canvas_content_frame = QFrame()
+        self.canvas_content_frame = QFrame(self)
+        self.canvas_content_frame.setObjectName('canvas_content_frame')
         self.canvas_content_frame_layout = QVBoxLayout(self.canvas_content_frame)
         # 设置画布控件
         self.content_scroll_area.set_canvas_widget(self.canvas_content_frame)

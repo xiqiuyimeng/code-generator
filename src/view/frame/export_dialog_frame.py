@@ -30,6 +30,7 @@ class ExportDialogFrame(ImportExportDialogFrameABC):
 
     def setup_child_content(self):
         self.selected_data_label = QLabel(self)
+        self.selected_data_label.setObjectName('form_label')
         self.selected_data_desc_label = QLabel(self)
         self.form_layout.insertRow(0, self.selected_data_label, self.selected_data_desc_label)
 

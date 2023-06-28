@@ -5,11 +5,11 @@ from PyQt5.QtGui import QIcon
 
 from src.constant.bar_constant import SWITCH_ACTION, ADD_DS_ACTION, REFRESH_ACTION, TYPE_ACTION, TEMPLATE_ACTION, \
     GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
+from src.constant.constant import CHOOSE_FILE_ICON
 from src.constant.dialog_constant import NAME_AVAILABLE, NAME_EXISTS
 from src.constant.ds_type_constant import SQLITE_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, SQLITE_COL, MYSQL_DISPLAY_NAME, \
     MYSQL_DB, MYSQL_TB, MYSQL_COL, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL, FOLDER_TYPE, \
     JSON_DISPLAY_NAME, STRUCT_COL_ICON
-from src.constant.export_import_constant import IMPORT_EXPORT_SELECT_FILE_ICON
 from src.constant.generator_dialog_constant import PREVIEW_TREE_FOLDER_ICON, PREVIEW_TREE_FILE_ICON
 from src.constant.list_constant import EDIT_LIST_ITEM_ICON, DEL_LIST_ITEM_ICON, DEL_ALL_LIST_ITEMS_ICON, \
     EXPORT_ITEM_ICON
@@ -146,8 +146,8 @@ class IconEnum(Enum):
     preview_tree_folder_icon = PREVIEW_TREE_FOLDER_ICON, ':/icon/exec.png'
     preview_tree_file_icon = PREVIEW_TREE_FILE_ICON, ':/icon/table_icon.png'
 
-    # 导入导出选择文件 icon
-    import_export_select_file_icon = IMPORT_EXPORT_SELECT_FILE_ICON, ':/icon/exec.png'
+    # 选择文件 icon
+    choose_file_icon = CHOOSE_FILE_ICON, ':/icon/exec.png'
 
 
 def get_icon_path(name):

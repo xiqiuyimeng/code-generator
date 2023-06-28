@@ -67,6 +67,7 @@ class DialogFrameABC(QFrame):
 
         if self.need_help_button:
             self.help_button = QPushButton()
+            self.help_button.setObjectName('help_button')
             self.button_layout.addWidget(self.help_button, 0, 0, 1, 1)
 
         # 空白占位左侧的按钮组
@@ -85,6 +86,7 @@ class DialogFrameABC(QFrame):
                 self.button_layout.addWidget(right_button, 0, idx, 1, 1)
 
         self.dialog_quit_button = QPushButton(self)
+        self.dialog_quit_button.setObjectName('dialog_quit_button')
         self.button_layout.addWidget(self.dialog_quit_button, 0, self.get_blank_right_start_col_idx(), 1, 1)
 
     def get_blank_left_buttons(self) -> tuple:

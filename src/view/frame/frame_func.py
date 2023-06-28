@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QLineEdit, QLabel, QAction, QVBoxLayout, QHBoxLayout, QStackedWidget, QFrame
 
+from src.constant.constant import CHOOSE_FILE_ICON
 from src.constant.dialog_constant import NAME_UNCHANGED_PROMPT, NAME_AVAILABLE, NAME_EXISTS
 from src.constant.icon_enum import get_icon
 from src.service.read_qrc.read_config import read_qss
@@ -97,3 +98,15 @@ def construct_list_stacked_ui(list_widget_type: type, frame_layout: QVBoxLayout,
 
     # 连接信号
     parent_frame.list_widget.currentRowChanged.connect(parent_frame.stacked_widget.setCurrentIndex)
+
+
+# ---------------------------------------- 创建带有文件选择功能的输入框和对应label ---------------------------------------- #
+
+def construct_lineedit_file_action():
+    file_url_label = QLabel()
+    file_url_label.setObjectName('form_label')
+    file_url_linedit = QLineEdit()
+    choose_file_action = QAction()
+    choose_file_action.setIcon(get_icon(CHOOSE_FILE_ICON))
+    file_url_linedit.addAction(choose_file_action, QLineEdit.ActionPosition.TrailingPosition)
+    return file_url_label, file_url_linedit, choose_file_action

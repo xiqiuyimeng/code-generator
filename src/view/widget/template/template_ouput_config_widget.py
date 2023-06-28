@@ -38,8 +38,10 @@ class TemplateOutputConfigWidget(TemplateConfigWidget):
     def setup_other_button_ui(self):
         # 插入到预览配置页之前
         self.auto_generate_config_btn = QPushButton()
+        self.auto_generate_config_btn.setObjectName('auto_generate_config_button')
         self.config_btn_layout.addWidget(self.auto_generate_config_btn, 0, 2, 1, 1)
         self.maintain_file_config_btn = QPushButton()
+        self.maintain_file_config_btn.setObjectName('maintain_file_config_button')
         self.config_btn_layout.addWidget(self.maintain_file_config_btn, 0, 3, 1, 1)
 
         self.config_btn_layout.addWidget(self.preview_config_btn, 0, 4, 1, 1)

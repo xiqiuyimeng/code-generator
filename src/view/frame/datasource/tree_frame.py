@@ -43,6 +43,7 @@ class TreeFrameABC(QFrame):
         self.header_layout.addWidget(self.tree_header_label)
 
         self.tree_locate_button = QPushButton(self)
+        self.tree_locate_button.setObjectName('locate_button')
         self.tree_locate_button.setText(LOCATION_TXT)
         # 设置比例
         self.header_layout.setStretch(0, 1)
@@ -89,6 +90,7 @@ class StructTreeFrame(TreeFrameABC):
 
         # 增加新建文件夹按钮
         self.create_folder_button = QPushButton(self)
+        self.create_folder_button.setObjectName('create_button')
         self.create_folder_button.setText(CREATE_NEW_FOLDER)
         self.header_layout.insertWidget(1, self.create_folder_button)
         self.create_folder_button.clicked.connect(lambda: add_folder_func(self.tree_widget))

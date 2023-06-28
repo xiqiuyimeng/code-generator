@@ -25,6 +25,7 @@ class OracleConnDialogFrame(InternetConnDialogFrame):
 
     def setup_special_conn_info_ui(self):
         self.service_name_label = QLabel(self)
+        self.service_name_label.setObjectName('form_label')
         self.service_name_value = QLineEdit(self)
         self.ds_info_layout.addRow(self.service_name_label, self.service_name_value)
 

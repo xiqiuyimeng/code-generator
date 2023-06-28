@@ -71,10 +71,13 @@ class TableDialogFrame(DialogFrameABC):
         first_operation_button = self.setup_first_button()
         self.operation_table_btn_layout.addWidget(first_operation_button, 0, 0, 1, 1)
         self.add_row_button = QPushButton(self)
+        self.add_row_button.setObjectName('create_row_button')
         self.operation_table_btn_layout.addWidget(self.add_row_button, 0, 1, 1, 1)
         self.del_row_button = QPushButton()
+        self.del_row_button.setObjectName('del_row_button')
         self.operation_table_btn_layout.addWidget(self.del_row_button, 0, 2, 1, 1)
         self.copy_row_button = QPushButton(self)
+        self.copy_row_button.setObjectName('copy_row_button')
         self.operation_table_btn_layout.addWidget(self.copy_row_button, 0, 3, 1, 1)
         self.setup_import_export_button()
 
@@ -83,8 +86,10 @@ class TableDialogFrame(DialogFrameABC):
 
     def setup_import_export_button(self):
         self.import_button = QPushButton(self)
+        self.import_button.setObjectName('import_button')
         self.operation_table_btn_layout.addWidget(self.import_button, 0, 4, 1, 1)
         self.export_button = QPushButton(self)
+        self.export_button.setObjectName('export_button')
         self.operation_table_btn_layout.addWidget(self.export_button, 0, 5, 1, 1)
 
     def make_table_widget(self):
