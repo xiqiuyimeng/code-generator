@@ -259,7 +259,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
 
 /* 定位按钮 */
 #locate_button {
-    background-color: Orange;
+    background-color: OrangeRed;
     color: white;
     border-radius: 4px;
     padding: 6px;
@@ -267,11 +267,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
 }
 /* 悬浮样式 */
 #locate_button:hover {
-    background-color: OrangeRed;
+    background-color: Coral;
 }
 /* 点击样式 */
 #locate_button:pressed {
-    background-color: Orange;
+    background-color: OrangeRed;
 }
 
 
@@ -319,7 +319,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
 }
 /* 悬浮样式 */
 #help_button:hover {
-    background-color: DeepSkyBlue;
+    background-color: MediumPurple;
 }
 /* 点击样式 */
 #help_button:pressed {
@@ -705,6 +705,45 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
 /* 点击样式 */
 #process_button:pressed {
     background-color: DarkCyan;
+}
+
+
+/* 窗口最小化按钮 */
+#min_button {
+    background: #6DDF6D;
+    border-radius: 2px;
+}
+#min_button:hover {
+    background: SpringGreen;
+}
+#min_button:pressed {
+    background: #6DDF6D;
+}
+
+
+/* 窗口最大化、还原按钮 */
+#max_button, #restore_button {
+    background: #F7D674;
+    border-radius: 2px;
+}
+#max_button:hover, #restore_button:hover {
+    background: Yellow;
+}
+#max_button:pressed, #restore_button:pressed {
+    background: #F7D674;
+}
+
+
+/* 关闭窗口按钮 */
+#close_button {
+    background: #F76677;
+    border-radius: 2px;
+}
+#close_button:hover {
+    background: OrangeRed;
+}
+#close_button:pressed {
+    background: #F76677;
 }
 
 

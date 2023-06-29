@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QPushButton, QFileDialog, QComboBox, QGridLayout
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QPushButton, QFileDialog, QComboBox, \
+    QGridLayout, QStyle
 
 from src.constant.template_dialog_constant import CONFIG_DESC_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT, \
     OPEN_FILE_DIALOG_BUTTON_TXT, SELECT_DIRECTORY_TITLE
@@ -126,6 +127,7 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
 
     def setup_config_widget_ui(self):
         self.open_file_dialog_button = QPushButton()
+        self.open_file_dialog_button.setIcon(self.style().standardIcon(QStyle.SP_DirOpenIcon))
         self.open_file_dialog_button.setObjectName('choose_dir_button')
         self.config_layout.addWidget(self.open_file_dialog_button)
 

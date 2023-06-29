@@ -3,7 +3,7 @@
 处理树节点相关操作
 """
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt5.QtWidgets import QTreeWidgetItem, QApplication, QStyle
 
 from src.constant.ds_type_constant import FOLDER_TYPE
 from src.constant.icon_enum import get_icon
@@ -322,7 +322,9 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     :param opened_item_record: 打开记录表中记录
     :param struct_type: 结构体类型，文件夹或具体结构体，以此确定icon
     """
-    icon = get_icon(struct_type)
+    # 如果是文件夹，使用默认图标
+    icon = get_icon(struct_type) \
+        if struct_type != FOLDER_TYPE else QApplication.style().standardIcon(QStyle.SP_DirIcon)
     struct_item = make_struct_tree_item(tree_widget, parent, opened_item_record.item_name,
                                         icon, opened_item_record.checked, opened_item_record)
     struct_item.setExpanded(opened_item_record.expanded)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import QStyle
 
-from src.constant.generator_dialog_constant import PREVIEW_TREE_FOLDER_ICON, PREVIEW_TREE_FILE_ICON
+from src.constant.generator_dialog_constant import PREVIEW_TREE_FILE_ICON
 from src.constant.icon_enum import get_icon
 from src.view.tree.tree_widget.tree_function import make_display_tree_item
 from src.view.tree.tree_widget.tree_widget_abc import DisplayTreeWidget
@@ -14,9 +15,9 @@ class PreviewGenerateFileTreeWidget(DisplayTreeWidget):
     def __init__(self, parent):
         # 存储item，可以更快定位item，k：path，v：item
         self.file_path_item_dict = dict()
-        self.folder_icon = get_icon(PREVIEW_TREE_FOLDER_ICON)
-        self.file_icon = get_icon(PREVIEW_TREE_FILE_ICON)
         super().__init__(parent)
+        self.folder_icon = self.style().standardIcon(QStyle.SP_DirIcon)
+        self.file_icon = get_icon(PREVIEW_TREE_FILE_ICON)
 
     def make_tree_item(self, file_name, file_path):
         # 首先获取父节点，创建子节点

@@ -4,7 +4,7 @@
 """
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QLabel, QSizePolicy, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QLabel, QSizePolicy, QPushButton, QHBoxLayout, QStyle
 
 from src.constant.bar_constant import GENERATOR_TITLE
 from src.view.custom_widget.draggable_widget import DraggableWidget
@@ -34,19 +34,23 @@ class TitleBar(DraggableWidget):
         self.min_button = QPushButton()
         self.min_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.min_button.setObjectName("min_button")
+        self.min_button.setIcon(self.style().standardIcon(QStyle.SP_TitleBarMinButton))
         # 最大化按钮
         self.max_button = QPushButton()
         self.max_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.max_button.setObjectName("max_button")
+        self.max_button.setIcon(self.style().standardIcon(QStyle.SP_TitleBarMaxButton))
         # 还原窗口按钮
         self.restore_button = QPushButton()
         self.restore_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.restore_button.setObjectName("restore_button")
+        self.restore_button.setIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
         self.restore_button.setVisible(False)
         # 关闭按钮
         self.close_button = QPushButton()
         self.close_button.setFixedSize(QSize(self.button_height, self.button_height))
         self.close_button.setObjectName("close_button")
+        self.close_button.setIcon(self.style().standardIcon(QStyle.SP_TitleBarCloseButton))
         # 标题栏的布局
         self.title_layout = QHBoxLayout()
         # 将各个控件依次添加到布局中
