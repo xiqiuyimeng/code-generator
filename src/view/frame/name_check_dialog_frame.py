@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QAction
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit
 
 from src.constant.dialog_constant import NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
@@ -33,8 +33,6 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.name_changed: bool = ...
         self.name_input: QLineEdit = ...
         self.name_checker: QLabel = ...
-        self.name_check_action: QAction = ...
-
         super().__init__(parent_dialog, dialog_title, **kwargs)
 
     def get_new_dialog_data(self) -> BasicSqliteDTO:
@@ -75,8 +73,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
 
     def check_name_available(self, name):
         self.name_available = check_name_available(name, self.old_name, self.exits_names,
-                                                   self.name_check_action, self.name_input,
-                                                   self.name_checker, 'name_input')
+                                                   self.name_input, self.name_checker, 'name_input')
 
     def check_input(self):
         # 收集用户输入数据

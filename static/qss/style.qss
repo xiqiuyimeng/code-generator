@@ -105,6 +105,11 @@ AboutDialogFrame {
     border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
 }
 
+/* 消息弹窗对话框 */
+MessageBox {
+    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+}
+
 /**************************************** 窗口背景图设置 end ****************************************/
 
 /**************************************** label 文本样式设置 start ****************************************/
@@ -169,6 +174,12 @@ QToolTip{
     font-size: 14px;
     font-weight: bold;
     color: red;
+}
+
+/* 消息弹窗标题字体 */
+#message_box_title {
+    font-size: 14px;
+    font-weight: bold;
 }
 
 /**************************************** label 文本样式设置 end ****************************************/
@@ -713,9 +724,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
     background: #6DDF6D;
     border-radius: 2px;
 }
+/* 悬浮样式 */
 #min_button:hover {
     background: SpringGreen;
 }
+/* 点击样式 */
 #min_button:pressed {
     background: #6DDF6D;
 }
@@ -726,9 +739,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
     background: #F7D674;
     border-radius: 2px;
 }
+/* 悬浮样式 */
 #max_button:hover, #restore_button:hover {
     background: Yellow;
 }
+/* 点击样式 */
 #max_button:pressed, #restore_button:pressed {
     background: #F7D674;
 }
@@ -739,16 +754,18 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{
     background: #F76677;
     border-radius: 2px;
 }
+/* 悬浮样式 */
 #close_button:hover {
     background: OrangeRed;
 }
+/* 点击样式 */
 #close_button:pressed {
     background: #F76677;
 }
 
 
-/* 消息框按钮 */
-QMessageBox QPushButton {
+/* 消息框确认按钮 */
+#accept_button {
     background-color: DarkCyan;
     color: white;
     border-radius: 4px;
@@ -756,12 +773,30 @@ QMessageBox QPushButton {
     width: 60%;
 }
 /* 悬浮样式 */
-QMessageBox QPushButton:hover {
+#accept_button:hover {
     background-color: MediumSlateBlue;
 }
-/* 悬浮样式 */
-QMessageBox QPushButton:pressed {
+/* 点击样式 */
+#accept_button:pressed {
     background-color: DarkCyan;
+}
+
+
+/* 消息框拒绝按钮 */
+#reject_button {
+    background-color: Crimson;
+    color: white;
+    border-radius: 4px;
+    padding: 4px;
+    width: 60%;
+}
+/* 悬浮样式 */
+#reject_button:hover {
+    background-color: HotPink;
+}
+/* 点击样式 */
+#reject_button:pressed {
+    background-color: Crimson;
 }
 
 /**************************************** 按钮样式设置 end ****************************************/

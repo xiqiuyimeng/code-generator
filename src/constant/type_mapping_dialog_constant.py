@@ -55,13 +55,13 @@ DEL_MAPPING_GROUP_BTN_TEXT = '删除列类型映射组'
 # 获取数据源类型
 GET_DS_TYPE_TITLE = '获取数据源类型'
 # 没有选择数据源类型提示语
-NO_DS_TYPE_PROMPT = f'数据源类型为空！\n\t请到 [{TYPE_MAPPING_INFO_TEXT}] -> [{DS_TYPE_TEXT.split("：")[0]}] ' \
+NO_DS_TYPE_PROMPT = f'数据源类型为空！\n请到 [{TYPE_MAPPING_INFO_TEXT}] -> [{DS_TYPE_TEXT.split("：")[0]}] ' \
                     f'中选择一种数据源类型'
 # 获取数据源列类型
 GET_COL_TYPES_TITLE = '获取数据源列类型'
 # 根据数据源类型获取不到列类型，提示维护数据，或手动添加列类型
-NO_COL_TYPES_PROMPT = f'根据数据源类型 [{0}]，获取列类型为空！\n\t请退出对话框，到 [{DS_COL_TYPE_BUTTON_TEXT}] ' \
-                      f' -> [{ADD_DS_COL_TYPE_BUTTON_TEXT}] 中维护列类型数据；\t\n或者在当前表格中，' \
+NO_COL_TYPES_PROMPT = f'根据数据源类型 [{0}]，获取列类型为空！\n请退出对话框，到 [{DS_COL_TYPE_BUTTON_TEXT}] ' \
+                      f' -> [{ADD_DS_COL_TYPE_BUTTON_TEXT}] 中维护列类型数据；\n或者在当前表格中，' \
                       f'[{ADD_COL_TYPE_MAPPING_BTN_TEXT}] 手动添加列类型数据'
 
 # 检查列类型映射表中未完成数据的提示

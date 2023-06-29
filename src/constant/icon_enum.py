@@ -5,7 +5,6 @@ from PyQt5.QtGui import QIcon
 
 from src.constant.bar_constant import SWITCH_ACTION, ADD_DS_ACTION, REFRESH_ACTION, TYPE_ACTION, TEMPLATE_ACTION, \
     GENERATE_ACTION, CLEAR_DATA_ACTION, EXIT_ACTION, HELP_ACTION, ABOUT_ACTION, SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
-from src.constant.dialog_constant import NAME_AVAILABLE, NAME_EXISTS
 from src.constant.ds_type_constant import SQLITE_DISPLAY_NAME, SQLITE_DB, SQLITE_TB, SQLITE_COL, MYSQL_DISPLAY_NAME, \
     MYSQL_DB, MYSQL_TB, MYSQL_COL, ORACLE_DISPLAY_NAME, ORACLE_DB, ORACLE_TB, ORACLE_COL, JSON_DISPLAY_NAME, \
     STRUCT_COL_ICON
@@ -98,10 +97,6 @@ class IconEnum(Enum):
     # table
     expand_child_table_icon = EXPAND_CHILD_TABLE_ICON, ':/icon/add.png'
     collapse_child_table_icon = COLLAPSE_CHILD_TABLE_ICON, ':/icon/remove.png'
-
-    # 名称校验 icon
-    name_available_icon = NAME_AVAILABLE, ':/icon/right.png'
-    name_unavailable_icon = NAME_EXISTS, ':/icon/wrong.png'
 
     # ds category icon
     sql_ds_icon = SQL_DS_CATEGORY, ':/icon/add.png'

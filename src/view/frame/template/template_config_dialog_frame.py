@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSignal, QRegExp
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QLabel, QLineEdit, QAction, QGridLayout, QComboBox, QStackedWidget, QWidget, QFormLayout, \
+from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QComboBox, QStackedWidget, QWidget, QFormLayout, \
     QPushButton
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
@@ -35,7 +35,6 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.var_name_label: QLabel = ...
         self.var_name_input: QLineEdit = ...
         self.var_name_checker: QLabel = ...
-        self.var_name_check_action: QAction = ...
         self.echo_data_complete = False
 
         self.widget_layout: QGridLayout = ...
@@ -251,8 +250,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
     def check_var_name_available(self, var_name):
         self.var_name_available = check_name_available(var_name, self.old_var_name, self.exits_var_names,
-                                                       self.var_name_check_action, self.var_name_input,
-                                                       self.var_name_checker, 'var_name_input')
+                                                       self.var_name_input, self.var_name_checker,
+                                                       'var_name_input')
 
     def button_available(self) -> bool:
         return self.name_input.displayText() and self.name_available \
