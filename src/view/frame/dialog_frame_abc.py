@@ -138,3 +138,8 @@ class DialogFrameABC(QFrame):
         ...
 
     # ------------------------------ 后置处理 end ------------------------------ #
+
+    def showEvent(self, event):
+        # 展示的时候，设置对话框标题
+        self.parent_dialog.setWindowTitle(self.dialog_title)
+        super().showEvent(event)

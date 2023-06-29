@@ -3,6 +3,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout
 
+from src.constant.icon_enum import get_icon
 from src.view.custom_widget.draggable_widget import DraggableDialog
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 from src.view.frame.save_dialog_frame import SaveDialogFrame
@@ -31,14 +32,13 @@ class CustomDialogABC(DraggableDialog):
         self.connect_signal()
 
     def setup_ui(self):
+        self.setWindowIcon(get_icon('window'))
         # 计算窗口大小
         self.resize_dialog()
         # 不透明度
         self.setWindowOpacity(0.97)
         # 隐藏窗口边框
         self.setWindowFlags(Qt.FramelessWindowHint)
-        # 设置窗口背景透明
-        # self.setAttribute(Qt.WA_TranslucentBackground, True)
 
         self.dialog_layout = QVBoxLayout(self)
         self.dialog_layout.setContentsMargins(0, 0, 0, 0)

@@ -17,7 +17,6 @@ class CentralWidget(QWidget):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
-        self.setObjectName('central_widget')
         self._layout = QHBoxLayout(self)
         self.horizontal_splitter = QSplitter(self)
 
