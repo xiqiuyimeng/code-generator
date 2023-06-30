@@ -115,7 +115,7 @@ class DialogFrameABC(QFrame):
     def connect_signal(self):
         if self.need_help_button:
             self.help_button.clicked.connect(self.open_help_dialog)
-        self.dialog_quit_button.clicked.connect(self.parent_dialog.close)
+        self.dialog_quit_button.clicked.connect(self.parent_dialog.close_dialog)
         self.connect_other_signal()
 
     def open_help_dialog(self):

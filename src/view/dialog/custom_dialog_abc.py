@@ -56,6 +56,10 @@ class CustomDialogABC(DraggableDialog):
     def connect_signal(self):
         ...
 
+    def close_dialog(self):
+        self.close_animation.finished.connect(self.close)
+        self.start_close_animation()
+
 
 class CustomSaveDialogABC(CustomDialogABC):
     """通用具有保存功能对话框抽象类"""

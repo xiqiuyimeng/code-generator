@@ -41,8 +41,6 @@ class MessageBox(DraggableDialog):
 
         self.setup_ui()
         self.setup_text()
-        # 移动到父对话框中心
-        # self.resize(400, 400)
 
     def keyPressEvent(self, event) -> None:
         # 屏蔽esc键关闭窗口事件
@@ -108,12 +106,20 @@ class MessageBox(DraggableDialog):
 
         if button_role == QMessageBox.AcceptRole:
             button.setObjectName('accept_button')
-            button.clicked.connect(self.accept)
+            button.clicked.connect(self.accept_clicked)
         elif button_role == QMessageBox.RejectRole:
             button.setObjectName('reject_button')
-            button.clicked.connect(self.reject)
+            button.clicked.connect(self.reject_clicked)
         # 加载样式表
         button.setStyleSheet(read_qss())
+        
+    def accept_clicked(self):
+        self.close_animation.finished.connect(self.accept)
+        self.start_close_animation()
+
+    def reject_clicked(self):
+        self.close_animation.finished.connect(self.reject)
+        self.start_close_animation()
 
     def get_message_icon(self):
         if self.box_icon == QMessageBox.Information:
