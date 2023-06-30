@@ -120,6 +120,7 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         self.no_data_frame = QFrame()
         self.no_data_layout = QVBoxLayout(self.no_data_frame)
         self.no_data_label = QLabel(self.no_data_frame)
+        self.no_data_label.setObjectName('no_config_data_label')
         self.no_data_label.setText(NO_TEMPLATE_CONFIG_ITEMS_TEXT)
         self.no_data_layout.addWidget(self.no_data_label)
 

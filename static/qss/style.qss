@@ -169,6 +169,12 @@ QToolTip{
     font-weight: bold;
 }
 
+/* 模板配置动态渲染页，无数据时提示文本字体 */
+#no_config_data_label {
+    font-size: 50px;
+    qproperty-alignment: AlignCenter;
+}
+
 /* 温馨提示字体 */
 #tips_label {
     font-size: 14px;
