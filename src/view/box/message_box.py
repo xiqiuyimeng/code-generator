@@ -41,6 +41,8 @@ class MessageBox(DraggableDialog):
 
         self.setup_ui()
         self.setup_text()
+        # 设置大小位置
+        self.resize(self.sizeHint())
 
     def keyPressEvent(self, event) -> None:
         # 屏蔽esc键关闭窗口事件
