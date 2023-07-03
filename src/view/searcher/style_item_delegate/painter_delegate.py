@@ -3,7 +3,7 @@ from abc import ABC
 
 from PyQt5.QtCore import QRect, Qt, QRectF
 from PyQt5.QtGui import QBrush, QColor
-from PyQt5.QtWidgets import QStyle, QTreeWidgetItem, QListWidgetItem, QStyleOptionButton
+from PyQt5.QtWidgets import QStyle, QStyleOptionButton
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:05'
@@ -20,8 +20,7 @@ class ItemPainterContext:
         self.margin_h = ...
         self.painters = ...
 
-    def init_item_rect(self, painter, option, index, item_text,
-                       selected_flag, search_flag, search_item_records):
+    def init_item_rect(self, painter, option, index, selected_flag, search_flag, search_item_records):
         style = option.widget.style()
         # 获取当前item rect
         visual_rect = self.parent.visualRect(index)
@@ -29,9 +28,9 @@ class ItemPainterContext:
         painter.translate(visual_rect.x(), visual_rect.y())
         # 小部件的水平方向margin，一个小部件会存在左右两个边距
         self.margin_h = style.pixelMetric(QStyle.PM_FocusFrameHMargin) + 1
-        self.painters = (CheckBoxItemPainter(self.item, self.margin_h, style, painter, visual_rect),
-                         IconItemPainter(self.item, self.margin_h, style, painter, visual_rect, self.parent),
-                         TextItemPainter(item_text, selected_flag, search_flag, search_item_records,
+        self.painters = (CheckBoxItemPainter(index, self.item, self.margin_h, style, painter, visual_rect),
+                         IconItemPainter(self.parent, index, self.item, self.margin_h, style, painter, visual_rect),
+                         TextItemPainter(selected_flag, search_flag, search_item_records, index,
                                          self.item, self.margin_h, style, painter, visual_rect))
 
     def paint_item(self):
@@ -44,23 +43,10 @@ class ItemPainterContext:
                 left_x = rect.x() + rect.width()
 
 
-def get_item_checkbox(item):
-    if isinstance(item, QTreeWidgetItem):
-        return item.data(0, Qt.CheckStateRole)
-    elif isinstance(item, QListWidgetItem):
-        return item.data(Qt.CheckStateRole)
-
-
-def get_item_icon(item):
-    if isinstance(item, QTreeWidgetItem):
-        return item.icon(0)
-    elif isinstance(item, QListWidgetItem):
-        return item.icon()
-
-
 class ItemPainterABC(ABC):
 
-    def __init__(self, item, margin_h, style, painter, visual_rect, *args):
+    def __init__(self, index, item, margin_h, style, painter, visual_rect, *args):
+        self.index = index
         self.item = item
         self.margin_h = margin_h
         self.style = style
@@ -80,10 +66,10 @@ class ItemPainterABC(ABC):
 
 class CheckBoxItemPainter(ItemPainterABC):
 
-    def __init__(self, item, margin_h, style, painter, visual_rect):
-        super().__init__(item, margin_h, style, painter, visual_rect)
+    def __init__(self, *args):
+        super().__init__(*args)
         self.checkbox_width = self.style.pixelMetric(QStyle.PM_IndicatorWidth)
-        self.check_state = get_item_checkbox(self.item)
+        self.check_state = self.index.data(Qt.CheckStateRole)
 
     def match_type(self) -> bool:
         self.match = self.check_state is not None
@@ -109,15 +95,15 @@ class CheckBoxItemPainter(ItemPainterABC):
 
 class IconItemPainter(ItemPainterABC):
 
-    def __init__(self, item, margin_h, style, painter, visual_rect, parent):
-        super().__init__(item, margin_h, style, painter, visual_rect)
+    def __init__(self, parent, *args):
+        super().__init__(*args)
         self.parent = parent
         # 如果指定了icon大小，取该值，否则用默认值
         if self.parent.iconSize().isValid():
             self.icon_width = self.parent.iconSize().width()
         else:
-            self.icon_width = style.pixelMetric(QStyle.PM_ListViewIconSize)
-        self.icon = get_item_icon(item)
+            self.icon_width = self.style.pixelMetric(QStyle.PM_ListViewIconSize)
+        self.icon = self.index.data(Qt.DecorationRole)
 
     def match_type(self) -> bool:
         self.match = not self.icon.isNull()
@@ -134,9 +120,9 @@ class IconItemPainter(ItemPainterABC):
 
 class TextItemPainter(ItemPainterABC):
 
-    def __init__(self, item_text, selected_flag, search_flag, search_item_records, *args):
+    def __init__(self, selected_flag, search_flag, search_item_records, *args):
         super().__init__(*args)
-        self.item_text = item_text
+        self.item_text = self.index.data()
         self.selected_flag = selected_flag
         self.search_flag = search_flag
         self.search_item_records = search_item_records

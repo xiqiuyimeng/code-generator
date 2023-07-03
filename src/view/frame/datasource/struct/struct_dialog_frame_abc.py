@@ -54,7 +54,7 @@ class StructDialogFrameABC(DsDialogFrameABC):
                          exists_struct_names, opened_struct_id, placeholder_blank_width=1)
 
         # 调整布局比例
-        self.frame_layout.setStretch(0, 2)
+        self.frame_layout.setStretch(0, 1)
         self.frame_layout.setStretch(1, 1)
         self.frame_layout.setStretch(2, 4)
         self.frame_layout.setStretch(3, 1)

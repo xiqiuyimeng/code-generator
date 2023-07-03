@@ -34,10 +34,8 @@ class Searcher:
         # 存储匹配到的元素列表记录，[[item0, item1], [item0]]，列表的最后永远是最新的元素匹配记录
         self.match_item_records = list()
         # 给target设置视图代理对象
-        self.target.setItemDelegate(SearchStyledItemDelegate(self.target,
-                                                             self.search_item_dict,
-                                                             self.match_item_records,
-                                                             self.get_item_text))
+        self.target.setItemDelegate(SearchStyledItemDelegate(self.target, self.search_item_dict,
+                                                             self.match_item_records))
 
     def handle_search(self, key, text, original_func, *args):
         # 如果是esc，清空相关容器

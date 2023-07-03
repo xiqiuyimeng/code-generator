@@ -11,11 +11,9 @@ _date_ = '2022/5/9 19:06'
 
 class SearchStyledItemDelegate(QStyledItemDelegate):
 
-    def __init__(self, parent, search_item_dict, match_item_records, get_item_text_func):
+    def __init__(self, parent, search_item_dict, match_item_records):
         self.search_item_dict = search_item_dict
         self.match_item_records = match_item_records
-        self.get_item_text_func = get_item_text_func
-
         self.parent = parent
         super().__init__(parent)
 
@@ -33,13 +31,11 @@ class SearchStyledItemDelegate(QStyledItemDelegate):
         if not selected_flag and not search_flag:
             super().paint(painter, option, index)
         else:
-            # 展示的文本
-            idx_str = self.get_item_text_func(item)
-            # 重构后的绘制代码
+            # 重绘项
             context = ItemPainterContext(item, self.parent)
             search_item_records = self.search_item_dict.get(id(item))[-1] \
                 if self.search_item_dict.get(id(item)) else None
-            context.init_item_rect(painter, option, index, idx_str, selected_flag, search_flag, search_item_records)
+            context.init_item_rect(painter, option, index, selected_flag, search_flag, search_item_records)
             # 如果是选中元素，处理背景色
             if selected_flag:
                 self.draw_selected_background(option, painter)
