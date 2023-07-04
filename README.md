@@ -8,3 +8,5 @@ mybatis_generator是借助jinja2实现的生成器。
 
 已完善数据库连接代码
 增加对service层和controller层模板代码的生成
+
+1. 打包方法：切换到程序目录下，执行 pyinstaller main.spec

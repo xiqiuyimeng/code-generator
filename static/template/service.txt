@@ -1,21 +1,23 @@
-{% if service_package %}
-package {{service_package}};
+{% set class = template_func.hump_class_name(table_name) %}
+{% set key, key_type = template_func.get_key(col_list, 'java_type') %}
+{% if var_config.service_package %}
+package {{ var_config.service_package }};
 {% endif %}
 
-import {{model_namespace}};
+import {{ var_config.model_package }}.{{ class }};
 
 import java.util.List;
 
 
-public interface {{cls_name}}Service {
+public interface {{ class }}Service {
 
-    {{cls_name}} get{{cls_name}}({{param}} {{key}});
+    {{ class }} get{{ class }}({{ key_type }} {{ key }});
 
-    void add{{cls_name}}({{cls_name}} record);
+    void add{{ class }}({{ class }} record);
 
-    void delete{{cls_name}}({{param}} {{key}});
+    void delete{{ class }}({{ key_type }} {{ key }});
 
-    void edit{{cls_name}}({{cls_name}} record);
+    void edit{{ class }}({{ class }} record);
 
-    List<{{cls_name}}> get{{cls_name}}List();
+    List<{{ class }}> get{{ class }}List();
 }

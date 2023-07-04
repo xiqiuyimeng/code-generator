@@ -1,46 +1,52 @@
-{% if controller_package %}
-package {{controller_package}};
+{% set class = template_func.hump_class_name(table_name) %}
+{% set hump_class = template_func.hump_property_name(table_name) %}
+{% set key, key_type = template_func.get_key(col_list, 'java_type') %}
+{% if var_config.controller_package %}
+package {{ var_config.controller_package }};
 {% endif %}
 
-import {{model_namespace}};
-import {{service_namespace}};
+import {{ var_config.model_package }}.{{ class }};
+import {{ var_config.service_package }}.{{ class }}Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
-@RequestMapping(value = "{{hump_cls_name}}")
-public class {{cls_name}}Controller {
+@RequestMapping(value = "{{ hump_class }}")
+@ResponseStatus(HttpStatus.OK)
+public class {{ class }}Controller {
 
     @Autowired
-    {{cls_name}}Service {{hump_cls_name}}Service;
+    private {{ class }}Service {{ hump_class }}Service;
 
-    @RequestMapping(value = "get", method = RequestMethod.GET)
-    public ResponseEntity<?> get(@RequestParam {{param}} {{key}}){
-        return ResponseEntity.ok().body({{hump_cls_name}}Service.get{{cls_name}}({{key}}));
+    @GetMapping("get")
+    public {{ class }} get(@RequestParam {{ key_type }} {{ key }}){
+        return {{ hump_class }}Service.get{{ class }}({{ key }});
     }
 
-    @RequestMapping(value = "add", method = RequestMethod.POST)
-    public ResponseEntity<?> add(@RequestBody {{cls_name}} {{hump_cls_name}}){
-        {{hump_cls_name}}Service.add{{cls_name}}({{hump_cls_name}});
-        return ResponseEntity.ok().body("ok");
+    @PostMapping("add")
+    public String add(@RequestBody {{ class }} {{ hump_class }}){
+        {{ hump_class }}Service.add{{ class }}({{ hump_class }});
+        return "ok";
     }
 
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ResponseEntity<?> delete(@RequestParam {{param}} {{key}}){
-        {{hump_cls_name}}Service.delete{{cls_name}}({{key}});
-        return ResponseEntity.ok().body("ok");
+    @DeleteMapping("delete")
+    public String delete(@RequestParam {{ key_type }} {{ key }}){
+        {{ hump_class }}Service.delete{{ class }}({{ key }});
+        return "ok";
     }
 
-    @RequestMapping(value = "edit", method = RequestMethod.POST)
-    public ResponseEntity<?> edit(@RequestBody {{cls_name}} {{hump_cls_name}}){
-        {{hump_cls_name}}Service.edit{{cls_name}}({{hump_cls_name}});
-        return ResponseEntity.ok().body("ok");
+    @PostMapping("edit")
+    public String edit(@RequestBody {{ class }} {{ hump_class }}){
+        {{ hump_class }}Service.edit{{ class }}({{ hump_class }});
+        return "ok";
     }
 
-    @RequestMapping(value = "list", method = RequestMethod.GET)
-    public ResponseEntity<?> getList(){
-        return ResponseEntity.ok().body({{hump_cls_name}}Service.get{{cls_name}}List());
+    @GetMapping("list")
+    public List<{{ class }}> getList(){
+        return {{ hump_class }}Service.get{{ class }}List();
     }
 }
