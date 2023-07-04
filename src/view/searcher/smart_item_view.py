@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAbstractItemView, QTreeWidget, QListWidget
 
 from src.view.searcher.search_func.list_searcher import ListSearcher
@@ -19,7 +20,12 @@ class SmartSearcherItemView(QAbstractItemView):
         ...
 
     def keyPressEvent(self, event):
-        self.searcher.handle_search(event.key(), event.text(), super().keyPressEvent, event)
+        # ctrl F 触发
+        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_F:
+            self.searcher.show_search()
+        else:
+            # 其他按键触发
+            self.searcher.continue_search()
 
     def set_selected_focus(self, item):
         # 设置对应节点选中状态

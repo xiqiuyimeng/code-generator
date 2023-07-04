@@ -8,13 +8,6 @@ from src.view.searcher.style_item_delegate.searcher_style_delegate import Search
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:02'
 
-letter_keys = [eval("Qt.Key_" + chr(i)) for i in range(65, 91)]
-num_keys = [eval(f'Qt.Key_{i}') for i in range(10)]
-
-
-def is_legal_key(key):
-    return key in letter_keys or key in num_keys
-
 
 class Searcher:
     """
@@ -33,64 +26,72 @@ class Searcher:
         self.search_item_dict = dict()
         # 存储匹配到的元素列表记录，[[item0, item1], [item0]]，列表的最后永远是最新的元素匹配记录
         self.match_item_records = list()
+        # 上一次匹配的文本长度
+        self.last_search_text_len = 0
         # 给target设置视图代理对象
         self.target.setItemDelegate(SearchStyledItemDelegate(self.target, self.search_item_dict,
                                                              self.match_item_records))
+        self.connect_signal()
 
-    def handle_search(self, key, text, original_func, *args):
-        # 如果是esc，清空相关容器
-        if key == Qt.Key_Escape:
-            self.clear_search()
-        # 如果是正常输入的按键，进行搜索
-        elif is_legal_key(key):
-            self.search(text)
-        elif key == Qt.Key_Backspace:
-            self.backspace_search()
-        elif self.match_item_records and all(self.match_item_records) \
-                and (key == Qt.Key_Up or key == Qt.Key_Down):
-            self.up_down_select_item(key)
-        else:
-            # 处理不了的情况，交由调用方处理
-            original_func(*args)
-        # 给子类一个处理特有逻辑的机会
-        self.search_post_process()
-        # 渲染，触发界面绘制刷新
-        self.target.viewport().update()
+    def connect_signal(self):
+        # 连接搜索信号
+        self.dock_widget.line_edit.search_text_signal.connect(self.search)
+        # 回退搜索信号
+        self.dock_widget.line_edit.back_select_signal.connect(self.backspace_search)
+        # 清空搜索信号
+        self.dock_widget.line_edit.clear_search_signal.connect(self.clear_search_data)
+        # 上下选择箭头信号
+        self.dock_widget.line_edit.up_down_select_signal.connect(self.up_down_select_item)
 
-    def clear_search(self):
+    def show_search(self):
+        self.dock_widget.line_edit.start_search(self.target)
+
+    def continue_search(self):
+        # 如果搜索控件未隐藏，那么将焦点设回到搜索框
+        if not self.dock_widget.isHidden():
+            self.dock_widget.line_edit.setFocus()
+
+    def clear_search_data(self):
         # 容器清空
         self.search_item_dict.clear()
         self.match_item_records.clear()
         self.clear_row_index()
-        # 隐藏dock窗口
-        self.dock_widget.hide()
-        # 重置line edit
-        self.dock_widget.line_edit.setText("")
+        self.last_search_text_len = 0
 
-    def search(self, cur_text):
-        match_items = list()
-        # 当前搜索的文本，加上前面输入的
-        text = self.dock_widget.line_edit.text() + cur_text
-        # 如果搜索过，在当前的小范围内搜索
-        if self.match_item_records:
-            self.smart_match_text(text, match_items)
-        else:
-            # 如果还没搜索过，用迭代器，在所有节点中搜寻
-            self.iterate_search(text, match_items)
-        self.match_item_records.append(match_items)
-        # 展示dock窗口
-        self.dock_widget.show()
-        self.dock_widget.line_edit.setText(text)
+    def search(self, text):
+        # 转化为每次输入都是一个字符的形式匹配，这样才能匹配回退搜索，每次删除一个字符
+        # 例如利用输入法，一次性输入 abc，那么匹配时将进行 a，ab，abc 三次匹配
+        match_result_len = 0
+        # 每次处理时，应该在上次搜索的基础上进行搜索
+        for i in range(self.last_search_text_len, len(text)):
+            # 构造当前搜索字符串
+            search_text = text[: i + 1]
+            match_items = list()
+            # 如果搜索过，在当前的小范围内搜索
+            if self.match_item_records:
+                self.smart_match_text(search_text, match_items)
+            else:
+                # 如果还没搜索过，用迭代器，在所有节点中搜寻
+                self.iterate_search(search_text, match_items)
+            self.match_item_records.append(match_items)
+            match_result_len = len(match_items)
+        # 记录已经匹配的长度
+        self.last_search_text_len = len(text)
         # 如果匹配不到，把输入框文本变为错误颜色
-        if not match_items:
+        if not match_result_len:
             self.dock_widget.line_edit.paint_wrong_color()
         # 设置焦点
         self.set_selected_focus()
+        # 在设置完搜索控件的焦点后，应将焦点设置回搜索框，否则无法继续输入搜索
+        self.dock_widget.line_edit.setFocus()
+        # 给子类一个处理特有逻辑的机会
+        self.search_post_process()
 
     def backspace_search(self):
         if self.match_item_records:
-            # 退格，删除字符，弹出容器最后一个元素
-            self.dock_widget.line_edit.sub_text()
+            # 每次回退，都需要将上次匹配文本长度减1
+            self.last_search_text_len -= 1
+            # 退格弹出容器最后一个元素
             pop_items = self.match_item_records.pop()
             # 弹出匹配到的元素索引
             for k, v in self.search_item_dict.items():
@@ -100,8 +101,14 @@ class Searcher:
             # 如果已经删除了所有字符，或者能匹配到，将输入框文本变为正常颜色
             if not self.match_item_records or self.match_item_records[-1]:
                 self.dock_widget.line_edit.paint_right_color()
+            # 渲染，触发界面绘制刷新
+            self.target.viewport().update()
+            # 给子类一个处理特有逻辑的机会
+            self.search_post_process()
 
     def up_down_select_item(self, key):
+        if not self.match_item_records:
+            return
         item_records = self.match_item_records[-1]
         # 如果当前节点在搜索列表中，按索引查找
         if self.target.currentItem() in item_records:
@@ -120,6 +127,8 @@ class Searcher:
                 # 找出离当前元素最近的下一个元素
                 next_item = next_item
         self.target.set_selected_focus(next_item)
+        # 在设置完搜索控件的焦点后，应将焦点设置回搜索框，否则无法继续输入搜索
+        self.dock_widget.line_edit.setFocus()
 
     def get_up_down_next(self, item_list, item):
         # 如果查找元素小于第一个元素或大于最后一个元素，则返回(-1，0)

@@ -106,7 +106,7 @@ class IconItemPainter(ItemPainterABC):
         self.icon = self.index.data(Qt.DecorationRole)
 
     def match_type(self) -> bool:
-        self.match = not self.icon.isNull()
+        self.match = self.icon and not self.icon.isNull()
         return self.match
 
     def calculate_paint_rect(self, left_x):

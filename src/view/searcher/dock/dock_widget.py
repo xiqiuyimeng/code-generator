@@ -15,8 +15,6 @@ class SearcherDockWidget(QDockWidget):
         blank_widget = QWidget()
         self.setTitleBarWidget(blank_widget)
         self.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        # 输入框，用来展示搜索时输入的内容，不允许输入
-        self.line_edit = SearcherLineEdit()
-        # 设置只读
-        self.line_edit.setReadOnly(True)
+        # 搜索输入框
+        self.line_edit = SearcherLineEdit(self)
         self.setWidget(self.line_edit)
