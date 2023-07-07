@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 
-from src.service.system_storage.ds_table_col_info_sqlite import ColTypeEnum
-from src.service.util.struct_util.data_type import get_data_type
+from src.enum.common_enum import ColTypeEnum
+from src.enum.data_type_enum import get_data_type
 from src.service.util.struct_util.struct_util import assemble_col_info, StructParser, StructBeautifier
 
 _author_ = 'luwt'
@@ -74,7 +74,7 @@ class JsonParser(StructParser):
             self.parse_json_array(value_obj, col_info)
         else:
             # 如果数组元素为基本数据类型，那么结束，最终的数据类型应类似于：string []
-            pass
+            ...
 
 
 # ---------------------------------------- 解析json结构体 end ---------------------------------------- #

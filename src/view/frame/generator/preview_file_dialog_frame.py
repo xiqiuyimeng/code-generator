@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QSplitter, QFrame, QHBoxLayout, QVBoxLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QPushButton, QSplitter, QFrame, QHBoxLayout, QVBoxLayout
 
 from src.constant.generator_dialog_constant import SAVE_FILE_BTN_TEXT, PREVIEW_TREE_LOCATE_BTN_TEXT, \
     PREVIEW_RENAME_FILE_NAME_BTN_TEXT, NO_SELECTED_FILE_ITEM_PROMPT, PREVIEW_RENAME_FILE_NAME_TITLE
@@ -42,7 +42,7 @@ class PreviewFileDialogFrame(DialogFrameABC):
     def setup_content_ui(self):
         # 竖直方向的分割器
         self.horizontal_splitter = QSplitter(self)
-        self.horizontal_splitter.setOrientation(Qt.Horizontal)
+        self.horizontal_splitter.setOrientation(Qt.Orientation.Horizontal)
         # 设置拉伸时，不覆盖子控件，也就是不会隐藏控件
         self.horizontal_splitter.setChildrenCollapsible(False)
         self.frame_layout.addWidget(self.horizontal_splitter)

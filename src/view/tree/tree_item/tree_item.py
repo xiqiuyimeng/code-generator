@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QTreeWidgetItem
 
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record
 
@@ -23,7 +23,7 @@ class TreeWidgetItem(QTreeWidgetItem):
                        and self.tree.clicked_item is not Ellipsis \
                        and self.tree.clicked_item is self \
                        and column == 0 \
-                       and role == Qt.CheckStateRole \
+                       and role == Qt.ItemDataRole.CheckStateRole \
                        and self.checkState(0) != value
         super().setData(column, role, value)
         if check_change:

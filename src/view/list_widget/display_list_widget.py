@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt6.QtWidgets import QListWidgetItem
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.view.list_widget.list_widget_abc import ListWidgetABC
 
 _author_ = 'luwt'

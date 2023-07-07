@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QVariant
+from PyQt6.QtCore import Qt, QVariant
 
+from src.view.tree.tree_item.tree_item_func import get_add_del_data, save_tree_data
 from src.view.tree.tree_item.tree_node_abc import TreeNodeABC
-from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, save_tree_data
 
 _author_ = 'luwt'
 _date_ = '2022/12/2 11:32'
@@ -23,7 +23,7 @@ class StructTreeNodeABC(TreeNodeABC):
 
     def hide_check_box(self):
         # 隐藏复选框
-        self.item.setData(0, Qt.CheckStateRole, QVariant())
+        self.item.setData(0, Qt.ItemDataRole.CheckStateRole, QVariant())
         parent_item = self.item.parent()
         if parent_item:
             parent_node = self.tree_widget.get_item_node(parent_item)
@@ -39,31 +39,6 @@ class StructTreeNodeABC(TreeNodeABC):
                     or parent_node.is_opening or parent_node.opening_child_count:
                 return
             parent_node.set_check_state()
-
-    def get_need_reorder_items(self):
-        """当前节点之后的节点需要调整顺序"""
-        reorder_opened_items = list()
-        reorder_flag = False
-        if self.item.parent():
-            for idx in range(self.item.parent().childCount()):
-                item = self.item.parent().child(idx)
-                if item is self.item:
-                    reorder_flag = True
-                if reorder_flag:
-                    opened_item = get_item_opened_record(item)
-                    opened_item.item_order -= 1
-                    reorder_opened_items.append(opened_item)
-        else:
-            # 获取顶层节点
-            top_items = self.tree_widget.get_top_level_items()
-            for item in top_items:
-                if item is self.item:
-                    reorder_flag = True
-                if reorder_flag:
-                    opened_item = get_item_opened_record(item)
-                    opened_item.item_order -= 1
-                    reorder_opened_items.append(opened_item)
-        return reorder_opened_items
 
     def del_callback(self):
         parent_item = self.item.parent()

@@ -2,10 +2,10 @@
 """
 表格结构，大体与树结构类似
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLabel
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLabel
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.table_constant import EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
 from src.view.table.table_header.check_box_table_header import CheckBoxHeaderWithButton
 from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
@@ -49,7 +49,7 @@ class StructDsColTableWidget(DsColTableWidgetABC):
                 checked_list.append(col)
                 # 需要展开子表的不处理，因为子表会自动联动父行状态
                 if not col.expanded:
-                    self.cellWidget(row + child_table_count, 0).check_box.setCheckState(Qt.Checked)
+                    self.cellWidget(row + child_table_count, 0).check_box.setCheckState(Qt.CheckState.Checked)
             if col.expanded:
                 self.add_child_table_func(col, row, reopen=True)
                 child_table_count += 1

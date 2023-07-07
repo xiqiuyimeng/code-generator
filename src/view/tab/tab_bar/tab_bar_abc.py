@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal, QPoint
-from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTabBar, QTabWidget, QAction, QMenu, QToolTip
+from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal, QPoint
+from PyQt6.QtGui import QCursor, QAction
+from PyQt6.QtWidgets import QTabBar, QTabWidget, QMenu, QToolTip
 
 from src.constant.tab_constant import CLOSE_CURRENT_TAB, CLOSE_OTHER_TABS, CLOSE_ALL_TABS, CLOSE_TABS_TO_THE_LEFT, \
     CLOSE_TABS_TO_THE_RIGHT, SET_CURRENT_INDEX, TABLE_CLOSE_WITH_PARTIALLY_CHECKED, TABLE_CLOSE_WITH_REFRESHING, \
@@ -31,20 +31,21 @@ class TabBarABC(QTabBar):
         # 监听自身，tab bar事件
         self.installEventFilter(self)
         # tab bar右击菜单功能
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.right_click_menu)
         # 关闭选项卡事件
         self.tabCloseRequested.connect(self.close_current_tab)
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         # 当事件的对象是tab bar时，并且是气泡提示事件
-        if obj == self and event.type() == QEvent.ToolTip:
+        if obj == self and event.type() == QEvent.Type.ToolTip:
             # 获取鼠标停留的tab索引
             index = self.tabAt(event.pos())
             # 获取当前tab页
             current_tab = self.parent.widget(index)
             # 设置气泡提示，向下略微偏移一些，以免鼠标挡住提示文字
-            QToolTip.showText(QPoint(event.globalPos().x() + 5, event.globalPos().y() + 10), current_tab.toolTip())
+            QToolTip.showText(QPoint(event.globalPos().x() + 5, event.globalPos().y() + 10),
+                              current_tab.toolTip())
             return True
         return super().eventFilter(obj, event)
 
@@ -57,7 +58,7 @@ class TabBarABC(QTabBar):
         # 右键菜单点击事件
         menu.triggered.connect(lambda action: self.handle_menu_func(action, index))
         # 右键菜单弹出位置跟随焦点位置
-        menu.exec_(QCursor.pos())
+        menu.exec(QCursor.pos())
 
     def handle_menu_func(self, act: QAction, index):
         """tab bar右键菜单功能实现，需要注意的是，删除tab后，索引也会刷新"""
@@ -133,7 +134,7 @@ class DsTabBar(TabBarABC):
 
     def mousePressEvent(self, event):
         # 如果按下了鼠标左键，将标志位设置为true
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.is_moving = True
         super().mousePressEvent(event)
 
@@ -151,7 +152,7 @@ class DsTabBar(TabBarABC):
             tab_widget = self.parent.widget(index)
             if tab_widget.tree_widget.get_item_node(tab_widget.tree_item).is_refreshing:
                 refreshing_tables.append(self.partially_checked_table_prompt(tab_widget))
-            if tab_widget.tree_item.checkState(0) == Qt.PartiallyChecked:
+            if tab_widget.tree_item.checkState(0) == Qt.CheckState.PartiallyChecked:
                 partially_checked_tables.append(self.partially_checked_table_prompt(tab_widget))
         if partially_checked_tables or refreshing_tables:
             prompt_list = list()

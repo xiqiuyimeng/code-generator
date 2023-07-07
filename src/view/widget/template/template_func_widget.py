@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 
 from src.constant.template_dialog_constant import SELECT_ALL_BTN_TEXT, UNSELECT_BTN_TEXT, \
     COPY_OTHER_TP_FUNC_BTN_TEXT, CREATE_NEW_FUNC_BTN_TEXT, DEL_FUNC_BTN_TEXT, CREATE_NEW_FUNC_TITLE

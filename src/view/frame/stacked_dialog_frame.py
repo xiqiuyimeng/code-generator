@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel, QHBoxLayout, QStackedWidget, QSpacerItem
+from PyQt6.QtWidgets import QLabel, QHBoxLayout, QStackedWidget, QSpacerItem
 
 from src.constant.type_mapping_dialog_constant import SAVE_DATA_TIPS
 from src.view.frame.frame_func import construct_list_stacked_ui

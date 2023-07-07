@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
 
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
@@ -70,16 +69,6 @@ class ImportExportTemplateFile:
     is_current_tab: int = field(default=None)
     # tab页顺序
     tab_item_order: int = field(default=None)
-
-
-class CurrentEnum(Enum):
-    current = 1
-    not_current = 0
-
-
-class TabOpenedEnum(Enum):
-    opened = 1
-    not_opened = 0
 
 
 class TemplateFileSqlite(SqliteBasic):

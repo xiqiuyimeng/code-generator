@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
 from src.view.table.table_item.table_item import make_checkbox_num_widget
@@ -24,7 +24,7 @@ class SqlDsColTableWidget(DsColTableWidgetABC):
         for row, col in enumerate(self.cols):
             if col.checked:
                 checked_list.append(col)
-                self.cellWidget(row, 0).check_box.setCheckState(Qt.Checked)
+                self.cellWidget(row, 0).check_box.setCheckState(Qt.CheckState.Checked)
         # 将选中项保存到选中树结构中
         if checked_list:
             self.add_checked_data(checked_list)

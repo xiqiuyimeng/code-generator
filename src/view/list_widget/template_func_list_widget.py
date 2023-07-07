@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QListWidgetItem
 
 from src.constant.list_constant import TEMPLATE_FUNC_NAME, EDIT_TEMPLATE_FUNC_BOX_TITLE
-from src.service.system_storage.template_func_sqlite import CurrentEnum
+from src.enum.common_enum import CurrentEnum, get_checked_enum
 from src.view.list_widget.custom_list_widget import CustomListWidget
 from src.view.list_widget.list_item_func import get_template_func_data, set_template_func_data
 
@@ -24,9 +24,9 @@ class TemplateFuncListWidget(CustomListWidget):
 
     def fill_list_widget(self, func_list):
         for func in func_list:
-            set_template_func_data(self.add_item(func.func_name, func.checked), func)
+            set_template_func_data(self.add_item(func.func_name, get_checked_enum(func.checked)), func)
 
-    def add_item(self, func_name, check_state=Qt.Unchecked):
+    def add_item(self, func_name, check_state=Qt.CheckState.Unchecked):
         func_item = QListWidgetItem(func_name)
         func_item.setCheckState(check_state)
         self.addItem(func_item)
@@ -41,26 +41,26 @@ class TemplateFuncListWidget(CustomListWidget):
         for row in range(self.count()):
             item = self.item(row)
             template_func = get_template_func_data(item)
-            template_func.checked = item.checkState()
-            template_func.is_current = CurrentEnum.current_func.value \
-                if item is self.currentItem() else CurrentEnum.not_current_func.value
+            template_func.checked = item.checkState().value
+            template_func.is_current = CurrentEnum.is_current.value \
+                if item is self.currentItem() else CurrentEnum.not_current.value
             template_func_list.append(template_func)
         return template_func_list
 
     def remove_selected_item(self):
         for row in reversed(range(self.count())):
-            if self.item(row).checkState():
+            if self.item(row).checkState() == Qt.CheckState.Checked:
                 self.takeItem(row)
 
     def select_all_item(self):
         for row in range(self.count()):
-            if self.item(row).checkState() == Qt.Unchecked:
-                self.item(row).setCheckState(Qt.Checked)
+            if self.item(row).checkState() == Qt.CheckState.Unchecked:
+                self.item(row).setCheckState(Qt.CheckState.Checked)
 
     def unselect_all_item(self):
         for row in range(self.count()):
-            if self.item(row).checkState() == Qt.Checked:
-                self.item(row).setCheckState(Qt.Unchecked)
+            if self.item(row).checkState() == Qt.CheckState.Checked:
+                self.item(row).setCheckState(Qt.CheckState.Unchecked)
 
     def copy_func_list(self, func_list):
         # 逐一添加元素，如果已经存在，删除原有项

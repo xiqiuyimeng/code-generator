@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QTabWidget
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTabWidget
 
 from src.constant.export_import_constant import OVERRIDE_TEMPLATE_TITLE
 from src.constant.help.help_constant import TEMPLATE_DETAIL_HELP

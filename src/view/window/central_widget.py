@@ -2,8 +2,8 @@
 """
 中心窗体，左右布局，包含两部分，左边数据源目录，树结构，右边表格展示区
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSplitter
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QSplitter
 
 from src.view.frame.datasource.tab_frame import get_tab_frame
 from src.view.frame.datasource.tree_frame import get_tree_frame
@@ -21,7 +21,7 @@ class CentralWidget(QWidget):
         self.horizontal_splitter = QSplitter(self)
 
         # 竖直方向的分割器
-        self.horizontal_splitter.setOrientation(Qt.Horizontal)
+        self.horizontal_splitter.setOrientation(Qt.Orientation.Horizontal)
         # 设置拉伸时，不覆盖子控件，也就是不会隐藏控件
         self.horizontal_splitter.setChildrenCollapsible(False)
         self._layout.addWidget(self.horizontal_splitter)

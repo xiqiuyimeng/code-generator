@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QMenu
+from PyQt6.QtWidgets import QMenu
 
 from src.constant.bar_constant import ADD_DS_ACTION
 from src.constant.ds_dialog_constant import TEST_CONN_BOX_TITLE, TEST_CONN_SUCCESS_PROMPT
-from src.constant.icon_enum import get_icon
 from src.constant.tree_constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, \
     CANCEL_TEST_CONN_ACTION, TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, \
     EDIT_CONN_PROMPT, DEL_CONN_PROMPT, CLOSE_CONN_PROMPT, REFRESH_CONN_ACTION, CANCEL_REFRESH_CONN_ACTION, \
     OPEN_CONN_BOX_TITLE
+from src.enum.icon_enum import get_icon
 from src.service.async_func.async_sql_conn_task import DelConnExecutor, CloseConnExecutor
 from src.service.async_func.async_sql_ds_task import OpenConnExecutor, TestConnIconMovieExecutor, RefreshConnExecutor
 from src.view.bar.bar_action import add_sql_ds_actions
 from src.view.box.message_box import pop_ok, pop_question, pop_fail
-from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode
+from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record, get_add_del_data, get_children_opened_ids, \
     get_item_opened_tab, refresh_tree_item_callback
 from src.view.tree.tree_widget.tree_function import make_db_items, edit_conn_func, make_sql_tree_item
@@ -61,7 +61,8 @@ class ConnTreeNode(SqlTreeNodeABC):
         # 检查连接是否可以关闭
         close_conn_prompt = self.not_allow_operate_prompt()
         if close_conn_prompt:
-            pop_fail(close_conn_prompt.format(self.item_name), CLOSE_CONN_ACTION.format(self.item_name), self.window)
+            pop_fail(close_conn_prompt.format(self.item_name),
+                     CLOSE_CONN_ACTION.format(self.item_name), self.window)
             return
         # 判断是否有选中数据
         del_data = get_add_del_data(self.item)
@@ -210,23 +211,13 @@ class ConnTreeNode(SqlTreeNodeABC):
 
     def del_conn(self):
         # 在删除连接之后的连接项，应该对其进行重新排序
-        reorder_items = self.get_need_reorder_items()
+        reorder_items = self.get_need_reorder_item_records()
         tab_indexes, tab_ids = self.get_tab_indexes_and_ids()
         opened_record = get_item_opened_record(self.item)
         self.del_conn_executor = DelConnExecutor(opened_record.parent_id, opened_record.item_name,
                                                  reorder_items, tab_indexes, tab_ids,
                                                  self.del_conn_callback, self.item, self.window)
         self.del_conn_executor.start()
-
-    def get_need_reorder_items(self):
-        conn_items = self.tree_widget.get_top_level_items()
-        index = conn_items.index(self.item)
-        need_reorder_items = conn_items[index + 1:]
-        if need_reorder_items:
-            reorder_items = [get_item_opened_record(item) for item in need_reorder_items]
-            for reorder_item in reorder_items:
-                reorder_item.item_order -= 1
-            return reorder_items
 
     def del_conn_callback(self, tab_indexes):
         self.do_close_conn_callback(tab_indexes)

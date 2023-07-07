@@ -5,9 +5,10 @@ import platform
 import sys
 
 import win32gui
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt6 import QtWidgets, QtGui
+from PyQt6.QtCore import Qt, QDir
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QApplication
 
 from src.constant.window_constant import WINDOW_TITLE
 from src.logger.log import logger as log
@@ -16,9 +17,6 @@ from src.service.util.init_util import init_data
 from src.view.window.main_window import MainWindow
 from src.view.window.main_window_func import set_window
 
-# 引入静态资源
-from static import image_rc
-from static import style_rc
 
 pyi_splash_spec = importlib.util.find_spec("pyi_splash")
 if pyi_splash_spec is not None:
@@ -58,26 +56,32 @@ def move_above_splash(hwnd):
             win32gui.SetForegroundWindow(hwnd)
         except:
             # 这样可以避免多次点击导致的获取句柄错误
-            pass
+            ...
 
 
 if __name__ == "__main__":
     log.info("**********生成器启动**********")
+    # 加载静态资源
+    QDir.addSearchPath('qss', 'static/qss/')
+    QDir.addSearchPath('icon', 'static/icon/')
+    QDir.addSearchPath('bg_jpg', 'static/bg_jpg/')
+    QDir.addSearchPath('boot', 'static/boot/')
+    QDir.addSearchPath('gif', 'static/gif/')
+
     app = QtWidgets.QApplication(sys.argv)
-    splash = QtWidgets.QSplashScreen(
-        QtGui.QPixmap(":/boot_jpg/boot.jpg").scaled(600, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-    )
-    splash.showMessage("加载中...", Qt.AlignHCenter | Qt.AlignBottom)
+    splash = QtWidgets.QSplashScreen(QtGui.QPixmap("boot:boot.jpg")
+                                     .scaled(600, 500, Qt.AspectRatioMode.KeepAspectRatio,
+                                             Qt.TransformationMode.SmoothTransformation))
+    splash.showMessage("加载中...", Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom)
     # 显示启动界面
     splash.show()
-    QtWidgets.qApp.processEvents()
+    QApplication.instance().processEvents()
     # 后台数据初始化
     init_data()
-    # 获取当前屏幕分辨率
-    desktop = QtWidgets.QApplication.desktop()
     app.setStyleSheet(read_qss())
     app.setFont(QFont('Microsoft YaHei', 9))
-    screen_rect = desktop.screenGeometry()
+    # 获取当前屏幕分辨率
+    screen_rect = app.primaryScreen().size()
     main_window = MainWindow(screen_rect)
     # 保存引用
     set_window(main_window)
@@ -89,6 +93,6 @@ if __name__ == "__main__":
             move_above_splash(main_window.winId())
         pyi_splash.close()
     splash.finish(main_window)
-    app.exec_()
+    app.exec()
     log.info("**********生成器退出**********\n")
     sys.exit()

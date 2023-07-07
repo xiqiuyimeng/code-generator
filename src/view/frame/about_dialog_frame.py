@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel
+from PyQt6.QtWidgets import QLabel
 
 from src.constant.about_dialog_constant import ABOUT_INFO
 from src.view.frame.dialog_frame_abc import DialogFrameABC

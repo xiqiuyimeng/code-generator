@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from src.logger.log import logger as log
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init
-from src.service.util.db_id_generator import update_id_generator
+from src.service.util.db_id_generator_util import update_id_generator
 from src.service.util.group_util import group_model_list
 from src.service.util.system_storage_util import transactional, Condition
 

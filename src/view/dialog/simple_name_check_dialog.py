@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.view.dialog.custom_dialog_abc import CustomSaveDialogABC
 from src.view.frame.simple_name_check_dialog_frame import SimpleNameCheckDialogFrame

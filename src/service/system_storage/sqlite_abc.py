@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Union
 
 from src.logger.log import logger as log
-from src.service.util.db_id_generator import update_id_generator, get_id
+from src.service.util.db_id_generator_util import update_id_generator, get_id
 from src.service.util.system_storage_util import get_cursor, get_now_str, batch_operate, Condition, get_field_list, \
     SelectCol, update_table_field_dict
 

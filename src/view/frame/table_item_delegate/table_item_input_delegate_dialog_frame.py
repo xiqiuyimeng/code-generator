@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QLabel
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtWidgets import QLabel
 
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.frame.frame_func import check_text_available
@@ -26,7 +26,7 @@ class TableItemInputDelegateDialogFrame(SaveDialogFrame):
         super().__init__(*args, need_help_button=False)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+        if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             # 拦截回车键，避免在编辑器内回车触发对话框关闭事件
             ...
         else:

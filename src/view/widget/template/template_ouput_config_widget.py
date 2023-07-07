@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton
+from PyQt6.QtWidgets import QPushButton
 
 from src.constant.template_dialog_constant import AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT, MAINTAIN_FILE_CONFIG_BTN_TEXT, \
     NO_UNBIND_FILE_PROMPT, GENERATE_FILE_CONFIG_TITLE, GENERATE_CONFIG_FAIL_PROMPT, MAINTAIN_FILE_CONFIG_BOX_TITLE, \
     NO_OUTPUT_CONFIG_PROMPT, CHECK_OUTPUT_CONFIG_NAME_PROMPT, CHECK_OUTPUT_CONFIG_NAME_TITLE, \
     CHECK_OUTPUT_CONFIG_VAR_NAME_PROMPT, CHECK_OUTPUT_CONFIG_VAR_NAME_TITLE
+from src.enum.common_enum import ConfigTypeEnum
 from src.service.async_func.async_template_task import AutoGenerateOutputConfigExecutor
-from src.service.system_storage.template_config_sqlite import ConfigTypeEnum
-from src.service.util.import_export_util import check_template_config
+from src.view.box.message_box import pop_fail
 from src.view.dialog.template.template_maintain_file_config_dialog import TemplateMaintainFileConfigDialog
 from src.view.table.table_widget.template_table_widget.template_config_table_widget import \
     TemplateOutputConfigTableWidget
 from src.view.widget.template.template_config_widget import TemplateConfigWidget
-from src.view.box.message_box import pop_fail
 
 _author_ = 'luwt'
 _date_ = '2023/4/12 14:39'

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import cx_Oracle
+from PyQt6.QtCore import Qt
 
+from src.enum.common_enum import ColTypeEnum
 from src.service.sql_ds_executor.db_executor import SqlDBExecutor
-from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 
 _author_ = 'luwt'
 _date_ = '2023/2/7 11:03'
@@ -55,7 +57,7 @@ class OracleDBExecutor(SqlDBExecutor):
         table_info.full_data_type = data_type
         table_info.is_pk = row[7] == 'Y'
         table_info.col_comment = row[6]
-        table_info.checked = CheckedEnum.unchecked.value
+        table_info.checked = Qt.CheckState.Unchecked.value
         table_info.handle_data_type()
         table_info.col_type = ColTypeEnum.col.value
         return table_info

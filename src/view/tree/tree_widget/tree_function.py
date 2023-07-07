@@ -2,16 +2,17 @@
 """
 处理树节点相关操作
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem, QApplication, QStyle
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QTreeWidgetItem, QApplication, QStyle
 
 from src.constant.ds_type_constant import FOLDER_TYPE
-from src.constant.icon_enum import get_icon
+from src.enum.common_enum import get_checked_enum
+from src.enum.icon_enum import get_icon
 from src.constant.tree_constant import ADD_CONN_DIALOG_TITLE, EDIT_CONN_DIALOG_TITLE, ADD_STRUCT_DIALOG_TITLE, \
     EDIT_STRUCT_DIALOG_TITLE, CREATE_NEW_FOLDER, EDIT_FOLDER_NAME
-from src.service.system_storage.conn_type import get_conn_dialog
-from src.service.system_storage.struct_type import get_struct_dialog, FolderTypeEnum
-from src.service.util.tree_node import TreeData
+from src.enum.conn_type_enum import get_conn_dialog
+from src.enum.struct_type_enum import get_struct_dialog, FolderTypeEnum
+from src.service.util.tree_node_util import TreeData
 from src.view.dialog.datasource.conn_dialog import *
 from src.view.dialog.datasource.struct_dialog import *
 from src.view.tree.tree_item.tree_item import TreeWidgetItem
@@ -23,7 +24,7 @@ _author_ = 'luwt'
 _date_ = '2020/7/6 11:34'
 
 
-def make_sql_tree_item(tree_widget, parent, name, icon, opened_item_record=None, checkbox=None):
+def make_sql_tree_item(tree_widget, parent, name, icon, opened_item_record=None, check_value=None):
     """
     构造sql树的子项
     :param tree_widget: 树部件
@@ -31,15 +32,15 @@ def make_sql_tree_item(tree_widget, parent, name, icon, opened_item_record=None,
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
     :param opened_item_record: 打开记录表中的记录
-    :param checkbox: 构造的子节点的复选框
+    :param check_value: 构造的子节点的复选框状态值
     """
     item = TreeWidgetItem(tree_widget, parent)
     item.setIcon(0, icon)
     item.setText(0, name)
     if opened_item_record:
         set_item_opened_record(item, opened_item_record)
-    if checkbox is not None:
-        item.setCheckState(0, checkbox)
+    if check_value is not None:
+        item.setCheckState(0, get_checked_enum(check_value))
     return item
 
 
@@ -83,7 +84,6 @@ def show_conn_dialog(sql_type, tree_widget, conn_id, title):
     dialog: ConnDialogABC = globals()[get_conn_dialog(sql_type)](title, exists_conn_names, conn_id)
     if title == ADD_CONN_DIALOG_TITLE:
         dialog.save_signal.connect(lambda opened_conn_record: add_conn_tree_item(tree_widget, opened_conn_record))
-
     elif title == EDIT_CONN_DIALOG_TITLE:
         dialog.edit_signal.connect(lambda conn_name: update_conn_tree_item(tree_widget, conn_name))
     dialog.exec()
@@ -143,7 +143,7 @@ def make_table_items(tree_widget, parent_item, opened_table_items, tree_data: Tr
     icon = get_icon(opened_table_items[0].data_type.tb_icon_name)
     for opened_table_item in opened_table_items:
         make_sql_tree_item(tree_widget, parent_item, opened_table_item.item_name, icon,
-                           opened_table_item, checkbox=opened_table_item.checked)
+                           opened_table_item, check_value=opened_table_item.checked)
         if opened_table_item.checked:
             checked_table_opened_items.append(opened_table_item)
     # 如果表已选中，添加到选中数据集合中
@@ -168,9 +168,9 @@ def check_table_status(parent):
             # 将checkbox选中状态放入集合，状态有选中、部分选中与未选中，
             # 若集合元素为两个，则为部分选中，若为一个，取值判断。
             check_set.add(parent.child(index).checkState(0))
-        if Qt.PartiallyChecked in check_set or len(check_set) > 1:
+        if Qt.CheckState.PartiallyChecked in check_set or len(check_set) > 1:
             parted_checked = True
-        elif len(check_set) == 1 and check_set.pop() == Qt.Checked:
+        elif len(check_set) == 1 and check_set.pop() == Qt.CheckState.Checked:
             all_checked = True
     return all_checked, parted_checked
 
@@ -296,7 +296,7 @@ def show_folder_dialog(tree_widget, parent_opened_item, dialog_title, folder_inf
     folder_dialog.exec()
 
 
-def make_struct_tree_item(tree_widget, parent, name, icon, checkbox, opened_item_record):
+def make_struct_tree_item(tree_widget, parent, name, icon, check_value, opened_item_record):
     """
     构造结构体树的子项
     :param tree_widget: 树组件
@@ -304,12 +304,12 @@ def make_struct_tree_item(tree_widget, parent, name, icon, checkbox, opened_item
     :param name: 构造的子节点名称
     :param icon: 图标，该元素的展示图标对象
     :param opened_item_record: 打开记录表中的记录
-    :param checkbox: 构造的子节点的复选框
+    :param check_value: 构造的子节点的复选框状态值
     """
     item = TreeWidgetItem(tree_widget, parent)
     item.setIcon(0, icon)
     item.setText(0, name)
-    item.setCheckState(0, checkbox)
+    item.setCheckState(0, get_checked_enum(check_value))
     set_item_opened_record(item, opened_item_record)
     return item
 
@@ -324,7 +324,7 @@ def add_struct_tree_item(tree_widget, parent, opened_item_record, struct_type):
     """
     # 如果是文件夹，使用默认图标
     icon = get_icon(struct_type) \
-        if struct_type != FOLDER_TYPE else QApplication.style().standardIcon(QStyle.SP_DirIcon)
+        if struct_type != FOLDER_TYPE else QApplication.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon)
     struct_item = make_struct_tree_item(tree_widget, parent, opened_item_record.item_name,
                                         icon, opened_item_record.checked, opened_item_record)
     struct_item.setExpanded(opened_item_record.expanded)

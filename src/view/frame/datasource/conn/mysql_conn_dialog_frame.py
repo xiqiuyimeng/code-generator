@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from src.constant.ds_dialog_constant import MYSQL_DEFAULT_HOST, MYSQL_DEFAULT_PORT, MYSQL_DEFAULT_USER
-from src.service.system_storage.conn_type import ConnTypeEnum, ConnType
+from src.enum.conn_type_enum import ConnTypeEnum, ConnType
 from src.view.frame.datasource.conn.internet_conn_dialog_frame import InternetConnDialogFrame
 
 _author_ = 'luwt'

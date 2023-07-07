@@ -9,8 +9,8 @@
     而在itemChanged信号发出时，会触发树节点的 setData 方法，所以可以根据是否点击和数据变化，判断复选框是否点击，
     在clicked信号槽函数中重置标志位，实现点击复选框功能
 """
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 
 from src.service.async_func.async_item_changed_task import ItemChangedExecutor
 from src.view.custom_widget.item_view_abc import ItemViewABC
@@ -56,13 +56,13 @@ class TreeWidgetABC(DisplayTreeWidget):
         self.item_changed_executor = ItemChangedExecutor()
         self.item_changed_executor.start()
 
-    def mousePressEvent(self, e) -> None:
-        if e.button() == Qt.LeftButton:
+    def mousePressEvent(self, event) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
             # 判断是左键点击，将标志位置位True
             self.item_clicked = True
             # 获取点击的项
-            self.clicked_item = self.itemAt(e.pos())
-        super().mousePressEvent(e)
+            self.clicked_item = self.itemAt(event.pos())
+        super().mousePressEvent(event)
 
     def connect_signal(self):
         """定义通用的信号槽连接"""
@@ -111,18 +111,19 @@ class TreeWidgetABC(DisplayTreeWidget):
             for i in range(item.childCount()):
                 child_item = item.child(i)
                 # 如果复选框状态相同，跳过
-                if child_item.data(0, Qt.CheckStateRole) is None \
+                if child_item.data(0, Qt.ItemDataRole.CheckStateRole) is None \
                         or child_item.checkState(0) == check_state:
                     continue
                 child_item.setCheckState(0, check_state)
-                get_item_opened_record(child_item).checked = check_state
+                # 保存子节点复选框状态数据
+                get_item_opened_record(child_item).checked = check_state.value
                 # 如果子元素
                 if not self.handle_checkbox_changed(child_item, clicked=False):
                     opened_list.append(get_item_opened_record(child_item))
             if opened_list:
                 recursive_get_add_del_data(item, add_del_data)
                 add_del_data[opened_list[0].level] = opened_list
-                if check_state == Qt.Unchecked:
+                if check_state == Qt.CheckState.Unchecked:
                     self.tree_data.del_node(add_del_data)
                 else:
                     self.tree_data.add_node(add_del_data)
@@ -170,20 +171,17 @@ class TreeWidgetABC(DisplayTreeWidget):
             iterator = iterator.__iadd__(1)
 
     def get_top_level_items(self):
-        top_level_items = list()
-        for idx in range(self.topLevelItemCount()):
-            top_level_items.append(self.topLevelItem(idx))
-        return top_level_items
+        return [self.topLevelItem(idx) for idx in range(self.topLevelItemCount())]
 
     def set_tree_unchecked(self):
         iterator = QTreeWidgetItemIterator(self)
         while iterator.value():
             item = iterator.value()
             # 如果选中，置为非选中
-            if item.checkState(0):
-                item.setCheckState(0, Qt.Unchecked)
+            if item.checkState(0) != Qt.CheckState.Unchecked:
+                item.setCheckState(0, Qt.CheckState.Unchecked)
                 self.item_changed_executor.item_checked(item)
-                link_table_checkbox(item, Qt.Unchecked)
+                link_table_checkbox(item, Qt.CheckState.Unchecked)
             iterator = iterator.__iadd__(1)
 
     def locate_item(self):

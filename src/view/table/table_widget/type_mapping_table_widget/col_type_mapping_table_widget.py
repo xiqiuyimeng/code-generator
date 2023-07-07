@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 
 from src.constant.table_constant import DEL_MAPPING_GROUP_BOX_TITLE, DEL_MAPPING_GROUP_PROMPT, \
     DEL_COL_TYPE_MAPPING_PROMPT, DEL_COL_TYPE_MAPPING_TITLE
@@ -56,7 +56,7 @@ class ColTypeMappingTableWidgetABC(TableWidgetABC):
         rm_index_list = list()
         for row in range(self.rowCount()):
             cell_widget = self.cellWidget(row, 0)
-            if cell_widget.check_box.checkState():
+            if cell_widget.check_box.checkState() == Qt.CheckState.Checked:
                 rm_index_list.append(row)
         # 执行删除
         for idx in sorted(rm_index_list, reverse=True):
@@ -103,7 +103,7 @@ class ColTypeMappingFrozenTableWidget(ColTypeMappingTableWidgetABC):
 
 class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     # 表头复选框状态变化信号
-    header_check_changed = pyqtSignal(int)
+    header_check_changed = pyqtSignal(Qt.CheckState)
 
     def __init__(self, *args):
         # 冻结前两列的表格
@@ -235,16 +235,15 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
     def _sync_last_mapping_col_text(self, row):
         # 同步上一个映射列名称到当前列下面单元格，需要保持映射列名称一致
-        # 找出所有映射列名称 列索引
-        mapping_col_idx_list = [idx for idx in range(2, self.columnCount()) if (idx - 2) % 3 == 0]
-        for col_idx in mapping_col_idx_list:
-            last_mapping_col_name = self.item(row - 1, col_idx).text()
-            # 给当前列行赋值
-            self.item(row, col_idx).setText(last_mapping_col_name)
+        for col_idx in range(2, self.columnCount()):
+            if (col_idx - 2) % 3 == 0:
+                last_mapping_col_name = self.item(row - 1, col_idx).text()
+                # 给当前列行赋值
+                self.item(row, col_idx).setText(last_mapping_col_name)
 
     def del_type_mapping(self):
         check_count = len([row for row in range(self.rowCount())
-                           if self.cellWidget(row, 0).check_box.checkState() == Qt.Checked])
+                           if self.cellWidget(row, 0).check_box.checkState() == Qt.CheckState.Checked])
         if not pop_question(DEL_COL_TYPE_MAPPING_PROMPT.format(check_count), DEL_COL_TYPE_MAPPING_TITLE, self):
             return
         # 移除类型映射行，根据选中情况来删除
@@ -322,10 +321,9 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
     def sync_col_types(self, col_types):
         exists_col_types = [self._get_col_type(row) for row in range(self.rowCount())]
         for idx, col_type in enumerate(col_types):
-            if col_type in exists_col_types:
-                continue
-            self.add_type_mapping()
-            self._set_col_type_item(self.rowCount() - 1, col_type)
+            if col_type not in exists_col_types:
+                self.add_type_mapping()
+                self._set_col_type_item(self.rowCount() - 1, col_type)
 
     def collect_data(self):
         # 收集数据，类型：list [ColTypeMapping]

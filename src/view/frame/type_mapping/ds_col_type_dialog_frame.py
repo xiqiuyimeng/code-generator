@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton, QLabel, QStackedWidget, QListWidgetItem
+from PyQt6.QtWidgets import QPushButton, QLabel, QStackedWidget, QListWidgetItem
 
 from src.constant.help.help_constant import DS_COL_TYPE_HELP
 from src.constant.type_mapping_dialog_constant import SAVE_DATA_TIPS, ADD_DS_COL_TYPE_BUTTON_TEXT, \

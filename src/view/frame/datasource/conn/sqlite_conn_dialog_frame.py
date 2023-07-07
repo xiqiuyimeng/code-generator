@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel, QLineEdit, QFileDialog, QFormLayout, QAction
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QLabel, QLineEdit, QFileDialog, QFormLayout
 
 from src.constant.ds_dialog_constant import SQLITE_FILE_URL_TXT, CHOOSE_SQLITE_FILE
-from src.service.system_storage.conn_type import ConnType, ConnTypeEnum
+from src.enum.conn_type_enum import ConnType, ConnTypeEnum
 from src.view.frame.datasource.conn.conn_dialog_frame_abc import ConnDialogFrameABC
 from src.view.frame.frame_func import construct_lineedit_file_action
 

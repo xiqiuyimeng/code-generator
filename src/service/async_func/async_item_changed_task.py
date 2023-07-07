@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from queue import Queue
 
+from src.enum.common_enum import CurrentEnum, ExpandedEnum
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecutorABC
-from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, ExpandedEnum, OpenedTreeItemSqlite, \
-    CurrentEnum
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem, OpenedTreeItemSqlite
 from src.service.util.system_storage_util import release_connection
 from src.view.tree.tree_item.tree_item_func import get_item_opened_record
 
@@ -72,12 +72,12 @@ class ItemChangedExecutor(ThreadExecutorABC):
 
     def item_checked(self, item):
         opened_item = get_item_opened_record(item)
-        opened_item.checked = item.checkState(0)
+        opened_item.checked = item.checkState(0).value
         self.queue.put(('item_checked', opened_item))
 
     def item_child_checked(self, item, check_state):
         opened_item = get_item_opened_record(item)
         update_record = OpenedTreeItem()
         update_record.id = opened_item.id
-        update_record.checked = check_state
+        update_record.checked = check_state.value
         self.queue.put(('item_child_checked', update_record))

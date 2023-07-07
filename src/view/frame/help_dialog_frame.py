@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QStackedWidget, QHBoxLayout
+from PyQt6.QtWidgets import QStackedWidget, QHBoxLayout
 
 from src.constant.help.help_constant import HELP_TYPE_DICT
 from src.view.frame.dialog_frame_abc import DialogFrameABC

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.window_constant import SWITCH_DS_CATEGORY_TITLE
+from src.enum.ds_category_enum import get_ds_category_list
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
-from src.service.system_storage.ds_category_sqlite import DsCategorySqlite, DsCategoryEnum
+from src.service.system_storage.ds_category_sqlite import DsCategorySqlite
 from src.service.util.ds_category_util import get_current_ds_category
 from src.service.util.system_storage_util import transactional
 
@@ -41,10 +42,7 @@ class InitDsCategoryWorker(ThreadWorkerABC):
         # 上述条件不满足，则进行初始化，将库里原有数据清空，初始化数据
         log.info('数据源种类列表数据初始化')
         self.ds_category_sqlite.drop_table()
-        ds_categories = list()
-        for ds_category in DsCategoryEnum:
-            ds_categories.append(ds_category.value)
-        DsCategorySqlite().batch_insert(ds_categories)
+        DsCategorySqlite().batch_insert(get_ds_category_list())
         log.info('数据源种类列表数据初始化成功')
         return self.get_ds_categories()
 

@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 
 from src.constant.ds_dialog_constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
 from src.constant.tree_constant import OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, REFRESH_CONN_BOX_TITLE, \
     REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, \
     REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, \
     REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT
+from src.enum.common_enum import SqlTreeItemLevelEnum
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     RefreshMovieThreadExecutor
 from src.service.sql_ds_executor import *
 from src.service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite, DsTableTab
-from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, SqlTreeItemLevel, OpenedTreeItem, \
-    CheckedEnum
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem
 from src.service.util.refresh_util import deal_opened_items, refresh_tab_cols
 from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
@@ -111,8 +111,8 @@ class OpenConnWorker(ConnWorkerABC):
         opened_tree_item_sqlite.open_item(self.conn_opened_record.id)
         # 添加库节点
         return opened_tree_item_sqlite.add_opened_child_item(db_names, self.conn_opened_record.id,
-                                                             SqlTreeItemLevel.db_level.value,
-                                                             DsCategoryEnum.sql_ds_category.value.name,
+                                                             SqlTreeItemLevelEnum.db_level.value,
+                                                             DsCategoryEnum.sql_ds_category.get_name(),
                                                              self.conn_opened_record.data_type,
                                                              init_checked=False)
 
@@ -142,8 +142,8 @@ class RefreshConnWorker(ConnWorkerABC):
         db_names = executor.open_conn()
         self.modifying_db_task = True
         data_type = self.conn_opened_record.data_type
-        level = SqlTreeItemLevel.db_level.value
-        ds_category = DsCategoryEnum.sql_ds_category.value.name
+        level = SqlTreeItemLevelEnum.db_level.value
+        ds_category = DsCategoryEnum.sql_ds_category.get_name()
         exists_db_records = deal_opened_items(db_names, self.conn_opened_record.id, data_type,
                                               level, ds_category, self.db_changed_signal, False)
 
@@ -158,8 +158,8 @@ class RefreshConnWorker(ConnWorkerABC):
     def refresh_db(self, executor, db_record, data_type):
         tree_item_sqlite = OpenedTreeItemSqlite()
         # 获取本地库中缓存的数据
-        level = SqlTreeItemLevel.tb_level.value
-        ds_category = DsCategoryEnum.sql_ds_category.value.name
+        level = SqlTreeItemLevelEnum.tb_level.value
+        ds_category = DsCategoryEnum.sql_ds_category.get_name()
         child_opened_records = tree_item_sqlite.get_children(db_record.id, level, ds_category)
         # 如果之前没有子节点，那么不需要进行刷新处理
         if not child_opened_records:
@@ -226,8 +226,8 @@ class OpenDBWorker(ConnWorkerABC):
         opened_tree_item_sqlite.open_item(self.opened_db_id)
         # 添加表节点
         return opened_tree_item_sqlite.add_opened_child_item(tb_names, self.opened_db_id,
-                                                             SqlTreeItemLevel.tb_level.value,
-                                                             DsCategoryEnum.sql_ds_category.value.name,
+                                                             SqlTreeItemLevelEnum.tb_level.value,
+                                                             DsCategoryEnum.sql_ds_category.get_name(),
                                                              self.conn_opened_record.data_type)
 
     def get_err_msg(self) -> str:
@@ -265,8 +265,8 @@ class RefreshDBWorker(ConnWorkerABC):
                 raise Exception('未获取到表')
             self.modifying_db_task = True
             data_type = self.conn_opened_record.data_type
-            level = SqlTreeItemLevel.tb_level.value
-            ds_category = DsCategoryEnum.sql_ds_category.value.name
+            level = SqlTreeItemLevelEnum.tb_level.value
+            ds_category = DsCategoryEnum.sql_ds_category.get_name()
             exists_item_records = deal_opened_items(tb_names, self.opened_db_id, data_type,
                                                     level, ds_category, self.table_changed_signal)
 
@@ -371,7 +371,7 @@ class RefreshTBWorker(ConnWorkerABC):
         # 首先检查表本身是否存在
         executor.check_tb(self.db_name, self.tb_name)
         # 更新表的复选框状态
-        self.opened_table_item.checked = CheckedEnum.unchecked.value
+        self.opened_table_item.checked = Qt.CheckState.Unchecked.value
         OpenedTreeItemSqlite().update_checked(self.opened_table_item)
         # 如果表之前tab页已经打开，尝试获取新的列数据
         if self.tab:

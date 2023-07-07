@@ -2,9 +2,9 @@
 """
 消息弹窗
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMessageBox, QLabel, QVBoxLayout, QFrame, QStyle, QHBoxLayout, QPushButton, QDialog
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QMessageBox, QLabel, QVBoxLayout, QFrame, QStyle, QHBoxLayout, QPushButton, QDialog
 
 from src.constant.message_box_constant import OK_BUTTON, ACCEPT_BUTTON, REJECT_BUTTON
 from src.service.read_qrc.read_config import read_qss
@@ -46,23 +46,23 @@ class MessageBox(DraggableDialog):
 
     def keyPressEvent(self, event) -> None:
         # 屏蔽esc键关闭窗口事件
-        if event.key() == Qt.Key_Escape:
-            pass
+        if event.key() == Qt.Key.Key_Escape:
+            ...
         else:
             super().keyPressEvent(event)
 
     def setup_ui(self):
         self.setWindowIcon(self.dialog_icon)
         # 隐藏窗口边框
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self._layout = QVBoxLayout(self)
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._layout.setSpacing(0)
         self.frame = QFrame(self)
         self._layout.addWidget(self.frame)
 
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
+        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.frame_layout = QVBoxLayout(self.frame)
         self.frame.setLayout(self.frame_layout)
 
@@ -106,10 +106,10 @@ class MessageBox(DraggableDialog):
         button.setFixedWidth(button.sizeHint().width())
         self.button_layout.addWidget(button)
 
-        if button_role == QMessageBox.AcceptRole:
+        if button_role == QMessageBox.ButtonRole.AcceptRole:
             button.setObjectName('accept_button')
             button.clicked.connect(self.accept_clicked)
-        elif button_role == QMessageBox.RejectRole:
+        elif button_role == QMessageBox.ButtonRole.RejectRole:
             button.setObjectName('reject_button')
             button.clicked.connect(self.reject_clicked)
         # 加载样式表
@@ -124,12 +124,12 @@ class MessageBox(DraggableDialog):
         self.start_close_animation()
 
     def get_message_icon(self):
-        if self.box_icon == QMessageBox.Information:
-            return self.style().standardIcon(QStyle.SP_MessageBoxInformation)
-        elif self.box_icon == QMessageBox.Critical:
-            return self.style().standardIcon(QStyle.SP_MessageBoxCritical)
-        elif self.box_icon == QMessageBox.Question:
-            return self.style().standardIcon(QStyle.SP_MessageBoxQuestion)
+        if self.box_icon == QMessageBox.Icon.Information:
+            return self.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxInformation)
+        elif self.box_icon == QMessageBox.Icon.Critical:
+            return self.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxCritical)
+        elif self.box_icon == QMessageBox.Icon.Question:
+            return self.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxQuestion)
 
 
 def pop_msg(title, msg, window=None):
@@ -139,8 +139,8 @@ def pop_msg(title, msg, window=None):
     :param msg: 弹窗消息
     :param window: 父窗体
     """
-    msg_box = MessageBox(QMessageBox.Information, title, msg, parent=window)
-    msg_box.add_button(OK_BUTTON, QMessageBox.AcceptRole)
+    msg_box = MessageBox(QMessageBox.Icon.Information, title, msg, parent=window)
+    msg_box.add_button(OK_BUTTON, QMessageBox.ButtonRole.AcceptRole)
     msg_box.exec()
 
 
@@ -151,8 +151,8 @@ def pop_ok(msg, title, window=None):
     :param title: 标题
     :param window: 父窗体
     """
-    msg_box = MessageBox(QMessageBox.NoIcon, title, msg, parent=window)
-    msg_box.add_button(OK_BUTTON, QMessageBox.AcceptRole)
+    msg_box = MessageBox(QMessageBox.Icon.NoIcon, title, msg, parent=window)
+    msg_box.add_button(OK_BUTTON, QMessageBox.ButtonRole.AcceptRole)
     msg_box.exec()
 
 
@@ -163,8 +163,8 @@ def pop_fail(msg, title, window=None):
     :param title: 标题
     :param window: 父窗体
     """
-    msg_box = MessageBox(QMessageBox.Critical, title, msg, parent=window)
-    msg_box.add_button(OK_BUTTON, QMessageBox.AcceptRole)
+    msg_box = MessageBox(QMessageBox.Icon.Critical, title, msg, parent=window)
+    msg_box.add_button(OK_BUTTON, QMessageBox.ButtonRole.AcceptRole)
     msg_box.exec()
 
 
@@ -175,9 +175,9 @@ def pop_question(msg, title, window=None):
     :param title: 弹窗标题
     :param window: 父窗体
     """
-    msg_box = MessageBox(QMessageBox.Question, title, msg, parent=window)
-    msg_box.add_button(ACCEPT_BUTTON, QMessageBox.AcceptRole)
-    msg_box.add_button(REJECT_BUTTON, QMessageBox.RejectRole)
+    msg_box = MessageBox(QMessageBox.Icon.Question, title, msg, parent=window)
+    msg_box.add_button(ACCEPT_BUTTON, QMessageBox.ButtonRole.AcceptRole)
+    msg_box.add_button(REJECT_BUTTON, QMessageBox.ButtonRole.RejectRole)
     reply = msg_box.exec()
-    return True if reply == QDialog.Accepted else False
+    return True if reply == QDialog.DialogCode.Accepted else False
 

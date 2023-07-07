@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QSize, QRect, Qt
-from PyQt5.QtGui import QColor, QTextFormat, QPainter
-from PyQt5.QtWidgets import QWidget, QTextEdit
+from PyQt6.QtCore import QSize, QRect, Qt
+from PyQt6.QtGui import QColor, QTextFormat, QPainter
+from PyQt6.QtWidgets import QWidget, QTextEdit
 
 from src.view.custom_widget.scrollable_widget import ScrollableTextEdit
 
@@ -74,7 +74,7 @@ class TextEditor(ScrollableTextEdit):
             line_color = QColor('DeepSkyBlue').lighter(160)
 
             selection.format.setBackground(line_color)
-            selection.format.setProperty(QTextFormat.FullWidthSelection, True)
+            selection.format.setProperty(QTextFormat.Property.FullWidthSelection, True)
             selection.cursor = self.textCursor()
             # QPlainTextEdit提供了同时拥有多个选择的可能性。我们可以设置这些选择的字符格式（QTextCharFormat）。
             # 在设置新的QPlainTextEdit：：ExtraSelection之前，我们清除光标选择，否则当用户用鼠标选择多行时，几行将突出显示
@@ -98,10 +98,10 @@ class TextEditor(ScrollableTextEdit):
 
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bottom >= event.rect().top():
-                painter.setPen(Qt.black)
+                painter.setPen(Qt.GlobalColor.black)
                 painter.setFont(self.font())
                 painter.drawText(0, top, self.lineNumberArea.width(),
-                                 self.fontMetrics().height(), Qt.AlignRight,
+                                 self.fontMetrics().height(), Qt.AlignmentFlag.AlignRight,
                                  str(block_num + 1))
 
             block = block.next()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.template_dialog_constant import DEL_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, BATCH_DEL_CONFIG_PROMPT, \
@@ -87,7 +87,7 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
 
     def del_rows(self):
         for row_index in reversed(range(self.rowCount())):
-            if self.cellWidget(row_index, 0).check_box.checkState():
+            if self.cellWidget(row_index, 0).check_box.checkState() == Qt.CheckState.Checked:
                 self.unbind_config_file(row_index)
         super().del_rows()
 
@@ -118,17 +118,17 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
 
     def clear_bind_file_rows(self):
         # 搜集所有绑定了文件的配置
-        bind_file_config_list, row_idxes = list(), list()
+        bind_file_config_list, row_idx_list = list(), list()
         for row_index in range(self.rowCount()):
             config = self.get_row_data(row_index)
             if config.bind_file_list:
                 bind_file_config_list.append(config)
-                row_idxes.append(row_index)
+                row_idx_list.append(row_index)
         if not bind_file_config_list:
             return
         # 如果存在配置绑定了文件，询问是否删除
         if pop_question(BATCH_DEL_OUTPUT_CONFIG_PROMPT, DEL_CONFIG_BOX_TITLE, self):
-            for row in reversed(row_idxes):
+            for row in reversed(row_idx_list):
                 self.removeRow(row)
             # 行序号重排序
             self.resort_row()
@@ -138,7 +138,7 @@ class TemplateOutputConfigTableWidget(TemplateConfigTableWidgetABC):
             for config in bind_file_config_list:
                 config.bind_file_list = None
                 # 更新表中显示的文件数量
-                self.update_bind_file_num_row(row_idxes[bind_file_config_list.index(config)])
+                self.update_bind_file_num_row(row_idx_list[bind_file_config_list.index(config)])
 
     def update_bind_file_num_row(self, row):
         output_config = self.get_row_data(row)

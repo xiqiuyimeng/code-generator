@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC

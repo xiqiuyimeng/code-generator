@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
 
 from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT
+from src.enum.common_enum import RequiredEnum, ConfigTypeEnum
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
 from src.service.util.system_storage_util import Condition, transactional
@@ -82,24 +82,6 @@ class ImportExportTemplateConfig:
     range_values: str = field(init=False, default=None)
     # 非数据库字段，统计关联的模板文件列表
     bind_file_list: list = field(init=False, default=None)
-
-
-class ConfigTypeEnum(Enum):
-    # 输出路径
-    output_dir = 0
-    # 模板变量
-    template_var = 1
-
-
-class RequiredEnum(Enum):
-    not_required = 0
-    required = 1
-
-
-def check_required_value_legal(value):
-    if value == RequiredEnum.not_required.value or value == RequiredEnum.required.value:
-        return True
-    return False
 
 
 class TemplateConfigSqlite(SqliteBasic):

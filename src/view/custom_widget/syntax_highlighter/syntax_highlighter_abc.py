@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from PyQt5.QtGui import QSyntaxHighlighter
+from PyQt6.QtGui import QSyntaxHighlighter
 
 _author_ = 'luwt'
 _date_ = '2023/3/15 15:25'

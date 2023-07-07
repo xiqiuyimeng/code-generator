@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
-from src.service.util.struct_util.data_type import get_data_type
+from src.enum.data_type_enum import get_data_type
 
 _author_ = 'luwt'
 _date_ = '2023/1/31 13:57'

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 from jinja2 import Template
 
 from src.logger.log import logger as log

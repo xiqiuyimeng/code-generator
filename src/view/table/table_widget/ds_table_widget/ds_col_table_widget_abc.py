@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QWidget
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QAbstractItemView, QHeaderView, QWidget
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.table_constant import DS_TABLE_HEADER_LABELS
@@ -37,7 +37,7 @@ class DsColTableWidgetABC(TableWidgetABC):
 
     def setup_other_ui(self):
         # 设置双击触发修改
-        self.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
 
         # 设置表格列数
         self.setColumnCount(6)
@@ -51,7 +51,7 @@ class DsColTableWidgetABC(TableWidgetABC):
         # 设置表头列宽度，第一列全选列
         self.horizontalHeader().resizeSection(0, 80)
         # 第二列字段列，根据大小自动调整宽度
-        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         # 最后备注列拉伸到最大
         self.horizontalHeader().setStretchLastSection(True)
 
@@ -67,8 +67,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         ...
 
     def resizeEvent(self, e) -> None:
-        self.table_header.setGeometry(self.frameWidth(), self.frameWidth(), self.viewport().width(),
-                                      self.horizontalHeader().height())
+        self.table_header.setGeometry(self.frameWidth(), self.frameWidth(),
+                                      self.viewport().width(), self.horizontalHeader().height())
         # 表头每列的宽度，应该跟表格内每列宽度一致
         for col in range(self.columnCount()):
             self.table_header.horizontalHeader().resizeSection(col, self.columnWidth(col))
@@ -136,7 +136,7 @@ class DsColTableWidgetABC(TableWidgetABC):
     def click_row_checkbox(self, checked, row):
         row = int(row) - 1
         # 将列数据置为选中状态，保存数据
-        self.save_data(row, 0, checked)
+        self.save_data(row, 0, checked.value)
         # 联动表头
         self.table_header.calculate_header_check_state()
 
@@ -185,18 +185,18 @@ class DsColTableWidgetABC(TableWidgetABC):
     def batch_update_check_state(self, cols, check_state):
         modify_col_data_list = list()
         for col in cols:
-            if col.checked != check_state:
-                col.checked = check_state
+            if col.checked != check_state.value:
+                col.checked = check_state.value
                 modify_col_data = DsTableColInfo()
                 modify_col_data.id = col.id
-                modify_col_data.checked = check_state
+                modify_col_data.checked = check_state.value
                 modify_col_data_list.append(modify_col_data)
         if not modify_col_data_list:
             return
         # 保存数据
         self.async_save_executor.batch_save_data(modify_col_data_list)
         # 批量选中数据或取消选中
-        if check_state == Qt.Unchecked:
+        if check_state == Qt.CheckState.Unchecked:
             self.remove_all_table_checked(cols)
-        elif check_state == Qt.Checked:
+        elif check_state == Qt.CheckState.Checked:
             self.add_checked_data(cols)

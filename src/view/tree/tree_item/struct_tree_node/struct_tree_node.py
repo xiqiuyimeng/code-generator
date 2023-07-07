@@ -3,6 +3,7 @@
 from src.constant.tree_constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
     OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
     CANCEL_REFRESH_STRUCT_ACTION, OPEN_STRUCT_BOX_TITLE, DEL_STRUCT_BOX_TITLE, REFRESH_STRUCT_BOX_TITLE
+from src.enum.common_enum import get_checked_enum
 from src.service.async_func.async_struct_task import DelStructExecutor
 from src.service.async_func.async_struct_task import OpenStructExecutor, RefreshStructExecutor
 from src.view.box.message_box import pop_question
@@ -78,7 +79,7 @@ class StructTreeNode(StructTreeNodeABC):
 
     def show_check_box(self):
         # 显示复选框，选中状态根据 opened record 决定
-        self.item.setCheckState(0, get_item_opened_record(self.item).checked)
+        self.item.setCheckState(0, get_checked_enum(get_item_opened_record(self.item).checked))
         self.link_parent_node()
 
     def do_fill_menu(self, menu):
@@ -126,19 +127,20 @@ class StructTreeNode(StructTreeNodeABC):
         # 如果结构体已经打开，先关闭，再进行编辑
         editable = False
         if get_item_opened_tab(self.item):
-            if pop_question(EDIT_STRUCT_PROMPT, EDIT_STRUCT_ACTION.format(self.item_name), self.window) \
-                    and self.close_item():
+            question_reply = pop_question(EDIT_STRUCT_PROMPT,
+                                          EDIT_STRUCT_ACTION.format(self.item_name),
+                                          self.window)
+            if question_reply and self.close_item():
                 editable = True
         else:
             editable = True
-
         if editable:
             opened_record = get_item_opened_record(self.item)
             edit_struct_func(opened_record.data_type.display_name, self.tree_widget, opened_record.id)
 
     def del_struct(self):
         # 删除结构体后，应该对同级别的其他项进行重排序
-        reorder_items = self.get_need_reorder_items()
+        reorder_items = self.get_need_reorder_item_records()
         tab = get_item_opened_tab(self.item)
         table_tab = tab.table_tab if tab else None
         self.del_struct_executor = DelStructExecutor(get_item_opened_record(self.item), reorder_items,

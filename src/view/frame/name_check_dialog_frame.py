@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit
+from PyQt6.QtWidgets import QFormLayout, QLabel, QLineEdit
 
 from src.constant.dialog_constant import NAME_MAX_LENGTH_PLACEHOLDER_TEXT
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QTreeWidgetItem
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QTreeWidgetItem
 
 from src.constant.help.help_constant import TEMPLATE_FILE_OUTPUT_CONFIG_MAINTAIN_HELP
 from src.constant.template_dialog_constant import OUTPUT_CONFIG_LIST_HEADER_TEXT, FILE_LIST_HEADER_TEXT

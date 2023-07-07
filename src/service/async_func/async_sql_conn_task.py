@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.ds_dialog_constant import SAVE_CONN_SUCCESS_PROMPT, SAVE_CONN_FAIL_PROMPT
 from src.constant.tree_constant import CLOSE_CONN_BOX_TITLE, DEL_CONN_BOX_TITLE, CLOSE_DB_BOX_TITLE, \
     DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT
+from src.enum.common_enum import SqlTreeItemLevelEnum
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor
 from src.service.system_storage.conn_sqlite import ConnSqlite, SqlConnection
-from src.service.system_storage.conn_type import get_conn_type_by_type
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
+from src.enum.conn_type_enum import get_conn_type_by_type
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTabSqlite
-from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, SqlTreeItemLevel
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem
 from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
 from src.view.tree.tree_item.tree_item_func import get_children_opened_ids, get_item_opened_record
@@ -177,9 +178,9 @@ class ListConnWorker(ThreadWorkerABC):
         connections = ConnSqlite().get_conn_id_types()
 
         # 查询 OpenedItem
-        level = SqlTreeItemLevel.conn_level.value
-        max_level = SqlTreeItemLevel.tb_level.value
-        ds_category = DsCategoryEnum.sql_ds_category.value.name
+        level = SqlTreeItemLevelEnum.conn_level.value
+        max_level = SqlTreeItemLevelEnum.tb_level.value
+        ds_category = DsCategoryEnum.sql_ds_category.get_name()
 
         opened_item_sqlite = OpenedTreeItemSqlite()
         for conn in connections:
@@ -199,7 +200,7 @@ class ListConnWorker(ThreadWorkerABC):
         self.success_signal.emit()
 
     def get_tab_cols(self):
-        tab_list = DsTableTabSqlite().get_ds_category_tabs(DsCategoryEnum.sql_ds_category.value.name)
+        tab_list = DsTableTabSqlite().get_ds_category_tabs(DsCategoryEnum.sql_ds_category.get_name())
         col_info_sqlite = DsTableColInfoSqlite()
         for tab in tab_list:
             tab.col_list = col_info_sqlite.get_col_list_by_tab_id(tab.id)

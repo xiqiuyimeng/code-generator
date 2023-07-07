@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStatusBar
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.window_constant import SWITCH_DS_CATEGORY_TITLE, DS_CATEGORY_NO_CHANGE_MSG, WINDOW_TITLE
 from src.service.async_func.async_ds_category_task import InitDsCategoryExecutor, SwitchDsCategoryExecutor
 from src.service.system_storage.ds_category_sqlite import DsCategory
@@ -55,8 +55,9 @@ class MainWindow(QMainWindow):
 
     def setup_ui(self):
         # 设置窗口无边框，点击任务栏图标，可以实现隐藏和显示
-        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint
-                            | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint
+                            | Qt.WindowType.WindowSystemMenuHint | Qt.WindowType.WindowMinimizeButtonHint
+                            | Qt.WindowType.WindowMaximizeButtonHint)
         # 按当前分辨率计算窗口大小
         self.resize(self.desktop_screen_rect.width() * 0.6, self.desktop_screen_rect.height() * 0.75)
         # 不透明度

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
 
-from src.constant.bar_constant import SQL_DS_CATEGORY, STRUCT_DS_CATEGORY
 from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 from src.service.util.dataclass_util import init
 from src.service.util.system_storage_util import get_cursor, transactional
@@ -30,23 +28,6 @@ sql_dict = {
 class DsCategory(BasicSqliteDTO):
     name: str = field(default=None, init=False)
     is_current: int = field(default=None, init=False)
-
-
-sql_ds_category_dict = {
-    'name': SQL_DS_CATEGORY,
-    'item_order': 1,
-    'is_current': 1
-}
-struct_ds_category_dict = {
-    'name': STRUCT_DS_CATEGORY,
-    'item_order': 2,
-    'is_current': 0
-}
-
-
-class DsCategoryEnum(Enum):
-    sql_ds_category = DsCategory(**sql_ds_category_dict)
-    struct_ds_category = DsCategory(**struct_ds_category_dict)
 
 
 class DsCategorySqlite(SqliteBasic):

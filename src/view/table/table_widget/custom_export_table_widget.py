@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QAction
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtGui import QAction
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.table_constant import ROW_EXPORT_ICON, ROW_EXPORT_TEXT, ROW_COPY_ICON, ROW_COPY_TEXT
 from src.view.table.table_widget.custom_table_widget import CustomTableWidget
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import dataclasses
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QPushButton
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QPushButton
 
 from src.constant.ds_dialog_constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, TEST_CONN_BOX_TITLE, \
     SAVE_CONN_BOX_TITLE, QUERY_CONN_BOX_TITLE
@@ -10,7 +10,7 @@ from src.constant.help.help_constant import SQL_DS_HELP
 from src.service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor, QueryConnInfoExecutor
 from src.service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor
 from src.service.system_storage.conn_sqlite import SqlConnection
-from src.service.system_storage.conn_type import *
+from src.enum.conn_type_enum import *
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.view.frame.datasource.ds_dialog_frame_abc import DsDialogFrameABC
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QGridLayout, QPushButton
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QGridLayout, QPushButton
 
 from src.constant.dialog_constant import QUIT_BTN_TEXT, HELP_BTN_TEXT
 
@@ -38,8 +38,8 @@ class DialogFrameABC(QFrame):
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def setup_ui(self):
-        self.setFrameShape(QFrame.StyledPanel)
-        self.setFrameShadow(QFrame.Raised)
+        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setFrameShadow(QFrame.Shadow.Raised)
         self.frame_layout = QVBoxLayout(self)
         # 创建空白label
         self.placeholder_blank = QLabel(self)

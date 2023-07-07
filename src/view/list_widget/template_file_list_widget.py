@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt6.QtWidgets import QListWidgetItem
 
 from src.constant.list_constant import TEMPLATE_TYPE_NAME, EDIT_FILE_BOX_TITLE
-from src.service.system_storage.template_file_sqlite import CurrentEnum, TabOpenedEnum
+from src.enum.common_enum import CurrentEnum, TabOpenedEnum
 from src.view.list_widget.custom_list_widget import CustomListWidget
 from src.view.list_widget.list_item_func import get_template_file_data, set_template_file_data
 
@@ -87,14 +87,14 @@ class TemplateFileListWidget(CustomListWidget):
         for list_idx in range(self.count()):
             list_item = self.item(list_idx)
             template_file = get_template_file_data(list_item)
-            template_file.is_current = CurrentEnum.current.value \
+            template_file.is_current = CurrentEnum.is_current.value \
                 if self.currentRow() == list_idx else CurrentEnum.not_current.value
             tab_widget = name_tab_dict.get(list_item.text())
             if tab_widget:
                 template_file.file_content = tab_widget.content_editor.toPlainText()
                 template_file.file_name_template = tab_widget.file_name_edit.text()
                 template_file.tab_opened = TabOpenedEnum.opened.value
-                template_file.is_current_tab = CurrentEnum.current.value \
+                template_file.is_current_tab = CurrentEnum.is_current.value \
                     if file_tab_widget.currentWidget() is tab_widget else CurrentEnum.not_current.value
                 template_file.tab_item_order = file_tab_widget.indexOf(tab_widget)
             else:

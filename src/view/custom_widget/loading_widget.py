@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QSize, QEvent
-from PyQt5.QtGui import QMoveEvent, QHideEvent, QShowEvent, QResizeEvent
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout
+from PyQt6.QtCore import Qt, QSize, QEvent
+from PyQt6.QtGui import QMoveEvent, QHideEvent, QShowEvent, QResizeEvent
+from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout
 
 _author_ = 'luwt'
 _date_ = '2022/5/10 18:02'
@@ -24,9 +24,9 @@ class LoadingMaskWidget(QWidget):
         layout = QHBoxLayout(self)
         layout.addWidget(self.label)
 
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog)
         self.setWindowOpacity(0.8)
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
     def start(self):
         self.movie.start()

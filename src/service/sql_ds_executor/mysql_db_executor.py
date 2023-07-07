@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import pymysql
+from PyQt6.QtCore import Qt
 
+from src.enum.common_enum import ColTypeEnum
 from src.service.sql_ds_executor.db_executor import SqlDBExecutor
-from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -31,7 +33,7 @@ class MySqlDBExecutor(SqlDBExecutor):
         table_info.full_data_type = row.get('Type')
         table_info.is_pk = row.get('Key') == 'PRI'
         table_info.col_comment = row.get('Comment')
-        table_info.checked = CheckedEnum.unchecked.value
+        table_info.checked = Qt.CheckState.Unchecked.value
         table_info.handle_data_type()
         table_info.col_type = ColTypeEnum.col.value
         return table_info

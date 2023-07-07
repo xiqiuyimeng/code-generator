@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.help.help_constant import TEMPLATE_COPY_FUNC_HELP
 from src.constant.template_dialog_constant import HAS_FUNC_TEMPLATE_LIST_BOX_TITLE, TEMPLATE_FUNC_TITLE, \
@@ -50,8 +50,11 @@ class TemplateCopyFuncDialogFrame(DialogFrameABC):
         self.list_has_func_template_executor = ListHasFuncTemplateExecutor(self.excluded_template_id,
                                                                            self.parent_dialog, self.parent_dialog,
                                                                            HAS_FUNC_TEMPLATE_LIST_BOX_TITLE,
-                                                                           self.template_list_widget.fill_list_widget)
+                                                                           self.fill_list_widget)
         self.list_has_func_template_executor.start()
+
+    def fill_list_widget(self, template_list):
+        self.template_list_widget.fill_list_widget(template_list)
 
     # ------------------------------ 后置处理 end ------------------------------ #
 

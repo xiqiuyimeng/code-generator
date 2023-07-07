@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.template_dialog_constant import EDIT_OUTPUT_CONFIG_TITLE, CREATE_OUTPUT_CONFIG_TITLE, \
     EDIT_VAR_CONFIG_TITLE, CREATE_VAR_CONFIG_TITLE

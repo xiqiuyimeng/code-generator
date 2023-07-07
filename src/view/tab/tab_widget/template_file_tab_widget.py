@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QFormLayout, QLabel, QLineEdit
+from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QFormLayout, QLabel, QLineEdit
 
 from src.constant.template_dialog_constant import FILE_NAME_TEMPLATE_LABEL_TEXT
 from src.view.custom_widget.text_editor import TextEditor

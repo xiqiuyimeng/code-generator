@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QListWidgetItem, QTreeWidgetItem
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QListWidgetItem, QTreeWidgetItem
 
 from src.view.custom_widget.item_view_abc import DraggableItemViewABC
 from src.view.list_widget.list_item_func import get_template_file_data

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 from src.view.searcher.search_func.searcher import Searcher
 
@@ -18,7 +18,7 @@ class ListSearcher(Searcher):
     def iterate_search(self, text, match_items):
         for idx in range(self.target.count()):
             item = self.target.item(idx)
-            item.setData(Qt.UserRole + 1, idx)
+            item.setData(Qt.ItemDataRole.UserRole + 1, idx)
             # 简单搜索
             self.simple_match_text(text, item, match_items)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import dataclasses
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.export_import_constant import TYPE_MAPPING_DATA_KEY
 from src.logger.log import logger as log
@@ -10,8 +10,8 @@ from src.service.async_func.async_import_export_task import ImportDataWorker, Im
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMappingSqlite, ImportExportColTypeMapping, \
     ColTypeMapping
-from src.service.system_storage.conn_type import check_conn_type
-from src.service.system_storage.struct_type import check_struct_type
+from src.enum.conn_type_enum import check_conn_type
+from src.enum.struct_type_enum import check_struct_type
 from src.service.system_storage.type_mapping_sqlite import TypeMappingSqlite, TypeMapping, ImportExportTypeMapping
 from src.service.util.copy_util import copy_type_mapping
 from src.service.util.import_export_util import convert_import_to_model_list, convert_import_to_model, add_group_list, \

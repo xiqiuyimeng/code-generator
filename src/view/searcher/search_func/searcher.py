@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 from src.view.searcher.dock.dock_widget import SearcherDockWidget
 from src.view.searcher.search_func.matcher_func import SmartMatcher
@@ -113,14 +113,14 @@ class Searcher:
         # 如果当前节点在搜索列表中，按索引查找
         if self.target.currentItem() in item_records:
             index = item_records.index(self.target.currentItem())
-            if key == Qt.Key_Up:
+            if key == Qt.Key.Key_Up:
                 next_item = item_records[index - 1]
             else:
                 next_item = item_records[index + 1 if index < len(item_records) - 1 else 0]
         else:
             # 如果当前节点不在搜索列表中，找出离当前元素最近的搜索节点，也就是选中元素并非搜索高亮节点
             up_item, next_item = self.get_up_down_next(item_records, self.target.currentItem())
-            if key == Qt.Key_Up:
+            if key == Qt.Key.Key_Up:
                 # 找出离当前元素最近的上一个元素
                 next_item = up_item
             else:

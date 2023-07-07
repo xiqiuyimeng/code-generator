@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QDir
-from PyQt5.QtWidgets import QLabel, QFileDialog
+from PyQt6.QtCore import QDir
+from PyQt6.QtWidgets import QLabel, QFileDialog
 
 from src.constant.export_import_constant import EXPORT_SELECTED_DATA_LABEL_TEXT, EXPORT_OUTPUT_PATH_LABEL_TEXT, \
     START_EXPORT_BTN_TEXT, EXPORT_SELECTED_DATA_DESC_TEXT, CHOOSE_EXPORT_DIR_TEXT

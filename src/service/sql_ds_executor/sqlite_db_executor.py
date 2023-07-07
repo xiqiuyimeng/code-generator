@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 
+from PyQt6.QtCore import Qt
+
+from src.enum.common_enum import ColTypeEnum
 from src.service.sql_ds_executor.db_executor import SqlDBExecutor
-from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo, CheckedEnum, ColTypeEnum
+from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 12:52'
@@ -29,7 +32,7 @@ class SqliteDBExecutor(SqlDBExecutor):
         table_info.col_name = row_data.get('name')
         table_info.full_data_type = row_data.get('type')
         table_info.is_pk = row_data.get('pk')
-        table_info.checked = CheckedEnum.unchecked.value
+        table_info.checked = Qt.CheckState.Unchecked.value
         # sqlite 没有注释
         table_info.col_comment = ''
         table_info.handle_data_type()

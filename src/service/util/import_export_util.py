@@ -2,7 +2,7 @@
 import dataclasses
 
 from src.constant.template_dialog_constant import CONFIG_INPUT_WIDGET_TYPE_DICT, DEFAULT_INPUT_WIDGET_TYPE
-from src.service.system_storage.template_config_sqlite import RequiredEnum, check_required_value_legal, ConfigTypeEnum
+from src.enum.common_enum import check_required_value_legal, RequiredEnum, ConfigTypeEnum
 from src.service.util.group_util import group_model_list, add_group_list
 
 _author_ = 'luwt'

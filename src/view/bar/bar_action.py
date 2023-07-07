@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAction, QToolButton
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QToolButton
 
 from src.constant.bar_constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
     TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
     HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, TYPE_ACTION, TYPE_ACTION_TIP
-from src.constant.icon_enum import get_icon
-from src.service.system_storage.conn_type import ConnTypeEnum
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
-from src.service.system_storage.struct_type import StructTypeEnum
+from src.enum.ds_category_enum import DsCategoryEnum
+from src.enum.icon_enum import get_icon
+from src.enum.conn_type_enum import ConnTypeEnum
+from src.enum.struct_type_enum import StructTypeEnum
 from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_struct_dialog, refresh, \
     open_type_mapping_dialog, open_template_dialog, open_help_dialog, open_about_dialog
 
@@ -28,9 +29,9 @@ def add_ds_actions(parent_menu, main_window):
     if parent_menu.receivers(parent_menu.triggered):
         parent_menu.triggered.disconnect()
     # 根据当前的数据源类型，决定构建的action类型
-    if main_window.current_ds_category.name == DsCategoryEnum.sql_ds_category.value.name:
+    if main_window.current_ds_category.name == DsCategoryEnum.sql_ds_category.get_name():
         add_sql_ds_actions(parent_menu, main_window)
-    elif main_window.current_ds_category.name == DsCategoryEnum.struct_ds_category.value.name:
+    elif main_window.current_ds_category.name == DsCategoryEnum.struct_ds_category.get_name():
         add_struct_ds_actions(parent_menu, main_window)
 
 
@@ -56,8 +57,8 @@ def add_tool_button(action_name, action_tip):
     tool_button.setIcon(get_icon(action_name))
     tool_button.setText(action_name)
     tool_button.setStatusTip(action_tip)
-    tool_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-    tool_button.setPopupMode(QToolButton.InstantPopup)
+    tool_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+    tool_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
     return tool_button
 
 

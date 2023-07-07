@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QToolBar, QMenu
+from PyQt6.QtCore import QSize
+from PyQt6.QtWidgets import QToolBar, QMenu
 
 from src.constant.bar_constant import SWITCH_ACTION, ADD_DS_ACTION, ADD_DS_ACTION_TIP
 from src.view.bar.bar_action import *
@@ -19,7 +19,7 @@ class ToolBar(QToolBar, DraggableWidget):
 
         self.setIconSize(QSize(50, 40))
         # 设置名称显示在图标下面（默认本来是只显示图标）
-        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
 
         self.switch_ds_category_menu = ...
         self.add_ds_menu: QMenu = ...

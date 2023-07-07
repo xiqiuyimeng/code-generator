@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton
+from PyQt6.QtWidgets import QPushButton
 
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 

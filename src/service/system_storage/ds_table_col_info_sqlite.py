@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
+
+from PyQt6.QtCore import Qt
 
 from src.service.system_storage.ds_col_type_sqlite import DsColTypeSqlite
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
@@ -31,17 +32,6 @@ sql_dict = {
     update_time datetime
     );''',
 }
-
-
-class CheckedEnum(Enum):
-    checked = 2
-    unchecked = 0
-
-
-class ColTypeEnum(Enum):
-    col = 'col'
-    obj = 'object'
-    array = 'array'
 
 
 @init
@@ -147,7 +137,7 @@ class DsTableColInfoSqlite(SqliteBasic):
     def refresh_tab_cols(self, tab_id, columns, ds_type):
         self.delete_by_parent_tab_id(tab_id)
         # 默认数据应为未选中情况
-        self.save_cols(columns, tab_id, CheckedEnum.unchecked.value, ds_type)
+        self.save_cols(columns, tab_id, Qt.CheckState.Unchecked.value, ds_type)
 
     def get_col_list_by_tab_id(self, parent_tab_id):
         condition = Condition(self.table_name).add('parent_tab_id', parent_tab_id)

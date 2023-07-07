@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QPushButton, QFileDialog, QComboBox, \
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPalette
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QPushButton, QFileDialog, QComboBox, \
     QGridLayout, QStyle
 
 from src.constant.template_dialog_constant import CONFIG_DESC_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT, \
@@ -47,21 +47,21 @@ class ConfigValueWidgetABC(QWidget):
         self._layout = QGridLayout(self)
         self.required_label = QLabel()
         self.required_label.setObjectName('form_label')
-        self.required_label.setAlignment(Qt.AlignTop)
+        self.required_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._layout.addWidget(self.required_label, 0, 0, 1, 1)
         self.config_name_label = QLabel()
-        self.config_name_label.setAlignment(Qt.AlignTop)
+        self.config_name_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.config_name_label.setObjectName('form_label')
         self._layout.addWidget(self.config_name_label, 0, 1, 1, 1)
         self.config_layout = QHBoxLayout()
         self.setup_config_widget_ui()
         self._layout.addLayout(self.config_layout, 0, 2, 1, 1)
         self.config_desc_label = QLabel()
-        self.config_desc_label.setAlignment(Qt.AlignTop)
+        self.config_desc_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.config_desc_label.setObjectName('form_label')
         self._layout.addWidget(self.config_desc_label, 1, 1, 1, 1)
         self.config_desc_value_label = QLabel()
-        self.config_desc_value_label.setAlignment(Qt.AlignTop)
+        self.config_desc_value_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._layout.addWidget(self.config_desc_value_label, 1, 2, 1, 1)
         self._layout.setColumnStretch(0, 1)
         self._layout.setColumnStretch(1, 10)
@@ -75,7 +75,7 @@ class ConfigValueWidgetABC(QWidget):
             # 必填项文本为 *，红色文本
             if self.required_label_palette is Ellipsis:
                 self.required_label_palette = QPalette()
-                self.required_label_palette.setColor(QPalette.WindowText, Qt.red)
+                self.required_label_palette.setColor(QPalette.ColorRole.WindowText, Qt.GlobalColor.red)
             self.required_label.setText('*')
             self.required_label.setPalette(self.required_label_palette)
         # 配置项名称，设置自动换行
@@ -127,7 +127,7 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
 
     def setup_config_widget_ui(self):
         self.open_file_dialog_button = QPushButton()
-        self.open_file_dialog_button.setIcon(self.style().standardIcon(QStyle.SP_DirOpenIcon))
+        self.open_file_dialog_button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
         self.open_file_dialog_button.setObjectName('choose_dir_button')
         self.config_layout.addWidget(self.open_file_dialog_button)
 
@@ -138,7 +138,8 @@ class FileDialogConfigValueWidgetABC(ConfigValueWidgetABC):
         self.open_file_dialog_button.clicked.connect(self.open_dir_dialog)
 
     def open_dir_dialog(self):
-        exists_dir = QFileDialog.getExistingDirectory(self, SELECT_DIRECTORY_TITLE, '', QFileDialog.ShowDirsOnly)
+        exists_dir = QFileDialog.getExistingDirectory(self, SELECT_DIRECTORY_TITLE,
+                                                      '', QFileDialog.Option.ShowDirsOnly)
         if exists_dir:
             self.set_dir(exists_dir)
 

@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=['E:\\python_workspace\\code-generator'],
     binaries=[],
-    datas=[],
+    datas=[('E:\\python_workspace\\code-generator\\static', 'static')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

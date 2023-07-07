@@ -2,7 +2,7 @@
 from src.constant.tree_constant import LIST_ALL_STRUCT_BOX_TITLE
 from src.service.async_func.async_struct_task import ListStructExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
-from src.service.util.tree_node import TreeData
+from src.service.util.tree_node_util import TreeData
 from src.view.tab.tab_widget.tab_widget import TabWidget
 from src.view.tree.tree_item.context import get_struct_tree_node
 from src.view.tree.tree_item.struct_tree_node.struct_tree_node_abc import StructTreeNodeABC
@@ -31,8 +31,9 @@ class StructTreeWidget(TreeWidgetABC):
         if self.list_struct_executor is Ellipsis:
             # 初始化数据
             window = get_window()
-            self.list_struct_executor = ListStructExecutor(self.reopen_items, self.reopen_tab, window, window,
-                                                           LIST_ALL_STRUCT_BOX_TITLE, self.reopen_end, self.reopen_end)
+            self.list_struct_executor = ListStructExecutor(self.reopen_items, self.reopen_tab,
+                                                           window, window, LIST_ALL_STRUCT_BOX_TITLE,
+                                                           self.reopen_end, self.reopen_end)
             self.reopening_flag = True
             self.list_struct_executor.start()
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
 
-from PyQt5.QtCore import QRect, Qt, QRectF
-from PyQt5.QtGui import QBrush, QColor
-from PyQt5.QtWidgets import QStyle, QStyleOptionButton
+from PyQt6.QtCore import QRect, Qt, QRectF
+from PyQt6.QtGui import QBrush, QColor
+from PyQt6.QtWidgets import QStyle, QStyleOptionButton
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:05'
@@ -27,7 +27,7 @@ class ItemPainterContext:
         # 平移坐标系到item rect的位置
         painter.translate(visual_rect.x(), visual_rect.y())
         # 小部件的水平方向margin，一个小部件会存在左右两个边距
-        self.margin_h = style.pixelMetric(QStyle.PM_FocusFrameHMargin) + 1
+        self.margin_h = style.pixelMetric(QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
         self.painters = (CheckBoxItemPainter(index, self.item, self.margin_h, style, painter, visual_rect),
                          IconItemPainter(self.parent, index, self.item, self.margin_h, style, painter, visual_rect),
                          TextItemPainter(selected_flag, search_flag, search_item_records, index,
@@ -68,8 +68,8 @@ class CheckBoxItemPainter(ItemPainterABC):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.checkbox_width = self.style.pixelMetric(QStyle.PM_IndicatorWidth)
-        self.check_state = self.index.data(Qt.CheckStateRole)
+        self.checkbox_width = self.style.pixelMetric(QStyle.PixelMetric.PM_IndicatorWidth)
+        self.check_state = self.index.data(Qt.ItemDataRole.CheckStateRole)
 
     def match_type(self) -> bool:
         self.match = self.check_state is not None
@@ -83,14 +83,14 @@ class CheckBoxItemPainter(ItemPainterABC):
         # 画复选框
         opt = QStyleOptionButton()
         opt.rect = rect
-        opt.state = QStyle.State_Enabled | QStyle.State_Active
-        if self.check_state == Qt.Unchecked:
-            opt.state |= QStyle.State_Off
-        elif self.check_state == Qt.PartiallyChecked:
-            opt.state |= QStyle.State_NoChange
-        elif self.check_state == Qt.Checked:
-            opt.state |= QStyle.State_On
-        self.style.drawControl(QStyle.CE_CheckBox, opt, self.painter)
+        opt.state = QStyle.StateFlag.State_Enabled | QStyle.StateFlag.State_Active
+        if self.check_state == Qt.CheckState.Unchecked.value:
+            opt.state |= QStyle.StateFlag.State_Off
+        elif self.check_state == Qt.CheckState.PartiallyChecked.value:
+            opt.state |= QStyle.StateFlag.State_NoChange
+        elif self.check_state == Qt.CheckState.Checked.value:
+            opt.state |= QStyle.StateFlag.State_On
+        self.style.drawControl(QStyle.ControlElement.CE_CheckBox, opt, self.painter)
 
 
 class IconItemPainter(ItemPainterABC):
@@ -102,8 +102,8 @@ class IconItemPainter(ItemPainterABC):
         if self.parent.iconSize().isValid():
             self.icon_width = self.parent.iconSize().width()
         else:
-            self.icon_width = self.style.pixelMetric(QStyle.PM_ListViewIconSize)
-        self.icon = self.index.data(Qt.DecorationRole)
+            self.icon_width = self.style.pixelMetric(QStyle.PixelMetric.PM_ListViewIconSize)
+        self.icon = self.index.data(Qt.ItemDataRole.DecorationRole)
 
     def match_type(self) -> bool:
         self.match = self.icon and not self.icon.isNull()
@@ -115,7 +115,7 @@ class IconItemPainter(ItemPainterABC):
         return QRect(margin_h + 1 + left_x, 0, self.icon_width, self.visual_rect.height())
 
     def paint_rect(self, rect):
-        self.icon.paint(self.painter, rect, Qt.AlignVCenter | Qt.AlignLeft)
+        self.icon.paint(self.painter, rect, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
 
 
 class TextItemPainter(ItemPainterABC):
@@ -164,7 +164,7 @@ class TextItemPainter(ItemPainterABC):
             # 左边的文本
             left_text = self.item_text[start: char_start_idx]
             # 左边像素宽度
-            left_text_width = font_metrics.width(left_text)
+            left_text_width = font_metrics.boundingRect(left_text).width()
             # 找到左边字符的rect
             left_rect = QRectF(text_rect_x, text_rect.y(), left_text_width + 1, text_rect.height())
 
@@ -172,7 +172,7 @@ class TextItemPainter(ItemPainterABC):
             current_search_text = self.item_text[char_start_idx: char_end_idx + 1] \
                 if char_end_idx < len(self.item_text) - 1 else self.item_text[char_start_idx:]
             # 获取搜索文本的像素宽度
-            search_text_width = font_metrics.width(current_search_text)
+            search_text_width = font_metrics.boundingRect(current_search_text).width()
             # 找到当前字符的rect
             search_rect = QRectF(text_rect_x + left_text_width,
                                  text_rect.y(),
@@ -187,11 +187,11 @@ class TextItemPainter(ItemPainterABC):
             if left_text:
                 self.painter.drawText(left_rect, left_text)
             # 处理当前搜索的字符
-            self.painter.setPen(Qt.white)
+            self.painter.setPen(Qt.GlobalColor.white)
             # 背景色设置为橙红色
             self.painter.setBackground(QBrush(QColor(255, 69, 0)))
             # 不透明模式OpaqueMode，默认为透明
-            self.painter.setBackgroundMode(Qt.OpaqueMode)
+            self.painter.setBackgroundMode(Qt.BGMode.OpaqueMode)
             self.painter.drawText(search_rect, current_search_text)
             # 弹出保存的painter
             self.painter.restore()

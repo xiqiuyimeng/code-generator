@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QPushButton
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QPushButton
 
 from src.constant.template_dialog_constant import ADD_CONFIG_BTN_TEXT, REMOVE_CONFIG_BTN_TEXT, PREVIEW_CONFIG_BTN_TEXT
 from src.service.util.import_export_util import check_template_config
@@ -100,7 +101,7 @@ class TemplateConfigWidget(QWidget):
     def set_remove_btn_available(self, checked):
         # 如果表格存在行，删除按钮状态根据传入状态变化，否则应该置为不可用
         if self.config_table.rowCount():
-            self.remove_config_btn.setDisabled(not checked)
+            self.remove_config_btn.setDisabled(checked == Qt.CheckState.Unchecked)
         else:
             self.remove_config_btn.setDisabled(True)
 

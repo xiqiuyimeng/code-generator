@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QLabel
+from PyQt6.QtWidgets import QHBoxLayout, QPushButton, QLabel
 
 from src.constant.help.help_constant import TEMPLATE_COPY_FUNC_HELP
 from src.constant.template_dialog_constant import SELECT_ALL_FUNC_BTN_TEXT, UNSELECT_ALL_FUNC_BTN_TEXT, \

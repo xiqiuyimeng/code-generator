@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton
+from PyQt6.QtWidgets import QPushButton
 
 from src.constant.export_import_constant import IMPORT_TYPE_MAPPING_TITLE, EXPORT_TYPE_MAPPING_TITLE, \
     EXPORT_TYPE_MAPPING_FILE_NAME, PROCESS_DUPLICATE_TYPE_MAPPING_TITLE, OVERRIDE_TYPE_MAPPING_TITLE, \

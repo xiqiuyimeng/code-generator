@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QPushButton
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtWidgets import QPushButton
 
 from src.constant.dialog_constant import QUIT_PROMPT, QUIT_BOX_TITLE, OK_BTN_TEXT
 from src.view.box.message_box import pop_question
@@ -22,7 +22,7 @@ class SaveDialogFrame(DialogFrameABC):
 
     def keyPressEvent(self, event: QKeyEvent):
         # 拦截esc按键导致的退出事件
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             # 弹出提示，需要保存数据，确认退出再执行
             if pop_question(QUIT_PROMPT, QUIT_BOX_TITLE, self):
                 super().keyPressEvent(event)

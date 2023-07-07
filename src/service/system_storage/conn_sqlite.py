@@ -3,7 +3,7 @@ import dataclasses
 import json
 from dataclasses import dataclass, field
 
-from src.service.system_storage.conn_type import mapping_conn_type
+from src.enum.conn_type_enum import mapping_conn_type
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite
 from src.service.system_storage.sqlite_abc import SqliteBasic, BasicSqliteDTO
 from src.service.util.dataclass_util import init

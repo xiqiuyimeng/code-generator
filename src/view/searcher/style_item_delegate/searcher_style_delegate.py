@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QRect
-from PyQt5.QtGui import QBrush, QColor
-from PyQt5.QtWidgets import QStyledItemDelegate, QStyle
+from PyQt6.QtCore import QRect
+from PyQt6.QtGui import QBrush, QColor
+from PyQt6.QtWidgets import QStyledItemDelegate, QStyle
 
 from src.view.searcher.style_item_delegate.painter_delegate import ItemPainterContext
 
@@ -24,7 +24,7 @@ class SearchStyledItemDelegate(QStyledItemDelegate):
         painter.save()
         # item
         item = self.parent.itemFromIndex(index)
-        selected_flag = option.state & QStyle.State_Selected
+        selected_flag = option.state & QStyle.StateFlag.State_Selected
         search_flag = match_items and item in match_items
 
         # 如果既不是选中元素也不是搜索元素，使用原方式进行渲染
