@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.service.system_storage.template_func_sqlite import TemplateFunc
 from src.view.dialog.custom_dialog_abc import CustomSaveDialogABC

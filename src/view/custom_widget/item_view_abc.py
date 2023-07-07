@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QCursor, QDropEvent
-from PyQt5.QtWidgets import QAbstractItemView, QMenu, QFrame, QTreeWidget, QListWidget, QListWidgetItem, QTreeWidgetItem
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QCursor, QDropEvent
+from PyQt6.QtWidgets import QAbstractItemView, QMenu, QFrame, QTreeWidget, QListWidget, QListWidgetItem, \
+    QTreeWidgetItem
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 
@@ -14,7 +15,7 @@ class ItemViewABC(QAbstractItemView, ScrollableWidget):
     def __init__(self, parent):
         super().__init__(parent)
         # 设置无边框
-        self.setFrameShape(QFrame.NoFrame)
+        self.setFrameShape(QFrame.Shape.NoFrame)
         # 统一设置图标大小
         self.setIconSize(QSize(40, 30))
 
@@ -22,7 +23,7 @@ class ItemViewABC(QAbstractItemView, ScrollableWidget):
 
     def connect_signal(self):
         # 右击事件
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.handle_right_mouse_clicked)
 
     def handle_right_mouse_clicked(self, pos):
@@ -36,7 +37,7 @@ class ItemViewABC(QAbstractItemView, ScrollableWidget):
             # 右键菜单点击事件
             menu.triggered.connect(self.right_menu_func)
             # 右键菜单弹出位置跟随焦点位置
-            menu.exec_(QCursor.pos())
+            menu.exec(QCursor.pos())
 
     def fill_menu(self, item, menu):
         ...

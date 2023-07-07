@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.view.frame.generator.selected_data.selected_data_dialog_frame_abc import SelectedDataDialogFrameABC
 from src.view.tree.tree_widget.tree_function import make_display_tree_item
 

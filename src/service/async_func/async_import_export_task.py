@@ -3,7 +3,7 @@ import dataclasses
 import json
 import os
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.export_import_constant import TYPE_KEY, DATA_KEY
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor

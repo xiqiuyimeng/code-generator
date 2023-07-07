@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QDockWidget, QWidget
+from PyQt6.QtWidgets import QDockWidget, QWidget
 
 from src.view.searcher.line_edit.search_line_edit import SearcherLineEdit
 
@@ -14,7 +14,7 @@ class SearcherDockWidget(QDockWidget):
         # 取一个空的widget设置为dock窗口的标题栏，以此来去除标题栏
         blank_widget = QWidget()
         self.setTitleBarWidget(blank_widget)
-        self.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        self.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
         # 搜索输入框
         self.line_edit = SearcherLineEdit(self)
         self.setWidget(self.line_edit)

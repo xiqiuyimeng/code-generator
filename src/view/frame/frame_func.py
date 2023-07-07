@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLineEdit, QLabel, QAction, QVBoxLayout, QHBoxLayout, QStackedWidget, QFrame, \
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QHBoxLayout, QStackedWidget, QFrame, \
     QApplication, QStyle
 
 from src.constant.dialog_constant import NAME_UNCHANGED_PROMPT, NAME_AVAILABLE, NAME_EXISTS
@@ -96,6 +97,6 @@ def construct_lineedit_file_action():
     file_url_label.setObjectName('form_label')
     file_url_linedit = QLineEdit()
     choose_file_action = QAction()
-    choose_file_action.setIcon(QApplication.style().standardIcon(QStyle.SP_DirOpenIcon))
+    choose_file_action.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon))
     file_url_linedit.addAction(choose_file_action, QLineEdit.ActionPosition.TrailingPosition)
     return file_url_label, file_url_linedit, choose_file_action

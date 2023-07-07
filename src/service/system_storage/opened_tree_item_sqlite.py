@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
 
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
+from PyQt6.QtCore import Qt
+
+from src.enum.common_enum import SqlTreeItemLevelEnum, CurrentEnum, ExpandedEnum
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init
 from src.service.util.system_storage_util import Condition, transactional
@@ -54,27 +56,6 @@ class OpenedTreeItem(BasicSqliteDTO):
     data_type: dataclass = field(init=False, default=None, compare=False)
 
 
-class SqlTreeItemLevel(Enum):
-    conn_level = 0
-    db_level = 1
-    tb_level = 2
-
-
-class CurrentEnum(Enum):
-    is_current = 1
-    not_current = 0
-
-
-class ExpandedEnum(Enum):
-    expanded = 1
-    collapsed = 0
-
-
-class CheckedEnum(Enum):
-    checked = 2
-    unchecked = 0
-
-
 class OpenedTreeItemSqlite(SqliteBasic):
 
     def __init__(self):
@@ -101,7 +82,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
             opened_child_item.level = child_level
             opened_child_item.ds_category = ds_category
             if init_checked:
-                opened_child_item.checked = CheckedEnum.unchecked.value
+                opened_child_item.checked = Qt.CheckState.Unchecked.value
             opened_child_item.item_order = index
             opened_child_item.data_type = data_type
             opened_child_items.append(opened_child_item)
@@ -154,8 +135,8 @@ class OpenedTreeItemSqlite(SqliteBasic):
         conn_item.is_current = CurrentEnum.not_current.value
         conn_item.expanded = ExpandedEnum.collapsed.value
         conn_item.parent_id = conn_id
-        conn_item.level = SqlTreeItemLevel.conn_level.value
-        conn_item.ds_category = DsCategoryEnum.sql_ds_category.value.name
+        conn_item.level = SqlTreeItemLevelEnum.conn_level.value
+        conn_item.ds_category = DsCategoryEnum.sql_ds_category.get_name()
         conn_item.item_order = self.get_max_order()
         self.insert(conn_item)
         return conn_item
@@ -163,15 +144,15 @@ class OpenedTreeItemSqlite(SqliteBasic):
     def update_conn_opened_record(self, conn_id, conn_name):
         condition = Condition(self.table_name)
         condition.add('parent_id', conn_id)
-        condition.add('level', SqlTreeItemLevel.conn_level.value)
-        condition.add('ds_category', DsCategoryEnum.sql_ds_category.value.name)
+        condition.add('level', SqlTreeItemLevelEnum.conn_level.value)
+        condition.add('ds_category', DsCategoryEnum.sql_ds_category.get_name())
         opened_conn_tree_item = self.select_one(condition=condition)
         if opened_conn_tree_item:
             opened_conn_tree_item.item_name = conn_name
             self.update_by_id(opened_conn_tree_item)
 
     def add_struct_opened_item(self, name, parent_id, level):
-        ds_category = DsCategoryEnum.struct_ds_category.value.name
+        ds_category = DsCategoryEnum.struct_ds_category.get_name()
         opened_tree_item = OpenedTreeItem()
         opened_tree_item.item_name = name
         opened_tree_item.is_current = CurrentEnum.not_current.value

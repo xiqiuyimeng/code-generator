@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
-from src.service.system_storage.struct_type import mapping_struct_type
+from src.enum.struct_type_enum import mapping_struct_type
 from src.service.util.dataclass_util import init
 from src.service.util.system_storage_util import SelectCol, Condition
 

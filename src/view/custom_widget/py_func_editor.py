@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 from src.view.custom_widget.text_editor import TextEditor
 
@@ -18,7 +18,7 @@ class PyFuncEditor(TextEditor):
 
     def keyPressEvent(self, e):
         # 按下enter键，根据上一行结尾是否是冒号结尾，判断是否需要缩进
-        if e.key() == Qt.Key_Return:
+        if e.key() == Qt.Key.Key_Return:
             current_left_blank_len = 0
             tc = self.textCursor()
             # 获取当前行块

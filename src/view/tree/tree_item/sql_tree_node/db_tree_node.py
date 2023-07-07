@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 from src.constant.tree_constant import OPEN_DB_BOX_TITLE, NO_TBS_PROMPT, CLOSE_DB_ACTION, CLOSE_DB_PROMPT, \
     CANCEL_OPEN_DB_ACTION, CANCEL_REFRESH_DB_ACTION, UNSELECT_TB_ACTION, SELECT_ALL_TB_ACTION, OPEN_DB_ACTION, \
@@ -145,10 +145,10 @@ class DBTreeNode(SqlTreeNodeABC):
             self.close_item()
         # 全选所有表
         elif func == SELECT_ALL_TB_ACTION:
-            self.tree_widget.handle_child_item_checked(self.item, Qt.Checked)
+            self.tree_widget.handle_child_item_checked(self.item, Qt.CheckState.Checked)
         # 取消全选所有表
         elif func == UNSELECT_TB_ACTION:
-            self.tree_widget.handle_child_item_checked(self.item, Qt.Unchecked)
+            self.tree_widget.handle_child_item_checked(self.item, Qt.CheckState.Unchecked)
         # 刷新
         elif func == REFRESH_DB_ACTION.format(self.item_name):
             self.refresh()
@@ -164,8 +164,10 @@ class DBTreeNode(SqlTreeNodeABC):
             pop_fail(refresh_prompt.format(self.item_name),
                      REFRESH_DB_ACTION.format(self.item_name), self.window)
             return
-        self.refresh_db_executor = RefreshDBExecutor(self.refresh_tables_callback, self.refresh_cols_callback,
-                                                     self.tree_widget, self.item, self.window, REFRESH_DB_BOX_TITLE)
+        self.refresh_db_executor = RefreshDBExecutor(self.refresh_tables_callback,
+                                                     self.refresh_cols_callback,
+                                                     self.tree_widget, self.item,
+                                                     self.window, REFRESH_DB_BOX_TITLE)
         self.refresh_db_executor.start()
 
     def refresh_tables_callback(self, table_changed_dict: dict, refresh_executor=None):

@@ -3,9 +3,9 @@
 sql数据源树结构
 """
 from src.constant.tree_constant import LIST_ALL_CONN_BOX_TITLE
+from src.enum.common_enum import SqlTreeItemLevelEnum
 from src.service.async_func.async_sql_conn_task import ListConnExecutor
-from src.service.system_storage.opened_tree_item_sqlite import SqlTreeItemLevel
-from src.service.util.tree_node import TreeData
+from src.service.util.tree_node_util import TreeData
 from src.view.tab.tab_widget.tab_widget import TabWidget
 from src.view.tree.tree_item.context import get_sql_tree_node
 from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
@@ -32,8 +32,9 @@ class SqlTreeWidget(TreeWidgetABC):
             self.reopening_flag = True
             # 初始化数据
             window = get_window()
-            self.list_conn_executor = ListConnExecutor(self.reopen_items, self.reopen_tab, window, window,
-                                                       LIST_ALL_CONN_BOX_TITLE, self.reopen_end, self.reopen_end)
+            self.list_conn_executor = ListConnExecutor(self.reopen_items, self.reopen_tab,
+                                                       window, window, LIST_ALL_CONN_BOX_TITLE,
+                                                       self.reopen_end, self.reopen_end)
             self.list_conn_executor.start()
 
     def get_current_tab_widget(self) -> TabWidget:
@@ -46,7 +47,7 @@ class SqlTreeWidget(TreeWidgetABC):
         """
         level = opened_items[0].level
         # 如果是连接，单独处理
-        if level == SqlTreeItemLevel.conn_level.value:
+        if level == SqlTreeItemLevelEnum.conn_level.value:
             make_conn_tree_items(opened_items, self)
         else:
             # 如果是其他类型，按策略来执行

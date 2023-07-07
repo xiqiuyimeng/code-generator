@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QProgressBar, QFormLayout, QLabel, QPushButton
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QProgressBar, QFormLayout, QLabel, QPushButton
 
 from src.constant.generator_dialog_constant import PREPARE_PROGRESS_LABEL_TXT, GENERATE_PROGRESS_LABEL_TXT, \
     GENERATE_LOG_LABEL_TXT, BACK_TO_FILL_TEMPLATE_VAR_CONFIG_BTN_TXT, GENERATE_TO_FILE_BTN_TXT, \
@@ -56,20 +56,20 @@ class GenerateDialogFrame(ChainDialogFrameABC):
         self.prepare_progress_label = QLabel(self)
         self.prepare_progress_label.setObjectName('form_label')
         self.prepare_progress_bar = QProgressBar(self)
-        self.prepare_progress_bar.setAlignment(Qt.AlignCenter)
+        self.prepare_progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.generator_layout.addRow(self.prepare_progress_label, self.prepare_progress_bar)
 
         # 生成进度
         self.generate_progress_label = QLabel(self)
         self.generate_progress_label.setObjectName('form_label')
         self.generate_progress_bar = QProgressBar(self)
-        self.generate_progress_bar.setAlignment(Qt.AlignCenter)
+        self.generate_progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.generator_layout.addRow(self.generate_progress_label, self.generate_progress_bar)
 
         # 工作日志
         self.generate_log_label = QLabel(self)
         self.generate_log_label.setObjectName('form_label')
-        self.generate_log_label.setAlignment(Qt.AlignTop)
+        self.generate_log_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.generate_log_browser = ScrollableTextBrowser(self)
         self.generator_layout.addRow(self.generate_log_label, self.generate_log_browser)
 

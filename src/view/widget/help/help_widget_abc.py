@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFontMetrics, QTextDocument
-from PyQt5.QtWidgets import QFrame, QLabel, QFormLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFontMetrics, QTextDocument
+from PyQt6.QtWidgets import QFrame, QLabel, QFormLayout
 
 from src.constant.help.help_constant import TEXT_BROWSER_STYLE, MULTI_LINE_LABEL_STYLE
 from src.view.custom_widget.scrollable_widget import ScrollArea, ScrollableTextBrowser
@@ -37,7 +37,7 @@ class HelpWidgetABC(ScrollArea):
 
     def add_label(self, label_text):
         label = QLabel()
-        label.setAlignment(Qt.AlignTop)
+        label.setAlignment(Qt.AlignmentFlag.AlignTop)
         # 拼接上样式
         label.setText(f'{MULTI_LINE_LABEL_STYLE}<p>{label_text}</p>')
         # 自动换行
@@ -64,11 +64,11 @@ class HelpWidgetABC(ScrollArea):
 
     def add_row_label(self, label_text, help_label_text):
         label = QLabel()
-        label.setAlignment(Qt.AlignTop)
+        label.setAlignment(Qt.AlignmentFlag.AlignTop)
         label.setObjectName('form_label')
         label.setText(label_text)
         help_label = QLabel()
-        help_label.setAlignment(Qt.AlignTop)
+        help_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         help_label.setText(f'{MULTI_LINE_LABEL_STYLE}<p>{help_label_text}</p>')
         # 自动换行
         help_label.setWordWrap(True)
@@ -78,12 +78,12 @@ class HelpWidgetABC(ScrollArea):
 
     def add_row_text_browser(self, label_text, browser_text):
         label = QLabel()
-        label.setAlignment(Qt.AlignTop)
+        label.setAlignment(Qt.AlignmentFlag.AlignTop)
         label.setObjectName('form_label')
         label.setText(label_text)
         content_browser = ScrollableTextBrowser()
         # 自动换行
-        content_browser.setLineWrapMode(content_browser.WidgetWidth)
+        content_browser.setLineWrapMode(content_browser.LineWrapMode.WidgetWidth)
 
         # 使用 QTextDocument 设置文本，可以获取文本实际高度
         doc = QTextDocument()

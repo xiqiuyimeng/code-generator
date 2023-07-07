@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from src.constant.ds_type_constant import STRUCT_COL_ICON
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.view.frame.generator.selected_data.selected_data_dialog_frame_abc import SelectedDataDialogFrameABC
 from src.view.tree.tree_widget.tree_function import make_display_tree_item

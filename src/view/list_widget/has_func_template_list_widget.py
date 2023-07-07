@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt6.QtWidgets import QListWidgetItem
 
 from src.view.list_widget.list_item_func import set_template_data, get_template_data
 from src.view.list_widget.list_widget_abc import ListWidgetABC

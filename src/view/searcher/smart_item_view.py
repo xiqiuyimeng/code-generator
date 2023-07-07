@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAbstractItemView, QTreeWidget, QListWidget
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QAbstractItemView, QTreeWidget, QListWidget
 
 from src.view.searcher.search_func.list_searcher import ListSearcher
 from src.view.searcher.search_func.tree_searcher import TreeSearcher
@@ -21,7 +21,7 @@ class SmartSearcherItemView(QAbstractItemView):
 
     def keyPressEvent(self, event):
         # ctrl F 触发
-        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_F:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_F:
             self.searcher.show_search()
         else:
             # 其他按键触发
@@ -33,9 +33,9 @@ class SmartSearcherItemView(QAbstractItemView):
             self.setFocus()
         self.setCurrentItem(item)
         # 选中节点后，将节点滑动到视图中央
-        self.scrollToItem(item, QAbstractItemView.PositionAtCenter)
+        self.scrollToItem(item, QAbstractItemView.ScrollHint.PositionAtCenter)
         # 滚动到视图中央后，可能由于水平方向其他项文本过长，导致计算的水平中央并不能展示出当前项，所以在调用一次滚动确保可见
-        self.scrollToItem(item, QAbstractItemView.EnsureVisible)
+        self.scrollToItem(item, QAbstractItemView.ScrollHint.EnsureVisible)
 
 
 class SmartSearcherTreeWidget(QTreeWidget, SmartSearcherItemView):

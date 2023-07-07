@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
 
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
 from src.service.util.dataclass_util import init, import_export
@@ -57,11 +56,6 @@ class ImportExportTemplateFunc:
     is_current: int = field(default=None)
     # 选中状态
     checked: int = field(default=None)
-
-
-class CurrentEnum(Enum):
-    current_func = 1
-    not_current_func = 0
 
 
 class TemplateFuncSqlite(SqliteBasic):

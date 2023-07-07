@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QVariant
+from PyQt6.QtCore import Qt, QVariant
 
 from src.constant.tree_constant import OPEN_TB_BOX_TITLE, CANCEL_OPEN_TABLE_ACTION, CANCEL_REFRESH_TB_ACTION, \
     OPEN_TABLE_ACTION, CLOSE_TABLE_ACTION, REFRESH_TB_ACTION, REFRESH_TB_BOX_TITLE
+from src.enum.common_enum import get_checked_enum
 from src.service.async_func.async_sql_ds_task import OpenTBExecutor, RefreshTBExecutor
 from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
-from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, \
-    link_table_checkbox, save_tree_data, get_add_del_data, get_item_opened_record
+from src.view.tree.tree_item.tree_item_func import get_item_opened_tab, link_table_checkbox, save_tree_data, \
+    get_add_del_data, get_item_opened_record
 
 _author_ = 'luwt'
 _date_ = '2022/7/6 22:05'
@@ -80,11 +81,11 @@ class TableTreeNode(SqlTreeNodeABC):
 
     def hide_check_box(self):
         # 隐藏复选框
-        self.item.setData(0, Qt.CheckStateRole, QVariant())
+        self.item.setData(0, Qt.ItemDataRole.CheckStateRole, QVariant())
 
     def show_check_box(self):
         # 显示复选框，选中状态根据 opened record 决定
-        self.item.setCheckState(0, get_item_opened_record(self.item).checked)
+        self.item.setCheckState(0, get_checked_enum(get_item_opened_record(self.item).checked))
 
     def do_fill_menu(self, menu):
         # 取消打开和取消刷新

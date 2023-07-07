@@ -2,112 +2,112 @@
 
 /* 主窗口 */
 MainWindow{
-    border-image: url(:/bg_jpg/window_bg.jpg);
+    border-image: url(bg_jpg:window_bg.jpg);
 }
 
 /* 数据源对话框背景图 */
 DsDialogFrameABC {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 文件夹对话框背景图 */
 FolderDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 以表格形式管理的数据页，类型映射列表、模板列表对话框 */
 TableDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 以表格形式管理的数据页的详情页，类型映射详情、模板详情对话框 */
 StackedDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 数据源列类型对话框 */
 DsColTypeDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 通用的带有名称检查的对话框 */
 SimpleNameCheckDialog {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 模板配置项对话框 */
 TemplateConfigDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 维护输出路径配置和文件关系对话框 */
 TemplateMaintainFileConfigFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 模板方法对话框 */
 TemplateFuncDetailDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 复制模板方法对话框 */
 TemplateCopyFuncDialogFrame, TemplateCopyFuncListFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 表格单元格代理编辑对话框 */
 TableItemInputDelegateDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 生成链路中使用到的对话框 */
 ChainDialogFrameABC {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 画布框架，动态渲染用户配置的模板配置项时使用，最好和生成链路中使用到的对话框背景图可以贴合 */
 #canvas_content_frame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 预览生成结果的对话框 */
 PreviewFileDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 保存预览生成结果的对话框 */
 SaveFileDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 导入导出对话框 */
 ImportExportDialogFrameABC {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 处理导入错误错误的对话框 */
 ImportErrorDataProcessDialogFrameABC {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 帮助信息对话框 */
 HelpDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 帮助信息画布框架，最好和帮助信息对话框背景图贴合 */
 #help_canvas_content_frame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 关于信息对话框 */
 AboutDialogFrame {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /* 消息弹窗对话框 */
 MessageBox {
-    border-image: url(:/bg_jpg/conn_dialog_bg.jpg);
+    border-image: url(bg_jpg:conn_dialog_bg.jpg);
 }
 
 /**************************************** 窗口背景图设置 end ****************************************/

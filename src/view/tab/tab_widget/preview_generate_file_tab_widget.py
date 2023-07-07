@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout
 
 from src.view.custom_widget.text_editor import TextEditor
 

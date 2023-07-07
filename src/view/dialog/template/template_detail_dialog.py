@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.template_dialog_constant import CREATE_TEMPLATE_TITLE, EDIT_TEMPLATE_TITLE
 from src.service.system_storage.template_sqlite import Template

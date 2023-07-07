@@ -2,10 +2,10 @@
 from src.constant.generator_dialog_constant import STRUCT_CONFIRM_SELECTED_TITLE, SQL_CONFIRM_SELECTED_TITLE, \
     SELECT_TYPE_MAPPING_TITLE, SELECT_TEMPLATE_TITLE, FILL_TEMPLATE_OUTPUT_CONFIG_TITLE, \
     FILL_TEMPLATE_VAR_CONFIG_TITLE, GENERATE_TITLE
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.service.system_storage.template_sqlite import Template
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
-from src.service.util.tree_node import TreeData
+from src.service.util.tree_node_util import TreeData
 from src.view.dialog.custom_dialog_abc import CustomDialogABC
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC
 from src.view.frame.generator.dynamic_render_template_config.dyanmic_var_config_dialog_frame import \
@@ -61,9 +61,9 @@ class GeneratorDialog(CustomDialogABC):
 
     def get_frame(self) -> SelectedDataDialogFrameABC:
         # 根据类型判断，展示为sql还是结构体对话框框架
-        if self.ds_category == DsCategoryEnum.sql_ds_category.value.name:
+        if self.ds_category == DsCategoryEnum.sql_ds_category.get_name():
             return SqlSelectedDataDialogFrame(self.selected_data, self, SQL_CONFIRM_SELECTED_TITLE)
-        elif self.ds_category == DsCategoryEnum.struct_ds_category.value.name:
+        elif self.ds_category == DsCategoryEnum.struct_ds_category.get_name():
             return StructSelectedDataDialogFrame(self.selected_data, self, STRUCT_CONFIRM_SELECTED_TITLE)
 
     def setup_frame_chain(self):

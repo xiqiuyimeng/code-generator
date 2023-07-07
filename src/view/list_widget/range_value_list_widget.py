@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.list_constant import VALUE_RANGE_TYPE_NAME, EDIT_VALUE_RANGE_BOX_TITLE
 from src.view.list_widget.list_widget_abc import DraggableListWidgetABC

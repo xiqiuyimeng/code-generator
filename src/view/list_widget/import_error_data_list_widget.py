@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QListWidgetItem
 
 from src.view.list_widget.list_item_func import set_import_error_data, get_import_error_data
 from src.view.list_widget.list_widget_abc import ListWidgetABC
@@ -14,7 +14,7 @@ class ImportErrorDataListWidget(ListWidgetABC):
     def fill_list_widget(self, duplicate_data_list):
         for data in duplicate_data_list:
             item = QListWidgetItem(data.get_name())
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             set_import_error_data(item, data)
             self.addItem(item)
 
@@ -28,11 +28,11 @@ class ImportErrorDataListWidget(ListWidgetABC):
 
     def get_selected_data_list(self):
         return [get_import_error_data(self.item(row))
-                for row in range(self.count()) if self.item(row).checkState()]
+                for row in range(self.count()) if self.item(row).checkState() == Qt.CheckState.Checked]
 
     def remove_selected_items(self):
         for row in reversed(range(self.count())):
-            if self.item(row).checkState():
+            if self.item(row).checkState() == Qt.CheckState.Checked:
                 self.takeItem(row)
 
     def remove_item_by_name(self, data):

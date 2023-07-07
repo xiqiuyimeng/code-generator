@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel, QFormLayout, QLineEdit, QAction, QPushButton
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QLabel, QFormLayout, QLineEdit, QPushButton
 
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.frame.dialog_frame_abc import DialogFrameABC

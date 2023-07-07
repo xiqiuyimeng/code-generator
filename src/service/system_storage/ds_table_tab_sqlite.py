@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import List
 
+from src.enum.common_enum import CurrentEnum
 from src.logger.log import logger as log
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 from src.service.system_storage.sqlite_abc import BasicSqliteDTO, SqliteBasic
@@ -46,11 +46,6 @@ class DsTableTab(BasicSqliteDTO):
 
     def set_not_current(self):
         self.is_current = CurrentEnum.not_current.value
-
-
-class CurrentEnum(Enum):
-    is_current = 1
-    not_current = 0
 
 
 class DsTableTabSqlite(SqliteBasic):

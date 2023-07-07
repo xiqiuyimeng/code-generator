@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5 import sip
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
+from PyQt6 import sip
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel
 
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.view.table.table_widget.ds_table_widget.ds_col_table_widget_abc import DsColTableWidgetABC
 from src.view.table.table_widget.ds_table_widget.sql_table_widget import SqlDsColTableWidget
 from src.view.table.table_widget.ds_table_widget.struct_table_widget import StructDsColTableWidget
@@ -14,9 +14,9 @@ _date_ = '2022/9/26 19:28'
 
 def get_table_frame(current_frame_name, *args):
     """根据当前的frame名称获取对应的表结构frame"""
-    if current_frame_name == DsCategoryEnum.sql_ds_category.value.name:
+    if current_frame_name == DsCategoryEnum.sql_ds_category.get_name():
         return SqlTableFrame(*args)
-    elif current_frame_name == DsCategoryEnum.struct_ds_category.value.name:
+    elif current_frame_name == DsCategoryEnum.struct_ds_category.get_name():
         return StructTableFrame(*args)
 
 
@@ -28,8 +28,8 @@ class TableFrameABC(QFrame):
         self.column_list = column_list
         self.tree_item = tree_item
         self.tree_widget = tree_widget
-        self.setFrameShape(QFrame.StyledPanel)
-        self.setFrameShadow(QFrame.Raised)
+        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setFrameShadow(QFrame.Shadow.Raised)
         self.setObjectName('table_frame')
 
         self.table_header_label = QLabel(self)
@@ -61,7 +61,7 @@ class TableFrameABC(QFrame):
     def add_table(self):
         self.table_widget = self.get_table_widget()
         self.table_widget.setObjectName('table_widget')
-        self.table_widget.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.table_widget.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self._layout.addWidget(self.table_widget)
 
         self.table_widget.fill_table()

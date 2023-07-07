@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel, QLineEdit
+from PyQt6.QtWidgets import QLabel, QLineEdit
 
 from src.constant.ds_dialog_constant import SERVICE_NAME_TEXT, SERVICE_NAME_MAX_LENGTH_PLACEHOLDER_TEXT, \
     ORACLE_DEFAULT_HOST, ORACLE_DEFAULT_PORT, ORACLE_DEFAULT_SERVICE_NAME
-from src.service.system_storage.conn_type import ConnType, ConnTypeEnum
+from src.enum.conn_type_enum import ConnType, ConnTypeEnum
 from src.view.frame.datasource.conn.internet_conn_dialog_frame import InternetConnDialogFrame
 
 _author_ = 'luwt'

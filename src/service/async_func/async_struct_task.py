@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 
 from src.constant.ds_type_constant import FOLDER_TYPE
 from src.constant.tree_constant import REFRESH_FOLDER_BOX_TITLE
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
     RefreshMovieThreadExecutor
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab, DsTableTabSqlite
-from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem, CheckedEnum
+from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem
 from src.service.system_storage.struct_sqlite import StructSqlite, StructInfo
-from src.service.system_storage.struct_type import FolderTypeEnum, get_struct_type
+from src.enum.struct_type_enum import FolderTypeEnum, get_struct_type
 from src.service.util.struct_util import *
 from src.service.util.system_storage_util import transactional
 from src.view.box.message_box import pop_ok
@@ -203,7 +203,7 @@ class ListStructWorker(ThreadWorkerABC):
         # 转换为dict，key：opened_item_id，value：struct info
         struct_opened_dict = {struct_info.opened_item_id: struct_info for struct_info in struct_info_list}
 
-        ds_category = DsCategoryEnum.struct_ds_category.value.name
+        ds_category = DsCategoryEnum.struct_ds_category.get_name()
         # 读取打开记录表中的信息，获取所有的文件夹和结构体记录
         opened_item_sqlite = OpenedTreeItemSqlite()
         max_level = opened_item_sqlite.get_max_level(ds_category)
@@ -222,7 +222,7 @@ class ListStructWorker(ThreadWorkerABC):
         log.info('获取所有结构体成功')
 
     def get_tab_cols(self):
-        tab_list = DsTableTabSqlite().get_ds_category_tabs(DsCategoryEnum.struct_ds_category.value.name)
+        tab_list = DsTableTabSqlite().get_ds_category_tabs(DsCategoryEnum.struct_ds_category.get_name())
         col_info_sqlite = DsTableColInfoSqlite()
         for tab in tab_list:
             tab.col_list = col_info_sqlite.get_tab_cols(tab.id)
@@ -542,7 +542,7 @@ class RefreshStructWorker(ThreadWorkerABC):
     def refresh_struct(self, column_list):
         self.modifying_db_task = True
         # 更新表的复选框状态
-        self.opened_struct_item.checked = CheckedEnum.unchecked.value
+        self.opened_struct_item.checked = Qt.CheckState.Unchecked.value
         OpenedTreeItemSqlite().update_checked(self.opened_struct_item)
         # 保存新的列信息
         DsTableColInfoSqlite().refresh_tab_cols(self.table_tab.id, column_list,
@@ -601,7 +601,7 @@ class RefreshFolderWorker(ThreadWorkerABC):
     def refresh_struct(self, column_list, table_tab, opened_record):
         self.modifying_db_task = True
         # 刷新 结构体 选中状态
-        opened_record.checked = CheckedEnum.unchecked.value
+        opened_record.checked = Qt.CheckState.Unchecked.value
         OpenedTreeItemSqlite().update_checked(opened_record)
         # 保存新的列信息
         DsTableColInfoSqlite().refresh_tab_cols(table_tab.id, column_list, opened_record.data_type.display_name)

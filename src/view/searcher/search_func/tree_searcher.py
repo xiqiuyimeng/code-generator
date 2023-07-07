@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItemIterator
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QTreeWidgetItemIterator
 
 from src.view.searcher.search_func.searcher import Searcher
 
@@ -18,7 +18,7 @@ class TreeSearcher(Searcher):
         i = 0
         while iterator.value():
             item = iterator.value()
-            item.setData(0, Qt.UserRole + 1, i)
+            item.setData(0, Qt.ItemDataRole.UserRole + 1, i)
             # 简单搜索，单字符匹配，确定范围
             self.simple_match_text(text, item, match_items)
             iterator = iterator.__iadd__(1)
@@ -29,7 +29,7 @@ class TreeSearcher(Searcher):
         i = 0
         while iterator.value():
             item = iterator.value()
-            item.setData(0, Qt.UserRole + 1, i)
+            item.setData(0, Qt.ItemDataRole.UserRole + 1, i)
             iterator = iterator.__iadd__(1)
             i += 1
 
@@ -59,15 +59,15 @@ class TreeSearcher(Searcher):
 
     def get_row_index(self, item) -> int:
         """获取按顺序排列的索引号"""
-        user_data = item.data(0, Qt.UserRole + 1)
+        user_data = item.data(0, Qt.ItemDataRole.UserRole + 1)
         if not user_data:
             self.fill_row_index()
-            user_data = item.data(0, Qt.UserRole + 1)
+            user_data = item.data(0, Qt.ItemDataRole.UserRole + 1)
         return user_data
 
     def clear_row_index(self):
         iterator = QTreeWidgetItemIterator(self.target)
         while iterator.value():
             item = iterator.value()
-            item.setData(0, Qt.UserRole + 1, None)
+            item.setData(0, Qt.ItemDataRole.UserRole + 1, None)
             iterator = iterator.__iadd__(1)

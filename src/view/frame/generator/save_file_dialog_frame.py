@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFormLayout, QLabel, QProgressBar
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QFormLayout, QLabel, QProgressBar
 
 from src.constant.generator_dialog_constant import SAVE_PREVIEW_FILE_PROGRESS_TEXT
 from src.service.async_func.async_generate_task import SaveFileExecutor
@@ -28,7 +28,7 @@ class SaveFileDialogFrame(DialogFrameABC):
         self.frame_layout.addLayout(self.content_layout)
         self.save_progress_label = QLabel(self)
         self.save_progress_bar = QProgressBar(self)
-        self.save_progress_bar.setAlignment(Qt.AlignCenter)
+        self.save_progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.content_layout.addRow(self.save_progress_label, self.save_progress_bar)
 
     def setup_other_label_text(self):

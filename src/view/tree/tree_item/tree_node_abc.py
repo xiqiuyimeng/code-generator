@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QTreeWidgetItem, QAction
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QTreeWidgetItem
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.tree_constant import CLOSE_REFRESHING_NODE_PROMPT, CLOSE_REFRESHING_CHILD_NODE_PROMPT, \
     CLOSE_OPENING_CHILD_NODE_PROMPT
 from src.view.tab.tab_ui import TabTableUI
-from src.view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, \
-    get_add_del_data
+from src.view.tree.tree_item.tree_item_func import set_item_opened_tab, get_item_opened_tab, get_add_del_data, \
+    get_item_opened_record
 from src.view.window.main_window_func import get_window
 
 _author_ = 'luwt'
@@ -129,6 +130,27 @@ class TreeNodeABC:
     def add_menu(self, action_text, menu, with_item_name=True):
         action_display_text = action_text.format(self.item_name) if with_item_name else action_text
         menu.addAction(QAction(get_icon(action_text), action_display_text, menu))
+
+    def get_need_reorder_item_records(self):
+        """当前节点之后的节点需要调整顺序"""
+        # 当前节点不是顶层节点，确定节点同级别项目数，获取同级别项目的方法
+        if self.item.parent():
+            item_count = self.item.parent().childCount()
+            item_idx = self.item.parent().indexOfChild(self.item)
+            get_item_by_idx_func = self.item.parent().child
+        else:
+            item_count = self.tree_widget.topLevelItemCount()
+            item_idx = self.tree_widget.indexOfTopLevelItem(self.item)
+            get_item_by_idx_func = self.tree_widget.topLevelItem
+
+        # 对于需要排序的节点，是在当前节点之后，也就是索引大于当前节点
+        reorder_opened_item_records = list()
+        for idx in range(item_idx + 1, item_count):
+            item = get_item_by_idx_func(idx)
+            opened_record = get_item_opened_record(item)
+            opened_record.item_order -= 1
+            reorder_opened_item_records.append(opened_record)
+        return reorder_opened_item_records
 
     def open_item(self):
         ...

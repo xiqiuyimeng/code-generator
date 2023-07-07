@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QSize, pyqtSignal
-from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QLineEdit
+from PyQt6.QtCore import Qt, QSize, pyqtSignal
+from PyQt6.QtGui import QPalette
+from PyQt6.QtWidgets import QLineEdit
 
 _author_ = 'luwt'
 _date_ = '2022/5/9 19:00'
+
+
+up_down_key_tuple = (Qt.Key.Key_Up, Qt.Key.Key_Down)
+move_cursor_key_tuple = (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Home)
 
 
 class SearcherLineEdit(QLineEdit):
@@ -32,7 +36,7 @@ class SearcherLineEdit(QLineEdit):
 
     def paint_wrong_color(self):
         wrong_palette = QPalette()
-        wrong_palette.setColor(QPalette.Text, Qt.red)
+        wrong_palette.setColor(QPalette.ColorRole.Text, Qt.GlobalColor.red)
         self.setPalette(wrong_palette)
 
     def paint_right_color(self):
@@ -60,16 +64,16 @@ class SearcherLineEdit(QLineEdit):
 
     def keyPressEvent(self, event):
         # esc 触发关闭搜索
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.clear_search()
         # 上下箭头触发上下选择
-        elif event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
+        elif event.key() in up_down_key_tuple:
             self.up_down_select_signal.emit(event.key())
         # 左右移动箭头屏蔽，不允许移动光标，home按键屏蔽，不允许移动光标
-        elif event.key() == Qt.Key_Left or event.key() == Qt.Key_Right or event.key() == Qt.Key_Home:
-            pass
+        elif event.key() in move_cursor_key_tuple:
+            ...
         # 回退键，触发回退搜索
-        elif event.key() == Qt.Key_Backspace:
+        elif event.key() == Qt.Key.Key_Backspace:
             self.back_select_signal.emit()
             # 回退也需要触发控件删除文本操作
             super().keyPressEvent(event)
@@ -89,21 +93,21 @@ class SearcherLineEdit(QLineEdit):
         self.clear_search_signal.emit()
 
     def sizeHint(self):
-        return QSize(self.fontMetrics().width(self.text()) + self.fontMetrics().maxWidth(),
+        return QSize(self.fontMetrics().boundingRect(self.text()).width() + self.fontMetrics().maxWidth(),
                      self.fontMetrics().height() + self.fontMetrics().descent())
 
     def mousePressEvent(self, event):
         # 屏蔽鼠标移动光标能力
-        pass
+        ...
 
     def mouseMoveEvent(self, event):
         # 屏蔽鼠标选择文本能力
-        pass
+        ...
 
     def mouseDoubleClickEvent(self, event):
         # 屏蔽双击鼠标选中文本功能
-        pass
+        ...
 
     def contextMenuEvent(self, event):
         # 屏蔽右键菜单
-        pass
+        ...

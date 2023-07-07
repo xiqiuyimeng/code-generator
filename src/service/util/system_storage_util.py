@@ -56,7 +56,7 @@ def set_thread_terminate(thread_id, thread_terminate):
 def get_db_cursor():
     while conn_in_use:
         log.info("连接被其他线程占用，需要等待")
-        pass
+        ...
     with lock:
         set_conn_in_use(True)
         cursor = conn.cursor()
@@ -178,6 +178,8 @@ class Condition:
     def __str__(self):
         if self.condition_list:
             return f'where {" and ".join(self.condition_list)}'
+        else:
+            return ''
 
     def __bool__(self):
         return bool(self.condition_list)

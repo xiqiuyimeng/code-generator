@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.type_mapping_dialog_constant import EDIT_TYPE_MAPPING_TITLE, CREATE_TYPE_MAPPING_TITLE
 from src.service.system_storage.type_mapping_sqlite import TypeMapping

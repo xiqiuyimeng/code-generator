@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.dialog_constant import TABLE_ITEM_INPUT_DELEGATE_TITLE
 from src.view.dialog.custom_dialog_abc import CustomSaveDialogABC

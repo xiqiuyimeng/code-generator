@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.service.system_storage.struct_type import FolderTypeEnum
+from src.enum.struct_type_enum import FolderTypeEnum
 from src.view.tree.tree_item.sql_tree_node.sql_tree_node_abc import SqlTreeNodeABC
 from src.view.tree.tree_item.sql_tree_node.conn_tree_node import ConnTreeNode
 from src.view.tree.tree_item.sql_tree_node.db_tree_node import DBTreeNode

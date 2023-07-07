@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QPushButton
 
 from src.constant.tree_constant import LOCATION_TXT, CREATE_NEW_FOLDER
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.view.tree.tree_widget.sql_tree_widget import SqlTreeWidget
 from src.view.tree.tree_widget.struct_tree_widget import StructTreeWidget
 from src.view.tree.tree_widget.tree_function import add_folder_func
@@ -16,9 +16,9 @@ _date_ = '2022/9/14 18:01'
 
 def get_tree_frame(current_frame_name, frame_parent):
     """根据当前的frame名称获取对应的树结构frame"""
-    if current_frame_name == DsCategoryEnum.sql_ds_category.value.name:
+    if current_frame_name == DsCategoryEnum.sql_ds_category.get_name():
         return SqlTreeFrame(frame_parent)
-    elif current_frame_name == DsCategoryEnum.struct_ds_category.value.name:
+    elif current_frame_name == DsCategoryEnum.struct_ds_category.get_name():
         return StructTreeFrame(frame_parent)
 
 
@@ -27,8 +27,8 @@ class TreeFrameABC(QFrame):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.setFrameShape(QFrame.StyledPanel)
-        self.setFrameShadow(QFrame.Raised)
+        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setFrameShadow(QFrame.Shadow.Raised)
         self.setObjectName('tree_frame')
 
         self._layout = QVBoxLayout(self)
@@ -51,7 +51,7 @@ class TreeFrameABC(QFrame):
 
         self.tree_widget = self.get_tree_widget()
         self.tree_widget.setObjectName('tree_widget')
-        self.tree_widget.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.tree_widget.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self._layout.addWidget(self.tree_widget)
 
         self.tree_locate_button.clicked.connect(self.tree_widget.locate_item)
@@ -75,7 +75,7 @@ class SqlTreeFrame(TreeFrameABC):
         set_sql_tree_widget(self.tree_widget)
 
     def get_header_text(self) -> str:
-        return DsCategoryEnum.sql_ds_category.value.name
+        return DsCategoryEnum.sql_ds_category.get_name()
 
     def get_tree_widget(self) -> SqlTreeWidget:
         return SqlTreeWidget(self)
@@ -98,7 +98,7 @@ class StructTreeFrame(TreeFrameABC):
         set_struct_tree_widget(self.tree_widget)
 
     def get_header_text(self) -> str:
-        return DsCategoryEnum.struct_ds_category.value.name
+        return DsCategoryEnum.struct_ds_category.get_name()
 
     def get_tree_widget(self) -> StructTreeWidget:
         return StructTreeWidget(self)

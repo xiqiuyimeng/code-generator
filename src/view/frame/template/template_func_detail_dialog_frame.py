@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt6.QtCore import pyqtSignal, Qt
 
 from src.constant.help.help_constant import TEMPLATE_FUNC_DETAIL_HELP
 from src.constant.template_dialog_constant import TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT

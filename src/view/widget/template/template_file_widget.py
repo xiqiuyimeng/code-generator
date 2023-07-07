@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSplitter, QFrame, QVBoxLayout, QPushButton
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QSplitter, QFrame, QVBoxLayout, QPushButton
 
 from src.constant.template_dialog_constant import ADD_FILE_BTN_TEXT, LOCATE_FILE_BTN_TEXT, CREATE_FILE_TITLE, \
     CHECK_TEMPLATE_FILE_PROMPT, CHECK_TEMPLATE_FILE_TITLE, CHECK_TP_FILE_CONFIG_PROMPT, CHECK_TP_FILE_CONFIG_TITLE, \
@@ -47,7 +47,7 @@ class TemplateFileWidget(QWidget):
         # 不隐藏控件
         self.splitter.setChildrenCollapsible(False)
         # 竖直方向分割器，子项添加为frame，如果直接添加控件，无法调控比例
-        self.splitter.setOrientation(Qt.Horizontal)
+        self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self._layout.addWidget(self.splitter)
 
         self.file_list_frame = QFrame(self.splitter)

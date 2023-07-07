@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QLabel, QLineEdit, QAction, QPushButton, QFormLayout, QFileDialog
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QFormLayout, QFileDialog
 
 from src.constant.ds_dialog_constant import STRUCT_NAME_TEXT, STRUCT_FILE_URL_TEXT, STRUCT_CONTENT_TEXT, \
     PRETTY_STRUCT_TEXT, CHOOSE_STRUCT_FILE_TEXT, READ_STRUCT_FILE_BOX_TITLE, PRETTY_STRUCT_BOX_TITLE, \
@@ -10,7 +11,7 @@ from src.service.async_func.async_struct_task import ReadFileExecutor, PrettyStr
     EditStructExecutor, QueryStructExecutor
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_sqlite import StructInfo
-from src.service.system_storage.struct_type import StructType
+from src.enum.struct_type_enum import StructType
 from src.view.custom_widget.syntax_highlighter.syntax_highlighter_abc import SyntaxHighLighterABC
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.frame.datasource.ds_dialog_frame_abc import DsDialogFrameABC
@@ -141,10 +142,10 @@ class StructDialogFrameABC(DsDialogFrameABC):
         if file_url[0]:
             self.struct_file_url_linedit.setText(file_url[0])
             # 异步读取文件内容，回显到内容区域
+            box_title = READ_STRUCT_FILE_BOX_TITLE.format(self.struct_type.display_name)
             self.read_file_executor = ReadFileExecutor(file_url[0], self.struct_type.display_name,
                                                        self.parent_dialog, self.parent_dialog,
-                                                       READ_STRUCT_FILE_BOX_TITLE.format(self.struct_type.display_name),
-                                                       self.append_plain_text)
+                                                       box_title, self.append_plain_text)
             self.read_file_executor.start()
 
     def append_plain_text(self, index, text):
@@ -153,11 +154,11 @@ class StructDialogFrameABC(DsDialogFrameABC):
         self.struct_text_input.appendPlainText(text)
 
     def pretty_func(self):
+        box_title = PRETTY_STRUCT_BOX_TITLE.format(self.struct_type.display_name)
         self.pretty_executor = PrettyStructExecutor(self.new_dialog_data.content,
                                                     self.struct_type.beautifier_executor,
                                                     self.parent_dialog, self.parent_dialog,
-                                                    PRETTY_STRUCT_BOX_TITLE.format(self.struct_type.display_name),
-                                                    self.struct_text_input.setPlainText)
+                                                    box_title, self.struct_text_input.setPlainText)
         self.pretty_executor.start()
 
     def save_func(self):

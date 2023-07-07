@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QAbstractItemView, QToolButton, QMenu, QAction, QHeaderView
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QAbstractItemView, QToolButton, QMenu, QHeaderView
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.table_constant import ROW_OPERATION_ICON, ROW_OPERATION_TEXT, ROW_CAT_EDIT_TEXT, \
     ROW_CAT_EDIT_ICON, ROW_DEL_TEXT, ROW_DEL_ICON, OPERATION_HEADER_LABEL
 from src.view.table.table_header.check_box_table_header import CheckBoxHeader
@@ -39,10 +40,10 @@ class CustomTableWidget(TableWidgetABC):
         self.viewport().stackUnder(self.header_widget)
 
         # 设置表头列宽度
-        self.header_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.header_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         # 不可编辑
-        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
     def resizeEvent(self, e) -> None:
         self.header_widget.setGeometry(self.frameWidth(), self.frameWidth(),
@@ -74,8 +75,8 @@ class CustomTableWidget(TableWidgetABC):
         添加操作按钮
         """
         tool_button = QToolButton(self)
-        tool_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        tool_button.setPopupMode(QToolButton.InstantPopup)
+        tool_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        tool_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         tool_button.setText(ROW_OPERATION_TEXT)
         tool_button.setIcon(get_icon(ROW_OPERATION_ICON))
         tool_button.setAutoRaise(True)
@@ -132,7 +133,7 @@ class CustomTableWidget(TableWidgetABC):
         for row_idx in range(self.rowCount()):
             check_num_widget = self.cellWidget(row_idx, 0)
             # 如果选中，收集到列表中
-            if check_num_widget.check_box.checkState():
+            if check_num_widget.check_box.checkState() == Qt.CheckState.Checked:
                 row_id = check_num_widget.check_label.row_data.id
                 if row_id:
                     checked_ids.append(int(row_id))
@@ -142,7 +143,7 @@ class CustomTableWidget(TableWidgetABC):
     def del_rows(self):
         # 根据选中状态删除
         for row_index in reversed(range(self.rowCount())):
-            if self.cellWidget(row_index, 0).check_box.checkState():
+            if self.cellWidget(row_index, 0).check_box.checkState() == Qt.CheckState.Checked:
                 self.removeRow(row_index)
         # 行序号重排序
         self.resort_row()

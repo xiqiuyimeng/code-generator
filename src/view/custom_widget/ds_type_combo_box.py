@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QComboBox, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QComboBox, QLabel, QVBoxLayout
 
 from src.constant.constant import DS_TYPE_COMBO_BOX_PLACEHOLDER_TXT
-from src.service.system_storage.conn_type import ConnTypeEnum
-from src.service.system_storage.struct_type import StructTypeEnum
+from src.enum.conn_type_enum import ConnTypeEnum
+from src.enum.struct_type_enum import StructTypeEnum
 
 _author_ = 'luwt'
 _date_ = '2023/2/16 13:32'

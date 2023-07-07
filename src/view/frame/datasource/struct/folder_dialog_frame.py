@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.ds_dialog_constant import EDIT_FOLDER_BOX_TITLE, ADD_FOLDER_BOX_TITLE
 from src.constant.help.help_constant import FOLDER_HELP

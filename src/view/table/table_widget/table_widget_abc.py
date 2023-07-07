@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt, QObject, QEvent, QPoint
-from PyQt5.QtWidgets import QTableWidget, QFrame, QToolTip
+from PyQt6.QtCore import Qt, QObject, QEvent, QPoint
+from PyQt6.QtWidgets import QTableWidget, QFrame, QToolTip
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 from src.view.table.table_item.table_item import TableWidgetItem
@@ -20,7 +20,7 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
 
     def setup_ui(self):
         # 设置无边框
-        self.setFrameShape(QFrame.NoFrame)
+        self.setFrameShape(QFrame.Shape.NoFrame)
         # 隐藏网格线
         self.setShowGrid(False)
         # 去除选中时虚线框
@@ -55,7 +55,7 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
         self.setToolTip(model_index.data())
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
-        if obj == self and event.type() == QEvent.ToolTip:
+        if obj == self and event.type() == QEvent.Type.ToolTip:
             # self.indexAt(pos).isValid()，计算规则是默认隐藏了表头，所以需要减去表头高度，才是真实单元格的位置
             horizontal_header_pos = QPoint(0, self.horizontalHeader().height())
             if self.indexAt(event.pos() - horizontal_header_pos).isValid():

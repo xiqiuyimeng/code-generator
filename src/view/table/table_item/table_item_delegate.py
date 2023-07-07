@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QModelIndex, QAbstractItemModel
-from PyQt5.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox
+from PyQt6.QtCore import QModelIndex, QAbstractItemModel
+from PyQt6.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.view.dialog.table_item_delegate.table_item_input_delegate_dialog import TableItemInputDelegateDialog

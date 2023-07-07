@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton, QLabel, QGridLayout
+from PyQt6.QtWidgets import QPushButton, QLabel, QGridLayout
 
 from src.constant.export_import_constant import SELECT_ALL_BTN_TEXT, UNSELECT_ALL_BTN_TEXT
 from src.constant.help.help_constant import IMPORT_ERROR_DATA_HELP

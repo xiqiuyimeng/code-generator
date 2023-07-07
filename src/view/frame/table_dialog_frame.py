@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QPushButton, QFrame, QVBoxLayout, QGridLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QPushButton, QFrame, QVBoxLayout, QGridLayout
 
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.box.message_box import pop_question
@@ -171,9 +172,10 @@ class TableDialogFrame(DialogFrameABC):
     def set_button_available(self, checked):
         # 如果表格存在行，删除按钮、导出按钮和复制按钮状态根据传入状态变化，否则应该置为不可用
         if self.table_widget.rowCount():
-            self.del_row_button.setDisabled(not checked)
-            self.copy_row_button.setDisabled(not checked)
-            self.export_button.setDisabled(not checked)
+            disabled = checked == Qt.CheckState.Unchecked
+            self.del_row_button.setDisabled(disabled)
+            self.copy_row_button.setDisabled(disabled)
+            self.export_button.setDisabled(disabled)
         else:
             self.del_row_button.setDisabled(True)
             self.copy_row_button.setDisabled(True)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from src.service.system_storage.conn_sqlite import SqlConnection
-from src.service.system_storage.conn_type import get_conn_type_by_type
+from src.enum.conn_type_enum import get_conn_type_by_type
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfo
 
 _author_ = 'luwt'

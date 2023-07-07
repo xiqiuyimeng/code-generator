@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 
 _author_ = 'luwt'
 _date_ = '2022/10/1 17:55'
@@ -9,20 +9,20 @@ _date_ = '2022/10/1 17:55'
 
 def set_item_opened_record(item, opened_item_record):
     # 放入历史记录表中的记录
-    item.setData(0, Qt.UserRole, opened_item_record)
+    item.setData(0, Qt.ItemDataRole.UserRole, opened_item_record)
 
 
 def get_item_opened_record(item):
-    return item.data(0, Qt.UserRole)
+    return item.data(0, Qt.ItemDataRole.UserRole)
 
 
 def set_item_opened_tab(item, tab_widget):
     # 放入打开的tab_widget
-    item.setData(1, Qt.UserRole, tab_widget)
+    item.setData(1, Qt.ItemDataRole.UserRole, tab_widget)
 
 
 def get_item_opened_tab(item):
-    return item.data(1, Qt.UserRole)
+    return item.data(1, Qt.ItemDataRole.UserRole)
 
 
 def link_table_checkbox(tree_item, check_state):
@@ -50,10 +50,7 @@ def recursive_get_children_opened_items(parent_item):
 
 
 def get_children_items(parent_item):
-    children_items = list()
-    for idx in range(parent_item.childCount()):
-        children_items.append(parent_item.child(idx))
-    return children_items
+    return [parent_item.child(idx) for idx in range(parent_item.childCount())]
 
 
 def get_add_del_data(item):
@@ -63,6 +60,7 @@ def get_add_del_data(item):
 
 
 def recursive_get_add_del_data(item, data_dict):
+    # 递归获取从当前节点向上的节点，并按照level作为key，放入字典
     if item.parent():
         recursive_get_add_del_data(item.parent(), data_dict)
     opened_record = get_item_opened_record(item)
@@ -76,10 +74,10 @@ def save_tree_data(item, tree_data):
     if not tab:
         check_state = item.checkState(0)
         add_del_data = get_add_del_data(item)
-        if check_state == Qt.Checked:
+        if check_state == Qt.CheckState.Checked:
             # 如果是选中，添加选中数据
             tree_data.add_node(add_del_data)
-        elif check_state == Qt.Unchecked:
+        elif check_state == Qt.CheckState.Unchecked:
             # 如果是未选中，删除选中数据
             tree_data.del_node(add_del_data)
 
@@ -127,24 +125,24 @@ def refresh_tree_item_callback(tree_widget, item, item_changed_dict, handle_unch
         for new_item_record in new_item_records:
             # 直接添加节点，最后统一排序
             make_new_item_func(tree_widget, item, new_item_record.item_name,
-                               icon, new_item_record, Qt.Unchecked)
+                               icon, new_item_record, Qt.CheckState.Unchecked)
     if sort_order:
         item.sortChildren(0, Qt.SortOrder.AscendingOrder)
 
 
 def set_item_output_config(item, output_config):
     # 放入输出配置
-    item.setData(0, Qt.UserRole, output_config)
+    item.setData(0, Qt.ItemDataRole.UserRole, output_config)
 
 
 def get_item_output_config(item):
-    return item.data(0, Qt.UserRole)
+    return item.data(0, Qt.ItemDataRole.UserRole)
 
 
 def set_item_template_file(item, template_file):
     # 放入模板文件
-    item.setData(0, Qt.UserRole, template_file)
+    item.setData(0, Qt.ItemDataRole.UserRole, template_file)
 
 
 def get_item_template_file(item):
-    return item.data(0, Qt.UserRole)
+    return item.data(0, Qt.ItemDataRole.UserRole)

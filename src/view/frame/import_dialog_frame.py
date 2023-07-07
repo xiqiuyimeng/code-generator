@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent
-from PyQt5.QtWidgets import QFileDialog
+from PyQt6.QtGui import QDragEnterEvent, QDropEvent
+from PyQt6.QtWidgets import QFileDialog
 
 from src.constant.export_import_constant import IMPORT_FILE_PROMPT, IMPORT_FILE_LABEL_TEXT, \
     START_IMPORT_BTN_TEXT, CHOOSE_IMPORT_FILE_TEXT

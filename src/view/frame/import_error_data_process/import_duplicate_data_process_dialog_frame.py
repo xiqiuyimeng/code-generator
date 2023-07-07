@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.export_import_constant import SKIP_DUPLICATE_BTN_TEXT, PROCESS_DUPLICATE_BTN_TEXT
 from src.service.async_func.async_import_export_task import OverrideDataExecutor

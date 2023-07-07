@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QLabel
+from PyQt6.QtWidgets import QLabel
 
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
 from src.view.table.table_header.table_header_abc import TableHeaderABC

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtWidgets import QAbstractItemView
 
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
 from src.view.custom_widget.check_box import CheckBox
@@ -13,9 +13,9 @@ _date_ = '2023/2/28 14:18'
 
 class TableHeaderABC(TableWidgetABC):
     # 表头复选框点击信号
-    header_clicked = pyqtSignal(int)
+    header_clicked = pyqtSignal(Qt.CheckState)
     # 表头复选框变化信号
-    header_check_changed = pyqtSignal(int)
+    header_check_changed = pyqtSignal(Qt.CheckState)
 
     def __init__(self, row_count, column_count, parent_table: TableWidgetABC, *args):
         self.row_count = row_count
@@ -30,14 +30,14 @@ class TableHeaderABC(TableWidgetABC):
         # 表头隐藏
         self.horizontalHeader().setHidden(True)
         # 不可编辑
-        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         # 设置不可选中
-        self.setSelectionMode(QAbstractItemView.NoSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         # 关闭交替行颜色
         self.setAlternatingRowColors(False)
         # 隐藏滚动条
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # 行数
         self.setRowCount(self.row_count)
@@ -102,11 +102,11 @@ class TableHeaderABC(TableWidgetABC):
             if hasattr(cell_widget, 'check_box'):
                 check_state_set.add(cell_widget.check_box.checkState())
         if len(check_state_set) == 2:
-            header_check_state = Qt.PartiallyChecked
+            header_check_state = Qt.CheckState.PartiallyChecked
         elif len(check_state_set) == 1:
             header_check_state = check_state_set.pop()
         else:
-            header_check_state = Qt.Unchecked
+            header_check_state = Qt.CheckState.Unchecked
         self.check_box.setCheckState(header_check_state)
         # 发射表头复选框变化信号
         self.header_check_changed.emit(header_check_state)

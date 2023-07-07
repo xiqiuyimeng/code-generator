@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal, QRegExp
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QComboBox, QStackedWidget, QWidget, QFormLayout, \
+from PyQt6.QtCore import pyqtSignal, QRegularExpression
+from PyQt6.QtGui import QRegularExpressionValidator
+from PyQt6.QtWidgets import QLabel, QLineEdit, QGridLayout, QComboBox, QStackedWidget, QWidget, QFormLayout, \
     QPushButton
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
@@ -10,7 +10,8 @@ from src.constant.template_dialog_constant import CONFIG_NAME_TEXT, VAR_NAME_TEX
     CONFIG_DESC_TEXT, IS_REQUIRED_TEXT, DEFAULT_VALUE_TEXT, PLACEHOLDER_TEXT, VALUE_RANGE_TEXT, \
     ADD_VALUE_BTN_TEXT, CONFIG_INPUT_WIDGET_TYPE_DICT, ADD_RANGE_VALUE_BOX_TITLE, VAR_NAME_REG_RULE, \
     VAR_NAME_PLACEHOLDER_TEXT
-from src.service.system_storage.template_config_sqlite import TemplateConfig, RequiredEnum
+from src.enum.common_enum import RequiredEnum
+from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.view.custom_widget.text_editor import TextEditor
 from src.view.dialog.simple_name_check_dialog import SimpleNameCheckDialog
 from src.view.frame.frame_func import check_name_available
@@ -181,7 +182,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.value_range_label = QLabel()
         self.value_range_label.setObjectName('form_label')
         self.combox_layout.addWidget(self.value_range_label, 0, 0, 1, 1)
-        self.value_range_list_widget = ValueRangeListWidget(self.open_save_range_value_dialog, self.combox_widget)
+        self.value_range_list_widget = ValueRangeListWidget(self.open_save_range_value_dialog,
+                                                            self.combox_widget)
         self.combox_layout.addWidget(self.value_range_list_widget, 0, 1, 3, 1)
         # 默认值
         self.default_value_combo_box_layout = QFormLayout()
@@ -189,7 +191,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.default_combox_value_label = QLabel()
         self.default_combox_value_label.setObjectName('form_label')
         self.default_value_combo_box = QComboBox()
-        self.default_value_combo_box_layout.addRow(self.default_combox_value_label, self.default_value_combo_box)
+        self.default_value_combo_box_layout.addRow(self.default_combox_value_label,
+                                                   self.default_value_combo_box)
 
         # 添加值按钮
         self.add_value_button = QPushButton()
@@ -349,7 +352,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     def setup_other_input_limit_rule(self):
         self.var_name_input.setMaxLength(50)
         # 变量命名需要严格要求
-        self.var_name_input.setValidator(QRegExpValidator(QRegExp(VAR_NAME_REG_RULE)))
+        self.var_name_input.setValidator(QRegularExpressionValidator(QRegularExpression(VAR_NAME_REG_RULE)))
 
     def setup_other_placeholder_text(self):
         self.var_name_input.setPlaceholderText(VAR_NAME_PLACEHOLDER_TEXT)

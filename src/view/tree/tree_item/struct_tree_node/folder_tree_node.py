@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMenu
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMenu
 
 from src.constant.bar_constant import ADD_DS_ACTION
 from src.constant.ds_type_constant import FOLDER_TYPE
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.tree_constant import ADD_STRUCT_ACTION, CREATE_NEW_FOLDER_ACTION, RENAME_FOLDER_ACTION, \
     DEL_FOLDER_ACTION, SELECT_ALL_ACTION, UNSELECT_ACTION, DEL_FOLDER_PROMPT, REFRESH_FOLDER_ACTION, \
     CANCEL_REFRESH_FOLDER_ACTION, DEL_FOLDER_BOX_TITLE
@@ -56,9 +56,9 @@ class FolderTreeNode(StructTreeNodeABC):
         # 当文件夹下存在正在刷新或正在打开的节点时，不显示选择子节点菜单
         if self.refreshing_child_count + self.opening_child_count == 0:
             # 如果当前节点复选框状态为全选，菜单应该增加取消全选
-            if self.item.checkState(0) == Qt.Checked:
+            if self.item.checkState(0) == Qt.CheckState.Checked:
                 self.add_menu(UNSELECT_ACTION, menu, with_item_name=False)
-            elif self.item.checkState(0) == Qt.PartiallyChecked:
+            elif self.item.checkState(0) == Qt.CheckState.PartiallyChecked:
                 # 如果当前节点复选框状态为部分选择，菜单应该增加全选和取消全选
                 self.add_menu(SELECT_ALL_ACTION, menu, with_item_name=False)
                 self.add_menu(UNSELECT_ACTION, menu, with_item_name=False)
@@ -80,10 +80,10 @@ class FolderTreeNode(StructTreeNodeABC):
             add_folder_func(self.tree_widget)
         # 全选
         elif func == SELECT_ALL_ACTION:
-            self.handle_child_item_checked(Qt.Checked)
+            self.handle_child_item_checked(Qt.CheckState.Checked)
         # 取消全选
         elif func == UNSELECT_ACTION:
-            self.handle_child_item_checked(Qt.Unchecked)
+            self.handle_child_item_checked(Qt.CheckState.Unchecked)
         # 重命名
         elif func == RENAME_FOLDER_ACTION.format(self.item_name):
             parent_item = self.item.parent()
@@ -126,13 +126,13 @@ class FolderTreeNode(StructTreeNodeABC):
     def calculate_check_state(self):
         # 如果不存在子元素，那么应该返回未选择
         if self.item.childCount() == 0:
-            return Qt.Unchecked
+            return Qt.CheckState.Unchecked
         # 如果子元素全选，那么应该返回全选，如果子元素全未选，应该返回未选择，否则返回部分选择
         check_set = {self.item.child(idx).checkState(0) for idx in range(self.item.childCount())}
         if len(check_set) == 1:
             return check_set.pop()
         else:
-            return Qt.PartiallyChecked
+            return Qt.CheckState.PartiallyChecked
 
     def show_check_box(self):
         check_state = self.calculate_check_state()
@@ -142,7 +142,7 @@ class FolderTreeNode(StructTreeNodeABC):
 
     def del_folder(self):
         # 删除结构体后，应该对同级别的其他项进行重排序
-        reorder_items = self.get_need_reorder_items()
+        reorder_items = self.get_need_reorder_item_records()
         tab_indexes, tab_ids = list(), list()
         self.get_child_tab_indexes_and_ids(self.item, tab_indexes, tab_ids)
         # 获取所有子节点的 opened id 和 存在 tab

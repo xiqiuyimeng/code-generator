@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QTreeWidgetItem, QListWidgetItem
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QTreeWidgetItem, QListWidgetItem
 
 from src.view.list_widget.list_item_func import set_template_file_data
 from src.view.list_widget.list_widget_abc import DraggableListWidgetABC
@@ -22,7 +22,7 @@ class TemplateMaintainFileConfigListWidget(DraggableListWidgetABC):
 
     def deal_source_list_item_data(self, source_item):
         # 从列表拖拽项到列表中，不需要做任何处理
-        pass
+        ...
 
     def deal_source_tree_item_data(self, source_item):
         # 从树中拖拽项到列表中

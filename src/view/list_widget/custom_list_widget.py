@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QAction
+from PyQt6.QtGui import QAction
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.constant.list_constant import EDIT_ITEM_ACTION, EDIT_LIST_ITEM_ICON, DEL_ITEM_ACTION, DEL_LIST_ITEM_ICON, \
     DEL_ITEM_PROMPT, DEL_ALL_ITEMS_ACTION, DEL_ALL_LIST_ITEMS_ICON, DEL_ALL_ITEMS_PROMPT, DEL_ITEM_BOX_TITLE, \
     DEL_ALL_ITEMS_BOX_TITLE

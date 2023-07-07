@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QVBoxLayout
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import QVBoxLayout
 
-from src.constant.icon_enum import get_icon
+from src.enum.icon_enum import get_icon
 from src.view.custom_widget.draggable_widget import DraggableDialog
 from src.view.frame.dialog_frame_abc import DialogFrameABC
 from src.view.frame.save_dialog_frame import SaveDialogFrame
@@ -38,7 +38,7 @@ class CustomDialogABC(DraggableDialog):
         # 不透明度
         self.setWindowOpacity(0.97)
         # 隐藏窗口边框
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
         self.dialog_layout = QVBoxLayout(self)
         self.dialog_layout.setContentsMargins(0, 0, 0, 0)

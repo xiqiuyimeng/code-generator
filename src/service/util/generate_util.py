@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-
+from src.enum.ds_category_enum import DsCategoryEnum
 from src.service.sql_ds_executor import *
 from src.service.system_storage.conn_sqlite import ConnSqlite
-from src.service.system_storage.ds_category_sqlite import DsCategoryEnum
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_sqlite import StructSqlite
 from src.service.util.struct_util import *
@@ -16,9 +15,9 @@ def convert_complete_table_cols(selected_data, type_mapping_dict):
     root_children = selected_data.root_children()
     first_node = tuple(root_children.values())[0]
     table_col_dict = dict()
-    if first_node.data.ds_category == DsCategoryEnum.sql_ds_category.value.name:
+    if first_node.data.ds_category == DsCategoryEnum.sql_ds_category.get_name():
         CollectSqlTableCol(table_col_dict, type_mapping_dict).collect_table_cols(root_children)
-    elif first_node.data.ds_category == DsCategoryEnum.struct_ds_category.value.name:
+    elif first_node.data.ds_category == DsCategoryEnum.struct_ds_category.get_name():
         CollectStructTableCol(table_col_dict, type_mapping_dict).collect_table_cols(root_children)
     return table_col_dict
 

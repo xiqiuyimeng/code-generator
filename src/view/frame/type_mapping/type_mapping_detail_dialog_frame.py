@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QLabel, QGridLayout, QPushButton, QFrame
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QLabel, QGridLayout, QPushButton, QFrame
 
 from src.constant.export_import_constant import OVERRIDE_TYPE_MAPPING_TITLE
 from src.constant.help.help_constant import TYPE_MAPPING_DETAIL_HELP
@@ -219,7 +219,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
     def set_del_mapping_button_available(self, checked):
         # 当表格存在行，再动态渲染删除映射按钮状态，否则置为不可用
         if self.col_type_table_widget.rowCount():
-            self.del_mapping_button.setDisabled(not checked)
+            self.del_mapping_button.setDisabled(checked == Qt.CheckState.Unchecked)
         else:
             self.del_mapping_button.setDisabled(True)
 
@@ -311,7 +311,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
 
     def init_del_button_status(self):
         # 删除类型映射按钮，初始应该是不可用状态
-        self.set_del_mapping_button_available(False)
+        self.set_del_mapping_button_available(Qt.CheckState.Unchecked)
         # 删除类型映射组按钮状态
         self.set_del_mapping_group_btn_available(self.col_type_table_widget.header_widget.max_group_num)
 

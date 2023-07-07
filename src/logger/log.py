@@ -10,7 +10,7 @@ _date_ = '2022/5/24 12:25'
 # 移除原本的控制台输出样式
 logger.remove()
 log_format = (
-    '<g>{time:YYYY-MM-DD HH:mm:ss}</g> '
+    '<g>{time:YYYY-MM-DD HH:mm:ss SSS}</g> '
     '| <level>{level: <8}</level> '
     '| <e>{thread.name: <12}</e> '
     '| <cyan>{name}</cyan>: <cyan>{function}</cyan>: <cyan>{line}</cyan> '

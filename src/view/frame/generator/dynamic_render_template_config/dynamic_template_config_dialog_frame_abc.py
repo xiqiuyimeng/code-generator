@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
 
 from src.constant.template_dialog_constant import TEMPLATE_CONFIG_LIST_BOX_TITLE, NO_TEMPLATE_CONFIG_ITEMS_TEXT, \
     NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE, NO_TEMPLATE_PROMPT, NO_TEMPLATE_TITLE

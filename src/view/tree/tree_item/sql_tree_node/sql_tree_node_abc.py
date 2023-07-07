@@ -7,4 +7,4 @@ _date_ = '2022/7/6 22:08'
 
 
 class SqlTreeNodeABC(TreeNodeABC):
-    pass
+    ...

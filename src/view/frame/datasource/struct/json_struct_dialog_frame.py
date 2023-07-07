@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.service.system_storage.struct_type import StructTypeEnum, StructType
+from src.enum.struct_type_enum import StructTypeEnum, StructType
 from src.view.custom_widget.syntax_highlighter.json_syntax_highlighter import JsonSyntaxHighLighter
 from src.view.frame.datasource.struct.struct_dialog_frame_abc import StructDialogFrameABC
 

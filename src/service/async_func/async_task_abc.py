@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import threading
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
-from PyQt5.QtGui import QMovie, QIcon
+from PyQt6.QtCore import QThread, pyqtSignal, QObject
+from PyQt6.QtGui import QMovie, QIcon
 
 from src.exception.exception import ThreadStopException
 from src.logger.log import logger as log
@@ -135,7 +135,7 @@ class LoadingMaskThreadExecutor(ThreadExecutorABC):
     """使用遮罩层作为任务开始时前置动作的调度器"""
 
     def __init__(self, masked_widget, *args, **kwargs):
-        self.loading_movie = QMovie(":/gif/loading.gif")
+        self.loading_movie = QMovie("gif:loading.gif")
         self.masked_widget = masked_widget
         self.loading_mask = LoadingMaskWidget(self.masked_widget, self.loading_movie)
         super().__init__(*args, **kwargs)
@@ -155,7 +155,7 @@ class IconMovieThreadExecutor(ThreadExecutorABC):
 
     def __init__(self, item, *args, **kwargs):
         self.item = item
-        self.icon_movie = QMovie(":/gif/loading_simple.gif")
+        self.icon_movie = QMovie("gif:loading_simple.gif")
         self.icon = self.item.icon(0)
         super().__init__(*args, **kwargs)
 
@@ -176,8 +176,8 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
     def __init__(self, item, window, *args, **kwargs):
         self.item = item
         self.tab_widget = ...
-        self.loading_gif = ":/gif/loading.gif"
-        self.icon_movie = QMovie(":/gif/loading_simple.gif")
+        self.loading_gif = "gif:loading.gif"
+        self.icon_movie = QMovie("gif:loading_simple.gif")
         # 首先获取 item 下所有的子节点，key -> item id, value -> item item_icon tab_dict
         self.item_dict = dict()
         self.get_item_dict(item, window)
