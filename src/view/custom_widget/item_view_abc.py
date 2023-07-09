@@ -68,9 +68,9 @@ class DraggableItemViewABC(ItemViewABC):
     def dropEvent(self, event: QDropEvent):
         """重写，实现拖拽效果"""
         # 获取拖入事件的坐标
-        pos = event.pos()
+        pos = event.position()
         # 获取当前坐标下的item
-        current_item = self.itemAt(pos)
+        current_item = self.itemAt(pos.toPoint())
 
         # 获取拖入item的父组件
         source_widget = event.source()

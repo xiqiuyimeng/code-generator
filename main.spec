@@ -47,6 +47,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='static/icon/exec.png',
 )
 coll = COLLECT(
     exe,
@@ -57,5 +58,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='代码生成器',
+    name='code-generator',
 )

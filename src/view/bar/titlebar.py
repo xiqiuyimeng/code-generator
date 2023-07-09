@@ -24,7 +24,7 @@ class TitleBar(DraggableWidget):
         self.button_height = menu_bar.sizeHint().height()
         self.setFixedHeight(self.title_height << 1)
         self.icon = QLabel()
-        self.icon.setPixmap(QPixmap(":/icon/exec.png").scaled(self.title_height, self.title_height))
+        self.icon.setPixmap(QPixmap("icon:exec.png").scaled(self.title_height, self.title_height))
         # 标题栏文字
         self.main_title = QLabel(GENERATOR_TITLE)
         self.main_title.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
