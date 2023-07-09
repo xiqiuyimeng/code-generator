@@ -29,4 +29,4 @@ class DsCategoryEnum(Enum):
 
 
 def get_ds_category_list():
-    return [ds_category for ds_category in DsCategoryEnum]
+    return [ds_category.value for ds_category in DsCategoryEnum]
