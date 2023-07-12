@@ -69,7 +69,7 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
 
     def make_item(self, text=None):
         item = TableWidgetItem(self)
-        item.setText(str(text) if text is not None else '')
+        item.setText(text)
         return item
 
     def insert_row(self, row_index):
