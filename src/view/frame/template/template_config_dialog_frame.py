@@ -86,7 +86,6 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.var_name_label = QLabel(self)
         self.var_name_label.setObjectName('form_label')
         self.var_name_input = QLineEdit(self)
-        self.var_name_input.setObjectName('var_name_input')
 
         self.name_layout.addRow(self.var_name_label, self.var_name_input)
 
@@ -253,8 +252,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
     def check_var_name_available(self, var_name):
         self.var_name_available = check_name_available(var_name, self.old_var_name, self.exits_var_names,
-                                                       self.var_name_input, self.var_name_checker,
-                                                       'var_name_input')
+                                                       self.var_name_input, self.var_name_checker)
 
     def button_available(self) -> bool:
         return self.name_input.displayText() and self.name_available \
