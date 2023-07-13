@@ -11,26 +11,28 @@ _date_ = '2023/4/3 12:47'
 
 
 def set_name_input_style(name_available: bool, current_name: str, old_name: str,
-                         name_input_qss_id: str, name_input: QLineEdit, name_checker: QLabel):
+                         name_input: QLineEdit, name_checker: QLabel):
     if name_available:
         # 如果名称无变化，提示
         if old_name == current_name:
             prompt = NAME_UNCHANGED_PROMPT
         else:
             prompt = NAME_AVAILABLE.format(current_name)
-        style = "color:green"
-        # 重载样式表
-        name_input.setStyleSheet(read_qss())
+        name_checker.setObjectName('checker_right')
+        name_input.setObjectName('')
     else:
         prompt = NAME_EXISTS.format(current_name)
-        style = "color:red"
-        name_input.setStyleSheet(f"#{name_input_qss_id}{{border-color:red;color:red}}")
+        name_checker.setObjectName('checker_wrong')
+        name_input.setObjectName('name_input')
+    name_input.setStyleSheet(read_qss())
     name_checker.setText(prompt)
-    name_checker.setStyleSheet(style)
+    name_checker.setStyleSheet(read_qss())
 
 
 def reset_name_input_style(name_input: QLineEdit, name_checker: QLabel):
+    name_input.setObjectName('')
     name_input.setStyleSheet(read_qss())
+    name_checker.setObjectName('')
     name_checker.setStyleSheet(read_qss())
     name_checker.setText('')
 
@@ -45,10 +47,10 @@ def check_available(name, old_name, exits_names):
         return name not in exits_names
 
 
-def check_name_available(name, old_name, exits_names, name_input, name_checker, name_input_qss_id):
+def check_name_available(name, old_name, exits_names, name_input, name_checker):
     if name:
         name_available = check_available(name, old_name, exits_names)
-        set_name_input_style(name_available, name, old_name, name_input_qss_id, name_input, name_checker)
+        set_name_input_style(name_available, name, old_name, name_input, name_checker)
         return name_available
     else:
         reset_name_input_style(name_input, name_checker)
@@ -60,12 +62,12 @@ def check_name_available(name, old_name, exits_names, name_input, name_checker, 
 def check_text_available(text: str, exists_data_list, duplicate_checker: QLabel, duplicate_prompt: str):
     text_available = text not in exists_data_list
     if text_available:
-        duplicate_checker.setStyleSheet(read_qss())
+        duplicate_checker.setObjectName('')
         duplicate_checker.setText('')
     else:
-        style = "color:red"
+        duplicate_checker.setObjectName('checker_wrong')
         duplicate_checker.setText(duplicate_prompt)
-        duplicate_checker.setStyleSheet(style)
+    duplicate_checker.setStyleSheet(read_qss())
     return text_available
 
 

@@ -52,7 +52,6 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.name_label.setObjectName('form_label')
 
         self.name_input = QLineEdit(self)
-        self.name_input.setObjectName('name_input')
 
         self.name_layout.addRow(self.name_label, self.name_input)
 
@@ -73,7 +72,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
 
     def check_name_available(self, name):
         self.name_available = check_name_available(name, self.old_name, self.exits_names,
-                                                   self.name_input, self.name_checker, 'name_input')
+                                                   self.name_input, self.name_checker)
 
     def check_input(self):
         # 收集用户输入数据

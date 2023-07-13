@@ -188,6 +188,15 @@ QToolTip{
     font-weight: bold;
 }
 
+/* 检查器，正确配色 */
+#checker_right{
+    color: green;
+}
+/* 检查器，错误配色 */
+#checker_wrong{
+    color: red;
+}
+
 /**************************************** label 文本样式设置 end ****************************************/
 
 /**************************************** linedit 输入框文本样式设置 start ****************************************/
@@ -205,6 +214,12 @@ QLineEdit:hover{
 /* 输入框禁用边框颜色 */
 QLineEdit:disabled{
     border:1px solid gray;
+}
+
+/* 名称输入框样式 */
+#name_input{
+    border-color:red;
+    color:red
 }
 
 /**************************************** linedit 输入框文本样式设置 end ****************************************/
