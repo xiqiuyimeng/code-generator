@@ -38,7 +38,7 @@ class TextInputDelegate(QItemDelegate):
 
     def createEditor(self, parent: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex) -> QWidget:
         """创建编辑器，只有在编辑时才会触发，编辑器控件选择combox"""
-        self.input_dialog = TableItemInputDelegateDialog(index.row(), index.column(),
+        self.input_dialog = TableItemInputDelegateDialog(index.row() + 1, index.column(),
                                                          bool(self.get_exists_data_list_func),
                                                          self.duplicate_prompt)
         self.input_dialog.setModal(True)
