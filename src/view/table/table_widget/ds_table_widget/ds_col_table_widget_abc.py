@@ -82,9 +82,9 @@ class DsColTableWidgetABC(TableWidgetABC):
 
     def data_change(self, item):
         # 数据变化时触发
-        if not self.filling_table:
-            # 保存数据
-            self.save_data(item.row(), item.column(), item.text())
+        # if not self.filling_table:
+        # 保存数据
+        self.save_data(item.row(), item.column(), item.text())
 
     def batch_deal_checked(self, check_state):
         # 调用批量处理方法保存数据
@@ -94,7 +94,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         """
         根据列数据构建表格
         """
-        self.filling_table = True
+        # 先断开信号
+        self.itemChanged.disconnect()
         # 填充数据
         for i, col in enumerate(self.cols):
             # 插入新的一行
@@ -112,8 +113,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.fill_post_process()
         # 处理表头复选框
         self.table_header.calculate_header_check_state()
-
-        self.filling_table = False
+        # 表格填充完毕再连接信号
+        self.itemChanged.connect(self.data_change)
 
     def make_checkbox_num_widget(self, row_index, col_data) -> QWidget:
         ...
