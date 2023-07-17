@@ -22,8 +22,6 @@ class TableHeaderABC(TableWidgetABC):
         self.column_count = column_count
         self.parent_table = parent_table
         self.check_box: CheckBox = ...
-        # 是否正在批量操作
-        self.batch_operating = False
         super().__init__(*args)
 
     def setup_other_ui(self):
@@ -84,15 +82,12 @@ class TableHeaderABC(TableWidgetABC):
         ...
 
     def change_child_check_state(self, check_state):
-        # 设置正在批量处理标志位
-        self.batch_operating = True
         for row_idx in range(self.parent_table.rowCount()):
             cell_widget = self.parent_table.cellWidget(row_idx, 0)
             if hasattr(cell_widget, 'check_box'):
                 check_box = self.parent_table.cellWidget(row_idx, 0).check_box
                 if check_box.checkState() != check_state:
                     check_box.setCheckState(check_state)
-        self.batch_operating = False
 
     def calculate_header_check_state(self):
         """根据父表中所有复选框的状态，计算表头复选框状态"""

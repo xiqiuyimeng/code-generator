@@ -52,8 +52,9 @@ class TableItemInputDelegateDialogFrame(SaveDialogFrame):
             self.text_editor.textChanged.connect(self.check_text_available)
 
     def check_text_available(self):
-        if self.check_text_duplicate:
-            text_available = check_text_available(self.text_editor.toPlainText(), self.exists_data_list,
+        text = self.text_editor.toPlainText()
+        if text:
+            text_available = check_text_available(text, self.exists_data_list,
                                                   self.text_checker, self.duplicate_prompt)
             if text_available:
                 self.save_button.setDisabled(False)
