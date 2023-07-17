@@ -30,13 +30,6 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
         # 默认行号隐藏
         self.verticalHeader().setHidden(True)
 
-        # 设置表头字体加粗
-        font = self.horizontalHeader().font()
-        # 比原字体略大一点
-        font.setPointSize(font.pointSize() + 1)
-        font.setBold(True)
-        self.horizontalHeader().setFont(font)
-
         self.setup_other_ui()
 
     def setup_other_ui(self):

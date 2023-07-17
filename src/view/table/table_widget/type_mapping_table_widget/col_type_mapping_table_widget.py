@@ -320,7 +320,7 @@ class ColTypeMappingTableWidget(ColTypeMappingTableWidgetABC):
 
     def sync_col_types(self, col_types):
         exists_col_types = [self._get_col_type(row) for row in range(self.rowCount())]
-        for idx, col_type in enumerate(col_types):
+        for col_type in col_types:
             if col_type not in exists_col_types:
                 self.add_type_mapping()
                 self._set_col_type_item(self.rowCount() - 1, col_type)
