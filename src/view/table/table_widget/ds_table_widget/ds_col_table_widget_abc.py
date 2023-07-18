@@ -26,7 +26,6 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.tree_data = self.tree_widget.tree_data
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
-        self.filling_table = False
         # 保存代理引用
         self.combox_delegate: ComboboxDelegate = ...
         self.text_input_delegate: TextInputDelegate = ...
@@ -81,8 +80,6 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.table_header.header_clicked.connect(self.batch_deal_checked)
 
     def data_change(self, item):
-        # 数据变化时触发
-        # if not self.filling_table:
         # 保存数据
         self.save_data(item.row(), item.column(), item.text())
 

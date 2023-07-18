@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QPushButton, QFrame, QVBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QPushButton, QGridLayout
 
 from src.service.async_func.async_task_abc import LoadingMaskThreadExecutor
 from src.view.box.message_box import pop_question
@@ -18,9 +18,6 @@ class TableDialogFrame(DialogFrameABC):
     """通用表格对话框框架，包含一个主体展示表格及相关操作按钮"""
 
     def __init__(self, *args, **kwargs):
-        # 表格主体框架
-        self.table_frame: QFrame = ...
-        self.table_frame_layout: QVBoxLayout = ...
         # 操作表格按钮布局
         self.operation_table_btn_layout: QGridLayout = ...
         # 添加新行按钮
@@ -54,19 +51,13 @@ class TableDialogFrame(DialogFrameABC):
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def setup_content_ui(self):
-        # 类型映射表格
-        self.table_frame = QFrame(self)
-        self.table_frame_layout = QVBoxLayout(self.table_frame)
-        # 将表格布局边距清空
-        self.table_frame_layout.setContentsMargins(0, 0, 0, 0)
         # 操作按钮组
-        self.operation_table_btn_layout = QGridLayout(self.table_frame)
+        self.operation_table_btn_layout = QGridLayout()
         self.setup_operation_button()
-        self.table_frame_layout.addLayout(self.operation_table_btn_layout)
+        self.frame_layout.addLayout(self.operation_table_btn_layout)
         # 创建表格
         self.make_table_widget()
-        self.table_frame_layout.addWidget(self.table_widget)
-        self.frame_layout.addWidget(self.table_frame)
+        self.frame_layout.addWidget(self.table_widget)
 
     def setup_operation_button(self):
         first_operation_button = self.setup_first_button()

@@ -16,8 +16,8 @@ class TemplateConfigDialog(CustomSaveDialogABC):
     save_signal = pyqtSignal(TemplateConfig)
     edit_signal = pyqtSignal(TemplateConfig)
 
-    def __init__(self, exits_names, exits_var_names, config_type, template_config=None):
-        self.exits_names = exits_names
+    def __init__(self, exists_names, exits_var_names, config_type, template_config=None):
+        self.exists_names = exists_names
         self.exits_var_names = exits_var_names
         self.config_type = config_type
         self.template_config = template_config
@@ -32,5 +32,5 @@ class TemplateConfigDialog(CustomSaveDialogABC):
         self.resize(self.window_geometry.width() * 0.5, self.window_geometry.height() * 0.5)
 
     def get_frame(self) -> TemplateConfigDialogFrame:
-        return TemplateConfigDialogFrame(self, self.dialog_title, self.exits_names,
+        return TemplateConfigDialogFrame(self, self.dialog_title, self.exists_names,
                                          self.exits_var_names, self.config_type, self.template_config)
