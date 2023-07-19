@@ -79,7 +79,6 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.collect_input()
         # 如果输入框都有值，那么就开放按钮，否则关闭
         if self.button_available():
-            self.set_other_button_available()
             # 如果数据变化，应该放开保存按钮
             if self.check_data_changed():
                 self.save_button.setDisabled(False)
@@ -88,7 +87,6 @@ class NameCheckDialogFrame(SaveDialogFrame):
                 self.save_button.setDisabled(True)
         else:
             self.save_button.setDisabled(True)
-            self.init_other_button_status()
 
     def collect_input(self):
         ...
@@ -96,13 +94,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
     def button_available(self) -> bool:
         ...
 
-    def set_other_button_available(self):
-        ...
-
     def check_data_changed(self) -> bool:
-        ...
-
-    def init_other_button_status(self):
         ...
 
     def connect_child_signal(self):
