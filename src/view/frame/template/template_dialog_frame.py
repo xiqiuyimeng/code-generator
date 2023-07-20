@@ -25,7 +25,7 @@ class TemplateDialogFrame(TableDialogFrame):
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def make_table_widget(self):
-        self.table_widget = TemplateTableWidget(self.table_frame)
+        self.table_widget = TemplateTableWidget(self)
 
     def setup_other_label_text(self):
         self.add_row_button.setText(ADD_TEMPLATE_BTN_TEXT)

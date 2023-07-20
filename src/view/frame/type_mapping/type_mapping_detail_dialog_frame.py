@@ -261,7 +261,7 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
             self.edit_type_mapping_executor.start()
         else:
             # 如果名称存在，那么是覆盖模式
-            if self.new_dialog_data.mapping_name in self.exits_names:
+            if self.new_dialog_data.mapping_name in self.exists_names:
                 self.override_data_executor = OverrideTypeMappingExecutor((self.new_dialog_data,), self, self,
                                                                           OVERRIDE_TYPE_MAPPING_TITLE,
                                                                           success_callback=self.override_post_process)

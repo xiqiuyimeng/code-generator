@@ -26,7 +26,6 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.tree_data = self.tree_widget.tree_data
         self.tree_item = parent.tree_item
         self.table_header: CheckBoxHeader = ...
-        self.filling_table = False
         # 保存代理引用
         self.combox_delegate: ComboboxDelegate = ...
         self.text_input_delegate: TextInputDelegate = ...
@@ -81,8 +80,6 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.table_header.header_clicked.connect(self.batch_deal_checked)
 
     def data_change(self, item):
-        # 数据变化时触发
-        # if not self.filling_table:
         # 保存数据
         self.save_data(item.row(), item.column(), item.text())
 
@@ -94,8 +91,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         """
         根据列数据构建表格
         """
-        # 先断开信号
-        self.itemChanged.disconnect()
+        # 屏蔽信号
+        self.blockSignals(True)
         # 填充数据
         for i, col in enumerate(self.cols):
             # 插入新的一行
@@ -113,8 +110,8 @@ class DsColTableWidgetABC(TableWidgetABC):
         self.fill_post_process()
         # 处理表头复选框
         self.table_header.calculate_header_check_state()
-        # 表格填充完毕再连接信号
-        self.itemChanged.connect(self.data_change)
+        # 表格填充完毕再恢复信号
+        self.blockSignals(False)
 
     def make_checkbox_num_widget(self, row_index, col_data) -> QWidget:
         ...

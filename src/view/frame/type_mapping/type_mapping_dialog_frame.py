@@ -36,7 +36,7 @@ class TypeMappingDialogFrame(TableDialogFrame):
     # ------------------------------ 创建ui界面 start ------------------------------ #
 
     def make_table_widget(self):
-        self.table_widget = TypeMappingTableWidget(self.table_frame)
+        self.table_widget = TypeMappingTableWidget(self)
 
     def setup_first_button(self) -> QPushButton:
         self.open_ds_col_type_button = QPushButton(self)

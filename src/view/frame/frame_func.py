@@ -37,19 +37,19 @@ def reset_name_input_style(name_input: QLineEdit, name_checker: QLabel):
     name_checker.setText('')
 
 
-def check_available(name, old_name, exits_names):
+def check_available(name, old_name, exists_names):
     if old_name:
         # 假如原有的名称已经重复，那么再输入一遍原有名称，应该提示不可用
-        if exits_names.count(old_name) > 1 and name == old_name:
+        if exists_names.count(old_name) > 1 and name == old_name:
             return False
-        return (old_name != name and name not in exits_names) or old_name == name
+        return (old_name != name and name not in exists_names) or old_name == name
     else:
-        return name not in exits_names
+        return name not in exists_names
 
 
-def check_name_available(name, old_name, exits_names, name_input, name_checker):
+def check_name_available(name, old_name, exists_names, name_input, name_checker):
     if name:
-        name_available = check_available(name, old_name, exits_names)
+        name_available = check_available(name, old_name, exists_names)
         set_name_input_style(name_available, name, old_name, name_input, name_checker)
         return name_available
     else:

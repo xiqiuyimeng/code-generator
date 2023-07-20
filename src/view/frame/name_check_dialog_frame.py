@@ -14,11 +14,11 @@ _date_ = '2023/4/3 12:43'
 class NameCheckDialogFrame(SaveDialogFrame):
     """具有名称检查功能的对话框框架，内置一个名称输入表单"""
 
-    def __init__(self, parent_dialog, dialog_title, exits_names,
+    def __init__(self, parent_dialog, dialog_title, exists_names,
                  dialog_data=None, read_storage=True, **kwargs):
         # 框架布局，分四部分，第一部分：标题部分，第二部分：名称表单，第三部分：其他内容，第四部分：按钮部分
         # 存储当前已经存在的名称列表
-        self.exits_names = exits_names
+        self.exists_names = exists_names
         # 原数据对象，编辑时，回显数据使用
         self.dialog_data = dialog_data
         # 是否读取存储的数据，如果开启，将从数据库异步读取数据，否则将使用 dialog_data 回显数据
@@ -71,7 +71,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.connect_child_signal()
 
     def check_name_available(self, name):
-        self.name_available = check_name_available(name, self.old_name, self.exits_names,
+        self.name_available = check_name_available(name, self.old_name, self.exists_names,
                                                    self.name_input, self.name_checker)
 
     def check_input(self):
@@ -79,7 +79,6 @@ class NameCheckDialogFrame(SaveDialogFrame):
         self.collect_input()
         # 如果输入框都有值，那么就开放按钮，否则关闭
         if self.button_available():
-            self.set_other_button_available()
             # 如果数据变化，应该放开保存按钮
             if self.check_data_changed():
                 self.save_button.setDisabled(False)
@@ -88,7 +87,6 @@ class NameCheckDialogFrame(SaveDialogFrame):
                 self.save_button.setDisabled(True)
         else:
             self.save_button.setDisabled(True)
-            self.init_other_button_status()
 
     def collect_input(self):
         ...
@@ -96,13 +94,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
     def button_available(self) -> bool:
         ...
 
-    def set_other_button_available(self):
-        ...
-
     def check_data_changed(self) -> bool:
-        ...
-
-    def init_other_button_status(self):
         ...
 
     def connect_child_signal(self):

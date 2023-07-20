@@ -152,7 +152,7 @@ class TemplateDetailDialogFrame(StackedDialogFrame):
                 self.edit_template_executor.start()
             else:
                 # 如果名称存在，那么是覆盖模式
-                if self.new_dialog_data.template_name in self.exits_names:
+                if self.new_dialog_data.template_name in self.exists_names:
                     self.override_data_executor = OverrideTemplateExecutor((self.new_dialog_data,), self, self,
                                                                            OVERRIDE_TEMPLATE_TITLE,
                                                                            success_callback=self.override_post_process)

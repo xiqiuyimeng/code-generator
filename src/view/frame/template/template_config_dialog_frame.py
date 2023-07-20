@@ -27,9 +27,9 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
     save_signal = pyqtSignal(TemplateConfig)
     edit_signal = pyqtSignal(TemplateConfig)
 
-    def __init__(self, parent_dialog, dialog_title, exits_names, exits_var_names,
+    def __init__(self, parent_dialog, dialog_title, exists_names, exists_var_names,
                  config_type, template_config=None):
-        self.exits_var_names = exits_var_names
+        self.exists_var_names = exists_var_names
         self.config_type = config_type
         self.old_var_name: str = ...
         self.var_name_available: bool = ...
@@ -75,7 +75,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         # 取值范围下拉框，添加值按钮
         self.add_value_button: QPushButton = ...
         self.save_range_value_dialog: SimpleNameCheckDialog = ...
-        super().__init__(parent_dialog, dialog_title, exits_names, template_config, read_storage=False)
+        super().__init__(parent_dialog, dialog_title, exists_names, template_config, read_storage=False)
 
     def get_new_dialog_data(self) -> TemplateConfig:
         return TemplateConfig()
@@ -251,7 +251,7 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
         self.placeholder_input.textEdited.connect(self.check_input)
 
     def check_var_name_available(self, var_name):
-        self.var_name_available = check_name_available(var_name, self.old_var_name, self.exits_var_names,
+        self.var_name_available = check_name_available(var_name, self.old_var_name, self.exists_var_names,
                                                        self.var_name_input, self.var_name_checker)
 
     def button_available(self) -> bool:
