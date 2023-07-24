@@ -201,6 +201,8 @@ class SqliteBasic:
             select_sql += f' {where_clause}'
         if order_by:
             select_sql += f' order by {order_by} {sort_order}'
+        if not fetch_all:
+            select_sql += ' limit 1'
         log.info(f'查询[{self.table_name}]语句 ==> {select_sql}')
         cursor = get_cursor()
         if params:

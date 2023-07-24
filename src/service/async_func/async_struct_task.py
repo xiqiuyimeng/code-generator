@@ -86,7 +86,8 @@ class DelStructWorker(ThreadWorkerABC):
         opened_tree_item_sqlite = OpenedTreeItemSqlite()
         opened_tree_item_sqlite.delete_by_id(self.opened_item.id)
         # 重新排序需要排序的 opened item
-        opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
+        if self.reorder_items:
+            opened_tree_item_sqlite.reorder_opened_items(self.reorder_items)
         # 删除tab
         if self.table_tab:
             DsTableTabSqlite().remove_tab(self.table_tab)
