@@ -160,7 +160,7 @@ class OpenedTreeItemSqlite(SqliteBasic):
         opened_tree_item.parent_id = parent_id
         opened_tree_item.level = level
         opened_tree_item.ds_category = ds_category
-        opened_tree_item.checked = CheckedEnum.unchecked.value
+        opened_tree_item.checked = Qt.CheckState.Unchecked.value
         condition = Condition(self.table_name)
         condition.add('ds_category', ds_category)
         condition.add('level', level)
