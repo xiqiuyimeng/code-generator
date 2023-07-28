@@ -257,31 +257,31 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
             self.edit_type_mapping_executor = EditTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
                                                                       self.parent_dialog,
                                                                       EDIT_TYPE_MAPPING_BOX_TITLE,
-                                                                      self.edit_post_process)
+                                                                      self.edit_callback)
             self.edit_type_mapping_executor.start()
         else:
             # 如果名称存在，那么是覆盖模式
             if self.new_dialog_data.mapping_name in self.exists_names:
                 self.override_data_executor = OverrideTypeMappingExecutor((self.new_dialog_data,), self, self,
                                                                           OVERRIDE_TYPE_MAPPING_TITLE,
-                                                                          success_callback=self.override_post_process)
+                                                                          success_callback=self.override_callback)
                 self.override_data_executor.start()
             else:
                 self.add_type_mapping_executor = AddTypeMappingExecutor(self.new_dialog_data, self.parent_dialog,
                                                                         self.parent_dialog,
                                                                         ADD_TYPE_MAPPING_BOX_TITLE,
-                                                                        self.add_post_process)
+                                                                        self.add_callback)
                 self.add_type_mapping_executor.start()
 
-    def add_post_process(self):
+    def add_callback(self):
         self.save_signal.emit(self.new_dialog_data)
         self.parent_dialog.close()
 
-    def override_post_process(self, add_data_list, del_data_list):
+    def override_callback(self, add_data_list, del_data_list):
         self.override_signal.emit(add_data_list, del_data_list)
         self.parent_dialog.close()
 
-    def edit_post_process(self):
+    def edit_callback(self):
         self.edit_signal.emit(self.new_dialog_data)
         self.parent_dialog.close()
 
