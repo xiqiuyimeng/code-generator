@@ -38,7 +38,7 @@ TYPE_MAPPING_INFO_TEXT = '基本信息'
 TYPE_MAPPING_COL_TABLE_TEXT = '列类型映射'
 TYPE_MAPPING_NAME = '类型映射名称：'
 DS_TYPE_TEXT = '数据源类型：'
-TYPE_MAPPING_COMMENT_TEXT = '备\t\b\b注：'
+TYPE_MAPPING_COMMENT_TEXT = '备\b\b\b\b注：'
 
 # 同步数据源列类型按钮
 SYNC_DS_COL_TYPE_BTN_TEXT = '同步当前数据源列类型'
