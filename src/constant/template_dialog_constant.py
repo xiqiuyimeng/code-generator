@@ -20,7 +20,7 @@ COPY_TEMPLATE_BOX_TITLE = '复制模板'
 # 删除模板消息对话框标题
 DEL_TEMPLATE_BOX_TITLE = '删除模板'
 DEL_TEMPLATE_PROMPT = '模板：{}\n确认删除模板吗？'
-BATCH_TEMPLATE_PROMPT = '已选择{}个模板\n确认删除选中的模板吗？'
+BATCH_DEL_TEMPLATE_PROMPT = '已选择{}个模板\n确认删除选中的模板吗？'
 
 # 模板详细信息
 CREATE_TEMPLATE_TITLE = '添加模板'
@@ -44,7 +44,7 @@ TEMPLATE_OUTPUT_DIR_TAB_TEXT = '模板输出路径配置详情'
 TEMPLATE_VAR_CONFIG_TAB_TEXT = '模板变量配置详情'
 # 按钮
 ADD_CONFIG_BTN_TEXT = '添加配置项'
-REMOVE_CONFIG_BTN_TEXT = '移除配置项'
+REMOVE_CONFIG_BTN_TEXT = '删除配置项'
 PREVIEW_CONFIG_BTN_TEXT = '预览模板配置页'
 AUTO_GENERATE_OUTPUT_CONFIG_BTN_TEXT = '生成文件输出路径配置'
 MAINTAIN_FILE_CONFIG_BTN_TEXT = '维护文件输出路径'
