@@ -4,7 +4,7 @@ from src.constant.export_import_constant import EXPORT_TEMPLATE_TITLE, EXPORT_TE
     PROCESS_DUPLICATE_TEMPLATE_TITLE, OVERRIDE_TEMPLATE_TITLE, PROCESS_ILLEGAL_TEMPLATE_TITLE, IMPORT_TEMPLATE_TITLE
 from src.constant.help.help_constant import TEMPLATE_TABLE_HELP
 from src.constant.template_dialog_constant import ADD_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_BTN_TEXT, DEL_TEMPLATE_PROMPT, \
-    DEL_TEMPLATE_BOX_TITLE, BATCH_TEMPLATE_PROMPT, TEMPLATE_LIST_BOX_TITLE, IMPORT_TEMPLATE_BTN_TEXT, \
+    DEL_TEMPLATE_BOX_TITLE, BATCH_DEL_TEMPLATE_PROMPT, TEMPLATE_LIST_BOX_TITLE, IMPORT_TEMPLATE_BTN_TEXT, \
     EXPORT_TEMPLATE_BTN_TEXT, COPY_TEMPLATE_BTN_TEXT, COPY_TEMPLATE_BOX_TITLE
 from src.service.async_func.async_template_task import DelTemplateExecutor, BatchDelTemplateExecutor, \
     ListTemplateExecutor, ExportTemplateExecutor, ImportTemplateExecutor, OverrideTemplateExecutor, \
@@ -54,7 +54,7 @@ class TemplateDialogFrame(TableDialogFrame):
                                    del_title, self.table_widget.del_row)
 
     def get_batch_del_prompt_title(self):
-        return BATCH_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
+        return BATCH_DEL_TEMPLATE_PROMPT, DEL_TEMPLATE_BOX_TITLE
 
     def get_batch_del_executor(self, delete_ids, delete_names, del_title) -> BatchDelTemplateExecutor:
         return BatchDelTemplateExecutor(delete_ids, delete_names, self.parent_dialog, self.parent_dialog,
