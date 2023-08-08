@@ -291,6 +291,8 @@ class TypeMappingDetailDialogFrame(StackedDialogFrame):
 
     def post_process(self):
         super().post_process()
+        for index in range(self.col_type_button_layout.count()):
+            self.col_type_button_layout.itemAt(index).widget().setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # 获取数据源列类型
         self.list_ds_col_type_executor = ListDsColTypeExecutor(self.parent_dialog, self.parent_dialog,
                                                                DS_COL_TYPE_LIST_BOX_TITLE,

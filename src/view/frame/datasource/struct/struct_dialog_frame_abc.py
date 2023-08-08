@@ -194,8 +194,6 @@ class StructDialogFrameABC(DsDialogFrameABC):
     def post_process(self):
         super().post_process()
         # 清除焦点
-        self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pretty_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def get_read_storage_executor(self, callback):

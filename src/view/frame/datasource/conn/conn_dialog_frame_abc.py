@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import dataclasses
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import QPushButton
 
 from src.constant.ds_dialog_constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, TEST_CONN_BOX_TITLE, \
@@ -139,6 +139,11 @@ class ConnDialogFrameABC(DsDialogFrameABC):
     # ------------------------------ 信号槽处理 end ------------------------------ #
 
     # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.test_conn_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def get_read_storage_executor(self, callback):
         return QueryConnInfoExecutor(self.dialog_data, self.parent_dialog, self.parent_dialog,

@@ -105,6 +105,7 @@ class NameCheckDialogFrame(SaveDialogFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
         self.setup_input_limit_rule()
         self.setup_placeholder_text()
         # 如果读取数据库，那么打开线程执行器

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton
 
 from src.view.frame.dialog_frame_abc import DialogFrameABC
@@ -48,6 +49,16 @@ class ChainDialogFrameABC(DialogFrameABC):
             self.parent_dialog.close()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.previous_frame_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.next_frame_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    # ------------------------------ 后置处理 end ------------------------------ #
 
     def set_previous_frame(self, frame):
         self.previous_frame = frame

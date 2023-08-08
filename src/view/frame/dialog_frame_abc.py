@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QGridLayout, QPushButton
 
 from src.constant.dialog_constant import QUIT_BTN_TEXT, HELP_BTN_TEXT
@@ -135,7 +136,10 @@ class DialogFrameABC(QFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
-        ...
+        # 清除焦点
+        self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        if self.need_help_button:
+            self.help_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     # ------------------------------ 后置处理 end ------------------------------ #
 

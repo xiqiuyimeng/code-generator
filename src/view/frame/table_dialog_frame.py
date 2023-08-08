@@ -230,6 +230,10 @@ class TableDialogFrame(DialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
+        # 清除所有按钮焦点
+        for index in range(self.operation_table_btn_layout.count()):
+            self.operation_table_btn_layout.itemAt(index).widget().setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.list_table_data_executor = self.get_list_table_data_executor()
         self.list_table_data_executor.start()
         # 设置删除行按钮初始状态

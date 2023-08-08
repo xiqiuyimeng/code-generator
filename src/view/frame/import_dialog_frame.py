@@ -72,6 +72,7 @@ class ImportDialogFrame(ImportExportDialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
         # 操作按钮开始应该是禁用的
         self.start_process_button.setDisabled(True)
 

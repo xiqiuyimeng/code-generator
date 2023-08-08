@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt6.QtCore import pyqtSignal, QRegularExpression
+from PyQt6.QtCore import pyqtSignal, QRegularExpression, Qt
 from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtWidgets import QLabel, QLineEdit, QGridLayout, QComboBox, QStackedWidget, QWidget, QFormLayout, \
     QPushButton
@@ -344,6 +344,8 @@ class TemplateConfigDialogFrame(NameCheckDialogFrame):
 
     def post_process(self):
         super().post_process()
+        # 清除焦点
+        self.add_value_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # 设置回显数据完成
         self.echo_data_complete = True
 

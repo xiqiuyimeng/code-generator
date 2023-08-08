@@ -40,6 +40,7 @@ class TemplateFileWidget(QWidget):
         self.setup_ui()
         self.setup_label_text()
         self.connect_signal()
+        self.post_process()
 
     def setup_ui(self):
         self._layout = QHBoxLayout(self)
@@ -147,3 +148,8 @@ class TemplateFileWidget(QWidget):
 
     def collect_unbind_config_files(self):
         return self.file_list_widget.collect_unbind_config_files()
+
+    def post_process(self):
+        # 清除焦点
+        self.create_new_file_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.locate_file_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)

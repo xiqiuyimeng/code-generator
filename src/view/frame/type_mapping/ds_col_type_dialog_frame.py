@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QLabel, QStackedWidget, QListWidgetItem
 
 from src.constant.help.help_constant import DS_COL_TYPE_HELP
@@ -102,6 +103,8 @@ class DsColTypeDialogFrame(SaveDialogFrame):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
+        self.add_ds_col_type_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.list_ds_col_type_executor = ListDsColTypeExecutor(self.parent_dialog, self.parent_dialog,
                                                                DS_COL_TYPE_LIST_BOX_TITLE,
                                                                self.list_col_type_callback)

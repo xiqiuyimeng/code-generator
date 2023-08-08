@@ -47,6 +47,7 @@ class TemplateCopyFuncDialogFrame(DialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
         self.list_has_func_template_executor = ListHasFuncTemplateExecutor(self.excluded_template_id,
                                                                            self.parent_dialog, self.parent_dialog,
                                                                            HAS_FUNC_TEMPLATE_LIST_BOX_TITLE,

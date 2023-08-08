@@ -61,6 +61,7 @@ class ExportDialogFrame(ImportExportDialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
         # 给一个默认导出文件地址，当前路径 / 导出文件名
         self.file_path_linedit.setText(f'{QDir().absolutePath()}/{self.default_export_file_name}')
 
