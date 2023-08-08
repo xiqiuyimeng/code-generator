@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtCore import pyqtSignal
 
 from src.constant.help.help_constant import TEMPLATE_FUNC_DETAIL_HELP
 from src.constant.template_dialog_constant import TEMPLATE_FUNC_NAME_PLACEHOLDER_TEXT
@@ -73,10 +73,6 @@ class TemplateFuncDetailDialogFrame(NameCheckDialogFrame):
         super().post_process()
         # 名称框不可编辑
         self.name_input.setDisabled(True)
-        # 清除焦点
-        self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.help_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def setup_input_limit_rule(self):
         ...

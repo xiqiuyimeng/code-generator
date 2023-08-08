@@ -176,3 +176,14 @@ class PreviewFileDialogFrame(DialogFrameABC):
         self.save_file_dialog.exec()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.locate_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.rename_file_name_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.save_file_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    # ------------------------------ 后置处理 end ------------------------------ #

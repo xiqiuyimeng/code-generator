@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
 
 from src.constant.template_dialog_constant import TEMPLATE_CONFIG_LIST_BOX_TITLE, NO_TEMPLATE_CONFIG_ITEMS_TEXT, \
@@ -147,14 +146,6 @@ class DynamicTemplateConfigDialogFrameABC(ChainDialogFrameABC):
         super().connect_other_signal()
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
-
-    # ------------------------------ 后置处理 start ------------------------------ #
-
-    def post_process(self):
-        # 清除焦点
-        self.dialog_quit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-    # ------------------------------ 后置处理 end ------------------------------ #
 
     def switch_frame(self, frame):
         # 只要不是回退，都需要收集数据

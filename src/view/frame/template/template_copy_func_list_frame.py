@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QHBoxLayout, QPushButton, QLabel
 
 from src.constant.help.help_constant import TEMPLATE_COPY_FUNC_HELP
@@ -95,6 +96,13 @@ class TemplateCopyFuncListFrame(DialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.select_all_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.unselect_all_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.copy_func_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.back_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
         box_title = TEMPLATE_FUNC_BOX_TITLE.format(self.dialog_title)
         self.list_template_func_executor = ListTemplateFuncExecutor(self.template_id, self.parent_dialog,
                                                                     self.parent_dialog, box_title,

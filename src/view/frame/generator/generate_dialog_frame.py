@@ -167,6 +167,9 @@ class GenerateDialogFrame(ChainDialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.preview_generate_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # 初始化进度条
         self.before_generate_work()
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QLabel, QFormLayout, QLineEdit, QPushButton
 
@@ -70,3 +71,12 @@ class ImportExportDialogFrameABC(DialogFrameABC):
     def get_process_data_executor(self) -> LoadingMaskThreadExecutor: ...
 
     # ------------------------------ 信号槽处理 end ------------------------------ #
+
+    # ------------------------------ 后置处理 start ------------------------------ #
+
+    def post_process(self):
+        super().post_process()
+        # 清除焦点
+        self.start_process_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    # ------------------------------ 后置处理 end ------------------------------ #

@@ -52,6 +52,7 @@ class HelpDialogFrame(DialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
         # 根据当前传进来的帮助信息类型决定展示哪一页
         self.list_widget.setCurrentRow(self.help_info_type_tuple.index(self.help_info_type))
 

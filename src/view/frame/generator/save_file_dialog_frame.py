@@ -39,6 +39,7 @@ class SaveFileDialogFrame(DialogFrameABC):
     # ------------------------------ 后置处理 start ------------------------------ #
 
     def post_process(self):
+        super().post_process()
         self.save_progress_bar.setValue(0)
         # 开始保存
         self.save_file_executor = SaveFileExecutor(self.save_file_dict, self.dialog_quit_button,

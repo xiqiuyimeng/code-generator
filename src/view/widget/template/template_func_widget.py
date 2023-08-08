@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 
 from src.constant.template_dialog_constant import SELECT_ALL_BTN_TEXT, UNSELECT_BTN_TEXT, \
@@ -36,6 +37,7 @@ class TemplateFuncWidget(QWidget):
         self.setup_ui()
         self.setup_label_text()
         self.connect_signal()
+        self.post_process()
 
     def setup_ui(self):
         self._layout = QVBoxLayout(self)
@@ -117,3 +119,8 @@ class TemplateFuncWidget(QWidget):
         current_func_list = [func for func in template_func_list if func.is_current]
         if current_func_list:
             self.func_list_widget.setCurrentRow(template_func_list.index(current_func_list[0]))
+
+    def post_process(self):
+        # 清除焦点
+        for index in range(self.func_list_header_layout.count()):
+            self.func_list_header_layout.itemAt(index).widget().setFocusPolicy(Qt.FocusPolicy.NoFocus)

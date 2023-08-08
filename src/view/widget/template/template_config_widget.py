@@ -115,6 +115,9 @@ class TemplateConfigWidget(QWidget):
 
     def post_process(self):
         self.set_remove_btn_available(False)
+        # 清除焦点
+        for index in range(self.config_btn_layout.count()):
+            self.config_btn_layout.itemAt(index).widget().setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def echo_config_table(self, config_list):
         self.config_table.fill_table(config_list)
