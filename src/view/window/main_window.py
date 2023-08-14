@@ -12,13 +12,14 @@ from src.view.bar.menubar import Menubar
 from src.view.bar.titlebar import TitleBar
 from src.view.bar.toolbar import ToolBar
 from src.view.box.message_box import pop_ok
+from src.view.custom_widget.animation_widget import OpacityAnimationWidget
 from src.view.window.central_widget import CentralWidget
 
 _author_ = 'luwt'
 _date_ = '2022/5/7 10:04'
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, OpacityAnimationWidget):
 
     def __init__(self, screen_rect):
         super().__init__()
@@ -131,4 +132,5 @@ class MainWindow(QMainWindow):
 
     def close(self):
         close_conn()
-        super().close()
+        self.close_animation.finished.connect(super().close)
+        self.start_close_animation()
