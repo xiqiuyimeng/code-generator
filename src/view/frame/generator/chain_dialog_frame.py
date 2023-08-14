@@ -55,8 +55,9 @@ class ChainDialogFrameABC(DialogFrameABC):
     def post_process(self):
         super().post_process()
         # 清除焦点
-        self.previous_frame_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.next_frame_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        if self.previous_frame_button is not Ellipsis:
+            self.previous_frame_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.next_frame_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     # ------------------------------ 后置处理 end ------------------------------ #
 
