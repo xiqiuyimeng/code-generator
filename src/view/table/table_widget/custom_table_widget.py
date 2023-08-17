@@ -56,8 +56,8 @@ class CustomTableWidget(TableWidgetABC):
 
     def _do_add_row(self, row_data, row_index):
         self.insert_row(row_index)
-        checkbox_num_widget = make_checkbox_num_widget(row_index + 1,
-                                                       self.header_widget.calculate_header_check_state)
+        calculate_header_checked_func = self.header_widget.calculate_header_check_state
+        checkbox_num_widget = make_checkbox_num_widget(row_index + 1, calculate_header_checked_func)
         order_item = checkbox_num_widget.check_label
         setattr(order_item, 'row_data', row_data)
         self.setCellWidget(row_index, 0, checkbox_num_widget)
@@ -65,7 +65,7 @@ class CustomTableWidget(TableWidgetABC):
         # 最后一列添加操作按钮
         row_id = row_data.id if row_data.id else -1
         self.setCellWidget(row_index, self.columnCount() - 1, self.make_operation_buttons(order_item, row_id))
-        self.header_widget.calculate_header_check_state()
+        calculate_header_checked_func()
 
     def do_fill_row(self, row_index, row_data, fill_create_time=True):
         ...
