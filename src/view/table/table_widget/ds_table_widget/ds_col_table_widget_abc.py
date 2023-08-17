@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QAbstractItemView, QHeaderView, QWidget
+from PyQt6.QtWidgets import QHeaderView, QWidget
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
 from src.constant.table_constant import DS_TABLE_HEADER_LABELS
@@ -35,9 +35,6 @@ class DsColTableWidgetABC(TableWidgetABC):
         return self.tree_widget.get_current_tab_widget().async_save_executor
 
     def setup_other_ui(self):
-        # 设置双击触发修改
-        self.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
-
         # 设置表格列数
         self.setColumnCount(6)
         # 实例化自定义表头

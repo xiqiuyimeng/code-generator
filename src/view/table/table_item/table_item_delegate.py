@@ -1,15 +1,51 @@
 # -*- coding: utf-8 -*-
-from PyQt6.QtCore import QModelIndex, QAbstractItemModel
-from PyQt6.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox
+import re
+
+from PyQt6.QtCore import QModelIndex, QAbstractItemModel, Qt
+from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtWidgets import QItemDelegate, QWidget, QStyleOptionViewItem, QComboBox, QStyle
 
 from src.constant.constant import COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT
+from src.service.read_qrc.read_config import read_qss
 from src.view.dialog.table_item_delegate.table_item_input_delegate_dialog import TableItemInputDelegateDialog
 
 _author_ = 'luwt'
 _date_ = '2022/10/11 17:54'
 
 
-class ComboboxDelegate(QItemDelegate):
+class SelectedHighlightDelegate(QItemDelegate):
+
+    def __init__(self):
+        # 获取QSS样式中定义的颜色
+        qss = read_qss()
+        # 使用正则表达式从QSS中解析颜色值
+        pattern = r"QTableWidget::item\s*{\s*selection-background-color:\s*(\w+)\s*;\s*}"
+        match = re.search(pattern, qss)
+
+        if match:
+            color = match.group(1)
+            self.qss_color = QColor(color)
+        super().__init__()
+
+    def paint(self, painter, option, index):
+
+        # 自定义绘制选中状态
+        if option.state & QStyle.StateFlag.State_Selected:
+            painter.save()
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(self.qss_color)
+            painter.drawRect(option.rect)
+            painter.restore()
+
+            painter.save()
+            painter.setPen(option.palette.color(QPalette.ColorRole.Text))
+            painter.drawText(option.rect, Qt.AlignmentFlag.AlignCenter, index.data())
+            painter.restore()
+        else:
+            super().paint(painter, option, index)
+
+
+class ComboboxDelegate(SelectedHighlightDelegate):
 
     def __init__(self, value_list=None, default_idx=None):
         self.value_list = value_list if value_list else [COMBO_BOX_YES_TXT, COMBO_BOX_NO_TXT]
@@ -24,7 +60,7 @@ class ComboboxDelegate(QItemDelegate):
         return combox
 
 
-class TextInputDelegate(QItemDelegate):
+class TextInputDelegate(SelectedHighlightDelegate):
 
     def __init__(self, duplicate_prompt=None, get_exists_data_list_func=None):
         # 数据重复提示语

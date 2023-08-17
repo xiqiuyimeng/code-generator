@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtCore import Qt, QObject, QEvent, QPoint
-from PyQt6.QtWidgets import QTableWidget, QFrame, QToolTip
+from PyQt6.QtWidgets import QTableWidget, QFrame, QToolTip, QAbstractItemView
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 from src.view.table.table_item.table_item import TableWidgetItem
@@ -29,6 +29,8 @@ class TableWidgetABC(QTableWidget, ScrollableWidget):
         self.setAlternatingRowColors(True)
         # 默认行号隐藏
         self.verticalHeader().setHidden(True)
+        # 只能单选
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.setup_other_ui()
 
