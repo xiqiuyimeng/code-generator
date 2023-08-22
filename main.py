@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # 保存引用
     set_window(main_window)
     # 声明AppUserModelID，否则windows认为这是python子程序，无法使用自定义任务栏图标
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("generator")
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("code-generator")
     main_window.show()
     if pyi_splash_spec is not None and pyi_splash.is_alive():
         if platform.system() == 'Windows':
