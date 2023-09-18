@@ -4,6 +4,7 @@ import importlib
 import platform
 import sys
 
+import win32con
 import win32gui
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import Qt, QDir
@@ -59,7 +60,21 @@ def move_above_splash(hwnd):
             ...
 
 
+def check_singleton():
+    if platform.system() == 'Windows':
+        # 为了保证只有一个进程，首先查找进程，如果能找到，则将窗口前置，否则创建进程
+        window_handle = win32gui.FindWindow(None, WINDOW_TITLE)
+        if window_handle:
+            # 窗口前置
+            win32gui.SetForegroundWindow(window_handle)
+            # 如果窗口是在最小化，恢复窗口
+            win32gui.SendMessage(window_handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
+            sys.exit(0)
+
+
 if __name__ == "__main__":
+    # 启动前检查是否单例
+    check_singleton()
     log.info("**********生成器启动**********")
     # 加载静态资源
     QDir.addSearchPath('qss', 'static/qss/')

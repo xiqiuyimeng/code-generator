@@ -3,7 +3,6 @@
 _author_ = 'luwt'
 _date_ = '2023/2/24 11:32'
 
-GENERATOR_TITLE = '代码生成器'
 
 FILE_MENU = '文件'
 HELP_MENU = '帮助'
