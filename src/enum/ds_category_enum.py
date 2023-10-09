@@ -21,6 +21,7 @@ struct_ds_category_dict = {
 
 
 class DsCategoryEnum(Enum):
+    """初始化数据使用"""
     sql_ds_category = DsCategory(**sql_ds_category_dict)
     struct_ds_category = DsCategory(**struct_ds_category_dict)
 
