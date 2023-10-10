@@ -192,23 +192,26 @@ class IconMovieLoadingMaskThreadExecutor(ThreadExecutorABC):
                 "item": item,
                 "item_icon": item.icon(0),
             }
-            for i in range(item.childCount()):
-                child_item = item.child(i)
-                # 设置 child_item 标志
-                self.item_pre_process(child_item)
-                self.item_dict[id(child_item)] = {
-                    "item": child_item,
-                    "item_icon": child_item.icon(0),
-                    "tab_dict": self.get_tab_dict(child_item, window)
-                }
-                # 递归处理
-                self.get_item_dict(child_item, window)
+            self.get_children_item_dict(item, window)
         else:
             self.item_dict[id(item)] = {
                 "item": item,
                 "item_icon": item.icon(0),
                 "tab_dict": self.get_tab_dict(item, window)
             }
+
+    def get_children_item_dict(self, item, window):
+        for i in range(item.childCount()):
+            child_item = item.child(i)
+            # 设置 child_item 标志
+            self.item_pre_process(child_item)
+            self.item_dict[id(child_item)] = {
+                "item": child_item,
+                "item_icon": child_item.icon(0),
+                "tab_dict": self.get_tab_dict(child_item, window)
+            }
+            # 递归处理
+            self.get_item_dict(child_item, window)
 
     def get_tab_dict(self, item, window):
         tab = get_item_opened_tab(item)
