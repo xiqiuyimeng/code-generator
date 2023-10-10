@@ -148,6 +148,7 @@ def get_icon_path(name):
 
 
 def create_icon(icon_path, name):
+    """创建icon方法，为了保证在系统中，同样的icon，只存在一个，减少重复对象"""
     icon = QIcon(icon_path)
     icon_dict[icon_path] = icon
     return get_icon(name)
