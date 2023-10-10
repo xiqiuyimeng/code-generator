@@ -49,7 +49,8 @@ class ImportDataWorker(ThreadWorkerABC):
 
         # 数据去重，如果导入的数据内存在重复的，首先去重，再进行下面的处理
         unique_model_list = list({row.get_name(): row
-                                  for row in import_data_model_list if row.get_name()}.values())
+                                  for row in import_data_model_list
+                                  if row.get_name()}.values())
 
         # 前置处理，因为下面的校验会涉及数据库操作，允许子类预先将所有需要数据准备好
         self.pre_process_before_check_data()
@@ -119,14 +120,13 @@ class ImportDataExecutor(LoadingMaskThreadExecutor):
         success_msg = f'{self.error_box_title} {len(legal_rows)} 条数据成功'
         # 如果存在重复数据，或是异常数据，则弹窗询问是否处理
         if any((duplicate_rows, illegal_rows, duplicate_illegal_rows)):
-            reply = pop_question(f'{success_msg}\n'
-                                 f'\b\b\b\b{len(duplicate_rows)} 条数据已存在\n'
-                                 f'\b\b\b\b{len(illegal_rows)} 条数据异常\n'
-                                 f'\b\b\b\b{len(duplicate_illegal_rows)} 条数据已存在且数据异常\n'
-                                 f'是否手动处理这些数据？\n'
-                                 '选择 [是] 将进入异常文件处理页，选择 [否] 将忽略这些数据',
-                                 self.error_box_title, self.window)
-            if reply:
+            if pop_question(f'{success_msg}\n'
+                            f'\b\b\b\b{len(duplicate_rows)} 条数据已存在\n'
+                            f'\b\b\b\b{len(illegal_rows)} 条数据异常\n'
+                            f'\b\b\b\b{len(duplicate_illegal_rows)} 条数据已存在且数据异常\n'
+                            f'是否手动处理这些数据？\n'
+                            '选择 [是] 将进入异常文件处理页，选择 [否] 将忽略这些数据',
+                            self.error_box_title, self.window):
                 # 进行后续的异常文件处理
                 self.process_error_data_func(duplicate_rows, illegal_rows, duplicate_illegal_rows)
         else:
