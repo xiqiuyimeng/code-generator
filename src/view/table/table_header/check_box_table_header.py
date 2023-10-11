@@ -26,6 +26,7 @@ class CheckBoxHeader(TableHeaderABC):
 
 
 class CheckBoxHeaderWithButton(CheckBoxHeader):
+    """复选框表头，第一列带有操作按钮"""
 
     def get_checkbox_num_widget(self):
         return make_checkbox_num_widget_with_button(TABLE_HEADER_FIRST_COL_LABEL,
