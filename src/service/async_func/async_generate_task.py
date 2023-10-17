@@ -25,6 +25,7 @@ class GenerateWorker(ThreadWorkerABC):
     generate_progress_signal = pyqtSignal(int)
     # 文件名称、文件内容、文件目录
     generate_file_signal = pyqtSignal(str, str, str)
+    # 生成过程中的日志输出信号
     generate_log_signal = pyqtSignal(str)
 
     def __init__(self, selected_data, type_mapping_id, template, output_config_input_dict,
@@ -33,8 +34,10 @@ class GenerateWorker(ThreadWorkerABC):
         self.selected_data = selected_data
         self.type_mapping_id = type_mapping_id
         self.template = template
-        self.output_config_input_dict = dict() if output_config_input_dict is Ellipsis else output_config_input_dict
-        self.var_config_input_dict = dict() if var_config_input_dict is Ellipsis else var_config_input_dict
+        self.output_config_input_dict = dict() \
+            if output_config_input_dict is Ellipsis else output_config_input_dict
+        self.var_config_input_dict = dict() \
+            if var_config_input_dict is Ellipsis else var_config_input_dict
         self.save_file = save_file
         self.err_msg = err_msg
 
