@@ -7,8 +7,8 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLabel
 
 from src.enum.icon_enum import get_icon
 from src.constant.table_constant import EXPAND_CHILD_TABLE_ICON, COLLAPSE_CHILD_TABLE_ICON
-from src.view.table.table_header.check_box_table_header import CheckBoxHeaderWithButton
-from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
+from src.view.table.table_header.check_box_table_header import CheckBoxButtonHeader
+from src.view.table.table_item.table_item import make_checkbox_num_button
 from src.view.table.table_widget.ds_table_widget.ds_col_table_widget_abc import DsColTableWidgetABC
 from src.view.tree.tree_item.tree_item_func import get_add_del_data
 
@@ -23,7 +23,7 @@ class StructDsColTableWidget(DsColTableWidgetABC):
         super().__init__(*args)
 
     def get_header(self, header_labels):
-        return CheckBoxHeaderWithButton(header_labels, self)
+        return CheckBoxButtonHeader(header_labels, self)
 
     def batch_deal_checked(self, check_state):
         super().batch_deal_checked(check_state)
@@ -39,7 +39,7 @@ class StructDsColTableWidget(DsColTableWidgetABC):
                 lambda: self.add_child_table_func(col_data, row_index))
         else:
             button = QLabel()
-        return make_checkbox_num_widget_with_button(row_index + 1, self.click_row_checkbox, button)
+        return make_checkbox_num_button(row_index + 1, self.click_row_checkbox, button)
 
     def fill_post_process(self):
         checked_list, child_table_count = list(), 0

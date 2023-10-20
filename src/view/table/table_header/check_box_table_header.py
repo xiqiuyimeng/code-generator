@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QLabel
 from src.constant.table_constant import TABLE_HEADER_FIRST_COL_LABEL
 from src.view.table.table_header.table_header_abc import TableHeaderABC
 from src.view.table.table_header.table_header_style_delegate import TableHeaderStyleDelegate
-from src.view.table.table_item.table_item import make_checkbox_num_widget_with_button
+from src.view.table.table_item.table_item import make_checkbox_num_button
 
 _author_ = 'luwt'
 _date_ = '2023/2/28 17:27'
@@ -25,9 +25,9 @@ class CheckBoxHeader(TableHeaderABC):
             self.setItem(0, col, self.make_item(header_text))
 
 
-class CheckBoxHeaderWithButton(CheckBoxHeader):
+class CheckBoxButtonHeader(CheckBoxHeader):
     """复选框表头，第一列带有操作按钮"""
 
     def get_checkbox_num_widget(self):
-        return make_checkbox_num_widget_with_button(TABLE_HEADER_FIRST_COL_LABEL,
-                                                    self.click_header_checkbox, QLabel())
+        return make_checkbox_num_button(TABLE_HEADER_FIRST_COL_LABEL,
+                                        self.click_header_checkbox, QLabel())
