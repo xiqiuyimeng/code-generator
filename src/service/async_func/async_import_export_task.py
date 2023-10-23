@@ -24,7 +24,9 @@ class ImportDataWorker(ThreadWorkerABC):
     def __init__(self, file_path):
         super().__init__()
         self.file_path = file_path
+        # 支持的数据类型key
         self.data_key: str = ...
+        # 已存在的数据名称，导入时避免数据重复
         self.exists_names = ...
 
     def do_run(self):
