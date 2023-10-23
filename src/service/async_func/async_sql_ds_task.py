@@ -186,6 +186,7 @@ class RefreshConnExecutor(RefreshMovieThreadExecutor):
                  col_changed_callback, db_finished_callback):
         super().__init__(tree_widget, item, window, REFRESH_CONN_BOX_TITLE)
 
+        # 连接worker中的额外信号槽，需要在初始化完成后再连接，因为初始化后才能获取到 worker 对象
         self.worker.db_changed_signal.connect(db_changed_callback)
         self.worker.table_changed_signal.connect(tb_changed_callback)
         self.worker.col_signal.connect(lambda result: col_changed_callback(*result))
@@ -337,8 +338,7 @@ class OpenTBWorker(ConnWorkerABC):
         return table_tab
 
     def get_err_msg(self) -> str:
-        return f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]' \
-               f'{OPEN_TB_FAIL_PROMPT}'
+        return f'[{self.conn_opened_record.item_name}][{self.db_name}][{self.tb_name}]{OPEN_TB_FAIL_PROMPT}'
 
 
 class OpenTBExecutor(IconMovieThreadExecutor):
