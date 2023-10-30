@@ -49,10 +49,9 @@ class ImportDataWorker(ThreadWorkerABC):
         # 转为实体
         import_data_model_list: list = self.convert_to_model_list(import_data_list)
 
-        # 数据去重，如果导入的数据内存在重复的，首先去重，再进行下面的处理
-        unique_model_list = list({row.get_name(): row
-                                  for row in import_data_model_list
-                                  if row.get_name()}.values())
+        # 数据去重，如果导入的数据内存在重复的，首先去重（利用字典键不可重复进行去重），再进行下面的处理
+        model_dict = {row.get_name(): row for row in import_data_model_list if row.get_name()}
+        unique_model_list = list(model_dict.values())
 
         # 前置处理，因为下面的校验会涉及数据库操作，允许子类预先将所有需要数据准备好
         self.pre_process_before_check_data()
