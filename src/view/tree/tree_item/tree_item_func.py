@@ -89,10 +89,15 @@ def refresh_tree_item_callback(tree_widget, item, item_changed_dict, handle_unch
     del_data = get_add_del_data(item)
     tree_widget.tree_data.del_node(del_data)
 
+    # 新的记录
     new_item_records = item_changed_dict.get('new')
+    # 已存在的记录
     exists_item_records = item_changed_dict.get('exists')
+    # 删除的记录
     delete_item_records = item_changed_dict.get('delete')
+    # 没有改变的记录
     unchanged_item_records = item_changed_dict.get('unchanged')
+    # 排序
     sort_order = item_changed_dict.get('sort')
 
     # 1. 首先处理没有变化的元素
