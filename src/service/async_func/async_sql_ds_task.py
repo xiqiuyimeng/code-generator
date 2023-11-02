@@ -185,7 +185,6 @@ class RefreshConnExecutor(RefreshMovieThreadExecutor):
     def __init__(self, tree_widget, item, window, db_changed_callback, tb_changed_callback,
                  col_changed_callback, db_finished_callback):
         super().__init__(tree_widget, item, window, REFRESH_CONN_BOX_TITLE)
-
         # 连接worker中的额外信号槽，需要在初始化完成后再连接，因为初始化后才能获取到 worker 对象
         self.worker.db_changed_signal.connect(db_changed_callback)
         self.worker.table_changed_signal.connect(tb_changed_callback)
@@ -290,7 +289,6 @@ class RefreshDBExecutor(RefreshMovieThreadExecutor):
 
     def __init__(self, tb_changed_callback, col_changed_callback, *args):
         super().__init__(*args)
-
         self.worker.table_changed_signal.connect(tb_changed_callback)
         self.worker.col_signal.connect(lambda col_result: col_changed_callback(*col_result))
 
