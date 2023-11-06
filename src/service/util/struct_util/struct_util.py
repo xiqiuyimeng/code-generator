@@ -18,6 +18,7 @@ def assemble_col_info(name, value):
 
 
 class StructParser:
+    """结构体解析器"""
 
     def __init__(self, struct_content):
         self.struct_content = struct_content
@@ -34,6 +35,7 @@ class StructParser:
 
 
 class StructBeautifier:
+    """结构体美化器"""
 
     def __init__(self, struct_content):
         self.struct_content = struct_content
