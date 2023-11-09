@@ -12,7 +12,10 @@ from src.service.system_storage.type_mapping_sqlite import TypeMapping
 _author_ = 'luwt'
 _date_ = '2023/5/24 16:21'
 
+
+# 复制的统一名称后缀
 COPY_NAME_SUFFIX = '-copy'
+# 复制名称正则表达式
 COPY_NAME_PATTERN = f'(.+{COPY_NAME_SUFFIX})(\\d*)$'
 
 
