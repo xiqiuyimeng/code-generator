@@ -32,11 +32,11 @@ def generate_copy_name(exists_name_list, name_str, num_suffix=0):
 
 def generate_unique_name(origin_name, exists_name_list):
     find_result = re.findall(COPY_NAME_PATTERN, origin_name)
-    # 如果能匹配到，说明原有名称也是复制生成的，那么根据规则，取出数字编号，加1即可生成新的名称
+    # 如果能匹配到，说明原有名称也是复制生成的，那么根据规则，取出数字编号，加 1 即可生成新的名称
     if find_result:
         copy_num = int(find_result[0][1]) if find_result[0][1] else 0
+        # 生成复制后的名称
         unique_name = generate_copy_name(exists_name_list, find_result[0][0], copy_num + 1)
-        # 判断名称是否已经存在，如果存在，继续递归处理
     else:
         # 如果原有名称不是复制生成的，那么添加后缀
         unique_name = generate_copy_name(exists_name_list, f'{origin_name}{COPY_NAME_SUFFIX}')
