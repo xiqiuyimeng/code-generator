@@ -47,14 +47,6 @@ def generate_unique_name(origin_name, exists_name_list):
 
 # ------------------------------ 复制类型映射 start ------------------------------ #
 
-
-def copy_type_mapping_col(export_type_mapping_col):
-    col_type_mapping = ColTypeMapping()
-    for field in fields(export_type_mapping_col):
-        setattr(col_type_mapping, field.name, getattr(export_type_mapping_col, field.name))
-    return col_type_mapping
-
-
 def copy_type_mapping(export_type_mapping, exists_name_list):
     type_mapping = TypeMapping()
     # 复制类型映射主体数据
@@ -63,10 +55,22 @@ def copy_type_mapping(export_type_mapping, exists_name_list):
     # 生成新的名称
     type_mapping.mapping_name = generate_unique_name(export_type_mapping.mapping_name, exists_name_list)
     # 复制类型映射列信息
+    copy_type_mapping_cols(export_type_mapping, type_mapping)
+    return type_mapping
+
+
+def copy_type_mapping_col(export_type_mapping_col):
+    col_type_mapping = ColTypeMapping()
+    for field in fields(export_type_mapping_col):
+        setattr(col_type_mapping, field.name, getattr(export_type_mapping_col, field.name))
+    return col_type_mapping
+
+
+def copy_type_mapping_cols(export_type_mapping, type_mapping):
+    # 复制类型映射列信息
     if export_type_mapping.type_mapping_cols:
         type_mapping.type_mapping_cols = [copy_type_mapping_col(type_mapping_col)
                                           for type_mapping_col in export_type_mapping.type_mapping_cols]
-    return type_mapping
 
 
 # ------------------------------ 复制类型映射 end ------------------------------ #
