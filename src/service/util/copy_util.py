@@ -113,8 +113,9 @@ def copy_template(export_template, exists_name_list):
     # 生成新的名称
     template.template_name = generate_unique_name(export_template.template_name, exists_name_list)
     template.template_desc = export_template.template_desc
-    template_file_dict = dict()
+
     # 复制模板文件
+    template_file_dict = dict()
     if export_template.template_files:
         template_file_list = list()
         for file in export_template.template_files:
@@ -123,17 +124,20 @@ def copy_template(export_template, exists_name_list):
             # 将文件放入字典，名称为key，方便输出配置取值
             template_file_dict[file.file_name] = copy_file
         template.template_files = template_file_list
-    # 复制模板配置
+
+    # 复制模板配置，输出配置
     if export_template.output_config_list:
         template.output_config_list = [copy_template_output_config(output_config, template_file_dict)
                                        for output_config in export_template.output_config_list]
     else:
         template.output_config_list = tuple()
+    # 变量配置
     if export_template.var_config_list:
         template.var_config_list = [copy_template_config(var_config)
                                     for var_config in export_template.var_config_list]
     else:
         template.var_config_list = tuple()
+
     # 复制模板方法
     if export_template.template_func_list:
         template.template_func_list = [copy_template_func(template_func)
