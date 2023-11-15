@@ -18,6 +18,11 @@ _date_ = '2023/4/26 11:16'
 
 # ----------------------- 生成 start ----------------------- #
 
+
+def init_config_dict(config_dict):
+    return config_dict if config_dict is not Ellipsis else dict()
+
+
 class GenerateWorker(ThreadWorkerABC):
     # 准备工作相关的信号
     prepare_progress_signal = pyqtSignal(int)
@@ -34,10 +39,8 @@ class GenerateWorker(ThreadWorkerABC):
         self.selected_data = selected_data
         self.type_mapping_id = type_mapping_id
         self.template = template
-        self.output_config_input_dict = dict() \
-            if output_config_input_dict is Ellipsis else output_config_input_dict
-        self.var_config_input_dict = dict() \
-            if var_config_input_dict is Ellipsis else var_config_input_dict
+        self.output_config_input_dict = init_config_dict(output_config_input_dict)
+        self.var_config_input_dict = init_config_dict(var_config_input_dict)
         self.save_file = save_file
         self.err_msg = err_msg
 
