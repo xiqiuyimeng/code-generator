@@ -143,6 +143,7 @@ class CustomTableWidget(TableWidgetABC):
     def del_rows(self):
         # 根据选中状态删除
         for row_index in reversed(range(self.rowCount())):
+            # 取出cell widget 中的 check box，判断状态
             if self.cellWidget(row_index, 0).check_box.checkState() == Qt.CheckState.Checked:
                 self.removeRow(row_index)
         # 行序号重排序
