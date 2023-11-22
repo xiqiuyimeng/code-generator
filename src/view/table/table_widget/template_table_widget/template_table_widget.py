@@ -18,9 +18,5 @@ class TemplateTableWidget(CustomCopyExportTableWidget):
             self.setItem(row_index, 3, self.make_item(template.create_time))
         self.setItem(row_index, 4, self.make_item(template.update_time))
 
-    def del_duplicate_rows(self, duplicate_data_list):
-        # 根据名称删除
-        duplicate_names = tuple(data.template_name for data in duplicate_data_list)
-        for row in reversed(range(self.rowCount())):
-            if self.item(row, 1).text() in duplicate_names:
-                self.del_row(row)
+    def get_duplicate_name(self, data):
+        return data.template_name
