@@ -152,4 +152,11 @@ class CustomTableWidget(TableWidgetABC):
         self.header_widget.calculate_header_check_state()
 
     def del_duplicate_rows(self, duplicate_data_list):
+        # 根据名称删除
+        duplicate_names = tuple(self.get_duplicate_name(data) for data in duplicate_data_list)
+        for row in reversed(range(self.rowCount())):
+            if self.item(row, 1).text() in duplicate_names:
+                self.del_row(row)
+
+    def get_duplicate_name(self, data) -> str:
         ...
