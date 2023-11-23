@@ -143,10 +143,9 @@ class TableDialogFrame(DialogFrameABC):
 
     def del_row(self, row_id, row_index, item_name):
         del_prompt, del_title = self.get_del_prompt_title()
-        if not pop_question(del_prompt.format(item_name), del_title, self):
-            return
-        self.del_row_data_executor = self.get_del_executor(row_id, item_name, row_index, del_title)
-        self.del_row_data_executor.start()
+        if pop_question(del_prompt.format(item_name), del_title, self):
+            self.del_row_data_executor = self.get_del_executor(row_id, item_name, row_index, del_title)
+            self.del_row_data_executor.start()
 
     def get_del_prompt_title(self) -> tuple:
         ...
