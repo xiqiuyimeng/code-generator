@@ -230,7 +230,7 @@ class TableDialogFrame(DialogFrameABC):
 
     def post_process(self):
         super().post_process()
-        # 清除所有按钮焦点
+        # 清除所有按钮焦点，遍历按钮布局，将每一个按钮的焦点都清除
         for index in range(self.operation_table_btn_layout.count()):
             self.operation_table_btn_layout.itemAt(index).widget().setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.list_table_data_executor = self.get_list_table_data_executor()
