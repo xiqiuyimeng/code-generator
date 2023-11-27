@@ -236,13 +236,9 @@ class TableDialogFrame(DialogFrameABC):
         self.list_table_data_executor = self.get_list_table_data_executor()
         self.list_table_data_executor.start()
         # 设置删除行按钮初始状态
-        self.init_del_button_status()
+        self.set_button_available(False)
 
     def get_list_table_data_executor(self) -> LoadingMaskThreadExecutor:
         ...
-
-    def init_del_button_status(self):
-        # 初始化按钮状态
-        self.set_button_available(False)
 
     # ------------------------------ 后置处理 end ------------------------------ #
