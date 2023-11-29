@@ -52,7 +52,12 @@ class TestConnWorker(ConnWorkerABC):
 
     def do_executor_func(self, executor):
         executor.test_conn()
-        log.info(f'[{self.conn_opened_record.item_name}]{TEST_CONN_SUCCESS_PROMPT}')
+        # 打印测试成功日志，检查名称是否存在
+        if self.conn_opened_record.item_name:
+            log_str = f'[{self.conn_opened_record.item_name}]{TEST_CONN_SUCCESS_PROMPT}'
+        else:
+            log_str = TEST_CONN_SUCCESS_PROMPT
+        log.info(log_str)
         self.success_signal.emit()
 
     def get_err_msg(self) -> str:
@@ -66,8 +71,10 @@ class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
 
     def __init__(self, connection: SqlConnection, conn_type, *args):
         self.connection = connection
-        # 临时创建一个 opened item 使用
+        # 临时创建一个 opened record 使用
         self.opened_record = OpenedTreeItem()
+        # 给 opened record 赋值名称
+        self.opened_record.item_name = connection.conn_name
         self.opened_record.data_type = conn_type
         super().__init__(*args)
 
@@ -75,8 +82,12 @@ class TestConnLoadingMaskExecutor(LoadingMaskThreadExecutor):
         return TestConnWorker(self.opened_record, self.connection)
 
     def success_post_process(self):
-        pop_ok(f'[{self.connection.conn_name}]\n{TEST_CONN_SUCCESS_PROMPT}',
-               self.error_box_title, self.window)
+        # 如果暂时没有输入连接名称，只展示 测试成功提示
+        if self.opened_record.item_name:
+            prompt = f'[{self.connection.conn_name}]\n{TEST_CONN_SUCCESS_PROMPT}'
+        else:
+            prompt = TEST_CONN_SUCCESS_PROMPT
+        pop_ok(prompt, self.error_box_title, self.window)
 
 
 class TestConnIconMovieExecutor(IconMovieThreadExecutor):
