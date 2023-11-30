@@ -14,18 +14,19 @@ def convert_complete_table_cols(selected_data, type_mapping_dict):
     # 取第一个节点，判断数据类型是sql类型还是结构体类型
     root_children = selected_data.root_children()
     first_node = tuple(root_children.values())[0]
-    table_col_dict = dict()
+    table_col_dict_list = list()
     if first_node.data.ds_category == DsCategoryEnum.sql_ds_category.get_name():
-        CollectSqlTableCol(table_col_dict, type_mapping_dict).collect_table_cols(root_children)
+        # todo 如果是 sql 数据源，尝试获取表名注释，方便在生成代码时使用
+        CollectSqlTableCol(table_col_dict_list, type_mapping_dict).collect_table_cols(root_children)
     elif first_node.data.ds_category == DsCategoryEnum.struct_ds_category.get_name():
-        CollectStructTableCol(table_col_dict, type_mapping_dict).collect_table_cols(root_children)
-    return table_col_dict
+        CollectStructTableCol(table_col_dict_list, type_mapping_dict).collect_table_cols(root_children)
+    return table_col_dict_list
 
 
 class CollectTableColABC:
 
-    def __init__(self, table_col_dict, type_mapping_dict):
-        self.table_col_dict = table_col_dict
+    def __init__(self, table_col_dict_list: list, type_mapping_dict):
+        self.table_col_dict_list = table_col_dict_list
         self.type_mapping_dict = type_mapping_dict
 
     def collect_table_cols(self, data_children: dict):
@@ -35,11 +36,24 @@ class CollectTableColABC:
                 if isinstance(tuple(node.children.values())[0].data, OpenedTreeItem):
                     self.collect_table_cols(node.children)
                 else:
+                    # 列信息
                     col_list = [col.data for col in node.children.values()]
-                    self.table_col_dict[node.node_name] = self.convert_to_dict(col_list)
+                    self.collect_table_col_dict(node, col_list)
             else:
                 # 没有子节点，那么需要动态获取
-                self.table_col_dict[node.node_name] = self.convert_to_dict(self.get_table_cols(node))
+                col_list = self.get_table_cols(node)
+                self.collect_table_col_dict(node, col_list)
+
+    def collect_table_col_dict(self, node, col_list):
+        # 表名
+        table_name = node.node_name
+        # 表注释
+        table_comment = self.get_table_comment()
+        self.table_col_dict_list.append({
+            'table_name': table_name,
+            'table_comment': table_comment,
+            'cols': self.convert_to_dict(col_list)
+        })
 
     def convert_to_dict(self, col_list):
         col_dict_list = list()
@@ -65,7 +79,11 @@ class CollectTableColABC:
             col_dict_list.append(col_dict)
         return col_dict_list
 
-    def get_table_cols(self, table_node) -> tuple: ...
+    def get_table_cols(self, table_node) -> tuple:
+        ...
+
+    def get_table_comment(self) -> str:
+        ...
 
 
 class CollectSqlTableCol(CollectTableColABC):
@@ -98,6 +116,9 @@ class CollectSqlTableCol(CollectTableColABC):
             # 放入字典中，缓存等待下次使用
             self.sql_db_executor_dict[conn_id] = sql_db_executor
         return sql_db_executor
+
+    def get_table_comment(self) -> str:
+        ...
 
 
 class CollectStructTableCol(CollectTableColABC):
