@@ -10,7 +10,7 @@ HELP_BTN_TEXT = '帮助'
 # 检查系统库中连接名字存在提示语
 NAME_EXISTS = '当前名称不可用，{}已存在！'
 NAME_AVAILABLE = '名称{}可用'
-NAME_UNCHANGED_PROMPT = "名称无变化"
+NAME_UNCHANGED_PROMPT = "名称无变化！"
 
 NAME_MAX_LENGTH_PLACEHOLDER_TEXT = '名称最多可输入50字符'
 
