@@ -54,6 +54,8 @@ TEMPLATE_FILE_HELP_TEXT = '<p>提供对模板文件的管理功能，下面是�
                           '    <ol>' \
                           '      <li>数据表名：可以通过 table_name 变量获取，<br>' \
                           '引用方式：{{ table_name }}</li>' \
+                          '      <li>数据表注释：可以通过 table_comment 变量获取，<br>' \
+                          '引用方式：{{ table_comment }}</li>' \
                           '      <li>数据表字段：系统将注入数据表字段列表 col_list，所以在使用时，应先遍历字段列表，' \
                           '获取到每个字段对象时，再进行取值操作，col_list 结构体示例：' \
                           '<pre>' \
