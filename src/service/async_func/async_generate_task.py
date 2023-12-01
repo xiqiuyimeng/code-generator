@@ -9,7 +9,7 @@ from src.service.async_func.async_task_abc import ThreadWorkerABC, ThreadExecuto
 from src.service.system_storage.col_type_mapping_sqlite import ColTypeMappingSqlite
 from src.service.system_storage.template_file_sqlite import TemplateFileSqlite
 from src.service.system_storage.template_func_sqlite import TemplateFuncSqlite
-from src.service.util.generate_util import convert_complete_table_cols
+from src.service.util.generate_util import convert_intact_table_cols
 from src.service.util.path_util import check_path_legal
 
 _author_ = 'luwt'
@@ -73,7 +73,7 @@ class GenerateWorker(ThreadWorkerABC):
 
         # 4. 检查完善选中数据，如果选中数据没有列数据，需要补充列数据
         self.generate_log_signal.emit('<p style="color: magenta">开始准备数据表列数据 >>>>></p><br>')
-        table_col_dict = convert_complete_table_cols(self.selected_data, type_mapping_dict)
+        table_col_dict = convert_intact_table_cols(self.selected_data, type_mapping_dict)
         self.prepare_progress_signal.emit(60)
         self.generate_log_signal.emit('<p style="color: magenta">准备数据表列数据完毕 =====</p><br>')
 
