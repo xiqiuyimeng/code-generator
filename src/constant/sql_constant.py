@@ -25,6 +25,8 @@ MYSQL_CHECK_DB_SQL = 'show databases like "{}"'
 MYSQL_QUERY_TB_SQL = 'show tables from {}'
 # mysql检查表sql
 MYSQL_CHECK_TB_SQL = 'show tables from {} like "{}"'
+# mysql获取表注释sql
+MYSQL_QUERY_TB_COMMENT_SQL = 'show table status from {} like "{}"'
 # mysql查询数据库表的列名sql
 MYSQL_QUERY_COL_SQL = "show full columns from `{}`.`{}`"
 
