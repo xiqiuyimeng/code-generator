@@ -73,7 +73,7 @@ class GenerateWorker(ThreadWorkerABC):
 
         # 4. 检查完善选中数据，如果选中数据没有列数据，需要补充列数据
         self.generate_log_signal.emit('<p style="color: magenta">开始准备数据表列数据 >>>>></p><br>')
-        table_col_dict = convert_intact_table_cols(self.selected_data, type_mapping_dict)
+        table_cols = convert_intact_table_cols(self.selected_data, type_mapping_dict)
         self.prepare_progress_signal.emit(60)
         self.generate_log_signal.emit('<p style="color: magenta">准备数据表列数据完毕 =====</p><br>')
 
@@ -109,14 +109,15 @@ class GenerateWorker(ThreadWorkerABC):
         # 7. 准备字段开始生成
         self.generate_log_signal.emit('<p style="color: coral">********** 开始生成 **********</p><br>')
         # 需要生成的总文件数为 表数 × 模板文件数
-        total_file_count = len(table_col_dict) * len(template_files)
+        total_file_count = len(table_cols) * len(template_files)
         current_file_index = 0
         for template_file in template_files:
             # 获取当前模板文件，用户输入的输出路径
             file_path = self.output_config_input_dict.get(template_file.output_config_id)
             # 如果没有获取到用户输入路径或路径不合法，跳过
             if not file_path or not check_path_legal(file_path):
-                current_file_index += len(table_col_dict)
+                # 在跳过当前模板时，也就意味着，跳过了此模板可生成的所有文件，所以当前文件的索引，需要加上总表数
+                current_file_index += len(table_cols)
                 self.generate_log_signal.emit(f'<p style="color: red; background-color: yellow;">'
                                               f'模板文件：{template_file.file_name}，'
                                               f'当前输出路径为：{file_path}，输出路径不合法，跳过！</p><br>')
@@ -135,14 +136,23 @@ class GenerateWorker(ThreadWorkerABC):
             # 生成文件内容的模板
             template = Template(template_file.file_content, trim_blocks=True, lstrip_blocks=True)
 
-            for table_name, col_list in table_col_dict.items():
+            # 循环处理数据表格列数据
+            for table_col_dict in table_cols:
+                # 表名
+                table_name = table_col_dict.get('table_name')
+                # 表注释
+                table_comment = table_col_dict.get('table_comment')
+                # 列数据
+                col_list = table_col_dict.get('col_list')
                 # 生成文件名只需要表名和方法
                 file_name = file_name_template.render(table_name=table_name, template_func=template_func_dict)
                 # 拼接完整输出路径
                 full_file_path = os.path.join(file_path, file_name)
 
                 # 生成文件，放入所有可用的变量
-                generated_content = template.render(table_name=table_name, col_list=col_list,
+                generated_content = template.render(table_name=table_name,
+                                                    table_comment=table_comment,
+                                                    col_list=col_list,
                                                     template_func=template_func_dict,
                                                     output_config=output_config_dict,
                                                     var_config=var_config_dict)
