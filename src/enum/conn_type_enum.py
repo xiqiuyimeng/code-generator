@@ -9,7 +9,7 @@ from src.constant.ds_type_constant import SQLITE_TYPE, SQLITE_DISPLAY_NAME, SQLI
 from src.constant.sql_constant import SQLITE_QUERY_DB_SQL, SQLITE_QUERY_TB_SQL, SQLITE_QUERY_COL_SQL, \
     MYSQL_QUERY_DB_SQL, MYSQL_QUERY_TB_SQL, MYSQL_QUERY_COL_SQL, ORACLE_QUERY_DB_SQL, ORACLE_QUERY_TB_SQL, \
     ORACLE_QUERY_COL_SQL, SQLITE_CHECK_DB_SQL, SQLITE_CHECK_TB_SQL, MYSQL_CHECK_DB_SQL, MYSQL_CHECK_TB_SQL, \
-    ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL
+    ORACLE_CHECK_DB_SQL, ORACLE_CHECK_TB_SQL, MYSQL_QUERY_TB_COMMENT_SQL
 
 _author_ = 'luwt'
 _date_ = '2022/9/27 17:59'
@@ -69,6 +69,8 @@ class ConnType:
     query_tb_sql: str = field(init=False)
     # 检查数据库表是否存在sql
     check_tb_sql: str = field(init=False)
+    # 获取表注释sql，有些数据库可能不支持
+    query_tb_comment_sql: str = field(init=False, default='')
     # 查询数据库列sql
     query_col_sql: str = field(init=False)
 
@@ -102,6 +104,7 @@ class ConnTypeEnum(Enum):
     mysql.check_db_sql = MYSQL_CHECK_DB_SQL
     mysql.query_tb_sql = MYSQL_QUERY_TB_SQL
     mysql.check_tb_sql = MYSQL_CHECK_TB_SQL
+    mysql.query_tb_comment_sql = MYSQL_QUERY_TB_COMMENT_SQL
     mysql.query_col_sql = MYSQL_QUERY_COL_SQL
 
     oracle = ConnType()

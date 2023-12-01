@@ -50,7 +50,7 @@ class CollectTableColABC:
         # 表名
         table_name = node.node_name
         # 表注释
-        table_comment = self.get_table_comment()
+        table_comment = self.get_table_comment(node)
         self.table_col_dict_list.append({
             'table_name': table_name,
             'table_comment': table_comment,
@@ -84,7 +84,7 @@ class CollectTableColABC:
     def get_table_cols(self, table_node) -> tuple:
         ...
 
-    def get_table_comment(self) -> str:
+    def get_table_comment(self, table_node) -> str:
         ...
 
 
@@ -119,8 +119,11 @@ class CollectSqlTableCol(CollectTableColABC):
             self.sql_db_executor_dict[conn_id] = sql_db_executor
         return sql_db_executor
 
-    def get_table_comment(self) -> str:
-        ...
+    def get_table_comment(self, table_node) -> str:
+        """获取数据表注释，通过访问数据库，实时获取"""
+        conn_node = table_node.parent.parent
+        sql_db_executor = self.get_sql_db_executor(conn_node)
+        return sql_db_executor.get_table_comment(table_node.parent.node_name, table_node.node_name)
 
 
 class CollectStructTableCol(CollectTableColABC):
