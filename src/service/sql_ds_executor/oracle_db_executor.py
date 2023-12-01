@@ -61,3 +61,6 @@ class OracleDBExecutor(SqlDBExecutor):
         table_info.handle_data_type()
         table_info.col_type = ColTypeEnum.col.value
         return table_info
+
+    def parse_table_comment(self, row) -> str:
+        return row[0]

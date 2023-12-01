@@ -38,6 +38,8 @@ ORACLE_CHECK_DB_SQL = 'select distinct(OWNER) from all_tables where OWNER = \'{}
 ORACLE_QUERY_TB_SQL = 'select TABLE_NAME from ALL_TABLES where OWNER = \'{}\' order by TABLE_NAME'
 # oracle检查表sql
 ORACLE_CHECK_TB_SQL = 'select TABLE_NAME from ALL_TABLES where OWNER = \'{}\' and TABLE_NAME = \'{}\''
+# oracle获取表注释sql
+ORACLE_QUERY_TB_COMMENT_SQL = 'select COMMENTS from ALL_TAB_COMMENTS where OWNER = \'{}\' and TABLE_NAME = \'{}\''
 # oracle查询数据库表的列名sql
 ORACLE_QUERY_COL_SQL = """
 select ATC.COLUMN_NAME, ATC.DATA_TYPE, ATC.DATA_LENGTH, ATC.DATA_PRECISION, ATC.DATA_SCALE,
