@@ -54,7 +54,7 @@ class CollectTableColABC:
         self.table_col_dict_list.append({
             'table_name': table_name,
             'table_comment': table_comment,
-            'cols': self.convert_to_dict(col_list)
+            'col_list': self.convert_to_dict(col_list)
         })
 
     def convert_to_dict(self, col_list):
