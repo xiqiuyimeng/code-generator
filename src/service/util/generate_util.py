@@ -10,13 +10,15 @@ _author_ = 'luwt'
 _date_ = '2023/5/4 11:02'
 
 
-def convert_complete_table_cols(selected_data, type_mapping_dict):
+def convert_intact_table_cols(selected_data, type_mapping_dict):
+    """
+    转转完整的表格列数据，如果选中的数据中存在列信息，直接使用；否则实时获取最新列数据
+    """
     # 取第一个节点，判断数据类型是sql类型还是结构体类型
     root_children = selected_data.root_children()
     first_node = tuple(root_children.values())[0]
     table_col_dict_list = list()
     if first_node.data.ds_category == DsCategoryEnum.sql_ds_category.get_name():
-        # todo 如果是 sql 数据源，尝试获取表名注释，方便在生成代码时使用
         CollectSqlTableCol(table_col_dict_list, type_mapping_dict).collect_table_cols(root_children)
     elif first_node.data.ds_category == DsCategoryEnum.struct_ds_category.get_name():
         CollectStructTableCol(table_col_dict_list, type_mapping_dict).collect_table_cols(root_children)
