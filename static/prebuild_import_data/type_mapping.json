@@ -1,0 +1,181 @@
+{
+    "data_type": "type_mapping",
+    "data_list": [
+        {
+            "mapping_name": "java-mybatis类型映射",
+            "ds_type": "mysql",
+            "comment": "mysql到java的类型映射，用于生成java mybatis项目",
+            "max_col_type_group_num": 1,
+            "type_mapping_cols": [
+                {
+                    "ds_col_type": "bigint",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "Long",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "bigint",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "BIGINT",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "date",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "LocalDate",
+                    "import_desc": "import java.time.LocalDate",
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "date",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "DATE",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "datetime",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "LocalDateTime",
+                    "import_desc": "import java.time.LocalDateTime",
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "datetime",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "DATETIME",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "int",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "Integer",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "int",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "INTEGER",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "text",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "String",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "text",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "LONGVARCHAR",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "timestamp",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "LocalDateTime",
+                    "import_desc": "import java.time.LocalDateTime",
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "timestamp",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "TIMESTAMP",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "tinyint",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "Boolean",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "tinyint",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "TINYINT",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "varchar",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "String",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "varchar",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "VARCHAR",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "decimal",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "BigDecimal",
+                    "import_desc": "import java.math.BigDecimal",
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "decimal",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "DECIMAL",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "smallint",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "Short",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "smallint",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "SMALLINT",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "char",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "String",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "char",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "VARCHAR",
+                    "import_desc": null,
+                    "group_num": 1
+                },
+                {
+                    "ds_col_type": "tinyint unsigned",
+                    "mapping_col_name": "java_type",
+                    "mapping_type": "Boolean",
+                    "import_desc": null,
+                    "group_num": 0
+                },
+                {
+                    "ds_col_type": "tinyint unsigned",
+                    "mapping_col_name": "jdbc_type",
+                    "mapping_type": "TINYINT",
+                    "import_desc": null,
+                    "group_num": 1
+                }
+            ]
+        }
+    ]
+}

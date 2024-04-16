@@ -1,0 +1,323 @@
+{
+    "data_type": "template",
+    "data_list": [
+        {
+            "template_name": "java spring项目模板",
+            "template_desc": "java spring 模板，可以生成controller，service，service实现类，mapper，model，xml\njava spring项目使用的模板",
+            "output_config_list": [
+                {
+                    "config_name": "model文件 输出路径",
+                    "config_type": 0,
+                    "output_var_name": "var_1",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "model文件 文件将输出到此路径下",
+                    "placeholder_text": "",
+                    "default_value": "",
+                    "range_values": "",
+                    "bind_file_list": [
+                        {
+                            "file_name": "model实体文件",
+                            "file_name_template": "{{ template_func.hump_class_name(table_name) }}.java",
+                            "file_content": "{% set import_list = template_func.get_import_desc(col_list, 'java_type') %}\n{% if var_config.model_package %}\npackage {{ var_config.model_package }};\n{% endif %}\n\n{% if import_list %}\n{% for import_desc in import_list %}\n{{ import_desc }};\n{% endfor %}\n{% endif %}\n{% if var_config.lombok == 'True' %}\nimport lombok.Data;\n{% endif %}\n\n\n{% if var_config.lombok == 'True' %}\n@Data\n{% endif %}\npublic class {{ template_func.hump_class_name(table_name) }}{\n\n    {% for data in col_list %}\n    {% if data.comment %}\n    {{ template_func.handle_comment(data.comment) }}\n    {% endif %}\n    private {{ data.java_type.mapping_type if data.java_type else 'undefined' }} {{ template_func.hump_property_name(data.name) }};\n\n    {% endfor %}\n    {% if var_config.lombok == 'False' %}\n    {# ---getter和setter---- #}\n    {% for data in col_list %}\n    public {{ data.java_type.mapping_type if data.java_type else 'undefined' }} get{{ template_func.hump_class_name(data.name) }}() {\n        return {{ template_func.hump_property_name(data.name) }};\n    }\n\n    public void set{{ template_func.hump_class_name(data.name) }}({{ data.java_type.mapping_type if data.java_type else 'undefined' }} {{ template_func.hump_property_name(data.name) }}) {\n        this.{{ template_func.hump_property_name(data.name) }} = {{ template_func.hump_property_name(data.name) }};\n    }\n\n    {% endfor %}\n    {% endif %}\n}\n",
+                            "is_current": 0,
+                            "tab_opened": 1,
+                            "is_current_tab": 0,
+                            "tab_item_order": 0
+                        }
+                    ]
+                },
+                {
+                    "config_name": "mapper文件 输出路径",
+                    "config_type": 0,
+                    "output_var_name": "var_2",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "mapper文件 文件将输出到此路径下",
+                    "placeholder_text": "",
+                    "default_value": "",
+                    "range_values": "",
+                    "bind_file_list": [
+                        {
+                            "file_name": "mapper文件",
+                            "file_name_template": "{{ template_func.hump_class_name(table_name) }}Mapper.java",
+                            "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set property = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.mapper_package %}\npackage {{ var_config.mapper_package }};\n{% endif %}\n\nimport {{ var_config.model_package }}.{{ class }};\nimport org.apache.ibatis.annotations.Mapper;\n\nimport java.util.List;\n\n\n@Mapper\npublic interface {{ class }}Mapper {\n\n    {{ template_func.hump_class_name(table_name) }} selectByPrimaryKey({{ key_type }} {{ key }});\n\n    int deleteByPrimaryKey({{ key_type }} {{ key }});\n\n    int insert({{ class }} {{ property }});\n\n    int insertSelective({{ class }} {{ property }});\n\n    int updateByPrimaryKey({{ class }} {{ property }});\n\n    int updateByPrimaryKeySelective({{ class }} {{ property }});\n\n    List<{{ class }}> get{{ class }}List();\n}",
+                            "is_current": 0,
+                            "tab_opened": 1,
+                            "is_current_tab": 0,
+                            "tab_item_order": 1
+                        }
+                    ]
+                },
+                {
+                    "config_name": "controller文件 输出路径",
+                    "config_type": 0,
+                    "output_var_name": "var_3",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "controller文件 文件将输出到此路径下",
+                    "placeholder_text": "",
+                    "default_value": "",
+                    "range_values": "",
+                    "bind_file_list": [
+                        {
+                            "file_name": "controller文件",
+                            "file_name_template": "{{ template_func.hump_class_name(table_name) }}Controller.java",
+                            "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set hump_class = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.controller_package %}\npackage {{ var_config.controller_package }};\n{% endif %}\n\nimport {{ var_config.model_package }}.{{ class }};\nimport {{ var_config.service_package }}.{{ class }}Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.List;\n\n\n@RestController\n@RequestMapping(value = \"{{ hump_class }}\")\n@ResponseStatus(HttpStatus.OK)\npublic class {{ class }}Controller {\n\n    @Autowired\n    private {{ class }}Service {{ hump_class }}Service;\n\n    @GetMapping(\"get\")\n    public {{ class }} get(@RequestParam {{ key_type }} {{ key }}){\n        return {{ hump_class }}Service.get{{ class }}({{ key }});\n    }\n\n    @PostMapping(\"add\")\n    public String add(@RequestBody {{ class }} {{ hump_class }}){\n        {{ hump_class }}Service.add{{ class }}({{ hump_class }});\n        return \"ok\";\n    }\n\n    @DeleteMapping(\"delete\")\n    public String delete(@RequestParam {{ key_type }} {{ key }}){\n        {{ hump_class }}Service.delete{{ class }}({{ key }});\n        return \"ok\";\n    }\n\n    @PostMapping(\"edit\")\n    public String edit(@RequestBody {{ class }} {{ hump_class }}){\n        {{ hump_class }}Service.edit{{ class }}({{ hump_class }});\n        return \"ok\";\n    }\n\n    @GetMapping(\"list\")\n    public List<{{ class }}> getList(){\n        return {{ hump_class }}Service.get{{ class }}List();\n    }\n}\n",
+                            "is_current": 0,
+                            "tab_opened": 1,
+                            "is_current_tab": 1,
+                            "tab_item_order": 2
+                        }
+                    ]
+                },
+                {
+                    "config_name": "service接口文件 输出路径",
+                    "config_type": 0,
+                    "output_var_name": "var_4",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "service接口文件 文件将输出到此路径下",
+                    "placeholder_text": "",
+                    "default_value": "",
+                    "range_values": "",
+                    "bind_file_list": [
+                        {
+                            "file_name": "service接口文件",
+                            "file_name_template": "{{ template_func.hump_class_name(table_name) }}Service.java",
+                            "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.service_package %}\npackage {{ var_config.service_package }};\n{% endif %}\n\nimport {{ var_config.model_package }}.{{ class }};\n\nimport java.util.List;\n\n\npublic interface {{ class }}Service {\n\n    {{ class }} get{{ class }}({{ key_type }} {{ key }});\n\n    void add{{ class }}({{ class }} record);\n\n    void delete{{ class }}({{ key_type }} {{ key }});\n\n    void edit{{ class }}({{ class }} record);\n\n    List<{{ class }}> get{{ class }}List();\n}\n",
+                            "is_current": 1,
+                            "tab_opened": 1,
+                            "is_current_tab": 0,
+                            "tab_item_order": 3
+                        }
+                    ]
+                },
+                {
+                    "config_name": "service实现类 输出路径",
+                    "config_type": 0,
+                    "output_var_name": "var_5",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "service实现类 文件将输出到此路径下",
+                    "placeholder_text": "",
+                    "default_value": "",
+                    "range_values": "",
+                    "bind_file_list": [
+                        {
+                            "file_name": "service实现类",
+                            "file_name_template": "{{ template_func.hump_class_name(table_name) }}ServiceImpl.java",
+                            "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set hump_class = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.service_impl_package %}\npackage {{var_config.service_impl_package}};\n{% endif %}\n\nimport {{ var_config.mapper_package }}.{{ class }}Mapper;\nimport {{ var_config.model_package }}.{{ class }};\nimport {{ var_config.service_package }}.{{ class }}Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n\nimport java.util.List;\n\n\n@Service\npublic class {{ class }}ServiceImpl implements {{ class }}Service {\n\n    @Autowired\n    private {{ class }}Mapper {{ hump_class }}Mapper;\n\n    @Override\n    public {{ class }} get{{ class }}({{ key_type }} {{ key }}) {\n        return {{ hump_class }}Mapper.selectByPrimaryKey({{key}});\n    }\n\n    @Override\n    public void add{{ class }}({{ class }} {{ hump_class }}) {\n        {{ hump_class }}Mapper.insertSelective({{ hump_class }});\n    }\n\n    @Override\n    public void delete{{ class }}({{ key_type }} {{ key }}) {\n        {{ hump_class }}Mapper.deleteByPrimaryKey({{key}});\n    }\n\n    @Override\n    public void edit{{ class }}({{ class }} {{ hump_class }}) {\n        {{ hump_class }}Mapper.updateByPrimaryKeySelective({{ hump_class }});\n    }\n\n    @Override\n    public List<{{ class }}> get{{ class }}List() {\n        return {{ hump_class }}Mapper.get{{ class }}List();\n    }\n}\n",
+                            "is_current": 0,
+                            "tab_opened": 1,
+                            "is_current_tab": 0,
+                            "tab_item_order": 4
+                        }
+                    ]
+                },
+                {
+                    "config_name": "xml sql配置文件 输出路径",
+                    "config_type": 0,
+                    "output_var_name": "var_6",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "xml sql配置文件 文件将输出到此路径下",
+                    "placeholder_text": "",
+                    "default_value": "",
+                    "range_values": "",
+                    "bind_file_list": [
+                        {
+                            "file_name": "xml sql配置文件",
+                            "file_name_template": "{{ template_func.hump_class_name(table_name) }}Mapper.xml",
+                            "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set hump_class = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% set key_jdbc = template_func.get_key_jdbc_str(col_list, 'jdbc_type') %}\n<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\" >\n<mapper namespace=\"{{ var_config.mapper_package }}.{{ class }}Mapper\">\n    <resultMap id=\"BaseResultMap\" type=\"{{ var_config.model_package }}.{{ class }}\">\n        {% for data in col_list %}\n        <result column=\"{{ data.name }}\" property=\"{{ template_func.hump_property_name(data.name) }}\" jdbcType=\"{{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}\"/>\n        {% endfor %}\n    </resultMap>\n    <sql id=\"Base_Column_List\">\n        {{ template_func.get_base_sql_col(col_list, 9) }}\n    </sql>\n    <select id=\"selectByPrimaryKey\" resultMap=\"BaseResultMap\" parameterType=\"{{ key_type }}\">\n        select\n        <include refid=\"Base_Column_List\"/>\n        from {{ table_name }}\n        where {{ key_jdbc }}\n    </select>\n    <delete id=\"deleteByPrimaryKey\" parameterType=\"{{ key_type }}\" >\n        delete from {{ table_name }}\n        where {{ key_jdbc }}\n    </delete>\n    <insert id=\"insert\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        insert into {{ table_name }} (\n            {{ template_func.get_base_sql_col(col_list, 13) }}\n        )\n        values (\n            {{ template_func.get_insert_value_str(col_list, 'jdbc_type', 13) }}\n        )\n    </insert>\n    <insert id=\"insertSelective\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        insert into {{ table_name }}\n        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\" >\n            {% for data in col_list %}\n            <if test=\"{{ template_func.hump_property_name(data.name) }} != null\" >\n                {{ data.name }},\n            </if>\n            {% endfor %}\n        </trim>\n        <trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\" >\n            {% for data in col_list %}\n            <if test=\"{{ template_func.hump_property_name(data.name) }} != null\" >\n                #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}\n            </if>\n            {% endfor %}\n        </trim>\n    </insert>\n    <update id=\"updateByPrimaryKey\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        update {{ table_name }}\n        {% for data in col_list | selectattr('is_pk', '==', False) %}\n        {% if loop.first %}\n        set {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}\n        {% elif loop.last %}\n          {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}'}}\n        {% else %}\n          {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}\n        {% endif %}\n        {% endfor %}\n        where {{ key_jdbc }}\n    </update>\n    <update id=\"updateByPrimaryKeySelective\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        update {{ table_name }}\n        <set>\n        {% for data in col_list | selectattr('is_pk', '==', False) %}\n            <if test=\"{{ template_func.hump_property_name(data.name) }} != null\" >\n                {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}'}},\n            </if>\n        {% endfor %}\n        </set>\n        where {{ key_jdbc }}\n    </update>\n    <select id=\"get{{ class }}List\" resultMap=\"BaseResultMap\">\n        select\n        <include refid=\"Base_Column_List\"/>\n        from {{ table_name }}\n    </select>\n</mapper>\n",
+                            "is_current": 0,
+                            "tab_opened": 1,
+                            "is_current_tab": 0,
+                            "tab_item_order": 5
+                        }
+                    ]
+                }
+            ],
+            "var_config_list": [
+                {
+                    "config_name": "lombok",
+                    "config_type": 1,
+                    "output_var_name": "lombok",
+                    "config_value_widget": "下拉框列表",
+                    "is_required": 1,
+                    "config_desc": "是否使用lombok注解",
+                    "placeholder_text": "",
+                    "default_value": "True",
+                    "range_values": "True,False",
+                    "bind_file_list": null
+                },
+                {
+                    "config_name": "model_package",
+                    "config_type": 1,
+                    "output_var_name": "model_package",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "java实体文件包路径",
+                    "placeholder_text": "",
+                    "default_value": "org.demo.learn.model",
+                    "range_values": "",
+                    "bind_file_list": null
+                },
+                {
+                    "config_name": "mapper_package",
+                    "config_type": 1,
+                    "output_var_name": "mapper_package",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "mapper的包路径",
+                    "placeholder_text": "",
+                    "default_value": "org.demo.learn.dao",
+                    "range_values": "",
+                    "bind_file_list": null
+                },
+                {
+                    "config_name": "service_package",
+                    "config_type": 1,
+                    "output_var_name": "service_package",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "service 接口包路径",
+                    "placeholder_text": "",
+                    "default_value": "org.demo.learn.service",
+                    "range_values": "",
+                    "bind_file_list": null
+                },
+                {
+                    "config_name": "service_impl_package",
+                    "config_type": 1,
+                    "output_var_name": "service_impl_package",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "service 实体类包路径",
+                    "placeholder_text": "",
+                    "default_value": "org.demo.learn.service.impl",
+                    "range_values": "",
+                    "bind_file_list": null
+                },
+                {
+                    "config_name": "controller_package",
+                    "config_type": 1,
+                    "output_var_name": "controller_package",
+                    "config_value_widget": "文本输入框 + 文件夹对话框",
+                    "is_required": 1,
+                    "config_desc": "controller 包路径",
+                    "placeholder_text": "",
+                    "default_value": "org.demo.learn.controller",
+                    "range_values": "",
+                    "bind_file_list": null
+                }
+            ],
+            "template_files": [
+                {
+                    "file_name": "model实体文件",
+                    "file_name_template": "{{ template_func.hump_class_name(table_name) }}.java",
+                    "file_content": "{% set import_list = template_func.get_import_desc(col_list, 'java_type') %}\n{% if var_config.model_package %}\npackage {{ var_config.model_package }};\n{% endif %}\n\n{% if import_list %}\n{% for import_desc in import_list %}\n{{ import_desc }};\n{% endfor %}\n{% endif %}\n{% if var_config.lombok == 'True' %}\nimport lombok.Data;\n{% endif %}\n\n\n{% if var_config.lombok == 'True' %}\n@Data\n{% endif %}\npublic class {{ template_func.hump_class_name(table_name) }}{\n\n    {% for data in col_list %}\n    {% if data.comment %}\n    {{ template_func.handle_comment(data.comment) }}\n    {% endif %}\n    private {{ data.java_type.mapping_type if data.java_type else 'undefined' }} {{ template_func.hump_property_name(data.name) }};\n\n    {% endfor %}\n    {% if var_config.lombok == 'False' %}\n    {# ---getter和setter---- #}\n    {% for data in col_list %}\n    public {{ data.java_type.mapping_type if data.java_type else 'undefined' }} get{{ template_func.hump_class_name(data.name) }}() {\n        return {{ template_func.hump_property_name(data.name) }};\n    }\n\n    public void set{{ template_func.hump_class_name(data.name) }}({{ data.java_type.mapping_type if data.java_type else 'undefined' }} {{ template_func.hump_property_name(data.name) }}) {\n        this.{{ template_func.hump_property_name(data.name) }} = {{ template_func.hump_property_name(data.name) }};\n    }\n\n    {% endfor %}\n    {% endif %}\n}\n",
+                    "is_current": 0,
+                    "tab_opened": 1,
+                    "is_current_tab": 0,
+                    "tab_item_order": 0
+                },
+                {
+                    "file_name": "mapper文件",
+                    "file_name_template": "{{ template_func.hump_class_name(table_name) }}Mapper.java",
+                    "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set property = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.mapper_package %}\npackage {{ var_config.mapper_package }};\n{% endif %}\n\nimport {{ var_config.model_package }}.{{ class }};\nimport org.apache.ibatis.annotations.Mapper;\n\nimport java.util.List;\n\n\n@Mapper\npublic interface {{ class }}Mapper {\n\n    {{ template_func.hump_class_name(table_name) }} selectByPrimaryKey({{ key_type }} {{ key }});\n\n    int deleteByPrimaryKey({{ key_type }} {{ key }});\n\n    int insert({{ class }} {{ property }});\n\n    int insertSelective({{ class }} {{ property }});\n\n    int updateByPrimaryKey({{ class }} {{ property }});\n\n    int updateByPrimaryKeySelective({{ class }} {{ property }});\n\n    List<{{ class }}> get{{ class }}List();\n}",
+                    "is_current": 0,
+                    "tab_opened": 1,
+                    "is_current_tab": 0,
+                    "tab_item_order": 1
+                },
+                {
+                    "file_name": "controller文件",
+                    "file_name_template": "{{ template_func.hump_class_name(table_name) }}Controller.java",
+                    "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set hump_class = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.controller_package %}\npackage {{ var_config.controller_package }};\n{% endif %}\n\nimport {{ var_config.model_package }}.{{ class }};\nimport {{ var_config.service_package }}.{{ class }}Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.List;\n\n\n@RestController\n@RequestMapping(value = \"{{ hump_class }}\")\n@ResponseStatus(HttpStatus.OK)\npublic class {{ class }}Controller {\n\n    @Autowired\n    private {{ class }}Service {{ hump_class }}Service;\n\n    @GetMapping(\"get\")\n    public {{ class }} get(@RequestParam {{ key_type }} {{ key }}){\n        return {{ hump_class }}Service.get{{ class }}({{ key }});\n    }\n\n    @PostMapping(\"add\")\n    public String add(@RequestBody {{ class }} {{ hump_class }}){\n        {{ hump_class }}Service.add{{ class }}({{ hump_class }});\n        return \"ok\";\n    }\n\n    @DeleteMapping(\"delete\")\n    public String delete(@RequestParam {{ key_type }} {{ key }}){\n        {{ hump_class }}Service.delete{{ class }}({{ key }});\n        return \"ok\";\n    }\n\n    @PostMapping(\"edit\")\n    public String edit(@RequestBody {{ class }} {{ hump_class }}){\n        {{ hump_class }}Service.edit{{ class }}({{ hump_class }});\n        return \"ok\";\n    }\n\n    @GetMapping(\"list\")\n    public List<{{ class }}> getList(){\n        return {{ hump_class }}Service.get{{ class }}List();\n    }\n}\n",
+                    "is_current": 0,
+                    "tab_opened": 1,
+                    "is_current_tab": 1,
+                    "tab_item_order": 2
+                },
+                {
+                    "file_name": "service接口文件",
+                    "file_name_template": "{{ template_func.hump_class_name(table_name) }}Service.java",
+                    "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.service_package %}\npackage {{ var_config.service_package }};\n{% endif %}\n\nimport {{ var_config.model_package }}.{{ class }};\n\nimport java.util.List;\n\n\npublic interface {{ class }}Service {\n\n    {{ class }} get{{ class }}({{ key_type }} {{ key }});\n\n    void add{{ class }}({{ class }} record);\n\n    void delete{{ class }}({{ key_type }} {{ key }});\n\n    void edit{{ class }}({{ class }} record);\n\n    List<{{ class }}> get{{ class }}List();\n}\n",
+                    "is_current": 1,
+                    "tab_opened": 1,
+                    "is_current_tab": 0,
+                    "tab_item_order": 3
+                },
+                {
+                    "file_name": "service实现类",
+                    "file_name_template": "{{ template_func.hump_class_name(table_name) }}ServiceImpl.java",
+                    "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set hump_class = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% if var_config.service_impl_package %}\npackage {{var_config.service_impl_package}};\n{% endif %}\n\nimport {{ var_config.mapper_package }}.{{ class }}Mapper;\nimport {{ var_config.model_package }}.{{ class }};\nimport {{ var_config.service_package }}.{{ class }}Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n\nimport java.util.List;\n\n\n@Service\npublic class {{ class }}ServiceImpl implements {{ class }}Service {\n\n    @Autowired\n    private {{ class }}Mapper {{ hump_class }}Mapper;\n\n    @Override\n    public {{ class }} get{{ class }}({{ key_type }} {{ key }}) {\n        return {{ hump_class }}Mapper.selectByPrimaryKey({{key}});\n    }\n\n    @Override\n    public void add{{ class }}({{ class }} {{ hump_class }}) {\n        {{ hump_class }}Mapper.insertSelective({{ hump_class }});\n    }\n\n    @Override\n    public void delete{{ class }}({{ key_type }} {{ key }}) {\n        {{ hump_class }}Mapper.deleteByPrimaryKey({{key}});\n    }\n\n    @Override\n    public void edit{{ class }}({{ class }} {{ hump_class }}) {\n        {{ hump_class }}Mapper.updateByPrimaryKeySelective({{ hump_class }});\n    }\n\n    @Override\n    public List<{{ class }}> get{{ class }}List() {\n        return {{ hump_class }}Mapper.get{{ class }}List();\n    }\n}\n",
+                    "is_current": 0,
+                    "tab_opened": 1,
+                    "is_current_tab": 0,
+                    "tab_item_order": 4
+                },
+                {
+                    "file_name": "xml sql配置文件",
+                    "file_name_template": "{{ template_func.hump_class_name(table_name) }}Mapper.xml",
+                    "file_content": "{% set class = template_func.hump_class_name(table_name) %}\n{% set hump_class = template_func.hump_property_name(table_name) %}\n{% set key, key_type = template_func.get_key(col_list, 'java_type') %}\n{% set key_jdbc = template_func.get_key_jdbc_str(col_list, 'jdbc_type') %}\n<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\" >\n<mapper namespace=\"{{ var_config.mapper_package }}.{{ class }}Mapper\">\n    <resultMap id=\"BaseResultMap\" type=\"{{ var_config.model_package }}.{{ class }}\">\n        {% for data in col_list %}\n        <result column=\"{{ data.name }}\" property=\"{{ template_func.hump_property_name(data.name) }}\" jdbcType=\"{{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}\"/>\n        {% endfor %}\n    </resultMap>\n    <sql id=\"Base_Column_List\">\n        {{ template_func.get_base_sql_col(col_list, 9) }}\n    </sql>\n    <select id=\"selectByPrimaryKey\" resultMap=\"BaseResultMap\" parameterType=\"{{ key_type }}\">\n        select\n        <include refid=\"Base_Column_List\"/>\n        from {{ table_name }}\n        where {{ key_jdbc }}\n    </select>\n    <delete id=\"deleteByPrimaryKey\" parameterType=\"{{ key_type }}\" >\n        delete from {{ table_name }}\n        where {{ key_jdbc }}\n    </delete>\n    <insert id=\"insert\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        insert into {{ table_name }} (\n            {{ template_func.get_base_sql_col(col_list, 13) }}\n        )\n        values (\n            {{ template_func.get_insert_value_str(col_list, 'jdbc_type', 13) }}\n        )\n    </insert>\n    <insert id=\"insertSelective\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        insert into {{ table_name }}\n        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\" >\n            {% for data in col_list %}\n            <if test=\"{{ template_func.hump_property_name(data.name) }} != null\" >\n                {{ data.name }},\n            </if>\n            {% endfor %}\n        </trim>\n        <trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\" >\n            {% for data in col_list %}\n            <if test=\"{{ template_func.hump_property_name(data.name) }} != null\" >\n                #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}\n            </if>\n            {% endfor %}\n        </trim>\n    </insert>\n    <update id=\"updateByPrimaryKey\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        update {{ table_name }}\n        {% for data in col_list | selectattr('is_pk', '==', False) %}\n        {% if loop.first %}\n        set {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}\n        {% elif loop.last %}\n          {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}'}}\n        {% else %}\n          {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}, '}}\n        {% endif %}\n        {% endfor %}\n        where {{ key_jdbc }}\n    </update>\n    <update id=\"updateByPrimaryKeySelective\" parameterType=\"{{ var_config.model_package }}.{{ class }}\" >\n        update {{ table_name }}\n        <set>\n        {% for data in col_list | selectattr('is_pk', '==', False) %}\n            <if test=\"{{ template_func.hump_property_name(data.name) }} != null\" >\n                {{ data.name }} = #{{'{'}}{{ template_func.hump_property_name(data.name) }},jdbcType={{ data.jdbc_type.mapping_type if data.jdbc_type else 'undefined' }}{{'}'}},\n            </if>\n        {% endfor %}\n        </set>\n        where {{ key_jdbc }}\n    </update>\n    <select id=\"get{{ class }}List\" resultMap=\"BaseResultMap\">\n        select\n        <include refid=\"Base_Column_List\"/>\n        from {{ table_name }}\n    </select>\n</mapper>\n",
+                    "is_current": 0,
+                    "tab_opened": 1,
+                    "is_current_tab": 0,
+                    "tab_item_order": 5
+                }
+            ],
+            "template_func_list": [
+                {
+                    "func_name": "hump_class_name",
+                    "func_body": "def hump_class_name(table_name):\n    hump_name = ''\n    for name in table_name.split('_'):\n        hump_name += name.capitalize()\n    return hump_name\n",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "hump_property_name",
+                    "func_body": "def hump_property_name(property_name):\n    split_list = property_name.split('_')\n    hump_name = split_list[0]\n    for name in split_list[1: ]:\n        hump_name += name.capitalize()\n    return hump_name",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "get_base_sql_col",
+                    "func_body": "def get_base_sql_col(col_list, next_line_left_blank):\n    row_len = 0\n    result_sql = ''\n    result_sql_list = list()\n    for col in col_list:\n        if row_len + len(col.get('name')) <= 100:\n            # 如果是最后一个字段，那么将sql添加到list中\n            if col is col_list[-1]:\n                result_sql += col.get('name')\n                result_sql_list.append(result_sql)\n            else:\n                result_sql += f'{col.get(\"name\")}, '\n            row_len = len(result_sql)\n        else:\n            # 这里是超过长度的处理，先添加到列表中，重置并进入下一行处理\n            result_sql_list.append(result_sql)\n            if col is col_list[-1]:\n                result_sql = col.get('name')\n                result_sql_list.append(result_sql)\n            else:\n                result_sql = f'{col.get(\"name\")}, '\n            row_len = len(result_sql)\n    return f'\\n{\" \" * next_line_left_blank}'.join(result_sql_list)",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "handle_comment",
+                    "func_body": "def handle_comment(comment):\n    # 首先去除开头结尾的换行符\n    raw_comment = comment.strip('\\n')\n    format_comment = raw_comment.replace('\\n', f'\\n{\" \" * 5}* ')\n    return f'''/**\n     * {format_comment}\n     */ '''",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "get_key",
+                    "func_body": "def get_key(col_list, mapping_key):\n    def hump_col_name(col_name):\n        split_list = col_name.split('_')\n        hump_name = split_list[0]\n        for name in split_list[1:]:\n            hump_name += name.capitalize()\n        return hump_name\n\n    def get_key_data(col_data):\n        key_name = hump_col_name(col_data.get('name'))\n        type_mapping = col_data.get(mapping_key)\n        mapping_name = type_mapping.get('mapping_type') if type_mapping else None\n        return key_name, mapping_name\n\n    key = [get_key_data(col) for col in col_list if col.get('is_pk')]\n    return key[0] if key else ('', '')",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "get_key_jdbc_str",
+                    "func_body": "def get_key_jdbc_str(col_list, mapping_key):\n    def hump_col_name(col_name):\n        split_list = col_name.split('_')\n        hump_name = split_list[0]\n        for name in split_list[1:]:\n            hump_name += name.capitalize()\n        return hump_name\n\n    def get_key_jdbc_type(col_data):\n        col_name = col_data.get('name')\n        key_name = hump_col_name(col_name)\n        type_mapping = col_data.get(mapping_key)\n        jdbc_type = type_mapping.get('mapping_type') if type_mapping else None\n        return f'{col_name} = #{{{key_name},jdbcType={jdbc_type}}}'\n\n    key = [get_key_jdbc_type(col) for col in col_list if col.get('is_pk')]\n    return key[0] if key else '没有主键'",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "get_insert_value_str",
+                    "func_body": "def get_insert_value_str(col_list, mapping_key, next_line_left_blank):\n    def hump_col_name(col_name):\n        split_list = col_name.split('_')\n        hump_name = split_list[0]\n        for name in split_list[1:]:\n            hump_name += name.capitalize()\n        return hump_name\n\n    row_len = 0\n    result_sql = ''\n    result_sql_list = list()\n    for col in col_list:\n        # 拼接字符串\n        property_name = hump_col_name(col.get(\"name\"))\n        type_mapping = col.get(mapping_key)\n        jdbc_type = type_mapping.get('mapping_type') if type_mapping else None\n        insert_value = f'{{{property_name},jdbcType={jdbc_type}}}'\n        if row_len + len(insert_value) <= 100:\n            if col is col_list[-1]:\n                result_sql += insert_value\n                result_sql_list.append(result_sql)\n            else:\n                result_sql += f'{insert_value}, '\n            row_len = len(result_sql)\n        else:\n            result_sql_list.append(result_sql)\n            if col is col_list[-1]:\n                result_sql = insert_value\n                result_sql_list.append(result_sql)\n            else:\n                result_sql = f'{insert_value}, '\n            row_len = len(result_sql)\n    return f'\\n{\" \" * next_line_left_blank}'.join(result_sql_list)",
+                    "is_current": 0,
+                    "checked": 0
+                },
+                {
+                    "func_name": "get_import_desc",
+                    "func_body": "def get_import_desc(col_list, mapping_key):\n    return {col.get(mapping_key).get('import_desc') \n            for col in col_list \n            if col.get(mapping_key) and col.get(mapping_key).get('import_desc')}",
+                    "is_current": 0,
+                    "checked": 0
+                }
+            ]
+        }
+    ]
+}
