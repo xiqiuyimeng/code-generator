@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+项目中所有使用到的icon枚举，每个枚举元素包括展示名称、icon具体路径，使用方调用时，获取路径即可渲染icon
+"""
 from enum import Enum
 
 from PyQt6.QtGui import QIcon
