@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+项目中使用到的通用枚举类型
+"""
 from enum import Enum
 
 from PyQt6.QtCore import Qt
