@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+项目中使用到的通用枚举类型
+"""
 from enum import Enum
 
 from PyQt6.QtCore import Qt
@@ -54,4 +57,5 @@ class RequiredEnum(Enum):
 
 
 def check_required_value_legal(value):
+    """判断required枚举值，是否合法"""
     return value == RequiredEnum.not_required.value or value == RequiredEnum.required.value
