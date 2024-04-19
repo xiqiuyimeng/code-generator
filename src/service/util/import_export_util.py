@@ -67,6 +67,7 @@ def export_type_mapping(type_mapping_sqlite, col_type_mapping_sqlite, type_mappi
 # ------------------------------ 导入导出模板 start ------------------------------ #
 
 def create_default_file_name(template_file_name_set, default_file_name, start_idx):
+    """创建默认的文件名称，尝试创建，如果名称已存在，则将索引值增加，递归创建"""
     current_file_name = default_file_name.format(start_idx)
     if current_file_name in template_file_name_set:
         return create_default_file_name(template_file_name_set, default_file_name, start_idx + 1)
