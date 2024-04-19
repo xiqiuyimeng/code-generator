@@ -127,12 +127,15 @@ def check_template_func_name(template_func_list):
     error_count = 0
     func_name_set = set()
     for template_func in template_func_list:
+        # 检查名称是否存在
         if not template_func.func_name:
             error_count += 1
+        # 检查名称是否重复
         elif template_func.func_name in func_name_set:
             error_count += 1
         else:
             func_name_set.add(template_func.func_name)
+    # 返回检查错误名称的数量，以便上层方法判断处理
     return error_count
 
 
