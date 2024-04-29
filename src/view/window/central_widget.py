@@ -26,6 +26,7 @@ class CentralWidget(QWidget):
         self.horizontal_splitter.setChildrenCollapsible(False)
         self._layout.addWidget(self.horizontal_splitter)
 
+        # 对 frame 进行缓存，避免多次加载
         self.frame_dict = dict()
 
         self.tree_frame = ...
