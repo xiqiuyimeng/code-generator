@@ -117,7 +117,7 @@ class IconEnum(Enum):
     sql_mysql_tb_icon = MYSQL_TB, 'icon:table_icon.png'
     sql_mysql_col_icon = MYSQL_COL, 'icon:column_icon.png'
     # oracle
-    sql_oracle_conn_icon = ORACLE_DISPLAY_NAME, 'icon:right.png'
+    sql_oracle_conn_icon = ORACLE_DISPLAY_NAME, 'icon:oracle_conn_icon.png'
     sql_oracle_db_icon = ORACLE_DB, 'icon:template.png'
     sql_oracle_tb_icon = ORACLE_TB, 'icon:table_icon.png'
     sql_oracle_col_icon = ORACLE_COL, 'icon:column_icon.png'
