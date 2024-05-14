@@ -107,7 +107,7 @@ class IconEnum(Enum):
 
     # sql ds icon
     # sqlite
-    sql_sqlite_conn_icon = SQLITE_DISPLAY_NAME, 'icon:table_icon.png'
+    sql_sqlite_conn_icon = SQLITE_DISPLAY_NAME, 'icon:sqlite_conn_icon.png'
     sql_sqlite_db_icon = SQLITE_DB, 'icon:database_icon.png'
     sql_sqlite_tb_icon = SQLITE_TB, 'icon:table_icon.png'
     sql_sqlite_col_icon = SQLITE_COL, 'icon:column_icon.png'
