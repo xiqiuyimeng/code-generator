@@ -123,7 +123,7 @@ class IconEnum(Enum):
     sql_oracle_col_icon = ORACLE_COL, 'icon:column_icon.png'
 
     # struct ds icon
-    json_type_icon = JSON_DISPLAY_NAME, 'icon:exec.png'
+    json_type_icon = JSON_DISPLAY_NAME, 'icon:json_icon.png'
     struct_col_icon = STRUCT_COL_ICON, 'icon:column_icon.png'
     new_folder_icon = CREATE_NEW_FOLDER_ACTION, 'icon:add.png'
     rename_folder_icon = RENAME_FOLDER_ACTION, 'icon:exec.png'
