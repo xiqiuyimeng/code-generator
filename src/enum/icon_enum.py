@@ -41,7 +41,7 @@ class IconEnum(Enum):
     switch_ds_category_icon = SWITCH_ACTION, 'icon:exec.png'
     add_ds_icon = ADD_DS_ACTION, 'icon:add.png'
     refresh_icon = REFRESH_ACTION, 'icon:refresh.png'
-    type_mapping_icon = TYPE_ACTION, 'icon:table_icon.png'
+    type_mapping_icon = TYPE_ACTION, 'icon:type_mapping.png'
     template_icon = TEMPLATE_ACTION, 'icon:template.png'
     generate_icon = GENERATE_ACTION, 'icon:exec.png'
     clear_data_icon = CLEAR_DATA_ACTION, 'icon:remove.png'
