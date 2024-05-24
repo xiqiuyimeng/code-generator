@@ -46,7 +46,7 @@ class IconEnum(Enum):
     generate_icon = GENERATE_ACTION, 'icon:exec.png'
     clear_data_icon = CLEAR_DATA_ACTION, 'icon:remove.png'
     exit_icon = EXIT_ACTION, 'icon:exit.png'
-    help_icon = HELP_ACTION, 'icon:exec.png'
+    help_icon = HELP_ACTION, 'icon:help.png'
     about_icon = ABOUT_ACTION, 'icon:exec.png'
 
     # 右键菜单 icon
