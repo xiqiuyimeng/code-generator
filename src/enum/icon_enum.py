@@ -38,7 +38,7 @@ class IconEnum(Enum):
     window_icon = 'window', 'icon:exec.png'
 
     # bar icon
-    switch_ds_category_icon = SWITCH_ACTION, 'icon:exec.png'
+    switch_ds_category_icon = SWITCH_ACTION, 'icon:switch_ds_category.png'
     add_ds_icon = ADD_DS_ACTION, 'icon:add.png'
     refresh_icon = REFRESH_ACTION, 'icon:refresh.png'
     type_mapping_icon = TYPE_ACTION, 'icon:type_mapping.png'
