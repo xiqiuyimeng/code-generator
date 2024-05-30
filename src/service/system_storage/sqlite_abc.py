@@ -14,8 +14,11 @@ _date_ = '2022/5/11 10:25'
 @dataclass
 class BasicSqliteDTO:
     id: int = field(default=None, init=False, compare=False)
+    # 元素顺序
     item_order: int = field(init=False, default=None, compare=False)
+    # 数据创建时间
     create_time: str = field(default=None, init=False, compare=False)
+    # 数据更新时间
     update_time: str = field(default=None, init=False, compare=False)
 
 
