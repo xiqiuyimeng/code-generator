@@ -55,7 +55,7 @@ class IconEnum(Enum):
     cancel_open_conn_icon = CANCEL_OPEN_CONN_ACTION, 'icon:exec.png'
     refresh_conn_icon = REFRESH_CONN_ACTION, 'icon:refresh.png'
     cancel_refresh_conn_icon = CANCEL_REFRESH_CONN_ACTION, 'icon:exec.png'
-    close_conn_icon = CLOSE_CONN_ACTION, 'icon:exec.png'
+    close_conn_icon = CLOSE_CONN_ACTION, 'icon:close.png'
     test_conn_icon = TEST_CONN_ACTION, 'icon:exec.png'
     cancel_test_conn_icon = CANCEL_TEST_CONN_ACTION, 'icon:exec.png'
     add_conn_icon = ADD_CONN_ACTION, 'icon:exec.png'
@@ -64,7 +64,7 @@ class IconEnum(Enum):
     # sql db
     open_db_icon = OPEN_DB_ACTION, 'icon:exec.png'
     cancel_open_db_icon = CANCEL_OPEN_DB_ACTION, 'icon:exec.png'
-    close_db_icon = CLOSE_DB_ACTION, 'icon:exec.png'
+    close_db_icon = CLOSE_DB_ACTION, 'icon:close.png'
     select_all_tb_icon = SELECT_ALL_TB_ACTION, 'icon:exec.png'
     unselect_tb_icon = UNSELECT_TB_ACTION, 'icon:exec.png'
     refresh_db_icon = REFRESH_DB_ACTION, 'icon:refresh.png'
@@ -72,7 +72,7 @@ class IconEnum(Enum):
     # sql tb
     open_table_icon = OPEN_TABLE_ACTION, 'icon:exec.png'
     cancel_open_table_icon = CANCEL_OPEN_TABLE_ACTION, 'icon:exec.png'
-    close_table_icon = CLOSE_TABLE_ACTION, 'icon:exec.png'
+    close_table_icon = CLOSE_TABLE_ACTION, 'icon:close.png'
     select_all_field_icon = SELECT_ALL_FIELD_ACTION, 'icon:exec.png'
     unselect_field_icon = UNSELECT_FIELD_ACTION, 'icon:exec.png'
     refresh_tb_icon = REFRESH_TB_ACTION, 'icon:refresh.png'
@@ -81,7 +81,7 @@ class IconEnum(Enum):
     # struct
     cancel_open_struct_icon = CANCEL_OPEN_STRUCT_ACTION, 'icon:refresh.png'
     open_struct_icon = OPEN_STRUCT_ACTION, 'icon:exec.png'
-    close_struct_icon = CLOSE_STRUCT_ACTION, 'icon:wrong.png'
+    close_struct_icon = CLOSE_STRUCT_ACTION, 'icon:close.png'
     edit_struct_icon = EDIT_STRUCT_ACTION, 'icon:right.png'
     del_struct_icon = DEL_STRUCT_ACTION, 'icon:remove.png'
     refresh_struct_icon = REFRESH_STRUCT_ACTION, 'icon:refresh.png'
