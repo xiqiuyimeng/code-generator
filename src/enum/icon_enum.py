@@ -84,11 +84,11 @@ class IconEnum(Enum):
     close_struct_icon = CLOSE_STRUCT_ACTION, 'icon:wrong.png'
     edit_struct_icon = EDIT_STRUCT_ACTION, 'icon:right.png'
     del_struct_icon = DEL_STRUCT_ACTION, 'icon:remove.png'
-    refresh_struct_icon = REFRESH_STRUCT_ACTION, 'icon:remove.png'
+    refresh_struct_icon = REFRESH_STRUCT_ACTION, 'icon:refresh.png'
     cancel_refresh_struct_icon = CANCEL_REFRESH_STRUCT_ACTION, 'icon:remove.png'
     select_all_icon = SELECT_ALL_ACTION, 'icon:remove.png'
     unselect_icon = UNSELECT_ACTION, 'icon:remove.png'
-    refresh_folder_icon = REFRESH_FOLDER_ACTION, 'icon:remove.png'
+    refresh_folder_icon = REFRESH_FOLDER_ACTION, 'icon:refresh.png'
     cancel_refresh_folder_icon = CANCEL_REFRESH_FOLDER_ACTION, 'icon:remove.png'
 
     # 列表元素右键
