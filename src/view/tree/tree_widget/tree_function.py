@@ -352,7 +352,8 @@ def update_struct_tree_item(tree_widget, item_name):
     opened_item = get_item_opened_record(item)
     opened_item.item_name = item_name
     # 如果节点是选中或部分选中状态，更新选中数据中的名称
-    if item.checkState(0):
+    check_state = item.checkState(0)
+    if check_state == Qt.CheckState.Checked or check_state == Qt.CheckState.PartiallyChecked:
         update_data = get_add_del_data(item)
         tree_widget.tree_data.update_node_name(update_data)
     # 同sql连接节点，这里也需要同步更新下 tree_node 对象中的 结构体名称
