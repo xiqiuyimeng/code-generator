@@ -43,7 +43,8 @@ class StructTreeNodeABC(TreeNodeABC):
     def del_callback(self):
         parent_item = self.item.parent()
         # 同步删除选中数据
-        if self.item.checkState(0):
+        check_state = self.item.checkState(0)
+        if check_state == Qt.CheckState.Checked or check_state == Qt.CheckState.PartiallyChecked:
             del_data = get_add_del_data(self.item)
             self.tree_widget.tree_data.del_node(del_data)
         if parent_item:
