@@ -117,7 +117,8 @@ class TableTreeNode(SqlTreeNodeABC):
 
     def close_tab_callback(self):
         # 如果选中了数据，那么清空列数据，提供给tab bar调用，在关闭tab时调用
-        if self.item.checkState(0):
+        check_state = self.item.checkState(0)
+        if check_state == Qt.CheckState.Checked or check_state == Qt.CheckState.PartiallyChecked:
             del_data = get_add_del_data(self.item)
             self.tree_widget.tree_data.clear_node_children(del_data)
 

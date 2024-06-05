@@ -178,7 +178,8 @@ class TreeWidgetABC(DisplayTreeWidget):
         while iterator.value():
             item = iterator.value()
             # 如果选中，置为非选中
-            if item.checkState(0) != Qt.CheckState.Unchecked:
+            check_state = item.checkState(0)
+            if check_state == Qt.CheckState.Checked or check_state == Qt.CheckState.PartiallyChecked:
                 item.setCheckState(0, Qt.CheckState.Unchecked)
                 self.item_changed_executor.item_checked(item)
                 link_table_checkbox(item, Qt.CheckState.Unchecked)

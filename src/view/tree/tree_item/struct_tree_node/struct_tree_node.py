@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt6.QtCore import Qt
 
 from src.constant.tree_constant import EDIT_STRUCT_ACTION, DEL_STRUCT_ACTION, CANCEL_OPEN_STRUCT_ACTION, \
     OPEN_STRUCT_ACTION, CLOSE_STRUCT_ACTION, EDIT_STRUCT_PROMPT, DEL_STRUCT_PROMPT, REFRESH_STRUCT_ACTION, \
@@ -161,7 +162,8 @@ class StructTreeNode(StructTreeNodeABC):
 
     def close_tab_callback(self):
         # 清空列数据，提供给tab bar调用，在关闭tab时调用
-        if self.item.checkState(0):
+        check_state = self.item.checkState(0)
+        if check_state == Qt.CheckState.Checked or check_state == Qt.CheckState.PartiallyChecked:
             del_data = get_add_del_data(self.item)
             self.tree_widget.tree_data.clear_node_children(del_data)
 
