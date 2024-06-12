@@ -52,31 +52,31 @@ class IconEnum(Enum):
     # 右键菜单 icon
     # sql conn
     open_conn_icon = OPEN_CONN_ACTION, 'icon:exec.png'
-    cancel_open_conn_icon = CANCEL_OPEN_CONN_ACTION, 'icon:exec.png'
+    cancel_open_conn_icon = CANCEL_OPEN_CONN_ACTION, 'icon:cancel.png'
     refresh_conn_icon = REFRESH_CONN_ACTION, 'icon:refresh.png'
-    cancel_refresh_conn_icon = CANCEL_REFRESH_CONN_ACTION, 'icon:exec.png'
+    cancel_refresh_conn_icon = CANCEL_REFRESH_CONN_ACTION, 'icon:cancel.png'
     close_conn_icon = CLOSE_CONN_ACTION, 'icon:close.png'
     test_conn_icon = TEST_CONN_ACTION, 'icon:exec.png'
-    cancel_test_conn_icon = CANCEL_TEST_CONN_ACTION, 'icon:exec.png'
+    cancel_test_conn_icon = CANCEL_TEST_CONN_ACTION, 'icon:cancel.png'
     add_conn_icon = ADD_CONN_ACTION, 'icon:exec.png'
     edit_conn_icon = EDIT_CONN_ACTION, 'icon:exec.png'
     del_conn_icon = DEL_CONN_ACTION, 'icon:remove.png'
     # sql db
     open_db_icon = OPEN_DB_ACTION, 'icon:exec.png'
-    cancel_open_db_icon = CANCEL_OPEN_DB_ACTION, 'icon:exec.png'
+    cancel_open_db_icon = CANCEL_OPEN_DB_ACTION, 'icon:cancel.png'
     close_db_icon = CLOSE_DB_ACTION, 'icon:close.png'
     select_all_tb_icon = SELECT_ALL_TB_ACTION, 'icon:exec.png'
     unselect_tb_icon = UNSELECT_TB_ACTION, 'icon:exec.png'
     refresh_db_icon = REFRESH_DB_ACTION, 'icon:refresh.png'
-    cancel_refresh_db_icon = CANCEL_REFRESH_DB_ACTION, 'icon:exec.png'
+    cancel_refresh_db_icon = CANCEL_REFRESH_DB_ACTION, 'icon:cancel.png'
     # sql tb
     open_table_icon = OPEN_TABLE_ACTION, 'icon:exec.png'
-    cancel_open_table_icon = CANCEL_OPEN_TABLE_ACTION, 'icon:exec.png'
+    cancel_open_table_icon = CANCEL_OPEN_TABLE_ACTION, 'icon:cancel.png'
     close_table_icon = CLOSE_TABLE_ACTION, 'icon:close.png'
     select_all_field_icon = SELECT_ALL_FIELD_ACTION, 'icon:exec.png'
     unselect_field_icon = UNSELECT_FIELD_ACTION, 'icon:exec.png'
     refresh_tb_icon = REFRESH_TB_ACTION, 'icon:refresh.png'
-    cancel_refresh_tb_icon = CANCEL_REFRESH_TB_ACTION, 'icon:exec.png'
+    cancel_refresh_tb_icon = CANCEL_REFRESH_TB_ACTION, 'icon:cancel.png'
 
     # struct
     cancel_open_struct_icon = CANCEL_OPEN_STRUCT_ACTION, 'icon:refresh.png'
@@ -85,11 +85,11 @@ class IconEnum(Enum):
     edit_struct_icon = EDIT_STRUCT_ACTION, 'icon:right.png'
     del_struct_icon = DEL_STRUCT_ACTION, 'icon:remove.png'
     refresh_struct_icon = REFRESH_STRUCT_ACTION, 'icon:refresh.png'
-    cancel_refresh_struct_icon = CANCEL_REFRESH_STRUCT_ACTION, 'icon:remove.png'
+    cancel_refresh_struct_icon = CANCEL_REFRESH_STRUCT_ACTION, 'icon:cancel.png'
     select_all_icon = SELECT_ALL_ACTION, 'icon:remove.png'
     unselect_icon = UNSELECT_ACTION, 'icon:remove.png'
     refresh_folder_icon = REFRESH_FOLDER_ACTION, 'icon:refresh.png'
-    cancel_refresh_folder_icon = CANCEL_REFRESH_FOLDER_ACTION, 'icon:remove.png'
+    cancel_refresh_folder_icon = CANCEL_REFRESH_FOLDER_ACTION, 'icon:cancel.png'
 
     # 列表元素右键
     edit_list_item_icon = EDIT_LIST_ITEM_ICON, 'icon:refresh.png'
