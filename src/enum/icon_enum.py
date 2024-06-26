@@ -58,7 +58,7 @@ class IconEnum(Enum):
     close_conn_icon = CLOSE_CONN_ACTION, 'icon:close.png'
     test_conn_icon = TEST_CONN_ACTION, 'icon:test_conn.png'
     cancel_test_conn_icon = CANCEL_TEST_CONN_ACTION, 'icon:cancel.png'
-    add_conn_icon = ADD_CONN_ACTION, 'icon:exec.png'
+    add_conn_icon = ADD_CONN_ACTION, 'icon:add.png'
     edit_conn_icon = EDIT_CONN_ACTION, 'icon:edit.png'
     del_conn_icon = DEL_CONN_ACTION, 'icon:remove.png'
     # sql db
