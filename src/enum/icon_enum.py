@@ -82,7 +82,7 @@ class IconEnum(Enum):
     cancel_open_struct_icon = CANCEL_OPEN_STRUCT_ACTION, 'icon:refresh.png'
     open_struct_icon = OPEN_STRUCT_ACTION, 'icon:exec.png'
     close_struct_icon = CLOSE_STRUCT_ACTION, 'icon:close.png'
-    edit_struct_icon = EDIT_STRUCT_ACTION, 'icon:right.png'
+    edit_struct_icon = EDIT_STRUCT_ACTION, 'icon:edit.png'
     del_struct_icon = DEL_STRUCT_ACTION, 'icon:remove.png'
     refresh_struct_icon = REFRESH_STRUCT_ACTION, 'icon:refresh.png'
     cancel_refresh_struct_icon = CANCEL_REFRESH_STRUCT_ACTION, 'icon:cancel.png'
