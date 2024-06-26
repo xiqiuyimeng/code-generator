@@ -56,7 +56,7 @@ class IconEnum(Enum):
     refresh_conn_icon = REFRESH_CONN_ACTION, 'icon:refresh.png'
     cancel_refresh_conn_icon = CANCEL_REFRESH_CONN_ACTION, 'icon:cancel.png'
     close_conn_icon = CLOSE_CONN_ACTION, 'icon:close.png'
-    test_conn_icon = TEST_CONN_ACTION, 'icon:exec.png'
+    test_conn_icon = TEST_CONN_ACTION, 'icon:test_conn.png'
     cancel_test_conn_icon = CANCEL_TEST_CONN_ACTION, 'icon:cancel.png'
     add_conn_icon = ADD_CONN_ACTION, 'icon:exec.png'
     edit_conn_icon = EDIT_CONN_ACTION, 'icon:exec.png'
