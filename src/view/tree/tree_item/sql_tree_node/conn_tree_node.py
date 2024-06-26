@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtWidgets import QMenu
 
-from src.constant.bar_constant import ADD_DS_ACTION
 from src.constant.ds_dialog_constant import TEST_CONN_BOX_TITLE, TEST_CONN_SUCCESS_PROMPT
 from src.constant.tree_constant import CANCEL_OPEN_CONN_ACTION, OPEN_CONN_ACTION, CLOSE_CONN_ACTION, \
     CANCEL_TEST_CONN_ACTION, TEST_CONN_ACTION, ADD_CONN_ACTION, EDIT_CONN_ACTION, DEL_CONN_ACTION, \
@@ -121,7 +120,7 @@ class ConnTreeNode(SqlTreeNodeABC):
     def do_fill_menu(self, menu: QMenu):
         # 添加连接需要有二级菜单
         add_conn_menu = QMenu(ADD_CONN_ACTION, menu)
-        add_conn_menu.setIcon(get_icon(ADD_DS_ACTION))
+        add_conn_menu.setIcon(get_icon(ADD_CONN_ACTION))
         # 二级菜单
         add_sql_ds_actions(add_conn_menu, self.window)
         menu.addMenu(add_conn_menu)
