@@ -61,10 +61,6 @@ OPEN_TABLE_ACTION = '打开表 [{}]'
 CANCEL_OPEN_TABLE_ACTION = '取消打开表 [{}]'
 # 关闭表
 CLOSE_TABLE_ACTION = '关闭表 [{}]'
-# 全选表中所有字段
-SELECT_ALL_FIELD_ACTION = '全选 [{}] 表中所有字段'
-# 取消选择字段
-UNSELECT_FIELD_ACTION = '取消选择字段'
 # 刷新数据表
 REFRESH_TB_ACTION = '刷新数据表 [{}]'
 # 取消刷新数据表
