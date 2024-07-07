@@ -68,7 +68,7 @@ class IconEnum(Enum):
     cancel_open_db_icon = CANCEL_OPEN_DB_ACTION, 'icon:cancel.png'
     close_db_icon = CLOSE_DB_ACTION, 'icon:close.png'
     select_all_tb_icon = SELECT_ALL_TB_ACTION, 'icon:checked.png'
-    unselect_tb_icon = UNSELECT_TB_ACTION, 'icon:exec.png'
+    unselect_tb_icon = UNSELECT_TB_ACTION, 'icon:unchecked.png'
     refresh_db_icon = REFRESH_DB_ACTION, 'icon:refresh.png'
     cancel_refresh_db_icon = CANCEL_REFRESH_DB_ACTION, 'icon:cancel.png'
     # sql tb
@@ -87,7 +87,7 @@ class IconEnum(Enum):
     refresh_struct_icon = REFRESH_STRUCT_ACTION, 'icon:refresh.png'
     cancel_refresh_struct_icon = CANCEL_REFRESH_STRUCT_ACTION, 'icon:cancel.png'
     select_all_icon = SELECT_ALL_ACTION, 'icon:checked.png'
-    unselect_icon = UNSELECT_ACTION, 'icon:remove.png'
+    unselect_icon = UNSELECT_ACTION, 'icon:unchecked.png'
     refresh_folder_icon = REFRESH_FOLDER_ACTION, 'icon:refresh.png'
     cancel_refresh_folder_icon = CANCEL_REFRESH_FOLDER_ACTION, 'icon:cancel.png'
 
