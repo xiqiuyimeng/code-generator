@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from src.constant.template_dialog_constant import PREVIEW_VAR_CONFIG_TITLE, PREVIEW_OUTPUT_CONFIG_TITLE
 from src.view.dialog.custom_dialog_abc import CustomDialogABC
-from src.view.frame.generator.dynamic_render_template_config.dyanmic_var_config_dialog_frame import \
-    DynamicVarConfigDialogFrame
-from src.view.frame.generator.dynamic_render_template_config.dynamic_output_config_dialog_frame import \
-    DynamicOutputConfigDialogFrame
-from src.view.frame.generator.dynamic_render_template_config.dynamic_template_config_dialog_frame_abc import \
-    DynamicTemplateConfigDialogFrameABC
+from src.view.frame.generator.dynamic_render_template_config.dyanmic_var_config_dialog_frame import (
+    DynamicVarConfigDialogFrame)
+from src.view.frame.generator.dynamic_render_template_config.dynamic_output_config_dialog_frame import (
+    DynamicOutputConfigDialogFrame)
+from src.view.frame.generator.dynamic_render_template_config.dynamic_template_config_dialog_frame_abc import (
+    DynamicTemplateConfigDialogFrameABC)
 
 _author_ = 'luwt'
 _date_ = '2023/4/6 10:40'
