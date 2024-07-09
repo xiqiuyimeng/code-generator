@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from src.view.dialog.custom_dialog_abc import CustomDialogABC
-from src.view.frame.import_error_data_process.import_duplicate_data_process_dialog_frame import \
-    ImportDuplicateDataProcessDialogFrame
-from src.view.frame.import_error_data_process.import_error_data_process_dialog_frame_abc import \
-    ImportErrorDataProcessDialogFrameABC
-from src.view.frame.import_error_data_process.import_illegal_data_process_dialog_frame import \
-    ImportIllegalDataProcessDialogFrame
+from src.view.frame.import_error_data_process.import_duplicate_data_process_dialog_frame import (
+    ImportDuplicateDataProcessDialogFrame)
+from src.view.frame.import_error_data_process.import_error_data_process_dialog_frame_abc import (
+    ImportErrorDataProcessDialogFrameABC)
+from src.view.frame.import_error_data_process.import_illegal_data_process_dialog_frame import (
+    ImportIllegalDataProcessDialogFrame)
 
 _author_ = 'luwt'
 _date_ = '2023/5/12 11:10'
