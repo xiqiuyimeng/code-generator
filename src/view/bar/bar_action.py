@@ -3,15 +3,17 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QToolButton
 
-from src.constant.bar_constant import REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP, \
-    TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP, EXIT_ACTION, EXIT_ACTION_TP, \
-    HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP, ABOUT_ACTION, SWITCH_ACTION_TIP, TYPE_ACTION, TYPE_ACTION_TIP
+from src.constant.bar_constant import (REFRESH_ACTION, REFRESH_ACTION_TIP, CLEAR_DATA_ACTION, CLEAR_DATA_ACTION_TIP,
+                                       TEMPLATE_ACTION_TIP, TEMPLATE_ACTION, GENERATE_ACTION, GENERATE_ACTION_TP,
+                                       EXIT_ACTION, EXIT_ACTION_TP, HELP_ACTION, HELP_ACTION_TIP, ABOUT_ACTION_TIP,
+                                       ABOUT_ACTION, SWITCH_ACTION_TIP, TYPE_ACTION, TYPE_ACTION_TIP)
 from src.enum.ds_category_enum import DsCategoryEnum
 from src.enum.icon_enum import get_icon
 from src.enum.conn_type_enum import ConnTypeEnum
 from src.enum.struct_type_enum import StructTypeEnum
-from src.view.bar.bar_function import open_conn_dialog, generate, clear_data, open_struct_dialog, refresh, \
-    open_type_mapping_dialog, open_template_dialog, open_help_dialog, open_about_dialog
+from src.view.bar.bar_function import (open_conn_dialog, generate, clear_data, open_struct_dialog, refresh,
+                                       open_type_mapping_dialog, open_template_dialog, open_help_dialog,
+                                       open_about_dialog)
 
 _author_ = 'luwt'
 _date_ = '2022/9/29 12:38'
