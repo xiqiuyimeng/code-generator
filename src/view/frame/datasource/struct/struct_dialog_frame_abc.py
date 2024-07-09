@@ -3,12 +3,13 @@ from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QFormLayout, QFileDialog
 
-from src.constant.ds_dialog_constant import STRUCT_NAME_TEXT, STRUCT_FILE_URL_TEXT, STRUCT_CONTENT_TEXT, \
-    PRETTY_STRUCT_TEXT, CHOOSE_STRUCT_FILE_TEXT, READ_STRUCT_FILE_BOX_TITLE, PRETTY_STRUCT_BOX_TITLE, \
-    EDIT_STRUCT_BOX_TITLE, ADD_STRUCT_BOX_TITLE, QUERY_STRUCT_BOX_TITLE
+from src.constant.ds_dialog_constant import (STRUCT_NAME_TEXT, STRUCT_FILE_URL_TEXT, STRUCT_CONTENT_TEXT,
+                                             PRETTY_STRUCT_TEXT, CHOOSE_STRUCT_FILE_TEXT, READ_STRUCT_FILE_BOX_TITLE,
+                                             PRETTY_STRUCT_BOX_TITLE, EDIT_STRUCT_BOX_TITLE, ADD_STRUCT_BOX_TITLE,
+                                             QUERY_STRUCT_BOX_TITLE)
 from src.constant.help.help_constant import STRUCT_DS_HELP
-from src.service.async_func.async_struct_task import ReadFileExecutor, PrettyStructExecutor, AddStructExecutor, \
-    EditStructExecutor, QueryStructExecutor
+from src.service.async_func.async_struct_task import (ReadFileExecutor, PrettyStructExecutor, AddStructExecutor,
+                                                      EditStructExecutor, QueryStructExecutor)
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItem
 from src.service.system_storage.struct_sqlite import StructInfo
 from src.enum.struct_type_enum import StructType

@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-from src.constant.generator_dialog_constant import STRUCT_CONFIRM_SELECTED_TITLE, SQL_CONFIRM_SELECTED_TITLE, \
-    SELECT_TYPE_MAPPING_TITLE, SELECT_TEMPLATE_TITLE, FILL_TEMPLATE_OUTPUT_CONFIG_TITLE, \
-    FILL_TEMPLATE_VAR_CONFIG_TITLE, GENERATE_TITLE
+from src.constant.generator_dialog_constant import (STRUCT_CONFIRM_SELECTED_TITLE, SQL_CONFIRM_SELECTED_TITLE,
+                                                    SELECT_TYPE_MAPPING_TITLE, SELECT_TEMPLATE_TITLE,
+                                                    FILL_TEMPLATE_OUTPUT_CONFIG_TITLE, FILL_TEMPLATE_VAR_CONFIG_TITLE,
+                                                    GENERATE_TITLE)
 from src.enum.ds_category_enum import DsCategoryEnum
 from src.service.system_storage.template_sqlite import Template
 from src.service.system_storage.type_mapping_sqlite import TypeMapping
 from src.service.util.tree_node_util import TreeData
 from src.view.dialog.custom_dialog_abc import CustomDialogABC
 from src.view.frame.generator.chain_dialog_frame import ChainDialogFrameABC
-from src.view.frame.generator.dynamic_render_template_config.dyanmic_var_config_dialog_frame import \
-    DynamicVarConfigDialogFrame
-from src.view.frame.generator.dynamic_render_template_config.dynamic_output_config_dialog_frame import \
-    DynamicOutputConfigDialogFrame
+from src.view.frame.generator.dynamic_render_template_config.dyanmic_var_config_dialog_frame import (
+    DynamicVarConfigDialogFrame)
+from src.view.frame.generator.dynamic_render_template_config.dynamic_output_config_dialog_frame import (
+    DynamicOutputConfigDialogFrame)
 from src.view.frame.generator.generate_dialog_frame import GenerateDialogFrame
 from src.view.frame.generator.select_list.select_template_dialog_frame import SelectTemplateDialogFrame
 from src.view.frame.generator.select_list.select_type_mapping_dialog_frame import SelectTypeMappingDialogFrame

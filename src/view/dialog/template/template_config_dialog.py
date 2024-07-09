@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtCore import pyqtSignal
 
-from src.constant.template_dialog_constant import EDIT_OUTPUT_CONFIG_TITLE, CREATE_OUTPUT_CONFIG_TITLE, \
-    EDIT_VAR_CONFIG_TITLE, CREATE_VAR_CONFIG_TITLE
+from src.constant.template_dialog_constant import (EDIT_OUTPUT_CONFIG_TITLE, CREATE_OUTPUT_CONFIG_TITLE,
+                                                   EDIT_VAR_CONFIG_TITLE, CREATE_VAR_CONFIG_TITLE)
 from src.service.system_storage.template_config_sqlite import TemplateConfig
 from src.view.dialog.custom_dialog_abc import CustomSaveDialogABC
 from src.view.frame.template.template_config_dialog_frame import TemplateConfigDialogFrame

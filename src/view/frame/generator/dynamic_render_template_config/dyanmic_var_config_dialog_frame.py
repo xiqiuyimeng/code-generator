@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from src.constant.generator_dialog_constant import BACK_TO_FILL_OUTPUT_CONFIG_BTN_TXT, GENERATE_BTN_TXT
-from src.view.frame.generator.dynamic_render_template_config.dynamic_template_config_dialog_frame_abc import \
-    DynamicTemplateConfigDialogFrameABC
+from src.view.frame.generator.dynamic_render_template_config.dynamic_template_config_dialog_frame_abc import (
+    DynamicTemplateConfigDialogFrameABC)
 
 _author_ = 'luwt'
 _date_ = '2023/4/13 17:20'

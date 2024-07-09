@@ -3,8 +3,7 @@ from PyQt6.QtCore import pyqtSignal
 
 from src.constant.dialog_constant import TABLE_ITEM_INPUT_DELEGATE_TITLE
 from src.view.dialog.custom_dialog_abc import CustomSaveDialogABC
-from src.view.frame.table_item_delegate.table_item_input_delegate_dialog_frame import \
-    TableItemInputDelegateDialogFrame
+from src.view.frame.table_item_delegate.table_item_input_delegate_dialog_frame import TableItemInputDelegateDialogFrame
 
 _author_ = 'luwt'
 _date_ = '2023/5/19 17:31'

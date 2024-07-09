@@ -4,8 +4,8 @@ import dataclasses
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import QPushButton
 
-from src.constant.ds_dialog_constant import CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, TEST_CONN_BOX_TITLE, \
-    SAVE_CONN_BOX_TITLE, QUERY_CONN_BOX_TITLE
+from src.constant.ds_dialog_constant import (CONN_NAME_TEXT, TEST_CONN_BTN_TEXT, TEST_CONN_BOX_TITLE,
+                                             SAVE_CONN_BOX_TITLE, QUERY_CONN_BOX_TITLE)
 from src.constant.help.help_constant import SQL_DS_HELP
 from src.service.async_func.async_sql_conn_task import AddConnExecutor, EditConnExecutor, QueryConnInfoExecutor
 from src.service.async_func.async_sql_ds_task import TestConnLoadingMaskExecutor

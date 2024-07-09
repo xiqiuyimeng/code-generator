@@ -3,15 +3,16 @@
 from PyQt6.QtCore import pyqtSignal, Qt
 
 from src.constant.ds_dialog_constant import TEST_CONN_SUCCESS_PROMPT, TEST_CONN_FAIL_PROMPT
-from src.constant.tree_constant import OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, REFRESH_CONN_BOX_TITLE, \
-    REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT, OPEN_DB_FAIL_PROMPT, \
-    REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT, OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, \
-    REFRESH_TB_SUCCESS_PROMPT, REFRESH_TB_FAIL_PROMPT
+from src.constant.tree_constant import (OPEN_CONN_SUCCESS_PROMPT, OPEN_CONN_FAIL_PROMPT, REFRESH_CONN_BOX_TITLE,
+                                        REFRESH_CONN_SUCCESS_PROMPT, REFRESH_CONN_FAIL_PROMPT, OPEN_DB_SUCCESS_PROMPT,
+                                        OPEN_DB_FAIL_PROMPT, REFRESH_DB_SUCCESS_PROMPT, REFRESH_DB_FAIL_PROMPT,
+                                        OPEN_TB_SUCCESS_PROMPT, OPEN_TB_FAIL_PROMPT, REFRESH_TB_SUCCESS_PROMPT,
+                                        REFRESH_TB_FAIL_PROMPT)
 from src.enum.common_enum import SqlTreeItemLevelEnum
 from src.enum.ds_category_enum import DsCategoryEnum
 from src.logger.log import logger as log
-from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
-    RefreshMovieThreadExecutor
+from src.service.async_func.async_task_abc import (ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor,
+                                                   RefreshMovieThreadExecutor)
 from src.service.sql_ds_executor import *
 from src.service.system_storage.conn_sqlite import SqlConnection, ConnSqlite
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite

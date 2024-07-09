@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QDropEvent
-from PyQt6.QtWidgets import QAbstractItemView, QMenu, QFrame, QTreeWidget, QListWidget, QListWidgetItem, \
-    QTreeWidgetItem
+from PyQt6.QtWidgets import (QAbstractItemView, QMenu, QFrame, QTreeWidget, QListWidget,
+                             QListWidgetItem, QTreeWidgetItem)
 
 from src.view.custom_widget.scrollable_widget import ScrollableWidget
 

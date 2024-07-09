@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtWidgets import QStackedWidget, QFrame, QVBoxLayout, QLabel, QFormLayout
 
-from src.constant.template_dialog_constant import TEMPLATE_CONFIG_LIST_BOX_TITLE, NO_TEMPLATE_CONFIG_ITEMS_TEXT, \
-    NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE, NO_TEMPLATE_PROMPT, NO_TEMPLATE_TITLE
+from src.constant.template_dialog_constant import (TEMPLATE_CONFIG_LIST_BOX_TITLE, NO_TEMPLATE_CONFIG_ITEMS_TEXT,
+                                                   NOT_FILL_ALL_REQUIRED_INPUT_TXT, REQUIRED_CHECK_BOX_TITLE,
+                                                   NO_TEMPLATE_PROMPT, NO_TEMPLATE_TITLE)
 from src.service.async_func.async_template_task import ListTemplateConfigExecutor
 from src.view.box.message_box import pop_fail
 from src.view.custom_widget.scrollable_widget import ScrollArea
