@@ -3,8 +3,9 @@
 from PyQt6.QtCore import pyqtSignal
 
 from src.constant.ds_dialog_constant import SAVE_CONN_SUCCESS_PROMPT, SAVE_CONN_FAIL_PROMPT
-from src.constant.tree_constant import CLOSE_CONN_BOX_TITLE, DEL_CONN_BOX_TITLE, CLOSE_DB_BOX_TITLE, \
-    DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, LIST_ALL_CONN_SUCCESS_PROMPT, LIST_ALL_CONN_FAIL_PROMPT
+from src.constant.tree_constant import (CLOSE_CONN_BOX_TITLE, DEL_CONN_BOX_TITLE, CLOSE_DB_BOX_TITLE,
+                                        DEL_CONN_SUCCESS_PROMPT, DEL_CONN_FAIL_PROMPT, LIST_ALL_CONN_SUCCESS_PROMPT,
+                                        LIST_ALL_CONN_FAIL_PROMPT)
 from src.enum.common_enum import SqlTreeItemLevelEnum
 from src.logger.log import logger as log
 from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor

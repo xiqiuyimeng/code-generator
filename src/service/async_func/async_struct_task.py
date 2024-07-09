@@ -6,8 +6,8 @@ from src.constant.ds_type_constant import FOLDER_TYPE
 from src.constant.tree_constant import REFRESH_FOLDER_BOX_TITLE
 from src.enum.ds_category_enum import DsCategoryEnum
 from src.logger.log import logger as log
-from src.service.async_func.async_task_abc import ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor, \
-    RefreshMovieThreadExecutor
+from src.service.async_func.async_task_abc import (ThreadWorkerABC, LoadingMaskThreadExecutor, IconMovieThreadExecutor,
+                                                   RefreshMovieThreadExecutor)
 from src.service.system_storage.ds_table_col_info_sqlite import DsTableColInfoSqlite
 from src.service.system_storage.ds_table_tab_sqlite import DsTableTab, DsTableTabSqlite
 from src.service.system_storage.opened_tree_item_sqlite import OpenedTreeItemSqlite, OpenedTreeItem
