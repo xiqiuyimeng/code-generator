@@ -2,9 +2,9 @@
 from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import QLabel, QLineEdit, QFormLayout
 
-from src.constant.ds_dialog_constant import HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT, \
-    PORT_INPUT_PLACEHOLDER_TEXT, HOST_MAX_LENGTH_PLACEHOLDER_TEXT, USER_MAX_LENGTH_PLACEHOLDER_TEXT, \
-    PWD_MAX_LENGTH_PLACEHOLDER_TEXT
+from src.constant.ds_dialog_constant import (HOST_TEXT, PORT_TEXT, USERNAME_TEXT, PWD_TEXT,
+                                             PORT_INPUT_PLACEHOLDER_TEXT, HOST_MAX_LENGTH_PLACEHOLDER_TEXT,
+                                             USER_MAX_LENGTH_PLACEHOLDER_TEXT, PWD_MAX_LENGTH_PLACEHOLDER_TEXT)
 from src.view.frame.datasource.conn.conn_dialog_frame_abc import ConnDialogFrameABC
 
 _author_ = 'luwt'
